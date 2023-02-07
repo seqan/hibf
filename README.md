@@ -5,8 +5,6 @@
 [![license][5]][6]
 [![latest release][7]][8]
 ![platforms][9]
-[![start][11]][12]
-[![twitter][13]][14]
 
 <!--
     Above uses reference-style links with numbers.
