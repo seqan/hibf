@@ -66,33 +66,35 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
         with:
-          fetch-depth: 2
+          fetch-depth: 0
+          ref: "refs/pull/${{ github.event.number }}/merge"
           submodules: false
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
       - name: Get changed files
         id: changed_files
-        uses: tj-actions/changed-files@v35
-        with:
-          files: |
-            *.cpp
-            *.hpp
-
-      - name: Copy upstream .clang-format
         run: |
-          git remote add upstream ${{ github.event.pull_request.base.repo.html_url }}
-          git show upstream/${{ github.event.pull_request.base.ref }}:.clang-format | \
-          tee ${{ github.workspace }}/.clang-format
+          LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
+          { grep -v -E "(submodules/)" || test $? = 1; } | \
+          { grep -E "\.[hc]pp$" || test $? = 1; } | xargs)
+          echo "list=$LIST" >> $GITHUB_OUTPUT
+
+      - name: Switch to fork
+        run: |
+          git remote add fork ${{ github.event.pull_request.head.repo.html_url }}
+          git fetch fork ${{ github.event.pull_request.head.ref }}
+          git checkout --force --track fork/${{ github.event.pull_request.head.ref }}
 
       - name: Run clang-format
-        if: ${{ steps.changed_files.outputs.any_changed == 'true' }}
+        if: ${{ steps.changed_files.outputs.list }}
         uses: DoozyX/clang-format-lint-action@v0.15
         with:
-          source: ${{ steps.changed_files.outputs.all_changed_files }}
+          source: ${{ steps.changed_files.outputs.list }}
           clangFormatVersion: 15
           inplace: True
 
       - name: Import GPG key
-        if: ${{ steps.changed_files.outputs.any_changed == 'true' }}
+        if: ${{ steps.changed_files.outputs.list }}
         uses: crazy-max/ghaction-import-gpg@v5
         with:
           gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
@@ -101,16 +103,17 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Commit changes
-        if: ${{ steps.changed_files.outputs.any_changed == 'true' }}
-        uses: EndBug/add-and-commit@v9
-        with:
-          author_name: seqan-actions[bot]
-          author_email: seqan-actions@users.noreply.github.com
-          message: '[MISC] clang-format'
+        if: ${{ steps.changed_files.outputs.list }}
+        run: |
+          git config user.name "seqan-actions[bot]"
+          git config user.email "seqan-actions@users.noreply.github.com"
+          git add .
+          git commit -m '[MISC] clang-format' || true
+          git push fork ${{ github.event.pull_request.head.ref }}
 
       # Wait for 5 seconds such that workflows triggered by adding the label run on the newest commit.
       - name: Defer workflow
-        if: ${{ steps.changed_files.outputs.any_changed == 'true' }}
+        if: ${{ steps.changed_files.outputs.list }}
         run: sleep 5
 
       - name: Remove label
