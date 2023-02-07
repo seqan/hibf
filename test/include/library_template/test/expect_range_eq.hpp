@@ -17,6 +17,8 @@
 #include <algorithm>
 #include <ranges>
 
+#include <library_template/platform.hpp>
+
 namespace std
 {
 
