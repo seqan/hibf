@@ -21,7 +21,7 @@ The overall workflow of contributing changes to this repository is:
 
 ## Creating an issue
 
-Go to https://github.com/seqan/library_template/issues and check if someone else has already reported the same issue. If not,
+Go to https://github.com/seqan/library-template/issues and check if someone else has already reported the same issue. If not,
 create a new issue and follow the template.
 
 We usually reply quickly to issues; if there is no reply within a week (and it's not prime vacation season in Europe)
@@ -82,7 +82,7 @@ point. Always only request review from one person at a time.
 
 If you have not contributed to SeqAn before, you will likely receive a lot of comments on the style of your code. This
 is not a sign that we don't appreciate your contribution, but we have high code quality standards and everything
-must conform to our [style guide](https://github.com/seqan/library_template/wiki#library-coding-guide). In the future we hope
+must conform to our [style guide](https://github.com/seqan/library-template/wiki#library-coding-guide). In the future we hope
 to automate this step.
 After you have received the first review, go through all comments and clarify any suggestions and requests. When
 you are confident that you know how to address all comments, implement the changes and update your PR.

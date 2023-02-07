@@ -51,11 +51,11 @@ if ("${HEADER_COMPONENT}" MATCHES "library_template")
     endif ()
 
     # test whether library_template has the visibility bug on lower gcc versions
-    # https://github.com/seqan/library_template/issues/1317
+    # https://github.com/seqan/library-template/issues/1317
     file (APPEND "${HEADER_TARGET_SOURCE}" #
           "#include <library_template/platform.hpp>\n\n" #
           "class A{ int i{5}; };\n\n" #
           "template <typename t>\n" #
           "concept private_bug = requires(t a){a.i;};\n\n" #
-          "static_assert(!private_bug<A>, \"See https://github.com/seqan/library_template/issues/1317\");\n")
+          "static_assert(!private_bug<A>, \"See https://github.com/seqan/library-template/issues/1317\");\n")
 endif ()
