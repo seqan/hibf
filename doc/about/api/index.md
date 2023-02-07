@@ -114,7 +114,7 @@ are added by newer versions of a supported compiler.
 lifecycle is.</small><br>
 <small>² We consider CentOS 7 / RedHat Enterprise Linux (RHEL) 7 as being community-supported. That means issues and
 patches are welcome, but we do not actively test for those operating systems. See this related
-[issue](https://github.com/seqan/library_template/issues/2244).</small>
+[issue](https://github.com/seqan/library-template/issues/2244).</small>
 
 # Dependencies
 

@@ -2,7 +2,7 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library_template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 # This file provides functionality common to the different test modules used by
@@ -25,7 +25,7 @@ else ()
              LANGUAGES CXX
              VERSION "${LIBRARY_TEMPLATE_PROJECT_VERSION}"
              DESCRIPTION "Library_Template -- the modern C++ library for sequence analysis" # since cmake 3.9
-             HOMEPAGE_URL "https://github.com/seqan/library_template" # since cmake 3.12
+             HOMEPAGE_URL "https://github.com/seqan/library-template" # since cmake 3.12
     )
 endif ()
 
