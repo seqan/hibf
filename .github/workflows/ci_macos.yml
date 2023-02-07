@@ -1,0 +1,116 @@
+name: Unit macOS
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: macos-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+env:
+  CMAKE_VERSION: 3.16.9
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: macos-12
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: "gcc12"
+            os: macos-12
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Release
+
+          - name: "gcc11"
+            os: macos-12
+            cxx: "g++-11"
+            cc: "gcc-11"
+            build: unit
+            build_type: Release
+
+          - name: "gcc10"
+            os: macos-12
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: unit
+            build_type: Release
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Configure Homebrew
+        uses: Homebrew/actions/setup-homebrew@master
+
+      - name: Install CMake
+        run: bash .github/workflows/scripts/install_cmake.sh
+
+      - name: Install ccache
+        run: bash .github/workflows/scripts/install_via_brew.sh ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        env:
+          CC: ${{ matrix.cc }}
+        run: |
+          bash .github/workflows/scripts/install_via_brew.sh $(echo ${CC/clang/llvm} | awk -F '-' '{print $1, $2}')
+          sudo xcode-select -s '/Applications/Xcode_13.4.1.app/Contents/Developer' # https://github.com/actions/runner-images/issues/6350
+
+      - name: Load ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ runner.os }}-${{ matrix.name }}-ccache-
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                            -DLIBRARY_TEMPLATE_VERBOSE_TESTS=OFF
+          make -j3 gtest_build
+
+      - name: Build tests
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 12
+          CCACHE_MAXSIZE: 75M
+        run: |
+          ccache -z
+          cd build
+          make -k -j3
+          ccache -sv
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j3 --output-on-failure

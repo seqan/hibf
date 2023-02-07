@@ -1,0 +1,67 @@
+name: Documentation
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: documentation-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CMAKE_VERSION: 3.16.9
+  DOXYGEN_VERSION: 1.9.6
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: "doxygen"
+            build: documentation
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Configure APT
+        run: bash .github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash .github/workflows/scripts/install_cmake.sh
+
+      - name: Install Doxygen
+        run: bash .github/workflows/scripts/install_doxygen.sh
+
+      - name: Configure tests
+        env:
+            CXX: ${{ matrix.cxx }}
+            CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../test/${{ matrix.build }}
+          make -j2 download-cppreference-doxygen-web-tag
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure

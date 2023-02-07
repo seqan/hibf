@@ -1,0 +1,6 @@
+library_template_test (expect_range_eq_test.cpp)
+library_template_test (expect_same_type_test.cpp)
+library_template_test (file_access_test.cpp)
+library_template_test (sandboxed_path_test.cpp)
+library_template_test (tmp_directory_test.cpp)
+library_template_test (temporary_snippet_file_test.cpp)

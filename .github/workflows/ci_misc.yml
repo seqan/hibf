@@ -1,0 +1,145 @@
+name: Linux
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: misc-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'push' }}
+
+env:
+  CMAKE_VERSION: 3.16.9
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'clang-format'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: "Snippet gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: snippet
+            build_type: Release
+            cxx_flags: "-std=c++2a"
+            use_include_dependencies: "OFF"
+
+          - name: "Performance gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: performance
+            build_type: Release
+            cxx_flags: "-std=c++2a"
+            use_include_dependencies: "OFF"
+
+          - name: "Header gcc12"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: header
+            build_type: Release
+            use_include_dependencies: "OFF"
+
+          - name: "Header gcc10"
+            cxx: "g++-10"
+            cc: "gcc-10"
+            build: header
+            build_type: Release
+            cxx_flags: "-std=c++2a"
+            use_include_dependencies: "OFF"
+
+          - name: "Non-cyclic tests"
+            cxx: "g++-12"
+            cc: "gcc-12"
+            build: unit
+            build_type: Debug
+            use_include_dependencies: "ON"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: recursive
+
+      - name: Configure APT
+        run: bash .github/workflows/scripts/configure_apt.sh
+
+      - name: Install CMake
+        run: bash .github/workflows/scripts/install_cmake.sh
+
+      - name: Install ccache
+        run: sudo apt-get install --yes ccache
+
+      - name: Install compiler ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }}
+
+      - name: Load ccache
+        uses: actions/cache@v3
+        with:
+          path: .ccache
+          key: ${{ matrix.name }}-ccache-${{ github.ref }}-${{ github.run_number }}
+          restore-keys: |
+            ${{ matrix.name }}-ccache-${{ github.ref }}
+            ${{ matrix.name }}-ccache-${{ github.base_ref }}
+            ${{ matrix.name }}-ccache-
+
+      - name: Configure tests
+        env:
+          CXX: ${{ matrix.cxx }}
+          CC: ${{ matrix.cc }}
+        run: |
+          mkdir build
+          cd build
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                            -DLIBRARY_TEMPLATE_VERBOSE_TESTS=OFF \
+                                            -DLIBRARY_TEMPLATE_BENCHMARK_MIN_TIME=0.01 \
+                                            -DLIBRARY_TEMPLATE_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
+          case "${{ matrix.build }}" in
+            unit) make -j2 gtest_build;;
+            snippet) make -j2 gtest_build;;
+            performance) make -j2 gbenchmark_build;;
+            header) make -j2 gtest_build gbenchmark_build;;
+          esac
+
+      - name: Check cyclic includes
+        if: matrix.use_include_dependencies == 'ON'
+        run: |
+          cd build
+          make -k -j2 all_dependencies
+          cmake .
+
+      - name: Build tests
+        if: matrix.use_include_dependencies == 'OFF'
+        env:
+          CCACHE_BASEDIR: ${{ github.workspace }}
+          CCACHE_DIR: ${{ github.workspace }}/.ccache
+          CCACHE_COMPRESS: true
+          CCACHE_COMPRESSLEVEL: 12
+          CCACHE_MAXSIZE: 75M
+        run: |
+          ccache -z
+          cd build
+          make -k -j2
+          ccache -sv
+
+      - name: Run tests
+        if: matrix.use_include_dependencies == 'OFF'
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure
