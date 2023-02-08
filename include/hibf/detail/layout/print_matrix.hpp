@@ -1,8 +1,8 @@
 #pragma once
 
-#include <seqan3/core/debug_stream.hpp>
+#include <iostream>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 // helper function to print a matrix when debugging
@@ -17,13 +17,13 @@ void print_matrix(matrix_type const & matrix,
         for (size_t j = 0; j < column_bound; ++j)
         {
             if (matrix[i][j] == inf)
-                seqan3::debug_stream << "inf\t";
+                std::cerr << "inf\t";
             else
-                seqan3::debug_stream << matrix[i][j] << '\t';
+                std::cerr << matrix[i][j] << '\t';
         }
-        seqan3::debug_stream << '\n';
+        std::cerr << '\n';
     }
-    seqan3::debug_stream << '\n';
+    std::cerr << '\n';
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

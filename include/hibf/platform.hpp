@@ -124,8 +124,7 @@
 #if __has_include(<hibf/version.hpp>)
 #    include <hibf/version.hpp>
 #else
-#    error                                                                                                             \
-        "HIBF include directory not set correctly. Forgot to add -I ${INSTALLDIR}/include to your CXXFLAGS?"
+#    error "HIBF include directory not set correctly. Forgot to add -I ${INSTALLDIR}/include to your CXXFLAGS?"
 #endif
 
 // ============================================================================
@@ -150,7 +149,7 @@
 #ifndef HIBF_REMOVE_DEPRECATED_100
 #    ifndef HIBF_DEPRECATED_100
 #        ifndef HIBF_DISABLE_DEPRECATED_WARNINGS
-#            define HIBF_DEPRECATED_100                                                                    \
+#            define HIBF_DEPRECATED_100                                                                                \
                 [[deprecated("This will be removed in version 1.0.0; please see the documentation.")]]
 #        else
 #            define HIBF_DEPRECATED_100 /**/

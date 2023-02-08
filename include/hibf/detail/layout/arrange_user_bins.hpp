@@ -1,9 +1,9 @@
 #pragma once
 
-#include <seqan3/search/dream_index/detail/configuration.hpp>
-#include <seqan3/search/dream_index/detail/data_store.hpp>
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/data_store.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 //!\brief Depending on cli flags given, use HyperLogLog estimates and/or rearrangement algorithms
@@ -24,4 +24,4 @@ inline void arrange_user_bins(data_store & data, configuration const & config)
     }
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

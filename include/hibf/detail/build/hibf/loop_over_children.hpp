@@ -7,22 +7,22 @@
 
 #pragma once
 
-#include <seqan3/contrib/robin_hood.hpp>
+#include <hibf/contrib/robin_hood.hpp>
 
-#include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp>
+// #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp> // MIGRATION_TODO
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <seqan3/search/dream_index/detail/build/hibf/build_data.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/hierarchical_build.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/insert_into_ibf.hpp>
+#include <hibf/detail/build/hibf/build_data.hpp>
+#include <hibf/detail/build/hibf/hierarchical_build.hpp>
+#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
-template <seqan3::data_layout data_layout_mode, typename config_type>
+template <hibf::data_layout data_layout_mode, typename config_type>
 void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                        seqan3::interleaved_bloom_filter<> & ibf,
+                        hibf::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
                         build_data<data_layout_mode, config_type> & data,
@@ -73,8 +73,10 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         number_of_threads = 1u;
     }
 
-    seqan3::detail::execution_handler_parallel executioner{number_of_threads};
-    executioner.bulk_execute(std::move(worker), std::move(indices), []() {});
+    // hibf::detail::execution_handler_parallel executioner{number_of_threads}; // MIGRATION_TODO
+    // executioner.bulk_execute(std::move(worker), std::move(indices), []() {}); // MIGRATION_TODO
+    (void)worker;
+    (void)number_of_threads;
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

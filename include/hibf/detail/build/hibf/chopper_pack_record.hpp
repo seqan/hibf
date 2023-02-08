@@ -11,7 +11,7 @@
 #include <tuple>
 #include <vector>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 struct chopper_pack_record
@@ -25,14 +25,22 @@ struct chopper_pack_record
     bool operator==(chopper_pack_record const & other) const
     {
         return std::tie(filenames, user_bin_index, bin_indices, number_of_bins, estimated_sizes)
-            == std::tie(other.filenames, other.user_bin_index, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+            == std::tie(other.filenames,
+                        other.user_bin_index,
+                        other.bin_indices,
+                        other.number_of_bins,
+                        other.estimated_sizes);
     }
 
     bool operator!=(chopper_pack_record const & other) const
     {
         return std::tie(filenames, user_bin_index, bin_indices, number_of_bins, estimated_sizes)
-            != std::tie(other.filenames, other.user_bin_index, other.bin_indices, other.number_of_bins, other.estimated_sizes);
+            != std::tie(other.filenames,
+                        other.user_bin_index,
+                        other.bin_indices,
+                        other.number_of_bins,
+                        other.estimated_sizes);
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -6,7 +6,7 @@
 #include <map>
 #include <stdexcept>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 class ibf_query_cost
@@ -114,4 +114,4 @@ private:
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

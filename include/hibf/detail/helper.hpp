@@ -5,7 +5,7 @@
 #include <cstddef>
 #include <string>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 /*!\brief Returns the smallest natural number that is greater or equal to `value` and a multiplicative of 64.
@@ -95,4 +95,4 @@ namespace seqan3::hibf
     return result;
 }
 
-} // namespace seqan3
+} // namespace hibf

@@ -7,24 +7,20 @@
 
 #pragma once
 
+#include <lemon/list_graph.h> /// Must be first include.
+
 #include <ranges>
 #include <sstream>
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <hibf/detail/build/hibf/hierarchical_build.hpp>
+#include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/data_store.hpp>
+#include <hibf/detail/layout/execute.hpp>
+#include <hibf/detail/layout/layout.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-
-// layout
-#include <seqan3/search/dream_index/detail/configuration.hpp>
-#include <seqan3/search/dream_index/detail/data_store.hpp>
-#include <seqan3/search/dream_index/detail/layout/execute.hpp>
-#include <seqan3/search/dream_index/detail/layout/layout.hpp>
-
-#include <seqan3/search/dream_index/detail/build/hibf/hierarchical_build.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/read_chopper_pack_file.hpp>
-
-
-namespace seqan3
+namespace hibf
 {
 
 template <typename input_range_type>
@@ -35,9 +31,11 @@ struct hibf_config
     static_assert(std::ranges::input_range<std::ranges::range_value_t<std::ranges::range_value_t<input_range_type>>>,
                   "The input data must be a range of a range of a range, whose value type is an std::integral, "
                   "e.g. type `std::vector<std::vector<std::vector<size_t>>>`.");
-    static_assert(std::integral<std::ranges::range_value_t<std::ranges::range_value_t<std::ranges::range_value_t<input_range_type>>>>,
-                  "The input data must be a range of a range of a range, whose value type is an std::integral, "
-                  "e.g. type `std::vector<std::vector<std::vector<size_t>>>`.");
+    static_assert(
+        std::integral<
+            std::ranges::range_value_t<std::ranges::range_value_t<std::ranges::range_value_t<input_range_type>>>>,
+        "The input data must be a range of a range of a range, whose value type is an std::integral, "
+        "e.g. type `std::vector<std::vector<std::vector<size_t>>>`.");
 
     /*!\name General Configuration
      * \{
@@ -95,13 +93,13 @@ struct hibf_config
 /*!\brief The HIBF binning directory. A data structure that efficiently answers set-membership queries for multiple
  *        bins.
  * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See
- *                           [seqan3::data_layout](https://docs.seqan.de/seqan/3.0.3/group__submodule__dream__index.html#gae9cb143481c46a1774b3cdf5d9fdb518).
- * \see [seqan3::interleaved_bloom_filter][1]
+ *                           [hibf::data_layout](https://docs.seqan.de/seqan/3.0.3/group__submodule__dream__index.html#gae9cb143481c46a1774b3cdf5d9fdb518).
+ * \see [hibf::interleaved_bloom_filter][1]
  * \details
  *
- * This class improves the [seqan3::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
+ * This class improves the [hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
  * to establish a hierarchical structure. This structure can then be used to split or merge user bins and distribute
- * them over a variable number of technical bins. In the [seqan3::interleaved_bloom_filter][1], the number of user bins
+ * them over a variable number of technical bins. In the [hibf::interleaved_bloom_filter][1], the number of user bins
  * and technical bins is always the same. This causes performance degradation when there are many user bins or the user
  * bins are unevenly distributed.
  *
@@ -117,7 +115,7 @@ struct hibf_config
  *
  * # Hierarchical Interleaved Bloom Filter (HIBF)
  *
- * In constrast to the [seqan3::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
+ * In constrast to the [hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
  * , or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
  * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
  * to further distinguish between merged bins.
@@ -133,7 +131,7 @@ struct hibf_config
  * To query the Hierarchical Interleaved Bloom Filter for values, call
  * hibf::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
  * hibf::hierarchical_interleaved_bloom_filter::membership_agent.
- * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+ * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  *
  * To count the occurrences in each user bin of a range of values in the Hierarchical Interleaved Bloom Filter, call
  * hibf::hierarchical_interleaved_bloom_filter::counting_agent() and use
@@ -147,7 +145,7 @@ struct hibf_config
  *
  * [1]: https://docs.seqan.de/seqan/3.0.3/classseqan3_1_1interleaved__bloom__filter.html
  */
-template <seqan3::data_layout data_layout_mode_ = seqan3::data_layout::uncompressed>
+template <hibf::data_layout data_layout_mode_ = hibf::data_layout::uncompressed>
 class hierarchical_interleaved_bloom_filter
 {
 public:
@@ -158,10 +156,10 @@ public:
     class membership_agent;
 
     //!\brief Indicates whether the Interleaved Bloom Filter is compressed.
-    static constexpr seqan3::data_layout data_layout_mode = data_layout_mode_;
+    static constexpr hibf::data_layout data_layout_mode = data_layout_mode_;
 
     //!\brief The type of an individual Bloom filter.
-    using ibf_t = seqan3::interleaved_bloom_filter<data_layout_mode_>;
+    using ibf_t = hibf::interleaved_bloom_filter<data_layout_mode_>;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -206,13 +204,13 @@ public:
 
     /*!\cond DEV
      * \brief Serialisation support function.
-     * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_archive.
+     * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
      * \attention These functions are never called directly.
      * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
      */
-    template <seqan3::cereal_archive archive_t>
+    template <hibf::cereal_archive archive_t>
     void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
     {
         archive(ibf_vector);
@@ -220,36 +218,33 @@ public:
         archive(user_bins);
     }
     //!\endcond
+
 protected:
-
     template <typename config_type>
-    seqan3::hibf::layout compute_layout(config_type const & config)
+    hibf::layout compute_layout(config_type const & config)
     {
-        seqan3::hibf::layout resulting_layout{};
+        hibf::layout resulting_layout{};
 
-        seqan3::hibf::configuration chopper_config
-        {
-            .sketch_bits = config.sketch_bits,
-            .disable_sketch_output = true,
-            .tmax = config.tmax,
-            .num_hash_functions = config.number_of_hash_functions,
-            .false_positive_rate = config.maximum_false_positive_rate,
-            .alpha = config.alpha,
-            .max_rearrangement_ratio = config.max_rearrangement_ratio,
-            .threads = config.threads,
-            .estimate_union = config.estimate_union,
-            .rearrange_user_bins = config.rearrange_user_bins
-        };
+        hibf::configuration chopper_config{.sketch_bits = config.sketch_bits,
+                                           .disable_sketch_output = true,
+                                           .tmax = config.tmax,
+                                           .num_hash_functions = config.number_of_hash_functions,
+                                           .false_positive_rate = config.maximum_false_positive_rate,
+                                           .alpha = config.alpha,
+                                           .max_rearrangement_ratio = config.max_rearrangement_ratio,
+                                           .threads = config.threads,
+                                           .estimate_union = config.estimate_union,
+                                           .rearrange_user_bins = config.rearrange_user_bins};
 
         // The output streams facilitate writing the layout file in hierarchical structure.
-        // seqan3::hibf::execute currently writes the filled buffers to the output file.
+        // hibf::execute currently writes the filled buffers to the output file.
         std::stringstream output_buffer;
         std::stringstream header_buffer;
 
-        seqan3::hibf::data_store store{.false_positive_rate = chopper_config.false_positive_rate,
-                                  .output_buffer = &output_buffer,
-                                  .header_buffer = &header_buffer,
-                                  .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
+        hibf::data_store store{.false_positive_rate = chopper_config.false_positive_rate,
+                               .output_buffer = &output_buffer,
+                               .header_buffer = &header_buffer,
+                               .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
 
         size_t const number_of_user_bins = std::ranges::size(config.input);
 
@@ -262,22 +257,22 @@ protected:
         store.sketches.resize(number_of_user_bins);
         store.kmer_counts.resize(number_of_user_bins);
 
-// #pragma omp parallel for schedule(static) num_threads(config.threads)
+        // #pragma omp parallel for schedule(static) num_threads(config.threads)
         for (size_t i = 0; i < number_of_user_bins; ++i)
         {
-            seqan3::sketch::hyperloglog sketch(config.sketch_bits);
+            hibf::sketch::hyperloglog sketch(config.sketch_bits);
 
             for (auto && hash_sequence : config.input[i]) // multi range input
                 for (auto k_hash : hash_sequence)
                     sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
 
-// #pragma omp critical
+            // #pragma omp critical
             store.sketches[i] = sketch;
-// #pragma omp critical
+            // #pragma omp critical
             store.kmer_counts[i] = sketch.estimate();
         }
 
-        size_t const max_hibf_id = seqan3::hibf::execute(chopper_config, store);
+        size_t const max_hibf_id = hibf::execute(chopper_config, store);
 
         // brief Write the output to the layout file.
         std::stringstream fout{};
@@ -290,25 +285,25 @@ protected:
     }
 
     template <typename input_data_type>
-    void build_index(hibf_config<input_data_type> const & config, seqan3::hibf::layout layout)
+    void build_index(hibf_config<input_data_type> const & config, hibf::layout layout)
     {
-        seqan3::hibf::build_data<data_layout_mode, hibf_config<input_data_type>> data{.hibf_config = config};
+        hibf::build_data<data_layout_mode, hibf_config<input_data_type>> data{.hibf_config = config};
         data.hibf = this;
 
-        seqan3::hibf::read_chopper_pack_file(data, layout.layout_str);
+        hibf::read_chopper_pack_file(data, layout.layout_str);
         lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
         robin_hood::unordered_flat_set<size_t> root_kmers{};
 
         size_t const t_max{data.node_map[root].number_of_technical_bins};
         data.compute_fp_correction(t_max, config.number_of_hash_functions, config.maximum_false_positive_rate);
 
-        seqan3::hibf::hierarchical_build(root_kmers, root, data, true);
+        hibf::hierarchical_build(root_kmers, root, data, true);
     }
 };
 
 /*!\brief Bookkeeping for user and technical bins.
  */
-template <seqan3::data_layout data_layout_mode>
+template <hibf::data_layout data_layout_mode>
 class hierarchical_interleaved_bloom_filter<data_layout_mode>::user_bins
 {
 private:
@@ -407,7 +402,7 @@ public:
 
     /*!\cond DEV
      * \brief Serialisation support function.
-     * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_archive.
+     * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
      * \attention These functions are never called directly.
@@ -425,9 +420,9 @@ public:
 /*!\brief Manages membership queries for the hibf::hierarchical_interleaved_bloom_filter.
  * \see hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
  * \details
- * In contrast to the [seqan3::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+ * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  */
-template <seqan3::data_layout data_layout_mode> // TODO: value_t as template?
+template <hibf::data_layout data_layout_mode> // TODO: value_t as template?
 class hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent
 {
 private:
@@ -533,4 +528,4 @@ public:
     //!\}
 };
 
-} // namespace seqan3
+} // namespace hibf

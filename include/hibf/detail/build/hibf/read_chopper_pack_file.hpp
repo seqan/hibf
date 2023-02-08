@@ -7,19 +7,19 @@
 
 #pragma once
 
-#include <string>
-#include <sstream>
-
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <seqan3/search/dream_index/detail/build/hibf/build_data.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/parse_chopper_pack_header.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/parse_chopper_pack_line.hpp>
+#include <sstream>
+#include <string>
 
-namespace seqan3::hibf
+#include <hibf/detail/build/hibf/build_data.hpp>
+#include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
+#include <hibf/detail/build/hibf/parse_chopper_pack_line.hpp>
+
+namespace hibf
 {
 
-template <seqan3::data_layout data_layout_mode, typename config_type>
+template <hibf::data_layout data_layout_mode, typename config_type>
 void read_chopper_pack_file(build_data<data_layout_mode, config_type> & data, std::string const & layout_file)
 {
     std::istringstream chopper_pack_file{layout_file};
@@ -84,4 +84,4 @@ void read_chopper_pack_file(build_data<data_layout_mode, config_type> & data, st
     data.resize();
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

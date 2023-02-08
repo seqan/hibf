@@ -2,7 +2,7 @@
 
 #include <string_view>
 
-namespace seqan3::hibf::prefix
+namespace hibf::prefix
 {
 
 constexpr std::string_view chopper{"chopper"};
@@ -17,4 +17,4 @@ constexpr std::string_view merged_bin{"MERGED_BIN"};
 
 constexpr std::string_view split_bin{"SPLIT_BIN"};
 
-} // namespace seqan3::prefix
+} // namespace hibf::prefix

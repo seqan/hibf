@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 //!\brief Stores all information needed to construct an HIBF
@@ -15,4 +15,4 @@ struct layout
     std::vector<std::pair<std::vector<size_t>, size_t>> merged_bin_max_ids{};
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -2,9 +2,9 @@
 
 #include <fstream>
 
-#include <seqan3/search/dream_index/detail/data_store.hpp>
+#include <hibf/detail/data_store.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 inline void
@@ -38,4 +38,4 @@ inline void print_debug_line(data_store const & data,
                         << data.previous.tmax << (is_top_level ? "" : ";") << num_technical_bins << '\n';
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

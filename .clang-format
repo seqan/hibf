@@ -1,5 +1,5 @@
 # Format all files in include folder, including std module, excluding contrib module
-# find . -iname "*.[ch]pp"  -not -path "./submodules/*" -not -path "./build/*" | xargs clang-format-15 --style=file -i
+# find . -iname "*.[ch]pp" -not -path "./include/hibf/contrib/*" -not -path "./submodules/*" -not -path "./build/*" | xargs clang-format-15 --style=file -i
 ---
 Language:        Cpp
 AccessModifierOffset: -4
@@ -80,14 +80,16 @@ ForEachMacros:
 IfMacros:
 IncludeBlocks:   Regroup
 IncludeCategories:
-  - Regex:           '(<gtest/.*|<benchmark/.*)'
+  - Regex:           '<lemon/'
     Priority:        1
-  - Regex:           '(<[[:alnum:]._]+>|<seqan3/std/.*>)'
+  - Regex:           '(<gtest/.*|<benchmark/.*)'
     Priority:        2
-  - Regex:           '<hibf/'
+  - Regex:           '(<[[:alnum:]._]+>|<hibf/std/.*>)'
     Priority:        3
-  - Regex:           '.*'
+  - Regex:           '<hibf/'
     Priority:        4
+  - Regex:           '.*'
+    Priority:        5
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
 IndentAccessModifiers: false

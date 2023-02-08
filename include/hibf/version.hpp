@@ -25,8 +25,7 @@
 #define HIBF_RELEASE_CANDIDATE 1
 
 //!\brief The full version as MACRO (number).
-#define HIBF_VERSION                                                                                       \
-    (HIBF_VERSION_MAJOR * 10000 + HIBF_VERSION_MINOR * 100 + HIBF_VERSION_PATCH)
+#define HIBF_VERSION (HIBF_VERSION_MAJOR * 10000 + HIBF_VERSION_MINOR * 100 + HIBF_VERSION_PATCH)
 
 /*!\brief Converts a number to a string. Preprocessor needs this indirection to
  * properly expand the values to strings.
@@ -34,8 +33,8 @@
 #define HIBF_VERSION_CSTRING_HELPER_STR(str) #str
 
 //!\brief Converts version numbers to string.
-#define HIBF_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                              \
-    HIBF_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                 \
+#define HIBF_VERSION_CSTRING_HELPER_FUNC(MAJOR, MINOR, PATCH)                                                          \
+    HIBF_VERSION_CSTRING_HELPER_STR(MAJOR)                                                                             \
     "." HIBF_VERSION_CSTRING_HELPER_STR(MINOR) "." HIBF_VERSION_CSTRING_HELPER_STR(PATCH)
 
 #if (HIBF_RELEASE_CANDIDATE > 0)
@@ -47,10 +46,8 @@
 #endif
 
 //!\brief The full version as null terminated string.
-#define HIBF_VERSION_CSTRING                                                                               \
-    HIBF_VERSION_CSTRING_HELPER_FUNC(HIBF_VERSION_MAJOR,                                       \
-                                                 HIBF_VERSION_MINOR,                                       \
-                                                 HIBF_VERSION_PATCH)                                       \
+#define HIBF_VERSION_CSTRING                                                                                           \
+    HIBF_VERSION_CSTRING_HELPER_FUNC(HIBF_VERSION_MAJOR, HIBF_VERSION_MINOR, HIBF_VERSION_PATCH)                       \
     HIBF_RELEASE_CANDIDATE_HELPER(HIBF_RELEASE_CANDIDATE)
 
 namespace hibf

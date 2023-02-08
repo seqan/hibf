@@ -3,14 +3,14 @@
 #include <cassert>
 #include <cmath>
 
-#include <seqan3/search/dream_index/detail/configuration.hpp>
-#include <seqan3/search/dream_index/detail/helper.hpp>
-#include <seqan3/search/dream_index/detail/layout/arrange_user_bins.hpp>
-#include <seqan3/search/dream_index/detail/layout/print_result_line.hpp>
-#include <seqan3/search/dream_index/detail/layout/simple_binning.hpp>
-#include <seqan3/search/dream_index/detail/prefixes.hpp>
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/helper.hpp>
+#include <hibf/detail/layout/arrange_user_bins.hpp>
+#include <hibf/detail/layout/print_result_line.hpp>
+#include <hibf/detail/layout/simple_binning.hpp>
+#include <hibf/detail/prefixes.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 class hierarchical_binning
@@ -239,7 +239,7 @@ private:
                     }
                 }
 
-                // seqan3::debug_stream << "current vertical minimum of " << "j:" << j << " i:" << i
+                // hibf::debug_stream << "current vertical minimum of " << "j:" << j << " i:" << i
                 //                      << " -> score:" << full_minimum << " (M_ij=" << minimum << ")"
                 //                      << " trace:" << trace[i][j]
                 //                      << std::endl;
@@ -270,7 +270,7 @@ private:
                     size_t const ll_kmers = ll_matrix[i - 1][j_prime] + max_merge_levels(j - j_prime) * weight;
                     size_t const full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_kmers;
 
-                    // seqan3::debug_stream << " -- " << "j_prime:" << j_prime
+                    // hibf::debug_stream << " -- " << "j_prime:" << j_prime
                     //                      << " -> full_score:" << full_score << " (M_{i-1,j'}=" << score << ")"
                     //                      << std::endl;
 
@@ -546,4 +546,4 @@ private:
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

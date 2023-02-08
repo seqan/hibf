@@ -4,12 +4,12 @@
 #include <string>
 #include <vector>
 
-#include <seqan3/search/dream_index/detail/configuration.hpp>
-#include <seqan3/search/dream_index/detail/helper.hpp>
-#include <seqan3/search/dream_index/detail/layout/hibf_statistics.hpp>
-#include <seqan3/search/dream_index/detail/sketch/user_bin_sequence.hpp>
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/helper.hpp>
+#include <hibf/detail/layout/hibf_statistics.hpp>
+#include <hibf/detail/sketch/user_bin_sequence.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 //!\brief Information about the previous IBF level to be passed down to ensure correct output.
@@ -108,4 +108,4 @@ struct data_store
     }
 };
 
-} // namespace seqan3
+} // namespace hibf

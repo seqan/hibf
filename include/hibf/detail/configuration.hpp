@@ -2,13 +2,13 @@
 
 #include <filesystem>
 
+#include <hibf/detail/cereal/path.hpp>
+
 #include <cereal/cereal.hpp>
 #include <cereal/types/string.hpp>
 #include <cereal/types/vector.hpp>
 
-#include <seqan3/search/dream_index/detail/cereal/path.hpp>
-
-namespace seqan3::hibf
+namespace hibf
 {
 
 struct configuration
@@ -20,7 +20,7 @@ struct configuration
     bool debug{false};
     //!\}
 
-    /*!\name Configuration of size estimates (seqan3::count)
+    /*!\name Configuration of size estimates (hibf::count)
      * \{
      */
     //!\brief The name for the output directory when writing sketches to disk.
@@ -121,4 +121,4 @@ private:
     }
 };
 
-} // namespace seqan3
+} // namespace hibf

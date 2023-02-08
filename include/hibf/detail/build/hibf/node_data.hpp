@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <vector>
-
 #include <lemon/list_graph.h>
 
-#include <seqan3/search/dream_index/detail/build/hibf/chopper_pack_record.hpp>
+#include <vector>
 
-namespace seqan3::hibf
+#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
+
+namespace hibf
 {
 
 struct node_data // rename:ibf_data? or ibf_node_data
@@ -44,4 +44,4 @@ struct node_data // rename:ibf_data? or ibf_node_data
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

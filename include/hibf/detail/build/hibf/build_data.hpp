@@ -8,24 +8,24 @@
 #pragma once
 
 #include <atomic>
-#include <seqan3/std/new>
+#include <hibf/std/new>
 
-#include <seqan3/search/dream_index/detail/build/hibf/node_data.hpp>
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
+#include <hibf/detail/build/hibf/node_data.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
-namespace seqan3
+namespace hibf
 {
 
-// foreard
-template <seqan3::data_layout data_layout_mode_>
+// forward
+template <data_layout data_layout_mode_>
 class hierarchical_interleaved_bloom_filter;
 
-}
+} // namespace hibf
 
-namespace seqan3::hibf
+namespace hibf
 {
 
-template <seqan3::data_layout data_layout_mode, typename config_type>
+template <data_layout data_layout_mode, typename config_type>
 struct build_data
 {
     alignas(std::hardware_destructive_interference_size) std::atomic<size_t> ibf_number{};
@@ -75,4 +75,4 @@ struct build_data
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

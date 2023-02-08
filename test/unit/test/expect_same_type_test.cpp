@@ -22,9 +22,9 @@ TEST(expect_same_type, braces_with_many_commas)
 TEST(int, same_type_pass)
 {
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(0)>{}",
-                                                                       "std::type_identity< int>{}",
-                                                                       std::type_identity<decltype(0)>{},
-                                                                       std::type_identity<int>{});
+                                                           "std::type_identity< int>{}",
+                                                           std::type_identity<decltype(0)>{},
+                                                           std::type_identity<int>{});
     EXPECT_TRUE(expect_result);
     EXPECT_SAME_TYPE(decltype(0), int);
 }
@@ -38,9 +38,9 @@ TEST(int, same_type_fail)
                                  "    Which is: \"unsigned int\"";
 
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(0)>{}",
-                                                                       "std::type_identity< unsigned>{}",
-                                                                       std::type_identity<decltype(0)>{},
-                                                                       std::type_identity<unsigned>{});
+                                                           "std::type_identity< unsigned>{}",
+                                                           std::type_identity<decltype(0)>{},
+                                                           std::type_identity<unsigned>{});
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
     EXPECT_NONFATAL_FAILURE(EXPECT_SAME_TYPE(decltype(0), unsigned), error_message);
@@ -54,9 +54,9 @@ TEST(int_ref, same_type_pass)
     int a{};
     int & i = a;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< int &>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<int &>{});
+                                                           "std::type_identity< int &>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<int &>{});
     EXPECT_TRUE(expect_result);
     EXPECT_SAME_TYPE(decltype(i), int &);
 }
@@ -72,9 +72,9 @@ TEST(int_ref, same_type_fail)
     int a{};
     int & i = a;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< unsigned &>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<unsigned &>{});
+                                                           "std::type_identity< unsigned &>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<unsigned &>{});
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
     EXPECT_NONFATAL_FAILURE(EXPECT_SAME_TYPE(decltype(i), unsigned &), error_message);
@@ -87,9 +87,9 @@ TEST(int_const_ref, same_type_pass)
 {
     int const & i = 0;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< int const &>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<int const &>{});
+                                                           "std::type_identity< int const &>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<int const &>{});
     EXPECT_TRUE(expect_result);
     EXPECT_SAME_TYPE(decltype(i), int const &);
 }
@@ -104,9 +104,9 @@ TEST(int_const_ref, same_type_fail)
 
     int const & i = 0;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< unsigned const &>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<unsigned const &>{});
+                                                           "std::type_identity< unsigned const &>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<unsigned const &>{});
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
     EXPECT_NONFATAL_FAILURE(EXPECT_SAME_TYPE(decltype(i), unsigned const &), error_message);
@@ -119,9 +119,9 @@ TEST(int_rvalue_ref, same_type_pass)
 {
     int && i = 0;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< int &&>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<int &&>{});
+                                                           "std::type_identity< int &&>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<int &&>{});
     EXPECT_TRUE(expect_result);
     EXPECT_SAME_TYPE(decltype(i), int &&);
 }
@@ -136,9 +136,9 @@ TEST(int_rvalue_ref, same_type_fail)
 
     int && i = 0;
     auto && expect_result = hibf::test::expect_same_type{}("std::type_identity< decltype(i)>{}",
-                                                                       "std::type_identity< unsigned &&>{}",
-                                                                       std::type_identity<decltype(i)>{},
-                                                                       std::type_identity<unsigned &&>{});
+                                                           "std::type_identity< unsigned &&>{}",
+                                                           std::type_identity<decltype(i)>{},
+                                                           std::type_identity<unsigned &&>{});
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
     EXPECT_NONFATAL_FAILURE(EXPECT_SAME_TYPE(decltype(i), unsigned &&), error_message);
@@ -151,9 +151,9 @@ TEST(tuple, same_type_pass)
 {
     auto && expect_result =
         hibf::test::expect_same_type{}("std::type_identity< decltype(std::tuple{0, .0f, .0, 0u})>{}",
-                                                   "std::type_identity< std::tuple<int, float, double, unsigned>>{}",
-                                                   std::type_identity<decltype(std::tuple{0, .0f, .0, 0u})>{},
-                                                   std::type_identity<std::tuple<int, float, double, unsigned>>{});
+                                       "std::type_identity< std::tuple<int, float, double, unsigned>>{}",
+                                       std::type_identity<decltype(std::tuple{0, .0f, .0, 0u})>{},
+                                       std::type_identity<std::tuple<int, float, double, unsigned>>{});
 
     EXPECT_TRUE(expect_result);
     EXPECT_SAME_TYPE(decltype(std::tuple{0, .0f, .0, 0u}), (std::tuple<int, float, double, unsigned>));
@@ -169,9 +169,9 @@ TEST(tuple, same_type_fail)
 
     auto && expect_result =
         hibf::test::expect_same_type{}("std::type_identity< decltype(std::tuple{0, .0f, .0, 0u})>{}",
-                                                   "std::type_identity< std::tuple<int, float, unsigned, double>>{}",
-                                                   std::type_identity<decltype(std::tuple{0, .0f, .0, 0u})>{},
-                                                   std::type_identity<std::tuple<int, float, unsigned, double>>{});
+                                       "std::type_identity< std::tuple<int, float, unsigned, double>>{}",
+                                       std::type_identity<decltype(std::tuple{0, .0f, .0, 0u})>{},
+                                       std::type_identity<std::tuple<int, float, unsigned, double>>{});
 
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());

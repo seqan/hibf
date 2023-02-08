@@ -93,6 +93,7 @@ endif ()
 include (CheckIncludeFileCXX)
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
+include (CheckCXXCompilerFlag)
 
 # ----------------------------------------------------------------------------
 # Pretty printing and error handling
@@ -143,7 +144,7 @@ if (HIBF_CLONE_DIR)
 endif ()
 
 if (HIBF_SUBMODULES_DIR)
-    file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include)
+    file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde/simde)
     foreach (submodule ${submodules})
         if (IS_DIRECTORY ${submodule})
             hibf_config_print ("  …adding submodule include:  ${submodule}")
@@ -233,6 +234,58 @@ elseif (HIBF_CPP20_FLAG)
         "C++ Standard-20 support:    via ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
 else ()
     hibf_config_error ("HIBF requires C++20, but your compiler does not support it.")
+endif ()
+
+# ----------------------------------------------------------------------------
+# Required: OpenMP
+# ----------------------------------------------------------------------------
+
+check_cxx_compiler_flag ("-fopenmp" HIBF_HAS_OPENMP)
+if (HIBF_HAS_OPENMP)
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -fopenmp")
+    hibf_config_print ("OpenMP Support:             via -fopenmp")
+else ()
+    hibf_config_error ("HIBF requires OpenMP, but your compiler does not support it.")
+endif ()
+
+check_cxx_compiler_flag ("-fopenmp-simd" HIBF_HAS_OPENMP_SIMD)
+if (HIBF_HAS_OPENMP_SIMD)
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -fopenmp-simd -DSIMDE_ENABLE_OPENMP")
+    hibf_config_print ("SIMD-OpenMP Support:        via -fopenmp-simd")
+else ()
+    hibf_config_print ("SIMD-OpenMP Support:        not found")
+endif ()
+
+check_cxx_compiler_flag ("-Wno-psabi" HIBF_SUPPRESS_GCC4_ABI)
+if (HIBF_SUPPRESS_GCC4_ABI)
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -Wno-psabi")
+    hibf_config_print ("Suppressing GCC 4 warnings: via -Wno-psabi")
+endif ()
+
+# ----------------------------------------------------------------------------
+# Optimizations
+# ----------------------------------------------------------------------------
+
+if ("${CMAKE_BUILD_TYPE}" MATCHES "Debug" OR "${CMAKE_BUILD_TYPE}" MATCHES "Coverage")
+    set (HIBF_IS_DEBUG TRUE)
+else ()
+    set (HIBF_IS_DEBUG FALSE)
+endif ()
+
+option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON)
+if (HIBF_IS_DEBUG)
+    hibf_config_print ("Optimize build:             disabled")
+elseif (HIBF_NATIVE_BUILD)
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -march=native")
+    hibf_config_print ("Optimize build:             via -march=native")
+else ()
+    check_cxx_compiler_flag ("-mpopcnt" HIBF_HAS_POPCNT)
+    if (HIBF_HAS_POPCNT)
+        set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -mpopcnt")
+        hibf_config_print ("Optimize build:             via -mpopcnt")
+    else ()
+        hibf_config_print ("Optimize build:             disabled")
+    endif ()
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -380,6 +433,7 @@ if (HIBF_FOUND AND NOT TARGET hibf::hibf)
     add_library (hibf_hibf INTERFACE)
     target_compile_definitions (hibf_hibf INTERFACE ${HIBF_DEFINITIONS})
     target_compile_options (hibf_hibf INTERFACE ${HIBF_CXX_FLAGS_LIST})
+    target_link_options (hibf_hibf INTERFACE ${HIBF_CXX_FLAGS_LIST})
     target_link_libraries (hibf_hibf INTERFACE "${HIBF_LIBRARIES}")
     # include hibf/include/ as -I, because hibf should never produce warnings.
     target_include_directories (hibf_hibf INTERFACE "${HIBF_INCLUDE_DIR}")

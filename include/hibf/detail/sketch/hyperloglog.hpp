@@ -15,13 +15,13 @@
 #include <iostream>
 #include <vector>
 
-#include <seqan3/utility/container/aligned_allocator.hpp>
-#include <seqan3/contrib/xxhash/xxh3.h>
+// #include <seqan3/utility/container/aligned_allocator.hpp> // MIGRATION_TODO
+#include <hibf/contrib/xxhash/xxh3.h>
 
 #include <x86/avx.h>
 #include <x86/avx2.h>
 
-namespace seqan3::sketch
+namespace hibf::sketch
 {
 
 /** @class hyperloglog
@@ -339,12 +339,13 @@ private:
         return arr;
     }();
 
-    uint64_t mask_{};                                                    ///< mask for the rank bits
-    double alphaMM_{};                                                   ///< alpha * m^2
-    float alphaMM_float_{};                                              ///< alpha * m^2
-    uint64_t m_{};                                                       ///< register size
-    uint8_t b_{};                                                        ///< register bit width
-    std::vector<uint8_t, seqan3::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
+    uint64_t mask_{};       ///< mask for the rank bits
+    double alphaMM_{};      ///< alpha * m^2
+    float alphaMM_float_{}; ///< alpha * m^2
+    uint64_t m_{};          ///< register size
+    uint8_t b_{};           ///< register bit width
+    // std::vector<uint8_t, hibf::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers // MIGRATION_TODO
+    std::vector<uint8_t> M_{}; ///< registers
 };
 
-} // namespace seqan3::sketch
+} // namespace hibf::sketch

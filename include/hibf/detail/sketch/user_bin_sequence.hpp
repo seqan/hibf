@@ -5,11 +5,11 @@
 #include <omp.h>
 #include <queue>
 #include <random>
-#include <seqan3/contrib/robin_hood.hpp>
 
-#include <seqan3/search/dream_index/detail/sketch/hyperloglog.hpp>
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/detail/sketch/hyperloglog.hpp>
 
-namespace seqan3::sketch
+namespace hibf::sketch
 {
 
 class user_bin_sequence
@@ -630,4 +630,4 @@ public:
     }
 };
 
-} // namespace seqan3::sketch
+} // namespace hibf::sketch

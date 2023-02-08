@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <string>
+#include <hibf/std/charconv>
 #include <ranges>
-#include <seqan3/std/charconv>
+#include <string>
 
-#include <seqan3/search/dream_index/detail/build/hibf/chopper_pack_record.hpp>
+#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
@@ -66,4 +66,4 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
     return result;
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -7,14 +7,11 @@
 
 #pragma once
 
-#include <seqan3/contrib/robin_hood.hpp>
+#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
-#include <seqan3/search/views/minimiser_hash.hpp>
-#include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-
-#include <seqan3/search/dream_index/detail/build/hibf/chopper_pack_record.hpp>
-
-namespace seqan3::hibf
+namespace hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
@@ -22,36 +19,42 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      robin_hood::unordered_flat_set<size_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
-                     seqan3::interleaved_bloom_filter<> & ibf,
+                     hibf::interleaved_bloom_filter<> & ibf,
                      bool is_root)
 {
-    size_t const chunk_size = kmers.size() / number_of_bins + 1;
-    size_t chunk_number{};
+    // size_t const chunk_size = kmers.size() / number_of_bins + 1;
+    // size_t chunk_number{};
 
-    for (auto chunk : kmers | seqan3::views::chunk(chunk_size))
-    {
-        assert(chunk_number < number_of_bins);
-        seqan3::bin_index const bin_idx{bin_index + chunk_number};
-        ++chunk_number;
-        for (size_t const value : chunk)
-        {
-            ibf.emplace(value, bin_idx);
-            if (!is_root)
-                parent_kmers.insert(value);
-        }
-    }
+    // for (auto chunk : kmers | hibf::views::chunk(chunk_size)) // MIGRATION_TODO
+    // {
+    //     assert(chunk_number < number_of_bins);
+    //     hibf::bin_index const bin_idx{bin_index + chunk_number};
+    //     ++chunk_number;
+    //     for (size_t const value : chunk)
+    //     {
+    //         ibf.emplace(value, bin_idx);
+    //         if (!is_root)
+    //             parent_kmers.insert(value);
+    //     }
+    // }
+    (void)parent_kmers;
+    (void)kmers;
+    (void)number_of_bins;
+    (void)bin_index;
+    (void)ibf;
+    (void)is_root;
 }
 
-template <seqan3::data_layout data_layout_mode, typename config_type>
+template <hibf::data_layout data_layout_mode, typename config_type>
 void insert_into_ibf(build_data<data_layout_mode, config_type> & data,
                      chopper_pack_record const & record,
-                     seqan3::interleaved_bloom_filter<> & ibf)
+                     hibf::interleaved_bloom_filter<> & ibf)
 {
-    auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.bin_indices.back())};
+    auto const bin_index = hibf::bin_index{static_cast<size_t>(record.bin_indices.back())};
 
     for (auto && hash_sequence : data.hibf_config.input[record.user_bin_index])
         for (auto hash : hash_sequence)
             ibf.emplace(hash, bin_index);
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -76,6 +76,7 @@ jobs:
         run: |
           LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
           { grep -v -E "(submodules/)" || test $? = 1; } | \
+          { grep -v -E "(contrib/)" || test $? = 1; } | \
           { grep -E "\.[hc]pp$" || test $? = 1; } | xargs)
           echo "list=$LIST" >> $GITHUB_OUTPUT
 

@@ -7,12 +7,12 @@
 #include <numeric>
 #include <vector>
 
-#include <seqan3/search/dream_index/detail/helper.hpp>
-#include <seqan3/search/dream_index/detail/data_store.hpp>
-#include <seqan3/search/dream_index/detail/layout/print_matrix.hpp>
-#include <seqan3/search/dream_index/detail/layout/print_result_line.hpp>
+#include <hibf/detail/data_store.hpp>
+#include <hibf/detail/helper.hpp>
+#include <hibf/detail/layout/print_matrix.hpp>
+#include <hibf/detail/layout/print_result_line.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
 /*!\brief Distributes x Technical Bins across y User Bins while minimizing the maximal Technical Bin size
@@ -277,4 +277,4 @@ public:
     }
 };
 
-} // namespace seqan3::hibf
+} // namespace hibf

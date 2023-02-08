@@ -3,20 +3,18 @@
 #include <ranges>
 #include <vector>
 
-#include <seqan3/utility/range/to.hpp>
+#include <hibf/detail/data_store.hpp>
 
-#include <seqan3/search/dream_index/detail/data_store.hpp>
-
-namespace seqan3::hibf
+namespace hibf
 {
 
 inline void sort_by(data_store & data, int8_t column_to_sort_by)
 {
     // Note: We may only sort by extra information
 
-    // generate permutation of indices sorted in descinding order by the sequence lengths
-    auto permutation = std::views::iota(0u, data.filenames.size()) | seqan3::ranges::to<std::vector>();
-    assert(permutation.size() == data.filenames.size());
+    // generate permutation of indices sorted in descending order by the sequence lengths
+    std::vector<size_t> permutation(data.filenames.size());
+    std::iota(permutation.begin(), permutation.end(), size_t{});
 
     auto const & info = data.extra_information;
     auto compare = [&info, column_to_sort_by](auto const l, auto const r)
@@ -87,4 +85,4 @@ inline void aggregate_by(data_store & data, int8_t column_to_aggregate_by)
     }
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -1,0 +1,2 @@
+hibf_test (hierarchical_interleaved_bloom_filter_test.cpp)
+hibf_test (interleaved_bloom_filter_test.cpp)

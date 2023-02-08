@@ -9,13 +9,13 @@
 
 #include <lemon/list_graph.h> // Must be first include.
 
-#include <seqan3/search/dream_index/detail/build/hibf/build_data.hpp>
-#include <seqan3/search/dream_index/detail/build/hibf/chopper_pack_record.hpp>
+#include <hibf/detail/build/hibf/build_data.hpp>
+#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
 
-namespace seqan3::hibf
+namespace hibf
 {
 
-template <seqan3::data_layout data_layout_mode, typename config_type>
+template <hibf::data_layout data_layout_mode, typename config_type>
 void update_user_bins(build_data<data_layout_mode, config_type> & data,
                       std::vector<int64_t> & filename_indices,
                       chopper_pack_record const & record)
@@ -34,4 +34,4 @@ void update_user_bins(build_data<data_layout_mode, config_type> & data,
     std::fill_n(filename_indices.begin() + record.bin_indices.back(), record.number_of_bins.back(), idx);
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

@@ -1,11 +1,11 @@
 #pragma once
 
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/prefixes.hpp>
+
 #include <cereal/archives/json.hpp>
 
-#include <seqan3/search/dream_index/detail/configuration.hpp>
-#include <seqan3/search/dream_index/detail/prefixes.hpp>
-
-namespace seqan3::hibf
+namespace hibf
 {
 
 inline void write_config_to(configuration const & config, std::ostream & stream)
@@ -34,4 +34,4 @@ inline void write_layout_header_to(configuration const & config,
     stream << header;
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf

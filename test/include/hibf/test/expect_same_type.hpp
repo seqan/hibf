@@ -29,7 +29,7 @@ namespace hibf::test
 #define EXPECT_SAME_TYPE_VANEXPECT_SAME_TYPE_ISH
 
 #define EXPECT_SAME_TYPE(val1, val2)                                                                                   \
-    EXPECT_PRED_FORMAT2(::hibf::test::expect_same_type{},                                                  \
+    EXPECT_PRED_FORMAT2(::hibf::test::expect_same_type{},                                                              \
                         (std::type_identity<EXPECT_SAME_TYPE_DEPAREN(val1)>{}),                                        \
                         (std::type_identity<EXPECT_SAME_TYPE_DEPAREN(val2)>{}));
 

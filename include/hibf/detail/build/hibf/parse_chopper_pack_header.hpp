@@ -7,19 +7,18 @@
 
 #pragma once
 
-#include <iosfwd>
-#include <algorithm>
-#include <cassert>
-#include <seqan3/std/charconv>
-
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <seqan3/search/dream_index/detail/build/hibf/node_data.hpp>
-#include <seqan3/search/dream_index/detail/prefixes.hpp>
-
+#include <algorithm>
+#include <cassert>
+#include <hibf/std/charconv>
+#include <iosfwd>
 #include <string_view>
 
-namespace seqan3::hibf
+#include <hibf/detail/build/hibf/node_data.hpp>
+#include <hibf/detail/prefixes.hpp>
+
+namespace hibf
 {
 
 size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
@@ -55,12 +54,13 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     std::string line;
 
     while (std::getline(chopper_pack_file, line) && line.size() >= 2
-           && std::string_view{line}.substr(0, 1) == seqan3::hibf::prefix::header
-           && std::string_view{line}.substr(1, 1) == seqan3::hibf::prefix::header_config)
+           && std::string_view{line}.substr(0, 1) == hibf::prefix::header
+           && std::string_view{line}.substr(1, 1) == hibf::prefix::header_config)
         ; // skip config in header
 
-    assert(line[0] == '#');                                    // we are reading header lines
-    assert(line.substr(1, prefix::high_level.size()) == prefix::high_level); // first line should always be High level IBF
+    assert(line[0] == '#'); // we are reading header lines
+    assert(line.substr(1, prefix::high_level.size())
+           == prefix::high_level); // first line should always be High level IBF
 
     // parse High Level max bin index
     assert(line.substr(prefix::high_level.size() + 2, 11) == "max_bin_id:");
@@ -126,4 +126,4 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     return header_records.size();
 }
 
-} // namespace seqan3::hibf
+} // namespace hibf
