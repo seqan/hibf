@@ -23,10 +23,11 @@ TEST(temporary_snippet_file, with_content)
 {
     std::filesystem::path const path = std::filesystem::current_path();
     library_template::test::temporary_snippet_file tmp_file{"test.txt", "some content\n", "more"};
+    std::filesystem::path const new_path = std::filesystem::current_path();
 
-    EXPECT_TRUE(std::filesystem::exists(path / "test.txt"));
+    EXPECT_TRUE(std::filesystem::exists(new_path / "test.txt"));
 
-    std::ifstream file{path / "test.txt"};
+    std::ifstream file{new_path / "test.txt"};
     std::stringstream file_buffer;
     file_buffer << file.rdbuf();
     EXPECT_EQ(file_buffer.str(), "some content\nmore");
