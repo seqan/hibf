@@ -50,6 +50,19 @@ find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/library_template/<you
 find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/seqan\/library-template/<repo_owner>\/<repo_name>/g' {} \;
 ```
 
+## Updating
+
+Pull history of the template:
+```bash
+git remote add template https://github.com/seqan/library-template
+git fetch template
+git rebase --onto template/main SHA_of_first_commit_in_your_repo main
+# e.g. `git rebase --onto template/main 45a5e1dce4b440fc64fd1cd8d96c0370053b985a main`
+```
+The first commit is usually the one where you update all the names.
+
+After this, `git merge template/main` can be used to merge changes.
+
 ## Sponsorships
 
 [![Vercel](https://raw.githubusercontent.com/seqan/library-template/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
