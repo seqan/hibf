@@ -1,12 +1,12 @@
 cmake_minimum_required (VERSION 3.10)
 
-include ("${CMAKE_CURRENT_LIST_DIR}/../cmake/library_template_path_longest_stem.cmake")
+include ("${CMAKE_CURRENT_LIST_DIR}/../cmake/hibf_path_longest_stem.cmake")
 
 message (STATUS "TARGET_FILE: ${TARGET_FILE}")
 message (STATUS "SOURCE_FILE: ${SOURCE_FILE}")
 
 get_filename_component (TARGET_FILE_DIR "${TARGET_FILE}" DIRECTORY)
-library_template_path_longest_stem (SOURCE_FILE_NAME "${SOURCE_FILE}")
+hibf_path_longest_stem (SOURCE_FILE_NAME "${SOURCE_FILE}")
 get_filename_component (SOURCE_FILE_DIR "${SOURCE_FILE}" DIRECTORY)
 
 set (ACTUAL_OUTPUT_FILE "${TARGET_FILE}.out")

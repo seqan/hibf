@@ -29,33 +29,33 @@ file (APPEND "${HEADER_TARGET_SOURCE}" #
       "#include <benchmark/benchmark.h>\n" #
       "TEST(${HEADER_TEST_NAME_SAFE}) {}\n")
 
-# test that library_template headers include platform.hpp
-if ("${HEADER_COMPONENT}" MATCHES "library_template")
+# test that hibf headers include platform.hpp
+if ("${HEADER_COMPONENT}" MATCHES "hibf")
 
-    # exclude library_template/std/* and library_template/contrib/* from platform test
-    if (NOT HEADER_FILE_INCLUDE MATCHES "library_template/(std|contrib)/")
+    # exclude hibf/std/* and hibf/contrib/* from platform test
+    if (NOT HEADER_FILE_INCLUDE MATCHES "hibf/(std|contrib)/")
         file (APPEND "${HEADER_TARGET_SOURCE}" #
-              "#ifndef LIBRARY_TEMPLATE_DOXYGEN_ONLY\n" #
-              "#error \"Your header '${HEADER_FILE_INCLUDE}' file is missing #include <library_template/platform.hpp>\"\n" #
+              "#ifndef HIBF_DOXYGEN_ONLY\n" #
+              "#error \"Your header '${HEADER_FILE_INCLUDE}' file is missing #include <hibf/platform.hpp>\"\n" #
               "#endif\n")
     endif ()
 
-    # library_template/std/* must not include platform.hpp (and therefore any other library_template header)
+    # hibf/std/* must not include platform.hpp (and therefore any other hibf header)
     # See https://github.com/seqan/product_backlog/issues/135
-    if (HEADER_FILE_INCLUDE MATCHES "library_template/std/")
+    if (HEADER_FILE_INCLUDE MATCHES "hibf/std/")
         file (APPEND "${HEADER_TARGET_SOURCE}" #
-              "#ifdef LIBRARY_TEMPLATE_DOXYGEN_ONLY" #
+              "#ifdef HIBF_DOXYGEN_ONLY" #
               "#error \"The standard header '${HEADER_FILE_INCLUDE}' file MUST NOT include any other " #
-              "library_template header (except for library_template/contrib)\"\n" #
+              "hibf header (except for hibf/contrib)\"\n" #
               "#endif\n")
     endif ()
 
-    # test whether library_template has the visibility bug on lower gcc versions
-    # https://github.com/seqan/library-template/issues/1317
+    # test whether hibf has the visibility bug on lower gcc versions
+    # https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/issues/1317
     file (APPEND "${HEADER_TARGET_SOURCE}" #
-          "#include <library_template/platform.hpp>\n\n" #
+          "#include <hibf/platform.hpp>\n\n" #
           "class A{ int i{5}; };\n\n" #
           "template <typename t>\n" #
           "concept private_bug = requires(t a){a.i;};\n\n" #
-          "static_assert(!private_bug<A>, \"See https://github.com/seqan/library-template/issues/1317\");\n")
+          "static_assert(!private_bug<A>, \"See https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/issues/1317\");\n")
 endif ()

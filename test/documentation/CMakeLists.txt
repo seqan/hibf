@@ -2,39 +2,39 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 # Minimum cmake version
 cmake_minimum_required (VERSION 3.7)
 
-### Find library_template
-include (../../build_system/library_template-config-version.cmake)
-set (LIBRARY_TEMPLATE_VERSION "${PACKAGE_VERSION}")
+### Find hibf
+include (../../build_system/hibf-config-version.cmake)
+set (HIBF_VERSION "${PACKAGE_VERSION}")
 
-project (library_template
+project (hibf
          LANGUAGES NONE
-         VERSION "${LIBRARY_TEMPLATE_PROJECT_VERSION}")
+         VERSION "${HIBF_PROJECT_VERSION}")
 
-if (NOT EXISTS "${LIBRARY_TEMPLATE_INCLUDE_DIR}/library_template/version.hpp")
-    message (FATAL_ERROR "Could not find Library_Template. Not building documentation.")
+if (NOT EXISTS "${HIBF_INCLUDE_DIR}/hibf/version.hpp")
+    message (FATAL_ERROR "Could not find HIBF. Not building documentation.")
 endif ()
-message (STATUS "Found: ${LIBRARY_TEMPLATE_INCLUDE_DIR} (${LIBRARY_TEMPLATE_VERSION})")
+message (STATUS "Found: ${HIBF_INCLUDE_DIR} (${HIBF_VERSION})")
 
-set (LIBRARY_TEMPLATE_DOXYGEN_INPUT_DIR "${CMAKE_SOURCE_DIR}")
+set (HIBF_DOXYGEN_INPUT_DIR "${CMAKE_SOURCE_DIR}")
 
-include (library_template-doxygen.cmake)
+include (hibf-doxygen.cmake)
 
-include (library_template-doxygen-layout.cmake)
+include (hibf-doxygen-layout.cmake)
 
 enable_testing ()
 
-if (LIBRARY_TEMPLATE_USER_DOC)
+if (HIBF_USER_DOC)
     add_subdirectory (doc_usr)
 endif ()
 
-if (LIBRARY_TEMPLATE_DEV_DOC)
+if (HIBF_DEV_DOC)
     add_subdirectory (doc_dev)
 endif ()
 
-include (library_template-doxygen-package.cmake)
+include (hibf-doxygen-package.cmake)

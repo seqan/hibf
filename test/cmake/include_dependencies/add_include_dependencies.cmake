@@ -2,7 +2,7 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10)
@@ -11,12 +11,12 @@ include (diagnostics/list_missing_unit_tests)
 
 # get_include_target (<VAR> TARGET dna4_test)
 # get_include_target (<VAR> SOURCE "[test/unit/]alphabet/nucleotide/dna4_test.cpp")
-# get_include_target (<VAR> HEADER "[include/library_template/]alphabet/nucleotide/dna4.hpp")
+# get_include_target (<VAR> HEADER "[include/hibf/]alphabet/nucleotide/dna4.hpp")
 function (get_include_target VAR source_type source)
     if (source_type STREQUAL "TARGET")
         # e.g. dna4_test.cpp
         get_target_property (target_source "${source}" SOURCES)
-        # e.g. <library_template-root>/test/unit/alphabet/nucleotide
+        # e.g. <hibf-root>/test/unit/alphabet/nucleotide
         get_target_property (target_source_dir "${source}" SOURCE_DIR)
         # e.g. alphabet/nucleotide/dna4_test.cpp
         file (RELATIVE_PATH target_source_file "${CMAKE_SOURCE_DIR}" "${target_source_dir}/${target_source}")
@@ -34,10 +34,10 @@ function (get_include_target VAR source_type source)
         message (STATUS "get_include_target: source_type ${source_type} unknown")
     endif ()
 
-    string (REGEX REPLACE "\_test.cpp$" ".hpp" target_header_file "include/library_template/${target_source_file}")
-    library_template_test_component (include_target "${target_header_file}" TARGET_UNIQUE_NAME)
+    string (REGEX REPLACE "\_test.cpp$" ".hpp" target_header_file "include/hibf/${target_source_file}")
+    hibf_test_component (include_target "${target_header_file}" TARGET_UNIQUE_NAME)
 
-    # e.g. include-library_template-alphabet-nucleotide-dna4.hpp
+    # e.g. include-hibf-alphabet-nucleotide-dna4.hpp
     set (${VAR}
          "${include_target}.hpp"
          PARENT_SCOPE)
@@ -52,7 +52,7 @@ function (add_include_target include_target)
 endfunction ()
 
 function (add_include_dependencies target target_cyclic_depending_includes)
-    if (NOT LIBRARY_TEMPLATE_USE_INCLUDE_DEPENDENCIES)
+    if (NOT HIBF_USE_INCLUDE_DEPENDENCIES)
         return ()
     endif ()
 
@@ -66,7 +66,7 @@ function (add_include_dependencies target target_cyclic_depending_includes)
     if (NOT CMAKE_VERSION VERSION_LESS 3.20) # cmake >= 3.20
         if (NOT (DEFINED CMAKE_DEPENDS_USE_COMPILER) OR CMAKE_DEPENDS_USE_COMPILER)
             message (FATAL_ERROR "Starting with CMake 3.20, you need to specify -DCMAKE_DEPENDS_USE_COMPILER=OFF when "
-                                 "using -DLIBRARY_TEMPLATE_USE_INCLUDE_DEPENDENCIES=ON.")
+                                 "using -DHIBF_USE_INCLUDE_DEPENDENCIES=ON.")
         endif ()
     endif ()
 
@@ -113,19 +113,19 @@ function (add_include_dependencies target target_cyclic_depending_includes)
                         COMMAND "${CMAKE_COMMAND}" #
                                 "-DTARGET=${target}" #
                                 "-DTARGET_INTERNAL_DEPENDENCY_MAKE_FILE=${target_internal_dependency_make_file}" #
-                                "-DLIBRARY_TEMPLATE_INCLUDE_DIR=${LIBRARY_TEMPLATE_INCLUDE_DIR}" #
-                                "-DLIBRARY_TEMPLATE_TEST_CMAKE_MODULE_DIR=${LIBRARY_TEMPLATE_TEST_CMAKE_MODULE_DIR}" #
+                                "-DHIBF_INCLUDE_DIR=${HIBF_INCLUDE_DIR}" #
+                                "-DHIBF_TEST_CMAKE_MODULE_DIR=${HIBF_TEST_CMAKE_MODULE_DIR}" #
                                 "-DTARGET_DEPENDENCIES_FILE=${target_dependencies_file}" #
                                 "-DTARGET_CYCLIC_DEPENDING_INCLUDES=${target_cyclic_depending_includes}" #
                                 "-P" #
-                                "${LIBRARY_TEMPLATE_TEST_CMAKE_MODULE_DIR}/include_dependencies/generate_include_dependencies.cmake"
+                                "${HIBF_TEST_CMAKE_MODULE_DIR}/include_dependencies/generate_include_dependencies.cmake"
                         # touch alphabet/nucleotide/dna4_test_dependencies_include.cmake to "refresh" dependencies
                         COMMAND "${CMAKE_COMMAND}" #
                                 "-E" #
                                 "touch_nocreate" #
                                 "${target_dependencies_include_file}"
                         BYPRODUCTS "${target_internal_dependency_file}" "${target_dependencies_file}"
-                        DEPENDS "${LIBRARY_TEMPLATE_TEST_CMAKE_MODULE_DIR}/include_dependencies/generate_include_dependencies.cmake"
+                        DEPENDS "${HIBF_TEST_CMAKE_MODULE_DIR}/include_dependencies/generate_include_dependencies.cmake"
                         VERBATIM)
 
     add_custom_target ("${target}_dependencies" DEPENDS "${target_internal_dependency_file}")

@@ -84,7 +84,7 @@ IncludeCategories:
     Priority:        1
   - Regex:           '(<[[:alnum:]._]+>|<seqan3/std/.*>)'
     Priority:        2
-  - Regex:           '<library_template/'
+  - Regex:           '<hibf/'
     Priority:        3
   - Regex:           '.*'
     Priority:        4
@@ -176,5 +176,5 @@ TabWidth:        4
 UseCRLF:         false
 UseTab:          Never
 WhitespaceSensitiveMacros:
-  - LIBRARY_TEMPLATE_DEPRECATED_HEADER
+  - HIBF_DEPRECATED_HEADER
 ...

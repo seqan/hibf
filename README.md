@@ -1,4 +1,4 @@
-# Library_Template
+# HIBF
 
 [![build status][1]][2]
 [![codecov][3]][4]
@@ -23,29 +23,29 @@
     The picture, or alternative text, should link to `[2]`.
 -->
 
-[1]: https://img.shields.io/github/actions/workflow/status/seqan/library-template/ci_linux.yml?branch=main&style=flat&logo=github&label=CI "Open GitHub actions page"
-[2]: https://github.com/seqan/library-template/actions?query=branch%3Amain
-[3]: https://codecov.io/gh/seqan/library-template/branch/main/graph/badge.svg?token=BH1FQiBBle "Open Codecov page"
-[4]: https://codecov.io/gh/seqan/library-template
+[1]: https://img.shields.io/github/actions/workflow/status/seqan/Hierarchical_Interleaved_Bloomfilter/ci_linux.yml?branch=main&style=flat&logo=github&label=CI "Open GitHub actions page"
+[2]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/actions?query=branch%3Amain
+[3]: https://codecov.io/gh/seqan/Hierarchical_Interleaved_Bloomfilter/branch/main/graph/badge.svg?token=BH1FQiBBle "Open Codecov page"
+[4]: https://codecov.io/gh/seqan/Hierarchical_Interleaved_Bloomfilter
 [5]: https://img.shields.io/badge/license-BSD-green.svg "Open Copyright page"
-[6]: https://github.com/seqan/library-template/blob/main/LICENSE.md
-[7]: https://img.shields.io/github/release/seqan/library-template.svg "Get the latest release"
-[8]: https://github.com/seqan/library-template/releases/latest
+[6]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
+[7]: https://img.shields.io/github/release/seqan/Hierarchical_Interleaved_Bloomfilter.svg "Get the latest release"
+[8]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/releases/latest
 [9]: https://img.shields.io/badge/platform-linux%20%7C%20bsd%20%7C%20osx-informational.svg
 
 ## Quick start
 
-You may want to replace `LIBRARY_TEMPLATE` with your library name:
+You may want to replace `HIBF` with your library name:
 
 ```bash
 # Rename files
-find $(pwd) -type f -not -path '*/\.git/*' -iname "library_template*" -exec bash -c 'mv $1 ${1/library_template/<your_lib>}' bash {} \;
+find $(pwd) -type f -not -path '*/\.git/*' -iname "hibf*" -exec bash -c 'mv $1 ${1/hibf/<your_lib>}' bash {} \;
 # Rename directories
-find $(pwd) -type d -not -path '*/\.git/*' -iname "library_template*" -exec bash -c 'mv $1 ${1/library_template/<your_lib>}' bash {} \;
+find $(pwd) -type d -not -path '*/\.git/*' -iname "hibf*" -exec bash -c 'mv $1 ${1/hibf/<your_lib>}' bash {} \;
 # Rename occurrences in files
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/LIBRARY_TEMPLATE/<YOUR_LIB>/g' {} \;
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/Library_Template/<Your_Lib>/g' {} \;
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/library_template/<your_lib>/g' {} \;
+find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/HIBF/<YOUR_LIB>/g' {} \;
+find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/HIBF/<Your_Lib>/g' {} \;
+find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/hibf/<your_lib>/g' {} \;
 # Rename URLs
 find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/seqan\/library-template/<repo_owner>\/<repo_name>/g' {} \;
 ```
@@ -65,6 +65,6 @@ After this, `git merge template/main` can be used to merge changes.
 
 ## Sponsorships
 
-[![Vercel](https://raw.githubusercontent.com/seqan/library-template/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
+[![Vercel](https://raw.githubusercontent.com/seqan/Hierarchical_Interleaved_Bloomfilter/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
 
 Vercel is kind enough to sponsor our documentation preview-builds within our pull requests. Check them out!

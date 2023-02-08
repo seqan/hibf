@@ -94,7 +94,7 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                            -DLIBRARY_TEMPLATE_VERBOSE_TESTS=OFF
+                                            -DHIBF_VERBOSE_TESTS=OFF
           make -j3 gtest_build
 
       - name: Build tests

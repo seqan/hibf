@@ -2,24 +2,24 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10)
 
-set (library_template_test_include_targets
+set (hibf_test_include_targets
      ""
      CACHE STRING "" FORCE)
 
 function (collect_include_target include_target)
-    set (library_template_test_include_targets
-         "${library_template_test_include_targets};${include_target}"
+    set (hibf_test_include_targets
+         "${hibf_test_include_targets};${include_target}"
          CACHE STRING "" FORCE)
 endfunction ()
 
 function (list_missing_unit_tests)
-    list (SORT library_template_test_include_targets)
-    foreach (include_target ${library_template_test_include_targets})
+    list (SORT hibf_test_include_targets)
+    foreach (include_target ${hibf_test_include_targets})
         if (NOT TARGET ${include_target})
             continue ()
         endif ()

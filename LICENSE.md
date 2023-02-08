@@ -11,7 +11,7 @@
 # Source code license
 
 The contents of this repository/directory, in particular the library
-source code of Library_Template, are licensed under the following terms:
+source code of HIBF, are licensed under the following terms:
 
 ```
 Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin

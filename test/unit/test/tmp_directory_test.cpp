@@ -2,21 +2,21 @@
 // Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
 
 #include <regex>
 
-#include <library_template/test/file_access.hpp>
-#include <library_template/test/tmp_directory.hpp>
+#include <hibf/test/file_access.hpp>
+#include <hibf/test/tmp_directory.hpp>
 
 // check unique creation of paths
 TEST(tmp_directory, unique)
 {
-    library_template::test::tmp_directory t1;
-    library_template::test::tmp_directory t2;
+    hibf::test::tmp_directory t1;
+    hibf::test::tmp_directory t2;
 
     // checking they are unique
     EXPECT_NE(t1.path(), t2.path());
@@ -39,9 +39,9 @@ TEST(tmp_directory, unique)
 // move construction
 TEST(tmp_directory, move_constructible)
 {
-    library_template::test::tmp_directory t1{};
-    library_template::test::tmp_directory t2{};
-    library_template::test::tmp_directory t3{std::move(t2)};
+    hibf::test::tmp_directory t1{};
+    hibf::test::tmp_directory t2{};
+    hibf::test::tmp_directory t3{std::move(t2)};
 
     EXPECT_TRUE(std::filesystem::exists(t1.path()));
     EXPECT_TRUE(std::filesystem::exists(t3.path()));
@@ -49,7 +49,7 @@ TEST(tmp_directory, move_constructible)
     EXPECT_TRUE(t3.empty());
 
     EXPECT_NE(t1.path(), t3.path());
-    library_template::test::tmp_directory t4(std::move(t1));
+    hibf::test::tmp_directory t4(std::move(t1));
 
     EXPECT_TRUE(std::filesystem::exists(t4.path()));
     EXPECT_NE(t3.path(), t4.path());
@@ -63,9 +63,9 @@ TEST(tmp_directory, move_assignable)
     std::filesystem::path p3;
 
     {
-        library_template::test::tmp_directory t1{};
-        library_template::test::tmp_directory t2{};
-        library_template::test::tmp_directory t3;
+        hibf::test::tmp_directory t1{};
+        hibf::test::tmp_directory t2{};
+        hibf::test::tmp_directory t3;
 
         p1 = t1.path();
         p2 = t2.path();
@@ -89,12 +89,12 @@ TEST(tmp_directory, cleanup_on_destruction)
 {
     std::filesystem::path path;
     {
-        library_template::test::tmp_directory t1{};
+        hibf::test::tmp_directory t1{};
         path = t1.path();
 
         // create file structure
         // /tmp
-        //  + library_template_test_XXXXXXXX
+        //  + hibf_test_XXXXXXXX
         //    - file1
         //    + somefolder
         //      - file2
@@ -134,12 +134,12 @@ TEST(tmp_directory, dont_warn_about_missing_managed_tmp_directory_on_destruction
 {
     std::filesystem::path path;
     {
-        library_template::test::tmp_directory t1{};
+        hibf::test::tmp_directory t1{};
         path = t1.path();
 
         // create file structure
         // /tmp
-        //  + library_template_test_XXXXXXXX
+        //  + hibf_test_XXXXXXXX
 
         std::filesystem::remove_all(t1.path());
 
@@ -156,7 +156,7 @@ TEST(tmp_directory, dont_warn_about_missing_managed_tmp_directory_on_destruction
 TEST(tmp_directory_throw, directory_not_writeable)
 {
     // create a temporary folder that will mimic the normal tmp folder
-    library_template::test::tmp_directory temporary_tmp_folder;
+    hibf::test::tmp_directory temporary_tmp_folder;
     setenv("TMPDIR", temporary_tmp_folder.path().c_str(), 1); // name, value, overwrite
 
     // make temporary_tmp_folder read only
@@ -165,9 +165,9 @@ TEST(tmp_directory_throw, directory_not_writeable)
                                  std::filesystem::perm_options::remove);
 
     // The actual test
-    if (!library_template::test::write_access(temporary_tmp_folder.path())) // Do not execute with root permissions.
+    if (!hibf::test::write_access(temporary_tmp_folder.path())) // Do not execute with root permissions.
     {
-        EXPECT_THROW(library_template::test::tmp_directory{}, std::filesystem::filesystem_error);
+        EXPECT_THROW(hibf::test::tmp_directory{}, std::filesystem::filesystem_error);
     }
 
     // give temporary_tmp_folder write permissions back

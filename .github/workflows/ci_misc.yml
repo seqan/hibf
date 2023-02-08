@@ -107,9 +107,9 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                            -DLIBRARY_TEMPLATE_VERBOSE_TESTS=OFF \
-                                            -DLIBRARY_TEMPLATE_BENCHMARK_MIN_TIME=0.01 \
-                                            -DLIBRARY_TEMPLATE_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
+                                            -DHIBF_VERBOSE_TESTS=OFF \
+                                            -DHIBF_BENCHMARK_MIN_TIME=0.01 \
+                                            -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
           case "${{ matrix.build }}" in
             unit) make -j2 gtest_build;;
             snippet) make -j2 gtest_build;;

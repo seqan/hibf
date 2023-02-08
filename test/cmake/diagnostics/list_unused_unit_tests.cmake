@@ -2,19 +2,19 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10)
 
-set (library_template_test_targets
+set (hibf_test_targets
      ""
      CACHE STRING "" FORCE)
 
 # Add the `target` to the list of used test targets. This effectively marks the `target` as a used test.
 function (collect_used_test target)
-    set (library_template_test_targets
-         "${library_template_test_targets};${target}"
+    set (hibf_test_targets
+         "${hibf_test_targets};${target}"
          CACHE STRING "" FORCE)
 endfunction ()
 
@@ -24,7 +24,7 @@ function (list_unused_unit_tests)
     set (test_source_declared_list "")
 
     # get the source location of each "used" test target and collect it.
-    foreach (test_target ${library_template_test_targets})
+    foreach (test_target ${hibf_test_targets})
         get_target_property (sources "${test_target}" SOURCES)
         get_target_property (source_dir "${test_target}" SOURCE_DIR)
 
@@ -36,6 +36,6 @@ function (list_unused_unit_tests)
 
     # list all unused tests
     foreach (test_source ${test_source_glob_list})
-        message (WARNING "'${test_source}' test exists, but was not defined by library_template_test(...)")
+        message (WARNING "'${test_source}' test exists, but was not defined by hibf_test(...)")
     endforeach ()
 endfunction ()

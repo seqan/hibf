@@ -87,8 +87,8 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                            -DLIBRARY_TEMPLATE_VERBOSE_TESTS=OFF \
-                                            -DLIBRARY_TEMPLATE_COVERAGE_PARALLEL_LEVEL=2
+                                            -DHIBF_VERBOSE_TESTS=OFF \
+                                            -DHIBF_COVERAGE_PARALLEL_LEVEL=2
           make -j2 gtest_build
 
       - name: Build tests

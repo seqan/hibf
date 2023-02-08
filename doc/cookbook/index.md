@@ -1,8 +1,8 @@
-# The Library_Template Cookbook {#cookbook}
+# The HIBF Cookbook {#cookbook}
 
 [TOC]
 
-This document provides example recipes on how to carry out particular tasks using the Library_Template functionalities
+This document provides example recipes on how to carry out particular tasks using the HIBF functionalities
 in C++.
 Please note that these **recipes are not ordered**. You can use the links in the table of contents or the search
 function of your browser to navigate them.
@@ -11,7 +11,7 @@ It will take some time, but we hope to expand this document into containing nume
 If you have suggestions for how to improve the Cookbook and/or examples you would like included,
 please feel free to contact us.
 
-# All Library_Template documentation snippets
+# All HIBF documentation snippets
 
 The following lists all snippets that appear in our documentation.
 Search for keywords with `Strg + F`.

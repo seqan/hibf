@@ -2,7 +2,7 @@
 
 [TOC]
 
-Library_Template adheres to [semantic versioning](https://semver.org) and provides a stable API within
+HIBF adheres to [semantic versioning](https://semver.org) and provides a stable API within
 one major release (all of `seqan-3.*.*`) unless otherwise noted.
 
 There is no ABI stability.
@@ -11,8 +11,8 @@ Many of the rules on this page are derived from the [abseil library](https://abs
 
 # API stability {#api_stability}
 
-In general, you can expect all **stable** entities within the `library_template` namespace to be usable throughout the entire
-release cycle of Library_Template, i.e. if you write an application that includes `seqan-3.1.1`, you should be able
+In general, you can expect all **stable** entities within the `hibf` namespace to be usable throughout the entire
+release cycle of HIBF, i.e. if you write an application that includes `seqan-3.1.1`, you should be able
 to compile it against `seqan-3.4.5` without errors.
 
 Exceptions to the previous rule:
@@ -22,14 +22,14 @@ Exceptions to the previous rule:
   -# **Do not depend on entities marked as "experimental" or "no-api"**. Major changes to the library like new modules
      are often first marked as experimental within a minor release cycle. This means we do not guarantee
      stability until the next minor release happens and the experimental flag is removed in favour of the stable flag.
-     Some entities in namespace `library_template` are permanently marked as "no-api" which designates them as subject to
+     Some entities in namespace `hibf` are permanently marked as "no-api" which designates them as subject to
      unannounced change. In addition, all entities in **core** and **utility** are always marked "no-api". This is the
-     case for auxiliary data structures (usually in `library_template::detail`) that are needed for the public API documentation
+     case for auxiliary data structures (usually in `hibf::detail`) that are needed for the public API documentation
      or because they are considered a nice-to-have feature for users.
   -# **Do not depend on the *signatures* of SeqAn APIs.** In particular, you may not take the address of APIs in SeqAn
      and you may not use metaprogramming tricks to depend on those signatures. We reserve the right to:
-     * Add new names to namespace `library_template` and any sub-namespaces
-     * Add new member functions to types in namespace `library_template`
+     * Add new names to namespace `hibf` and any sub-namespaces
+     * Add new member functions to types in namespace `hibf`
      * Add new overloads to existing functions
      * Add new default arguments to functions and templates
      * Change return-types of functions in compatible ways (void to anything, numeric types in a widening fashion, etc.).
@@ -38,12 +38,12 @@ Exceptions to the previous rule:
      change in the face of forward-declarations.
   -# **Avoid unnecessary dependency on Argument-Dependent Lookup (ADL) when calling SeqAn APIs.** Some APIs are designed
      to work via ADL (e.g. `operator<<` for iostreams, unqualified `swap` in generic code, etc.) For most APIs, however,
-     ADL is not part of the design. Calling functions from namespace `library_template` via ADL, unless that is explicitly
+     ADL is not part of the design. Calling functions from namespace `hibf` via ADL, unless that is explicitly
      intended as part of the design, should be avoided.
   -# **Include What You Use.** We may make changes to the internal include-graph for SeqAn headers - if you use an
      API, please include the relevant header file directly.
   -# **Do not make unqualified calls in the global namespace.** A call like `f(a);` for a function `f` in the global
-     namespace can become ambiguous if/when we add `library_template::f` (especially if `a` is a SeqAn type). We generally do
+     namespace can become ambiguous if/when we add `hibf::f` (especially if `a` is a SeqAn type). We generally do
      not recommend you use the global namespace for anything. If you must, please qualify any call that accepts a type
      provided by SeqAn.
 
@@ -67,7 +67,7 @@ We intend for SeqAn to be built from source. The internal layout of our types ma
 In particular, building SeqAn in the presence of different C++ standard library types may change SeqAn types,
 especially for pre-adopted types in the `std` module — these will resolve to standard library types as of C++20.
 
-We do promise, however, that Library_Template data structures¹ serialised to disk are de-serialisable by later versions of Library_Template.
+We do promise, however, that HIBF data structures¹ serialised to disk are de-serialisable by later versions of HIBF.
 The reverse is not true, however, and re-serialising a data structure serialised by a previous release might result in
 a different (updated) on-disk format.
 
@@ -75,7 +75,7 @@ a different (updated) on-disk format.
 
 # Platform stability {#platform_stability}
 
-The main requirement for Library_Template is that your operating system provides one of the compilers supported by us.
+The main requirement for HIBF is that your operating system provides one of the compilers supported by us.
 In general, we only support the latest three major compiler versions.
 We currently support the following compilers on 64-bit operating systems with little-endian CPU architectures:
   * GCC7, GCC8, GCC9, GCC10, GCC11
@@ -84,7 +84,7 @@ We currently support the following compilers on 64-bit operating systems with li
 we may drop support for `gcc-10.3`. Since all platforms with an older version receive minor release updates,
 this should not be a problem.
 
-We promise to support the above compilers in the latest release of Library_Template, or until all the following
+We promise to support the above compilers in the latest release of HIBF, or until all the following
 operating systems provide a newer supported compiler:
 
 | Operating System             | Supported Releases¹                    |
@@ -104,7 +104,7 @@ cases), it merely states that you should be able to build applications that depe
 This implies the availability of a supported compiler in the default package repositories or via easy-to-use
 third party services.
 
-More platforms and compilers will be added during the Library_Template lifecycle, but some will be marked as
+More platforms and compilers will be added during the HIBF lifecycle, but some will be marked as
 *experimentally supported* which means support may be dropped again later on.
 
 **We promise to provide good forward-compatibility with the C++ standard.** And we will strive to fix any warnings that
@@ -114,7 +114,7 @@ are added by newer versions of a supported compiler.
 lifecycle is.</small><br>
 <small>² We consider CentOS 7 / RedHat Enterprise Linux (RHEL) 7 as being community-supported. That means issues and
 patches are welcome, but we do not actively test for those operating systems. See this related
-[issue](https://github.com/seqan/library-template/issues/2244).</small>
+[issue](https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/issues/2244).</small>
 
 # Dependencies
 

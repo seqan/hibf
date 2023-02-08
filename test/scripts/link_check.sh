@@ -3,10 +3,10 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 #
-# Usage: link_check.sh <Library_Template root directory>
+# Usage: link_check.sh <HIBF root directory>
 # Will output the status of links in the repository.
 #
 # Of main interest are broken links and those with a "Link STATUS" message.
@@ -37,7 +37,7 @@ do_check ()
 }
 
 if [[ $# -ne 1 ]]; then
-    echo "Usage: link_check.sh <Library_Template root directory>"
+    echo "Usage: link_check.sh <HIBF root directory>"
     exit 1
 fi
 
@@ -46,9 +46,9 @@ if [[ ! -d $1 ]]; then
     exit 1
 fi
 
-if [[ ! -f $1/include/library_template/version.hpp ]]; then
-    echo "The directory $1 does not seem to be the Library_Template root directory."
-    echo "Cannot find $1/include/library_template/version.hpp."
+if [[ ! -f $1/include/hibf/version.hpp ]]; then
+    echo "The directory $1 does not seem to be the HIBF root directory."
+    echo "Cannot find $1/include/hibf/version.hpp."
     exit 1
 fi
 

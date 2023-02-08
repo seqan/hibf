@@ -8,7 +8,7 @@ on SeqAn. This will help us continue to acquire funding and improve the library.
 
 # Publications
 
-Library_Template has not yet been published academically, for now cite SeqAn2:
+HIBF has not yet been published academically, for now cite SeqAn2:
 
 | Publication   |                                                                                                   |
 |---------------|---------------------------------------------------------------------------------------------------|
@@ -46,5 +46,5 @@ particular if you rely on the high-performance computing capabilities.
 | Links         | [original](https://doi.org/10.1007/978-3-319-07959-2_28)                                          |
 
 
-Full text indexing in Library_Template makes use of the Succint data structure library (SDSL).
+Full text indexing in HIBF makes use of the Succint data structure library (SDSL).
 Version 3 has not yet been published, for now cite SDSL-v2 (above).

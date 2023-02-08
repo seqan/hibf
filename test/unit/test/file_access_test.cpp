@@ -2,12 +2,12 @@
 // Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
 
-#include <library_template/test/file_access.hpp>
+#include <hibf/test/file_access.hpp>
 
 struct file_access_test : public ::testing::Test
 {
@@ -45,7 +45,7 @@ struct file_access_test : public ::testing::Test
     static bool is_root()
     {
         std::filesystem::path tmp_file = std::filesystem::temp_directory_path();
-        tmp_file /= "library_template_test_permissions_is_root.txt";
+        tmp_file /= "hibf_test_permissions_is_root.txt";
 
         {
             std::fstream stream{tmp_file, std::ios::out};
@@ -69,45 +69,45 @@ struct file_access_test : public ::testing::Test
 
 TEST_F(file_access_test, file_read_access_granted)
 {
-    auto path = create_file("library_template_test_permissions_file_read_access_granted");
-    EXPECT_TRUE(library_template::test::read_access(path));
+    auto path = create_file("hibf_test_permissions_file_read_access_granted");
+    EXPECT_TRUE(hibf::test::read_access(path));
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, file_read_access_revoked)
 {
-    auto path = create_file("library_template_test_permissions_file_read_access_revoked");
+    auto path = create_file("hibf_test_permissions_file_read_access_revoked");
     remove_read_permission(path);
-    EXPECT_EQ(library_template::test::read_access(path), is_root());
+    EXPECT_EQ(hibf::test::read_access(path), is_root());
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, file_write_access_granted)
 {
-    auto path = create_file("library_template_test_permissions_file_write_access_granted");
-    EXPECT_TRUE(library_template::test::write_access(path));
+    auto path = create_file("hibf_test_permissions_file_write_access_granted");
+    EXPECT_TRUE(hibf::test::write_access(path));
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, file_write_access_revoked)
 {
-    auto path = create_file("library_template_test_permissions_file_write_access_revoked");
+    auto path = create_file("hibf_test_permissions_file_write_access_revoked");
     remove_write_permission(path);
-    EXPECT_EQ(library_template::test::write_access(path), is_root());
+    EXPECT_EQ(hibf::test::write_access(path), is_root());
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, directory_write_access_granted)
 {
-    auto path = create_directory("library_template_test_permissions_directory_write_access_granted");
-    EXPECT_TRUE(library_template::test::write_access(path));
+    auto path = create_directory("hibf_test_permissions_directory_write_access_granted");
+    EXPECT_TRUE(hibf::test::write_access(path));
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, directory_write_access_revoked)
 {
-    auto path = create_directory("library_template_test_permissions_directory_write_access_revoked");
+    auto path = create_directory("hibf_test_permissions_directory_write_access_revoked");
     remove_write_permission(path);
-    EXPECT_EQ(library_template::test::write_access(path), is_root());
+    EXPECT_EQ(hibf::test::write_access(path), is_root());
     std::filesystem::remove(path);
 }

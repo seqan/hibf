@@ -3,10 +3,10 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 #
-# Usage: create_all_hpp.sh <Library_Template root directory>
+# Usage: create_all_hpp.sh <HIBF root directory>
 # Will update the cookbook to include all snippets of the documentation.
 
 set -Eeuo pipefail
@@ -14,7 +14,7 @@ set -Eeuo pipefail
 COOKBOOK="doc/cookbook/index.md"
 
 if [[ $# -ne 1 ]]; then
-    echo "Usage: create_all_hpp.sh <Library_Template root directory>"
+    echo "Usage: create_all_hpp.sh <HIBF root directory>"
     exit 1
 fi
 
@@ -24,7 +24,7 @@ if [[ ! -d "$1" ]]; then
 fi
 
 if [[ ! -f "$1/${COOKBOOK}" ]]; then
-    echo "The directory $1 does not seem to be the Library_Template root directory."
+    echo "The directory $1 does not seem to be the HIBF root directory."
     echo "Cannot find cookbook file $1/${COOKBOOK}."
     exit 1
 fi

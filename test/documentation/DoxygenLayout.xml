@@ -4,17 +4,17 @@
   <navindex>
     <tab type="mainpage" visible="yes" title=""/>
     <tab type="pages" visible="no" title="" intro=""/>
-    <!-- Setup pages are added in library_template-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
+    <!-- Setup pages are added in hibf-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
     <tab type="usergroup" visible="yes" title="Setup" intro="">
     </tab>
-    <!-- Tutorials are added in library_template-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
+    <!-- Tutorials are added in hibf-doxygen-layout.cmake automatically for each doc/tutorial/*/index.md file -->
     <tab type="usergroup" visible="yes" title="Tutorial" intro="">
     </tab>
-    <!-- How-To pages are added in library_template-doxygen-layout.cmake automatically for each doc/howto/*/index.md file -->
+    <!-- How-To pages are added in hibf-doxygen-layout.cmake automatically for each doc/howto/*/index.md file -->
     <tab type="usergroup" visible="yes" title="How-To" intro="">
     </tab>
     <tab type="user" visible="yes" title="Cookbook" url="\ref cookbook" intro=""/>
-    <!-- About pages are added in library_template-doxygen-layout.cmake automatically for each doc/about/*/index.md file -->
+    <!-- About pages are added in hibf-doxygen-layout.cmake automatically for each doc/about/*/index.md file -->
     <tab type="usergroup" visible="yes" title="About" intro="">
       <tab type="user" visible="yes" title="Changelog" url="\ref about_changelog" intro=""/>
       <tab type="user" visible="yes" title="Copyright" url="\ref about_copyright" intro=""/>
@@ -22,7 +22,7 @@
       <tab type="user" visible="yes" title="Contributing" url="\ref about_contributing" intro=""/>
     </tab>
     <tab type="modules" visible="yes" title="API Reference" intro=""/>
-    <tab type="usergroup" visible="${LIBRARY_TEMPLATE_SHOW_DEV_DOCS}" title="API Reference (details)" intro="">
+    <tab type="usergroup" visible="${HIBF_SHOW_DEV_DOCS}" title="API Reference (details)" intro="">
       <tab type="namespaces" visible="yes" title="">
         <tab type="namespacelist" visible="yes" title="" intro=""/>
         <tab type="namespacemembers" visible="yes" title="" intro=""/>

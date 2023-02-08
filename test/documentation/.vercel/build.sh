@@ -14,7 +14,7 @@ doxygen --version
 
 # Configure documentation build.
 mkdir -p "${BUILD_DIR}" && cd "${BUILD_DIR}"
-cmake3 -DLIBRARY_TEMPLATE_VERCEL_PREVIEW_DOC=ON -DCMAKE_INSTALL_PREFIX="" -DCMAKE_INSTALL_DOCDIR="." "${SOURCE_DIR}/test/documentation" 1>/dev/null
+cmake3 -DHIBF_VERCEL_PREVIEW_DOC=ON -DCMAKE_INSTALL_PREFIX="" -DCMAKE_INSTALL_DOCDIR="." "${SOURCE_DIR}/test/documentation" 1>/dev/null
 
 # Build documentation.
 cmake3 --build . --target download-cppreference-doxygen-web-tag 1>/dev/null

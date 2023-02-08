@@ -1,4 +1,4 @@
-_library_template_cmake_format_documentation_only:
+_hibf_cmake_format_documentation_only:
   install:
     command:
       - pip install cmakelang[YAML]
@@ -8,7 +8,7 @@ _library_template_cmake_format_documentation_only:
     description:
       - Format all "*.cmake" and "CMakeLists.txt", ignoring the directories "build" and "submodules"
     note:
-      - Run from library_template root directory!
+      - Run from hibf root directory!
     shell_single_line:
       - find . \( -iname CMakeLists.txt -or -iname "*.cmake" \) -and -not -path "./submodules/*" -and -not -path "./build/*" | xargs cmake-format --config-files .cmake-format.yaml --in-place
     shell_multi_line: |
@@ -31,12 +31,12 @@ parse:
         SEQAN3_INCLUDE_DIR: '+'
         TARGET_DEPENDENCIES_FILE: '+'
         TARGET_CYCLIC_DEPENDING_INCLUDES: '+'
-    library_template_macro_benchmark:
+    hibf_macro_benchmark:
       pargs: 1
       kwargs:
         REPETITIONS: '?'
         META_DATA: '*'
-    library_template_test:
+    hibf_test:
       pargs: 1
       kwargs:
         CYCLIC_DEPENDING_INCLUDES: '+'

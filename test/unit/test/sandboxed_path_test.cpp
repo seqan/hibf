@@ -2,15 +2,15 @@
 // Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
 #include <gtest/gtest.h>
 
-#include <library_template/test/sandboxed_path.hpp>
+#include <hibf/test/sandboxed_path.hpp>
 
 namespace fs = std::filesystem;
-using sandboxed_path = library_template::test::sandboxed_path;
+using sandboxed_path = hibf::test::sandboxed_path;
 
 // initialization
 TEST(sandboxed_path_init, init)
@@ -281,9 +281,9 @@ TEST(sandboxed_path_free_operator_append, free_operator_append)
 // Test special case when symbolic links are involved
 TEST(sandboxed_path_symbolic_link, symbolic_link)
 {
-    // We create a symbolic link from /tmp/library_template_sandboxed_path_symbolic_link_test -> /tmp
+    // We create a symbolic link from /tmp/hibf_sandboxed_path_symbolic_link_test -> /tmp
     auto tmp_base_dir = std::filesystem::temp_directory_path();
-    auto tmp_dir = tmp_base_dir / "library_template_sandboxed_path_symbolic_link_test";
+    auto tmp_dir = tmp_base_dir / "hibf_sandboxed_path_symbolic_link_test";
 
     // if link already exists, remove it
     if (std::filesystem::exists(tmp_dir))

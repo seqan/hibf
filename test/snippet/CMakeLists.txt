@@ -2,22 +2,22 @@
 # Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 # Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-# shipped with this file and also available at: https://github.com/seqan/library-template/blob/main/LICENSE.md
+# shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
 cmake_minimum_required (VERSION 3.10...3.22)
-project (library_template_test_snippet CXX)
+project (hibf_test_snippet CXX)
 
-include (../library_template-test.cmake)
+include (../hibf-test.cmake)
 include (../cmake/diagnostics/list_unused_snippets.cmake)
 
 add_library (snippet_main snippet_main.cpp)
-target_link_libraries (snippet_main PUBLIC library_template::test gtest)
+target_link_libraries (snippet_main PUBLIC hibf::test gtest)
 
-macro (library_template_snippet test_name_prefix snippet snippet_base_path)
-    library_template_test_component (snippet_target_name "${snippet}" TARGET_NAME)
-    library_template_test_component (snippet_test_name "${snippet}" TEST_NAME)
-    library_template_test_component (snippet_target_path "${snippet}" TARGET_PATH)
+macro (hibf_snippet test_name_prefix snippet snippet_base_path)
+    hibf_test_component (snippet_target_name "${snippet}" TARGET_NAME)
+    hibf_test_component (snippet_test_name "${snippet}" TEST_NAME)
+    hibf_test_component (snippet_target_path "${snippet}" TARGET_PATH)
     set (target "${snippet_target_name}_snippet")
 
     add_executable (${target} "${snippet_base_path}/${snippet}")
@@ -30,7 +30,7 @@ macro (library_template_snippet test_name_prefix snippet snippet_base_path)
     add_test (NAME "${snippet_test_target}" COMMAND ${target})
 
     # disable version checker, as it interferes with comparing the snippet output
-    set_tests_properties ("${snippet_test_target}" PROPERTIES ENVIRONMENT LIBRARY_TEMPLATE_NO_VERSION_CHECK=0)
+    set_tests_properties ("${snippet_test_target}" PROPERTIES ENVIRONMENT HIBF_NO_VERSION_CHECK=0)
 
     set (snippet_compare_test_target "${test_name_prefix}/${snippet_test_name}_snippet_cmp_output")
 
@@ -45,18 +45,18 @@ macro (library_template_snippet test_name_prefix snippet snippet_base_path)
     unset (target)
 endmacro ()
 
-macro (library_template_snippets test_name_prefix snippet_base_path)
-    library_template_test_files (snippet_files "${snippet_base_path}" "*.cpp")
+macro (hibf_snippets test_name_prefix snippet_base_path)
+    hibf_test_files (snippet_files "${snippet_base_path}" "*.cpp")
     foreach (snippet ${snippet_files})
-        library_template_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
+        hibf_snippet ("${test_name_prefix}" "${snippet}" "${snippet_base_path}")
     endforeach ()
 endmacro ()
 
-library_template_require_ccache ()
-library_template_require_test ()
+hibf_require_ccache ()
+hibf_require_test ()
 
-library_template_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
-library_template_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
+hibf_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
+hibf_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")
 
 # These are the tests that are known to have non-deterministic output.
 # set_tests_properties ("snippet/.../test_name_snippet_cmp_output" PROPERTIES SKIP_RETURN_CODE 1)
