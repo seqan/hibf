@@ -22,27 +22,15 @@ void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                      hibf::interleaved_bloom_filter<> & ibf,
                      bool is_root)
 {
-    // size_t const chunk_size = kmers.size() / number_of_bins + 1;
-    // size_t chunk_number{};
-
-    // for (auto chunk : kmers | hibf::views::chunk(chunk_size)) // MIGRATION_TODO
-    // {
-    //     assert(chunk_number < number_of_bins);
-    //     hibf::bin_index const bin_idx{bin_index + chunk_number};
-    //     ++chunk_number;
-    //     for (size_t const value : chunk)
-    //     {
-    //         ibf.emplace(value, bin_idx);
-    //         if (!is_root)
-    //             parent_kmers.insert(value);
-    //     }
-    // }
-    (void)parent_kmers;
-    (void)kmers;
-    (void)number_of_bins;
-    (void)bin_index;
-    (void)ibf;
-    (void)is_root;
+    size_t count{};
+    for (size_t const kmer : kmers)
+    {
+        hibf::bin_index const bin_idx{bin_index + (count % number_of_bins)}; // distribute kmers evenly
+        ibf.emplace(value, bin_idx);
+        if (!is_root)
+            parent_kmers.insert(value);
+        ++count;
+    }
 }
 
 template <hibf::data_layout data_layout_mode, typename config_type>
