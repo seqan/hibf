@@ -7,12 +7,11 @@
 #include <numeric>
 #include <vector>
 
-#include <hibf/detail/data_store.hpp>
-#include <hibf/detail/helper.hpp>
-#include <hibf/detail/layout/print_matrix.hpp>
-#include <hibf/detail/layout/print_result_line.hpp>
+#include <hibf/data_store.hpp>
+#include <hibf//detail/layout/print_matrix.hpp>
+#include <hibf/next_multiple_of_64.hpp>
 
-namespace hibf
+namespace hibf::layout
 {
 
 /*!\brief Distributes x Technical Bins across y User Bins while minimizing the maximal Technical Bin size
@@ -84,7 +83,7 @@ namespace hibf
 class simple_binning
 {
 private:
-    //!\brief The data input: filenames associated with the user bin and a kmer count per user bin.
+    //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
     data_store const * data{nullptr};
 
     /*!\brief The number of User bins.
@@ -113,7 +112,7 @@ public:
     ~simple_binning() = default;                                  //!< Defaulted.
 
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.
-     * \param[in] data_ The filenames and kmer counts associated with the user bin, as well as the ostream buffer.
+     * \param[in] data_ Stores all data that is needed to compute the layout.
      * \param[in] num_bins (optional) The number of technical bins.
      * \param[in] debug_ (optional) Enables debug output in layouting file.
      *
@@ -125,19 +124,11 @@ public:
      */
     simple_binning(data_store & data_, size_t const num_bins = 0, bool const debug_ = false) :
         data{std::addressof(data_)},
-        num_user_bins{data->kmer_counts.size()},
+        num_user_bins{data->positions.size()},
         num_technical_bins{num_bins ? num_bins : next_multiple_of_64(num_user_bins)},
         debug{debug_}
     {
         assert(data != nullptr);
-        assert(data->output_buffer != nullptr);
-        assert(data->header_buffer != nullptr);
-
-        if (debug)
-        {
-            *data->header_buffer << std::fixed << std::setprecision(2);
-            *data->output_buffer << std::fixed << std::setprecision(2);
-        }
 
         if (num_user_bins > num_technical_bins)
         {
@@ -156,11 +147,6 @@ public:
     size_t execute()
     {
         assert(data != nullptr);
-        assert(data->output_buffer != nullptr);
-        assert(data->header_buffer != nullptr);
-
-        if (data->stats)
-            data->stats->filenames = data->filenames;
 
         std::vector<std::vector<size_t>> matrix(num_technical_bins); // rows
         for (auto & v : matrix)
@@ -173,7 +159,7 @@ public:
         size_t const extra_bins = num_technical_bins - num_user_bins + 1;
 
         // initialize first column (first row is initialized with inf)
-        double const ub_cardinality = static_cast<double>(data->kmer_counts[0]);
+        double const ub_cardinality = static_cast<double>(data->kmer_counts[data->positions[0]]);
         for (size_t i = 0; i < extra_bins; ++i)
         {
             size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fp_correction[i + 1]);
@@ -183,7 +169,7 @@ public:
         // we must iterate column wise
         for (size_t j = 1; j < num_user_bins; ++j)
         {
-            double const ub_cardinality = static_cast<double>(data->kmer_counts[j]);
+            double const ub_cardinality = static_cast<double>(data->kmer_counts[data->positions[j]]);
 
             for (size_t i = j; i < j + extra_bins; ++i)
             {
@@ -215,31 +201,18 @@ public:
         size_t max_size{};
 
         size_t bin_id{};
-        size_t const optimal_score{matrix[trace_i][trace_j]};
 
         while (trace_j > 0)
         {
             size_t next_i = trace[trace_i][trace_j];
-            size_t const kmer_count = data->kmer_counts[trace_j];
+            size_t const kmer_count = data->kmer_counts[data->positions[trace_j]];
             size_t const number_of_bins = (trace_i - next_i);
             size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
-            // add split bin to ibf statistics
-            if (data->stats)
-            {
-                data->stats->bins.emplace_back(hibf_statistics::bin_kind::split, kmer_count, 1ul, number_of_bins);
-            }
-
-            if (!debug)
-                print_result_line(*data, trace_j, bin_id, number_of_bins);
-            else
-                print_debug_line(*data,
-                                 trace_j,
-                                 bin_id,
-                                 number_of_bins,
-                                 kmer_count_per_bin,
-                                 optimal_score,
-                                 num_technical_bins);
+            data->hibf_layout->user_bins.emplace_back(data->positions[trace_j],
+                                                      data->previous.bin_indices,
+                                                      number_of_bins,
+                                                      bin_id);
 
             if (kmer_count_per_bin > max_size)
             {
@@ -253,14 +226,10 @@ public:
             --trace_j;
         }
         ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins
-        size_t const kmer_count = data->kmer_counts[0];
+        size_t const kmer_count = data->kmer_counts[data->positions[0]];
         size_t const kmer_count_per_bin = (kmer_count + trace_i - 1) / trace_i;
 
-        // add split bin to ibf statistics
-        if (data->stats)
-        {
-            data->stats->bins.emplace_back(hibf_statistics::bin_kind::split, kmer_count, 1ul, trace_i);
-        }
+        data->hibf_layout->user_bins.emplace_back(data->positions[0], data->previous.bin_indices, trace_i, bin_id);
 
         if (kmer_count_per_bin > max_size)
         {
@@ -268,13 +237,8 @@ public:
             max_size = kmer_count_per_bin;
         }
 
-        if (!debug)
-            print_result_line(*data, 0, bin_id, trace_i);
-        else
-            print_debug_line(*data, 0, bin_id, trace_i, kmer_count_per_bin, optimal_score, num_technical_bins);
-
         return max_id;
     }
 };
 
-} // namespace hibf
+} // namespace hibf::layout

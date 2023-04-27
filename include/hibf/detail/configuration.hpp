@@ -16,18 +16,18 @@ struct configuration
     /*!\name General Configuration
      * \{
      */
+    //!\brief The input file to chopper. Should contain one file path per line.
+    std::filesystem::path data_file;
+
     //!\brief Internal parameter that triggers some verbose debug output.
     bool debug{false};
     //!\}
 
-    /*!\name Configuration of size estimates (hibf::count)
+    /*!\name Configuration of size estimates (chopper::count)
      * \{
      */
     //!\brief The name for the output directory when writing sketches to disk.
-    std::filesystem::path sketch_directory{"sketches"};
-
-    //!\brief Size estimates used to be able to be clustered by additional info in the file. OUTDATED.
-    size_t column_index_to_cluster{1u};
+    std::filesystem::path sketch_directory{};
 
     //!\brief The kmer size to hash the input sequences before computing a HyperLogLog sketch from them.
     uint8_t k{19};
@@ -38,7 +38,7 @@ struct configuration
     //!\brief Do not write the sketches into a dedicated directory.
     bool disable_sketch_output{false};
 
-    //!\brief Whether the input files are precomputed files (.minimizer) instead of sequence files.
+    //!\brief Whether the input files are precomputed files (.minimiser) instead of sequence files.
     bool precomputed_files{false};
     //!\}
 
@@ -49,10 +49,7 @@ struct configuration
     std::filesystem::path output_filename{"binning.out"};
 
     //!\brief The maximum number of technical bins on each IBF in the HIBF.
-    uint16_t tmax{64};
-
-    //!\brief Analog to `column_index_to_cluster`. OUTDATED
-    int8_t aggregate_by_column{-1};
+    uint16_t tmax{};
 
     //!\brief The number of hash functions for the IBFs.
     size_t num_hash_functions{2};
@@ -73,11 +70,11 @@ struct configuration
     //!\brief The number of threads to use to compute merged HLL sketches.
     size_t threads{1u};
 
-    //!\brief Whether to estimate the union of kmer sets to possibly improve the binning or not.
-    bool estimate_union{false};
+    //!\brief Whether to skip estimating the union of kmer sets to possibly improve the binning.
+    bool disable_estimate_union{false};
 
-    //!\brief Whether to do a second sorting of the bins which takes into account similarity or not.
-    bool rearrange_user_bins{false};
+    //!\brief Whether to skip the secondary sorting of the bins which considers similarity.
+    bool disable_rearrangement{false};
 
     //!\brief Whether the program should determine the best number of IBF bins by doing multiple binning runs.
     bool determine_best_tmax{false};
@@ -95,12 +92,12 @@ private:
     template <typename archive_t>
     void serialize(archive_t & archive)
     {
-        uint32_t const version{2};
+        uint32_t version{2};
         archive(CEREAL_NVP(version));
 
+        archive(CEREAL_NVP(data_file));
         archive(CEREAL_NVP(debug));
         archive(CEREAL_NVP(sketch_directory));
-        // archive(CEREAL_NVP(column_index_to_cluster));
         archive(CEREAL_NVP(k));
         archive(CEREAL_NVP(sketch_bits));
         archive(CEREAL_NVP(disable_sketch_output));
@@ -108,14 +105,13 @@ private:
 
         archive(CEREAL_NVP(output_filename));
         archive(CEREAL_NVP(tmax));
-        // archive(CEREAL_NVP(aggregate_by_column));
         archive(CEREAL_NVP(num_hash_functions));
         archive(CEREAL_NVP(false_positive_rate));
         archive(CEREAL_NVP(alpha));
         archive(CEREAL_NVP(max_rearrangement_ratio));
         archive(CEREAL_NVP(threads));
-        archive(CEREAL_NVP(estimate_union));
-        archive(CEREAL_NVP(rearrange_user_bins));
+        archive(CEREAL_NVP(disable_estimate_union));
+        archive(CEREAL_NVP(disable_rearrangement));
         archive(CEREAL_NVP(determine_best_tmax));
         archive(CEREAL_NVP(force_all_binnings));
     }

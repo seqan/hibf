@@ -12,7 +12,7 @@
 namespace hibf::sketch
 {
 
-class user_bin_sequence
+class toolbox
 {
 public:
     //!\brief type for a node in the clustering tree when for the rearrangement
@@ -50,55 +50,47 @@ public:
     //!\brief type of the distance matrix for the clustering for the rearrangement
     using distance_matrix = std::vector<entry>;
 
-    //!\brief A pointer to the filenames of the user input sequences.
-    std::vector<std::string> * filenames{nullptr};
-
     //!\brief A pointer to kmer counts associated with the above files used to layout user bin into technical bins.
-    std::vector<size_t> * user_bin_kmer_counts{nullptr};
+    std::vector<size_t> const & kmer_counts;
 
     //!\brief HyperLogLog sketches on the k-mer sets of the sequences from the files of filenames.
-    std::vector<hyperloglog> * sketches{nullptr};
+    std::vector<hyperloglog> const & sketches;
+
+    //!\brief HyperLogLog sketches on the k-mer sets of the sequences from the files of filenames.
+    std::vector<size_t> & positions;
 
 public:
-    user_bin_sequence() = default;                                      //!< Defaulted.
-    user_bin_sequence(user_bin_sequence const &) = default;             //!< Defaulted.
-    user_bin_sequence & operator=(user_bin_sequence const &) = default; //!< Defaulted.
-    user_bin_sequence(user_bin_sequence &&) = default;                  //!< Defaulted.
-    user_bin_sequence & operator=(user_bin_sequence &&) = default;      //!< Defaulted.
-    ~user_bin_sequence() = default;                                     //!< Defaulted.
+    toolbox() = default;                            //!< Defaulted.
+    toolbox(toolbox const &) = default;             //!< Defaulted.
+    toolbox & operator=(toolbox const &) = default; //!< Defaulted.
+    toolbox(toolbox &&) = default;                  //!< Defaulted.
+    toolbox & operator=(toolbox &&) = default;      //!< Defaulted.
+    ~toolbox() = default;                           //!< Defaulted.
 
     /*!\brief A sequence of user bins for which filenames and counts are given.
-     * \param[in] filenames_ filenames of the sequence files for the user bins
-     * \param[in] user_bin_kmer_counts_ counts of the k-mer sets of the bins corresponding to filenames
+     * \param[in] kmer_counts_ counts of the k-mer sets of the bins corresponding to filenames
      * \param[in] sketches_ sketches of the bins corresponding to filenames
+     * \param[in] positions_ The realtive positions of the input information to correctly access sketches and counts.
      */
-    user_bin_sequence(std::vector<std::string> & filenames_,
-                      std::vector<size_t> & user_bin_kmer_counts_,
-                      std::vector<hyperloglog> & sketches_) :
-        filenames{std::addressof(filenames_)},
-        user_bin_kmer_counts{std::addressof(user_bin_kmer_counts_)},
-        sketches{std::addressof(sketches_)}
+    toolbox(std::vector<size_t> const & kmer_counts_,
+            std::vector<hyperloglog> const & sketches_,
+            std::vector<size_t> & positions_) :
+        kmer_counts{kmer_counts_},
+        sketches{sketches_},
+        positions{positions_}
     {}
 
     //!\brief Sorts filenames and cardinalities by looking only at the cardinalities.
     void sort_by_cardinalities()
     {
-        // generate permutation of indices sorted in descending order by cardinalities
-        std::vector<size_t> permutation(user_bin_kmer_counts->size());
-        std::iota(permutation.begin(), permutation.end(), size_t{0});
-
-        assert(user_bin_kmer_counts != nullptr);
-        assert(filenames != nullptr);
-        assert(permutation.size() == user_bin_kmer_counts->size());
+        assert(positions.size() <= kmer_counts.size());
 
         auto cardinality_compare = [this](size_t const index1, size_t const index2)
         {
-            return (*user_bin_kmer_counts)[index1] > (*user_bin_kmer_counts)[index2];
+            return kmer_counts[index1] > kmer_counts[index2];
         };
 
-        std::sort(permutation.begin(), permutation.end(), cardinality_compare);
-
-        apply_permutation(permutation);
+        std::sort(positions.begin(), positions.end(), cardinality_compare);
     }
 
     /*!\brief Restore the HLL sketches from the files in hll_dir and target_filenames into target container.
@@ -135,67 +127,72 @@ public:
     }
 
     /*!\brief Estimate the cardinality of the union for a single user bin j with all prior ones j' < j.
-     * \param[in] j The current user bin (column in the DP matrix)
      * \param[out] estimates output row
+     * \param[in] sketches The hyperloglog sketches of the respective user bins.
+     * \param[in] counts The counts/sketch.estimates() of the respective user bins.
+     * \param[in] positions The realtive positions of the input information to correctly access sketches and counts.
+     * \param[in] j The current user bin (column in the DP matrix)
      *
      * estimates[j_prime] will be the union cardinality estimate of the interval {j_prime, ..., j}.
      */
-    void precompute_union_estimates_for(std::vector<uint64_t> & estimates, int64_t const j) const
+    static void precompute_union_estimates_for(std::vector<uint64_t> & estimates,
+                                               std::vector<hyperloglog> const & sketches,
+                                               std::vector<size_t> const & counts,
+                                               std::vector<size_t> const & positions,
+                                               int64_t const j)
     {
-        assert(user_bin_kmer_counts != nullptr);
-        assert(filenames != nullptr);
-        assert(sketches != nullptr);
-        assert(filenames->size() == user_bin_kmer_counts->size());
-        assert(filenames->size() == sketches->size());
-        assert(filenames->size() > static_cast<size_t>(j));
-        assert(estimates.size() == sketches->size()); // Resize happens in precompute_init_interval_union_estimations
+        assert(counts.size() == sketches.size());
+        assert(positions.size() <= counts.size());
+        assert(estimates.size() == sketches.size()); // Resize happens in precompute_init_interval_union_estimations
+        assert(estimates.size() > static_cast<size_t>(j));
 
-        hyperloglog temp_hll = (*sketches)[j];
-        estimates[j] = (*user_bin_kmer_counts)[j];
+        hyperloglog temp_hll = sketches[positions[j]];
+        estimates[j] = counts[positions[j]];
 
         for (int64_t j_prime = j - 1; j_prime >= 0; --j_prime)
-            estimates[j_prime] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD((*sketches)[j_prime]));
+            estimates[j_prime] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD(sketches[positions[j_prime]]));
     }
 
     /*!\brief Estimate the cardinality of the union for each interval [0, j] for all user bins j.
      * \param[out] estimates output row
+     * \param[in] sketches The hyperloglog sketches of the respective user bins.
+     * \param[in] counts The counts/sketch.estimates() of the respective user bins.
+     * \param[in] positions The realtive positions of the input information to correctly access sketches and counts.
      *
      * estimates[j] will be the union cardinality estimate of the interval {0, ..., j}.
      */
-    void precompute_initial_union_estimates(std::vector<uint64_t> & estimates) const
+    static void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
+                                                   std::vector<hyperloglog> const & sketches,
+                                                   std::vector<size_t> const & counts,
+                                                   std::vector<size_t> const & positions)
     {
-        assert(filenames != nullptr);
-        assert(user_bin_kmer_counts != nullptr);
-        assert(sketches != nullptr);
-        assert(filenames->size() == user_bin_kmer_counts->size());
-        assert(filenames->size() == sketches->size());
-        assert(filenames->size() > 0u);
+        assert(counts.size() == sketches.size());
+        assert(positions.size() <= counts.size());
+        assert(sketches.size() > 0u);
 
-        estimates.resize(sketches->size());
+        estimates.resize(sketches.size());
 
-        hyperloglog temp_hll = (*sketches)[0];
-        estimates[0] = (*user_bin_kmer_counts)[0];
+        hyperloglog temp_hll = sketches[positions[0]];
+        estimates[0] = counts[positions[0]];
 
-        for (size_t j = 1; j < sketches->size(); ++j)
-            estimates[j] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD((*sketches)[j]));
+        for (size_t j = 1; j < positions.size(); ++j)
+            estimates[j] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD(sketches[positions[j]]));
     }
 
     /*!\brief Estimate the cardinality of the union for a single interval.
-     * \param[in] start The start of the interval.
-     * \param[in] end   The end of the interval (end >= start);
+     * \param[in] sketches The hyperloglog sketches to be used for estimation.
+     * \param[in] positions The realtive positions of the input information to correctly access sketches and counts.
+     * \returns The the cardinality of the union for the interval [start, end).
      */
-    uint64_t estimate_interval(size_t const start, size_t const end) const
+    static uint64_t estimate_interval(std::vector<hyperloglog> const & sketches, std::vector<size_t> const & positions)
     {
-        assert(user_bin_kmer_counts != nullptr);
-        assert(filenames->size() == user_bin_kmer_counts->size());
-        assert(filenames->size() == sketches->size());
-        assert(start <= end);
-        assert(end < sketches->size());
+        assert(positions.size() <= sketches.size());
+        assert(!positions.empty());
 
-        hyperloglog temp_hll = (*sketches)[start];
+        hyperloglog temp_hll = sketches[positions[0]];
 
-        for (size_t i = start + 1; i <= end; ++i)
-            temp_hll.merge((*sketches)[i]);
+        for (size_t i = 1; i < positions.size(); ++i)
+            temp_hll.merge(sketches[positions[i]]);
 
         return temp_hll.estimate();
     }
@@ -206,18 +203,16 @@ public:
      */
     void rearrange_bins(double const max_ratio, size_t const num_threads)
     {
-        assert(user_bin_kmer_counts != nullptr);
-        assert(filenames != nullptr);
 
         std::vector<size_t> permutation;
 
         size_t first = 0;
         size_t last = 1;
 
-        while (first < filenames->size())
+        while (first < positions.size())
         {
             // size difference is too large or sequence is over -> do the clustering
-            if (last == filenames->size() || (*user_bin_kmer_counts)[first] * max_ratio > (*user_bin_kmer_counts)[last])
+            if (last == positions.size() || kmer_counts[positions[first]] * max_ratio > kmer_counts[positions[last]])
             {
                 // if this is not the first group, we want one bin overlap
                 cluster_bins(permutation, first, last, num_threads);
@@ -226,7 +221,14 @@ public:
             ++last;
         }
 
-        apply_permutation(permutation);
+        for (size_t i{0}; i < permutation.size(); ++i)
+        {
+            size_t swap_index = permutation[i];
+            while (swap_index < i)
+                swap_index = permutation[swap_index];
+
+            std::swap(positions[i], positions[swap_index]);
+        }
     }
 
     /*!\brief Perform an agglomerative clustering variant on the index range [first:last)
@@ -239,12 +241,10 @@ public:
     cluster_bins(std::vector<size_t> & permutation, size_t const first, size_t const last, size_t const num_threads)
     {
         assert(num_threads >= 1);
-        assert(filenames != nullptr);
-        assert(sketches != nullptr);
-        assert(sketches->size() == filenames->size());
+        assert(positions.size() <= sketches.size());
         assert((first == 0) == permutation.empty());
 
-        size_t const n = filenames->size();
+        size_t const n = sketches.size();
         size_t const chunk_size = std::floor(std::sqrt(n));
 
         size_t const prune_steps = chunk_size;
@@ -286,8 +286,8 @@ public:
         for (size_t id = first; id < last; ++id)
         {
             // id i is at the index i - first
-            clustering.push_back({none, none, (*sketches)[id]});
-            estimates.emplace_back((*sketches)[id].estimate());
+            clustering.push_back({none, none, sketches[positions[id]]});
+            estimates.emplace_back(sketches[positions[id]].estimate());
         }
 
         // if this is not the first group, we want to have one overlapping bin
@@ -305,8 +305,8 @@ public:
             ++new_id;
             previous_rightmost = new_id;
 
-            clustering.push_back({none, none, (*sketches)[actual_previous_rightmost]});
-            estimates.emplace_back((*sketches)[actual_previous_rightmost].estimate());
+            clustering.push_back({none, none, sketches[positions[actual_previous_rightmost]]});
+            estimates.emplace_back(sketches[positions[actual_previous_rightmost]].estimate());
         }
 
         // initialize priority queues in the distance matrix (sequentially)
@@ -469,7 +469,7 @@ public:
      * \param[in] dist the distance matrix (vector of priority queues) to shuffle
      * \param[in] remaining_ids the map with information about which ids remain at which index
      */
-    void random_shuffle(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids)
+    void random_shuffle(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids) const
     {
         size_t const n = dist.size();
 
@@ -493,7 +493,7 @@ public:
      * \param[in] dist the distance matrix (vector of priority queues) to prune
      * \param[in] remaining_ids the map with information about which ids remain at which index
      */
-    void prune(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids)
+    void prune(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids) const
     {
         if (dist.empty())
             return;
@@ -548,7 +548,7 @@ public:
     bool rotate(std::vector<clustering_node> & clustering,
                 size_t const previous_rightmost,
                 size_t const first,
-                size_t const id)
+                size_t const id) const
     {
         if (id == previous_rightmost) // we are at the leaf that is previous_rightmost (Anchor of the recursion)
             return true;
@@ -589,7 +589,7 @@ public:
                std::vector<size_t> & permutation,
                size_t const previous_rightmost,
                size_t const first,
-               size_t const id)
+               size_t const id) const
     {
         clustering_node const & curr = clustering[id - first];
 
@@ -602,31 +602,6 @@ public:
 
         trace(clustering, permutation, previous_rightmost, first, curr.left);
         trace(clustering, permutation, previous_rightmost, first, curr.right);
-    }
-
-    /*!\brief Apply a given permutation to filenames, user_bin_kmer_counts and sketches
-     * \param[in] permutation the permutation to apply
-     */
-    void apply_permutation(std::vector<size_t> const & permutation)
-    {
-        assert(user_bin_kmer_counts != nullptr);
-        assert(filenames != nullptr);
-        assert(user_bin_kmer_counts->size() == filenames->size());
-        assert(sketches == nullptr || sketches->empty() || sketches->size() == filenames->size());
-
-        bool const swap_sketches{sketches != nullptr && !sketches->empty()};
-
-        for (size_t i{0}; i < permutation.size(); ++i)
-        {
-            size_t swap_index = permutation[i];
-            while (swap_index < i)
-                swap_index = permutation[swap_index];
-
-            std::swap((*filenames)[i], (*filenames)[swap_index]);
-            std::swap((*user_bin_kmer_counts)[i], (*user_bin_kmer_counts)[swap_index]);
-            if (swap_sketches)
-                std::swap((*sketches)[i], (*sketches)[swap_index]);
-        }
     }
 };
 
