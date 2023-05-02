@@ -15,8 +15,8 @@
 namespace hibf
 {
 
-template <hibf::data_layout data_layout_mode, typename config_type>
-void update_user_bins(build_data<data_layout_mode, config_type> & data,
+template <typename config_type>
+void update_user_bins(build_data<config_type> & data,
                       std::vector<int64_t> & filename_indices,
                       chopper_pack_record const & record)
 {

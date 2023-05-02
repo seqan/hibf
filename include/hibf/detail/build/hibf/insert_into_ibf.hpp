@@ -15,26 +15,31 @@ namespace hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<size_t> & parent_kmers,
-                     robin_hood::unordered_flat_set<size_t> const & kmers,
+void insert_into_ibf(robin_hood::unordered_flat_set<size_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
-                     hibf::interleaved_bloom_filter<> & ibf,
-                     bool is_root)
+                     hibf::interleaved_bloom_filter<> & ibf)
 {
-    size_t count{};
-    for (size_t const kmer : kmers)
+    size_t const chunk_size = kmers.size() / number_of_bins + 1;
+    size_t chunk_number{};
+    size_t counter{};
+
+    for (auto kmer : kmers)
     {
-        hibf::bin_index const bin_idx{bin_index + (count % number_of_bins)}; // distribute kmers evenly
-        ibf.emplace(value, bin_idx);
-        if (!is_root)
-            parent_kmers.insert(value);
-        ++count;
+        if (counter == chunk_size)
+        {
+            counter = 0;
+            ++chunk_number;
+        }
+
+        ibf.emplace(kmer, hibf::bin_index{bin_index + chunk_number});
+
+        ++counter;
     }
 }
 
-template <hibf::data_layout data_layout_mode, typename config_type>
-void insert_into_ibf(build_data<data_layout_mode, config_type> & data,
+template <typename config_type>
+void insert_into_ibf(build_data<config_type> & data,
                      chopper_pack_record const & record,
                      hibf::interleaved_bloom_filter<> & ibf)
 {

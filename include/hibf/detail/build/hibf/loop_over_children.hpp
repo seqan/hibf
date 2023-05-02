@@ -9,7 +9,7 @@
 
 #include <hibf/contrib/robin_hood.hpp>
 
-// #include <seqan3/core/algorithm/detail/execution_handler_parallel.hpp> // MIGRATION_TODO
+#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
 
 #include <lemon/list_graph.h> /// Must be first include.
 
@@ -20,12 +20,12 @@
 namespace hibf
 {
 
-template <hibf::data_layout data_layout_mode, typename config_type>
+template <typename config_type>
 void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                         hibf::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
-                        build_data<data_layout_mode, config_type> & data,
+                        build_data<config_type> & data,
                         bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -53,14 +53,16 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 ibf_positions[parent_bin_index] = ibf_pos;
-                insert_into_ibf(parent_kmers, kmers, 1, parent_bin_index, ibf, is_root);
+                insert_into_ibf(kmers, 1, parent_bin_index, ibf);
+                if (!is_root)
+                    parent_kmers.insert(kmers.begin(), kmers.end());
             }
         }
     };
 
     size_t number_of_threads{};
-    auto indices_view = std::views::iota(0u, children.size()) | std::views::common;
-    std::vector<size_t> indices{indices_view.begin(), indices_view.end()};
+    std::vector<size_t> indices(children.size());
+    std::iota(indices.begin(), indices.end(), size_t{});
 
     if (is_root)
     {
@@ -73,10 +75,8 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         number_of_threads = 1u;
     }
 
-    // hibf::detail::execution_handler_parallel executioner{number_of_threads}; // MIGRATION_TODO
-    // executioner.bulk_execute(std::move(worker), std::move(indices), []() {}); // MIGRATION_TODO
-    (void)worker;
-    (void)number_of_threads;
+    seqan3::detail::execution_handler_parallel executioner{number_of_threads};
+    executioner.bulk_execute(std::move(worker), std::move(indices), []() {});
 }
 
 } // namespace hibf

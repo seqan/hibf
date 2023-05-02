@@ -19,10 +19,10 @@
 namespace hibf
 {
 
-template <hibf::data_layout data_layout_mode, typename config_type>
+template <typename config_type>
 size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
-                          build_data<data_layout_mode, config_type> & data,
+                          build_data<config_type> & data,
                           bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -44,7 +44,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
                                         std::vector<int64_t> & ibf_positions,
                                         std::vector<int64_t> & filename_indices,
                                         lemon::ListDigraph::Node const & node,
-                                        build_data<data_layout_mode, config_type> & data) -> size_t
+                                        build_data<config_type> & data) -> size_t
     {
         auto & node_data = data.node_map[node];
 
@@ -87,7 +87,7 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         else
         {
             compute_kmers(record);
-            insert_into_ibf(parent_kmers, kmers, record.number_of_bins.back(), record.bin_indices.back(), ibf, is_root);
+            insert_into_ibf(kmers, record.number_of_bins.back(), record.bin_indices.back(), ibf);
         }
 
         update_user_bins(data, filename_indices, record);

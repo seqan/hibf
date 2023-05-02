@@ -19,8 +19,8 @@
 namespace hibf
 {
 
-template <hibf::data_layout data_layout_mode, typename config_type>
-void read_chopper_pack_file(build_data<data_layout_mode, config_type> & data, std::string const & layout_file)
+template <typename config_type>
+void read_chopper_pack_file(build_data<config_type> & data, std::string const & layout_file)
 {
     std::istringstream chopper_pack_file{layout_file};
 
@@ -81,7 +81,11 @@ void read_chopper_pack_file(build_data<data_layout_mode, config_type> & data, st
     }
 
     data.number_of_user_bins = user_bins;
-    data.resize();
+
+    data.hibf->ibf_vector.resize(data.number_of_ibfs);
+    data.hibf->user_bins.set_ibf_count(data.number_of_ibfs);
+    data.hibf->user_bins.set_user_bin_count(data.number_of_user_bins);
+    data.hibf->next_ibf_id.resize(data.number_of_ibfs);
 }
 
 } // namespace hibf

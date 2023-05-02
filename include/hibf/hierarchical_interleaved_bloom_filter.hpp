@@ -145,21 +145,236 @@ struct hibf_config
  *
  * [1]: https://docs.seqan.de/seqan/3.0.3/classseqan3_1_1interleaved__bloom__filter.html
  */
-template <hibf::data_layout data_layout_mode_ = hibf::data_layout::uncompressed>
 class hierarchical_interleaved_bloom_filter
 {
 public:
-    // Forward declaration
-    class user_bins;
+    /*!\brief Bookkeeping for user and technical bins.
+    */
+    class user_bins
+    {
+    private:
+        //!\brief Contains filenames of all user bins.
+        std::vector<std::string> user_bin_filenames;
 
-    // Forward declaration
-    class membership_agent;
+        /*!\brief Stores for each bin in each IBF of the HIBF the ID of the filename.
+        * \details
+        * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_filename_position[i][b]`.
+        * If `-1` is returned, bin `b` is a merged bin, and there is no filename, we need to look into the lower level IBF.
+        * Otherwise, the returned value `j` can be used to access the corresponding filename `user_bin_filenames[j]`.
+        */
+        std::vector<std::vector<int64_t>> ibf_bin_to_filename_position{};
 
-    //!\brief Indicates whether the Interleaved Bloom Filter is compressed.
-    static constexpr hibf::data_layout data_layout_mode = data_layout_mode_;
+    public:
+        //!\brief Returns the number of managed user bins.
+        size_t num_user_bins() const noexcept
+        {
+            return user_bin_filenames.size();
+        }
+
+        //!\brief Changes the number of managed IBFs.
+        void set_ibf_count(size_t const size)
+        {
+            ibf_bin_to_filename_position.resize(size);
+        }
+
+        //!\brief Changes the number of managed user bins.
+        void set_user_bin_count(size_t const size)
+        {
+            user_bin_filenames.resize(size);
+        }
+
+        //!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
+        std::vector<int64_t> & bin_indices_of_ibf(size_t const idx)
+        {
+            return ibf_bin_to_filename_position[idx];
+        }
+
+        //!\brief Returns the filename of the `idx`th user bin.
+        std::string & filename_of_user_bin(size_t const idx)
+        {
+            return user_bin_filenames[idx];
+        }
+
+        //!\brief For a pair `(a,b)`, returns a const reference to the filename of the user bin at IBF `a`, bin `b`.
+        std::string const & operator[](std::pair<size_t, size_t> const & index_pair) const
+        {
+            return user_bin_filenames[ibf_bin_to_filename_position[index_pair.first][index_pair.second]];
+        }
+
+        /*!\brief Returns a view over the user bin filenames for the `ibf_idx`th IBF.
+        *        An empty string is returned for merged bins.
+        */
+        auto operator[](size_t const ibf_idx) const
+        {
+            return ibf_bin_to_filename_position[ibf_idx]
+                | std::views::transform(
+                    [this](int64_t i)
+                    {
+                        if (i == -1)
+                            return std::string{};
+                        else
+                            return user_bin_filenames[i];
+                    });
+        }
+
+        //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
+        int64_t filename_index(size_t const ibf_idx, size_t const bin_idx) const
+        {
+            return ibf_bin_to_filename_position[ibf_idx][bin_idx];
+        }
+
+        /*!\brief Writes all filenames to a stream. Index and filename are tab-separated.
+        * \details
+        * 0	\<path_to_user_bin_0\>
+        * 1	\<path_to_user_bin_1\>
+        */
+        template <typename stream_t>
+        void write_filenames(stream_t & out_stream) const
+        {
+            size_t position{};
+            std::string line{};
+            for (auto const & filename : user_bin_filenames)
+            {
+                line.clear();
+                line = '#';
+                line += std::to_string(position);
+                line += '\t';
+                line += filename;
+                line += '\n';
+                out_stream << line;
+                ++position;
+            }
+        }
+
+        /*!\cond DEV
+        * \brief Serialisation support function.
+        * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
+        * \param[in] archive The archive being serialised from/to.
+        *
+        * \attention These functions are never called directly.
+        * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
+        */
+        template <typename archive_t>
+        void serialize(archive_t & archive)
+        {
+            archive(user_bin_filenames);
+            archive(ibf_bin_to_filename_position);
+        }
+        //!\endcond
+    };
+
+    /*!\brief Manages membership queries for the hibf::hierarchical_interleaved_bloom_filter.
+    * \see hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
+    * \details
+    * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+    */
+    class membership_agent
+    {
+    private:
+        //!\brief The type of the augmented hierarchical_interleaved_bloom_filter.
+        using hibf_t = hierarchical_interleaved_bloom_filter;
+
+        //!\brief A pointer to the augmented hierarchical_interleaved_bloom_filter.
+        hibf_t const * const hibf_ptr{nullptr};
+
+        //!\brief Helper for recursive membership querying.
+        template <std::ranges::forward_range value_range_t>
+        void bulk_contains_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+        {
+            auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
+            auto & result = agent.bulk_count(values);
+
+            uint16_t sum{};
+
+            for (size_t bin{}; bin < result.size(); ++bin)
+            {
+                sum += result[bin];
+
+                auto const current_filename_index = hibf_ptr->user_bins.filename_index(ibf_idx, bin);
+
+                if (current_filename_index < 0) // merged bin
+                {
+                    if (sum >= threshold)
+                        bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                    sum = 0u;
+                }
+                else if (bin + 1u == result.size() ||                                                    // last bin
+                        current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
+                {
+                    if (sum >= threshold)
+                        result_buffer.emplace_back(current_filename_index);
+                    sum = 0u;
+                }
+            }
+        }
+
+    public:
+        /*!\name Constructors, destructor and assignment
+        * \{
+        */
+        membership_agent() = default;                                     //!< Defaulted.
+        membership_agent(membership_agent const &) = default;             //!< Defaulted.
+        membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
+        membership_agent(membership_agent &&) = default;                  //!< Defaulted.
+        membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
+        ~membership_agent() = default;                                    //!< Defaulted.
+
+        /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
+        * \private
+        * \param hibf The hierarchical_interleaved_bloom_filter.
+        */
+        explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
+        {}
+        //!\}
+
+        //!\brief Stores the result of bulk_contains().
+        std::vector<int64_t> result_buffer;
+
+        /*!\name Lookup
+        * \{
+        */
+        /*!\brief Determines set membership of given values, and returns the user bin indices of occurrences.
+        * \param[in] values The values to process; must model std::ranges::forward_range.
+        * \param[in] threshold Report a user bin if there are at least this many hits.
+        *
+        * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
+        * \attention Sequential calls to this function invalidate the previously returned reference.
+        *
+        * \details
+        *
+        * ### Thread safety
+        *
+        * Concurrent invocations of this function are not thread safe, please create a
+        * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
+        */
+        template <std::ranges::forward_range value_range_t>
+        [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
+        {
+            assert(hibf_ptr != nullptr);
+
+            static_assert(std::ranges::forward_range<value_range_t>, "The values must model forward_range.");
+            static_assert(std::unsigned_integral<std::ranges::range_value_t<value_range_t>>,
+                        "An individual value must be an unsigned integral.");
+
+            result_buffer.clear();
+
+            bulk_contains_impl(values, 0, threshold);
+
+            std::ranges::sort(result_buffer); // TODO: necessary?
+
+            return result_buffer;
+        }
+
+        // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
+        // is immediately destroyed.
+        template <std::ranges::range value_range_t>
+        [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
+                                                                size_t const threshold) && noexcept = delete;
+        //!\}
+    };
 
     //!\brief The type of an individual Bloom filter.
-    using ibf_t = hibf::interleaved_bloom_filter<data_layout_mode_>;
+    using ibf_t = hibf::interleaved_bloom_filter<hibf::data_layout::uncompressed>;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -199,7 +414,7 @@ public:
     //!\brief Returns a membership_agent to be used for counting.
     membership_agent membership_agent() const
     {
-        return typename hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent{*this};
+        return typename hierarchical_interleaved_bloom_filter::membership_agent{*this};
     }
 
     /*!\cond DEV
@@ -287,7 +502,7 @@ protected:
     template <typename input_data_type>
     void build_index(hibf_config<input_data_type> const & config, hibf::layout layout)
     {
-        hibf::build_data<data_layout_mode, hibf_config<input_data_type>> data{.hibf_config = config};
+        hibf::build_data<hibf_config<input_data_type>> data{.hibf_config = config};
         data.hibf = this;
 
         hibf::read_chopper_pack_file(data, layout.layout_str);
@@ -299,233 +514,6 @@ protected:
 
         hibf::hierarchical_build(root_kmers, root, data, true);
     }
-};
-
-/*!\brief Bookkeeping for user and technical bins.
- */
-template <hibf::data_layout data_layout_mode>
-class hierarchical_interleaved_bloom_filter<data_layout_mode>::user_bins
-{
-private:
-    //!\brief Contains filenames of all user bins.
-    std::vector<std::string> user_bin_filenames;
-
-    /*!\brief Stores for each bin in each IBF of the HIBF the ID of the filename.
-     * \details
-     * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_filename_position[i][b]`.
-     * If `-1` is returned, bin `b` is a merged bin, and there is no filename, we need to look into the lower level IBF.
-     * Otherwise, the returned value `j` can be used to access the corresponding filename `user_bin_filenames[j]`.
-     */
-    std::vector<std::vector<int64_t>> ibf_bin_to_filename_position{};
-
-public:
-    //!\brief Returns the number of managed user bins.
-    size_t num_user_bins() const noexcept
-    {
-        return user_bin_filenames.size();
-    }
-
-    //!\brief Changes the number of managed IBFs.
-    void set_ibf_count(size_t const size)
-    {
-        ibf_bin_to_filename_position.resize(size);
-    }
-
-    //!\brief Changes the number of managed user bins.
-    void set_user_bin_count(size_t const size)
-    {
-        user_bin_filenames.resize(size);
-    }
-
-    //!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
-    std::vector<int64_t> & bin_indices_of_ibf(size_t const idx)
-    {
-        return ibf_bin_to_filename_position[idx];
-    }
-
-    //!\brief Returns the filename of the `idx`th user bin.
-    std::string & filename_of_user_bin(size_t const idx)
-    {
-        return user_bin_filenames[idx];
-    }
-
-    //!\brief For a pair `(a,b)`, returns a const reference to the filename of the user bin at IBF `a`, bin `b`.
-    std::string const & operator[](std::pair<size_t, size_t> const & index_pair) const
-    {
-        return user_bin_filenames[ibf_bin_to_filename_position[index_pair.first][index_pair.second]];
-    }
-
-    /*!\brief Returns a view over the user bin filenames for the `ibf_idx`th IBF.
-     *        An empty string is returned for merged bins.
-     */
-    auto operator[](size_t const ibf_idx) const
-    {
-        return ibf_bin_to_filename_position[ibf_idx]
-             | std::views::transform(
-                   [this](int64_t i)
-                   {
-                       if (i == -1)
-                           return std::string{};
-                       else
-                           return user_bin_filenames[i];
-                   });
-    }
-
-    //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
-    int64_t filename_index(size_t const ibf_idx, size_t const bin_idx) const
-    {
-        return ibf_bin_to_filename_position[ibf_idx][bin_idx];
-    }
-
-    /*!\brief Writes all filenames to a stream. Index and filename are tab-separated.
-     * \details
-     * 0	\<path_to_user_bin_0\>
-     * 1	\<path_to_user_bin_1\>
-     */
-    template <typename stream_t>
-    void write_filenames(stream_t & out_stream) const
-    {
-        size_t position{};
-        std::string line{};
-        for (auto const & filename : user_bin_filenames)
-        {
-            line.clear();
-            line = '#';
-            line += std::to_string(position);
-            line += '\t';
-            line += filename;
-            line += '\n';
-            out_stream << line;
-            ++position;
-        }
-    }
-
-    /*!\cond DEV
-     * \brief Serialisation support function.
-     * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
-     * \param[in] archive The archive being serialised from/to.
-     *
-     * \attention These functions are never called directly.
-     * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
-     */
-    template <typename archive_t>
-    void serialize(archive_t & archive)
-    {
-        archive(user_bin_filenames);
-        archive(ibf_bin_to_filename_position);
-    }
-    //!\endcond
-};
-
-/*!\brief Manages membership queries for the hibf::hierarchical_interleaved_bloom_filter.
- * \see hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
- * \details
- * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
- */
-template <hibf::data_layout data_layout_mode> // TODO: value_t as template?
-class hierarchical_interleaved_bloom_filter<data_layout_mode>::membership_agent
-{
-private:
-    //!\brief The type of the augmented hierarchical_interleaved_bloom_filter.
-    using hibf_t = hierarchical_interleaved_bloom_filter<data_layout_mode>;
-
-    //!\brief A pointer to the augmented hierarchical_interleaved_bloom_filter.
-    hibf_t const * const hibf_ptr{nullptr};
-
-    //!\brief Helper for recursive membership querying.
-    template <std::ranges::forward_range value_range_t>
-    void bulk_contains_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
-    {
-        auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
-        auto & result = agent.bulk_count(values);
-
-        uint16_t sum{};
-
-        for (size_t bin{}; bin < result.size(); ++bin)
-        {
-            sum += result[bin];
-
-            auto const current_filename_index = hibf_ptr->user_bins.filename_index(ibf_idx, bin);
-
-            if (current_filename_index < 0) // merged bin
-            {
-                if (sum >= threshold)
-                    bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
-                sum = 0u;
-            }
-            else if (bin + 1u == result.size() ||                                                    // last bin
-                     current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
-            {
-                if (sum >= threshold)
-                    result_buffer.emplace_back(current_filename_index);
-                sum = 0u;
-            }
-        }
-    }
-
-public:
-    /*!\name Constructors, destructor and assignment
-     * \{
-     */
-    membership_agent() = default;                                     //!< Defaulted.
-    membership_agent(membership_agent const &) = default;             //!< Defaulted.
-    membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
-    membership_agent(membership_agent &&) = default;                  //!< Defaulted.
-    membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
-    ~membership_agent() = default;                                    //!< Defaulted.
-
-    /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
-     * \private
-     * \param hibf The hierarchical_interleaved_bloom_filter.
-     */
-    explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
-    {}
-    //!\}
-
-    //!\brief Stores the result of bulk_contains().
-    std::vector<int64_t> result_buffer;
-
-    /*!\name Lookup
-     * \{
-     */
-    /*!\brief Determines set membership of given values, and returns the user bin indices of occurrences.
-     * \param[in] values The values to process; must model std::ranges::forward_range.
-     * \param[in] threshold Report a user bin if there are at least this many hits.
-     *
-     * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
-     * \attention Sequential calls to this function invalidate the previously returned reference.
-     *
-     * \details
-     *
-     * ### Thread safety
-     *
-     * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
-     */
-    template <std::ranges::forward_range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
-    {
-        assert(hibf_ptr != nullptr);
-
-        static_assert(std::ranges::forward_range<value_range_t>, "The values must model forward_range.");
-        static_assert(std::unsigned_integral<std::ranges::range_value_t<value_range_t>>,
-                      "An individual value must be an unsigned integral.");
-
-        result_buffer.clear();
-
-        bulk_contains_impl(values, 0, threshold);
-
-        std::ranges::sort(result_buffer); // TODO: necessary?
-
-        return result_buffer;
-    }
-
-    // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
-    // is immediately destroyed.
-    template <std::ranges::range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
-                                                             size_t const threshold) && noexcept = delete;
-    //!\}
 };
 
 } // namespace hibf
