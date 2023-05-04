@@ -2,7 +2,7 @@
 
 #include <cstddef>
 
-namespace chopper
+namespace hibf
 {
 
 /*!\brief Returns the smallest natural number that is greater or equal to `value` and a multiplicative of 64.
@@ -13,4 +13,4 @@ namespace chopper
     return ((value + 63) >> 6) << 6;
 }
 
-} // namespace chopper
+} // namespace hibf

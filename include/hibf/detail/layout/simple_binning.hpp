@@ -7,8 +7,8 @@
 #include <numeric>
 #include <vector>
 
-#include <hibf/data_store.hpp>
-#include <hibf//detail/layout/print_matrix.hpp>
+#include <hibf/detail/data_store.hpp>
+#include <hibf/detail/layout/print_matrix.hpp>
 #include <hibf/next_multiple_of_64.hpp>
 
 namespace hibf::layout

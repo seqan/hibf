@@ -4,7 +4,7 @@
 #include <string>
 #include <vector>
 
-#include <hibf/prefixes.hpp>
+#include <hibf/detail/prefixes.hpp>
 
 namespace hibf::layout
 {

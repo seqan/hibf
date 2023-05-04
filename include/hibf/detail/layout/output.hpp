@@ -5,8 +5,9 @@
 
 #include <cereal/archives/json.hpp>
 
-namespace hibf
+namespace hibf::layout
 {
+
 
 inline void write_config_to(configuration const & config, std::ostream & stream)
 {
@@ -24,14 +25,33 @@ inline void write_config_to(configuration const & config, std::ostream & stream)
            << prefix::header << prefix::header_config << "ENDCONFIG\n";
 }
 
-inline void write_layout_header_to(configuration const & config,
-                                   size_t const max_hibf_id,
-                                   std::string_view const header,
-                                   std::ostream & stream)
+inline void write_layout_header_to(layout const & hibf_layout, size_t const max_hibf_id, std::ostream & stream)
 {
-    write_config_to(config, stream);
-    stream << prefix::header << prefix::high_level << " max_bin_id:" << max_hibf_id << '\n';
-    stream << header;
+    stream << prefix::first_header_line << " max_bin_id:" << max_hibf_id << '\n';
+    for (auto const & max_bin : hibf_layout.max_bins)
+        stream << max_bin << '\n';
 }
 
-} // namespace hibf
+inline void write_user_bin_line_to(layout::user_bin const & object,
+                                   std::vector<std::string> const & filenames,
+                                   std::ostream & stream)
+{
+    stream << filenames[object.idx] << '\t';
+    for (auto bin : object.previous_TB_indices)
+        stream << bin << ';';
+    stream << object.storage_TB_id << '\t';
+    for ([[maybe_unused]] auto && elem : object.previous_TB_indices) // number of bins per merged level is 1
+        stream << "1;";
+    stream << object.number_of_technical_bins;
+    stream << '\n';
+}
+
+inline void
+write_layout_content_to(layout const & hibf_layout, std::vector<std::string> const & filenames, std::ostream & stream)
+{
+    stream << prefix::header << "FILES\tBIN_INDICES\tNUMBER_OF_BINS\n";
+    for (auto const & user_bin : hibf_layout.user_bins)
+        write_user_bin_line_to(user_bin, filenames, stream);
+}
+
+} // namespace hibf::layout

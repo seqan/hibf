@@ -3,10 +3,10 @@
 #include <cassert>
 #include <cmath>
 
-#include <hibf/configuration.hpp>
+#include <hibf/detail/configuration.hpp>
 #include <hibf/detail/layout/simple_binning.hpp>
 #include <hibf/next_multiple_of_64.hpp>
-#include <hibf/prefixes.hpp>
+#include <hibf/detail/prefixes.hpp>
 
 /*!\brief Workaround bogus memcpy errors in GCC 12.1 and 12.2. (Wrestrict and Wstringop-overflow)
  * \see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105545

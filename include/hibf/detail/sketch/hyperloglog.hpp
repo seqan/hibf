@@ -344,7 +344,7 @@ private:
     float alphaMM_float_{};                                              ///< alpha * m^2
     uint64_t m_{};                                                       ///< register size
     uint8_t b_{};                                                        ///< register bit width
-    std::vector<uint8_t, seqan3::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
+    std::vector<uint8_t, hibf::contrib::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
 };
 
 } // namespace hibf::sketch

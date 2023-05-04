@@ -85,6 +85,9 @@ struct hibf_config
     // Related to k-mers
     bool disable_cutoffs{false};
 
+    //!\brief If given, no layout algorithm is esxecuted but the layout from file is used for building.
+    std::filesystem::path layout_file{};
+
     // Related to IBF
     // bool compressed{false};
     //!\}
@@ -436,9 +439,9 @@ public:
 
 protected:
     template <typename config_type>
-    hibf::layout compute_layout(config_type const & config)
+    hibf::layout::layout compute_layout(config_type const & config)
     {
-        hibf::layout resulting_layout{};
+        hibf::layout::layout resulting_layout{};
 
         hibf::configuration chopper_config{.sketch_bits = config.sketch_bits,
                                            .disable_sketch_output = true,
@@ -456,21 +459,20 @@ protected:
         std::stringstream output_buffer;
         std::stringstream header_buffer;
 
-        hibf::data_store store{.false_positive_rate = chopper_config.false_positive_rate,
-                               .output_buffer = &output_buffer,
-                               .header_buffer = &header_buffer,
-                               .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
-
         size_t const number_of_user_bins = std::ranges::size(config.input);
 
+        std::vector<std::string> filenames{};
+        std::vector<size_t> kmer_counts{};
+        std::vector<chopper::sketch::hyperloglog> sketches{};
+
         // dummy init filenames
-        store.filenames.resize(number_of_user_bins);
+        filenames.resize(number_of_user_bins);
         for (size_t i = 0; i < number_of_user_bins; ++i)
-            store.filenames[i] = "UB_" + std::to_string(i);
+            filenames[i] = "UB_" + std::to_string(i);
 
         // compute sketches
-        store.sketches.resize(number_of_user_bins);
-        store.kmer_counts.resize(number_of_user_bins);
+        sketches.resize(number_of_user_bins);
+        kmer_counts.resize(number_of_user_bins);
 
         // #pragma omp parallel for schedule(static) num_threads(config.threads)
         for (size_t i = 0; i < number_of_user_bins; ++i)
@@ -482,17 +484,25 @@ protected:
                     sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
 
             // #pragma omp critical
-            store.sketches[i] = sketch;
+            sketches[i] = sketch;
             // #pragma omp critical
-            store.kmer_counts[i] = sketch.estimate();
+            kmer_counts[i] = sketch.estimate();
         }
+
+        chopper::sketch::estimate_kmer_counts(sketches, kmer_counts);
+
+        chopper::data_store store{.false_positive_rate = chopper_config.false_positive_rate,
+                                  .hibf_layout = &resulting_layout,
+                                  .kmer_counts = kmer_counts,
+                                  .sketches = sketches,
+                                  .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
 
         size_t const max_hibf_id = hibf::execute(chopper_config, store);
 
         // brief Write the output to the layout file.
         std::stringstream fout{};
-        write_layout_header_to(chopper_config, max_hibf_id, store.header_buffer->str(), fout);
-        fout << store.output_buffer->str();
+        chopper::layout::write_layout_header_to(*(data.hibf_layout), max_hibf_id, fout);
+        chopper::layout::write_layout_content_to(*(data.hibf_layout), filenames, fout);
 
         resulting_layout.layout_str = fout.str();
 
@@ -500,7 +510,7 @@ protected:
     }
 
     template <typename input_data_type>
-    void build_index(hibf_config<input_data_type> const & config, hibf::layout layout)
+    void build_index(hibf_config<input_data_type> const & config, hibf::layout::layout layout)
     {
         hibf::build_data<hibf_config<input_data_type>> data{.hibf_config = config};
         data.hibf = this;
