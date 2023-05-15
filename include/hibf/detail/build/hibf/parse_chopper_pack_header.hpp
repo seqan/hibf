@@ -15,15 +15,13 @@
 #include <iosfwd>
 #include <string_view>
 
-#include <hibf/detail/build/hibf/node_data.hpp>
+#include <hibf/layout/layout.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 namespace hibf
 {
 
-size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
-                                 lemon::ListDigraph::NodeMap<node_data> & node_map,
-                                 std::istream & chopper_pack_file)
+void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout)
 {
     auto parse_bin_indices = [](std::string_view const & buffer)
     {
@@ -54,22 +52,17 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
     std::string line;
 
     while (std::getline(chopper_pack_file, line) && line.size() >= 2
-           && std::string_view{line}.substr(0, 1) == hibf::prefix::header
-           && std::string_view{line}.substr(1, 1) == hibf::prefix::header_config)
+           && std::string_view{line}.substr(0, 1) == prefix::header
+           && std::string_view{line}.substr(1, 1) == prefix::header_config)
         ; // skip config in header
 
     assert(line[0] == '#'); // we are reading header lines
-    assert(line.substr(1, prefix::high_level.size())
-           == prefix::high_level); // first line should always be High level IBF
+    assert(line.substr(1, prefix::high_level.size()) == prefix::high_level);
 
     // parse High Level max bin index
     assert(line.substr(prefix::high_level.size() + 2, 11) == "max_bin_id:");
     std::string_view const hibf_max_bin_str{line.begin() + 27, line.end()};
-
-    auto high_level_node = ibf_graph.addNode(); // high-level node = root node
-    node_map.set(high_level_node, {0, parse_first_bin(hibf_max_bin_str), 0, lemon::INVALID, {}});
-
-    std::vector<std::pair<std::vector<size_t>, size_t>> header_records{};
+    hibf_layout.top_level_max_bin_id = parse_first_bin(hibf_max_bin_str);
 
     // first read and parse header records, in order to sort them before adding them to the graph
     while (std::getline(chopper_pack_file, line) && line.substr(0, 6) != "#FILES")
@@ -77,53 +70,16 @@ size_t parse_chopper_pack_header(lemon::ListDigraph & ibf_graph,
         assert(line.substr(1, prefix::merged_bin.size()) == prefix::merged_bin);
 
         // parse header line
-        std::string_view const indices_str{line.begin() + 1 /*#*/ + prefix::merged_bin.size() + 1 /*_*/,
-                                           std::find(line.begin() + prefix::merged_bin.size() + 2, line.end(), ' ')};
+        std::string_view const indices_str{
+            line.begin() + 1 /*#*/ + prefix::merged_bin.size() + 1 /*_*/,
+            std::find(line.begin() + prefix::merged_bin.size() + 2, line.end(), ' ')};
 
         assert(line.substr(prefix::merged_bin.size() + indices_str.size() + 3, 11) == "max_bin_id:");
         std::string_view const max_id_str{line.begin() + prefix::merged_bin.size() + indices_str.size() + 14,
                                           line.end()};
 
-        header_records.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
+        hibf_layout.max_bins.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
     }
-
-    // sort records ascending by the number of bin indices (corresponds to the IBF levels)
-    std::ranges::sort(header_records,
-                      [](auto const & r, auto const & l)
-                      {
-                          return r.first.size() < l.first.size();
-                      });
-
-    for (auto const & [bin_indices, max_id] : header_records)
-    {
-        // we assume that the header lines are in the correct order
-        // go down the tree until you find the matching parent
-        auto it = bin_indices.begin();
-        lemon::ListDigraph::Node current_node = high_level_node; // start at root
-
-        while (it != (bin_indices.end() - 1))
-        {
-            for (lemon::ListDigraph::OutArcIt arc_it(ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
-            {
-                auto target = ibf_graph.target(arc_it);
-                if (node_map[target].parent_bin_index == *it)
-                {
-                    current_node = target;
-                    break;
-                }
-            }
-            ++it;
-        }
-
-        auto new_node = ibf_graph.addNode();
-        ibf_graph.addArc(current_node, new_node);
-        node_map.set(new_node, {bin_indices.back(), max_id, 0, lemon::INVALID, {}});
-
-        if (node_map[current_node].max_bin_index == bin_indices.back())
-            node_map[current_node].favourite_child = new_node;
-    }
-
-    return header_records.size();
 }
 
 } // namespace hibf

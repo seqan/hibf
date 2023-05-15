@@ -23,25 +23,13 @@
 namespace hibf
 {
 
-template <typename input_range_type>
 struct hibf_config
 {
-    static_assert(std::ranges::random_access_range<input_range_type>,
-                  "The input data must be a std::random_access_range.");
-    static_assert(std::ranges::input_range<std::ranges::range_value_t<std::ranges::range_value_t<input_range_type>>>,
-                  "The input data must be a range of a range of a range, whose value type is an std::integral, "
-                  "e.g. type `std::vector<std::vector<std::vector<size_t>>>`.");
-    static_assert(
-        std::integral<
-            std::ranges::range_value_t<std::ranges::range_value_t<std::ranges::range_value_t<input_range_type>>>>,
-        "The input data must be a range of a range of a range, whose value type is an std::integral, "
-        "e.g. type `std::vector<std::vector<std::vector<size_t>>>`.");
-
     /*!\name General Configuration
      * \{
      */
-    //!\brief A range over inputs. The most inner value type must be an integer (hash value);
-    input_range_type input;
+    //!\brief A lambda how to hash your input. TODO: Detailed docu needed!
+    std::function<void(size_t const, insert_iterator &&)> input_fn;
 
     //!\brief The number of hash functions for the IBFs.
     size_t number_of_hash_functions{2};
@@ -186,38 +174,18 @@ public:
             user_bin_filenames.resize(size);
         }
 
-        //!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
+        /*!\brief Returns a vector containing user bin indices for each bin in the `idx`th IBF.
+        * \param idx The id of the x-th IBF.
+        *
+        * \details
+        *
+        * ### Example
+        *
+        * \include test/snippet/hibf/bin_indices_of_ibf.cpp
+        */
         std::vector<int64_t> & bin_indices_of_ibf(size_t const idx)
         {
             return ibf_bin_to_filename_position[idx];
-        }
-
-        //!\brief Returns the filename of the `idx`th user bin.
-        std::string & filename_of_user_bin(size_t const idx)
-        {
-            return user_bin_filenames[idx];
-        }
-
-        //!\brief For a pair `(a,b)`, returns a const reference to the filename of the user bin at IBF `a`, bin `b`.
-        std::string const & operator[](std::pair<size_t, size_t> const & index_pair) const
-        {
-            return user_bin_filenames[ibf_bin_to_filename_position[index_pair.first][index_pair.second]];
-        }
-
-        /*!\brief Returns a view over the user bin filenames for the `ibf_idx`th IBF.
-        *        An empty string is returned for merged bins.
-        */
-        auto operator[](size_t const ibf_idx) const
-        {
-            return ibf_bin_to_filename_position[ibf_idx]
-                | std::views::transform(
-                    [this](int64_t i)
-                    {
-                        if (i == -1)
-                            return std::string{};
-                        else
-                            return user_bin_filenames[i];
-                    });
         }
 
         //!\brief Returns the filename index of the `ibf_idx`th IBF for bin `bin_idx`.
@@ -226,32 +194,9 @@ public:
             return ibf_bin_to_filename_position[ibf_idx][bin_idx];
         }
 
-        /*!\brief Writes all filenames to a stream. Index and filename are tab-separated.
-        * \details
-        * 0	\<path_to_user_bin_0\>
-        * 1	\<path_to_user_bin_1\>
-        */
-        template <typename stream_t>
-        void write_filenames(stream_t & out_stream) const
-        {
-            size_t position{};
-            std::string line{};
-            for (auto const & filename : user_bin_filenames)
-            {
-                line.clear();
-                line = '#';
-                line += std::to_string(position);
-                line += '\t';
-                line += filename;
-                line += '\n';
-                out_stream << line;
-                ++position;
-            }
-        }
-
         /*!\cond DEV
         * \brief Serialisation support function.
-        * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
+        * \tparam archive_t Type of `archive`; must satisfy seqan3::cereal_archive.
         * \param[in] archive The archive being serialised from/to.
         *
         * \attention These functions are never called directly.
@@ -498,31 +443,45 @@ protected:
                                   .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
 
         size_t const max_hibf_id = hibf::execute(chopper_config, store);
+        data.hibf_layout.top_level_max_bin_id = max_hibf_id;
 
-        // brief Write the output to the layout file.
-        std::stringstream fout{};
-        chopper::layout::write_layout_header_to(*(data.hibf_layout), max_hibf_id, fout);
-        chopper::layout::write_layout_content_to(*(data.hibf_layout), filenames, fout);
-
-        resulting_layout.layout_str = fout.str();
-
-        return resulting_layout; // return layout as string for now, containing the file
+        return data.hibf_layout; // return layout as string for now, containing the file
     }
 
     template <typename input_data_type>
-    void build_index(hibf_config<input_data_type> const & config, hibf::layout::layout layout)
+    void build_index(hibf_config const & config, hibf::layout::layout & layout)
     {
-        hibf::build_data<hibf_config<input_data_type>> data{.hibf_config = config};
+        build_data data{.arguments = arguments,
+                        .input_fn = [&](size_t const user_bin_id, hibf::insert_iterator && it) // GCOVR_EXCL_LINE
+                        {
+                            if (arguments.input_is_minimiser)
+                            {
+                                file_reader<file_types::minimiser> const reader{};
+                                reader.hash_into(filenames[user_bin_id], it);
+                            }
+                            else
+                            {
+                                file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
+                                reader.hash_into(filenames[user_bin_id], it);
+                            }
+                        },
+                        .hibf = this};
+
+        size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
+
         data.hibf = this;
+        data.hibf.ibf_vector.resize(number_of_ibfs);
+        data.hibf.user_bins.set_ibf_count(number_of_ibfs);
+        data.hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+        data.hibf.next_ibf_id.resize(number_of_ibfs);
 
-        hibf::read_chopper_pack_file(data, layout.layout_str);
-        lemon::ListDigraph::Node root = data.ibf_graph.nodeFromId(0); // root node = high level IBF node
-        robin_hood::unordered_flat_set<size_t> root_kmers{};
+        initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
+        lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
 
-        size_t const t_max{data.node_map[root].number_of_technical_bins};
-        data.compute_fp_correction(t_max, config.number_of_hash_functions, config.maximum_false_positive_rate);
+        size_t const t_max{data.node_map[root_node].number_of_technical_bins};
+        data.fp_correction = chopper::layout::compute_fp_correction(arguments.fpr, arguments.hash, t_max);
 
-        hibf::hierarchical_build(root_kmers, root, data, true);
+        hierarchical_build(root_node, data);
     }
 };
 

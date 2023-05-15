@@ -7,31 +7,14 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> // Must be first include.
-
-#include <hibf/detail/build/hibf/build_data.hpp>
-#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
+#include <chopper/layout/layout.hpp>
 
 namespace hibf
 {
 
-template <typename config_type>
-void update_user_bins(build_data<config_type> & data,
-                      std::vector<int64_t> & filename_indices,
-                      chopper_pack_record const & record)
+void update_user_bins(std::vector<int64_t> & filename_indices, chopper::layout::layout::user_bin const & record)
 {
-    size_t const idx = record.user_bin_index;
-
-    std::string & user_bin_filenames = data.hibf->user_bins.filename_of_user_bin(idx);
-    for (auto const & filename : record.filenames)
-    {
-        user_bin_filenames += filename;
-        user_bin_filenames += ';';
-    }
-    assert(!user_bin_filenames.empty());
-    user_bin_filenames.pop_back();
-
-    std::fill_n(filename_indices.begin() + record.bin_indices.back(), record.number_of_bins.back(), idx);
+    std::fill_n(filename_indices.begin() + record.storage_TB_id, record.number_of_technical_bins, record.idx);
 }
 
 } // namespace hibf

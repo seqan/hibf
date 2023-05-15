@@ -16,9 +16,10 @@
 namespace hibf
 {
 
-chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
+chopper::layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
+                                                          std::vector<std::vector<std::string>> & user_bin_filenames)
 {
-    chopper_pack_record result{};
+    chopper::layout::layout::user_bin result{};
 
     // initialize parsing
     std::string_view const buffer{current_line};
@@ -28,38 +29,36 @@ chopper_pack_record parse_chopper_pack_line(std::string const & current_line)
         ++field_end;
 
     // parse filenames
-    std::string_view const filenames{buffer.begin(), field_end};
-    for (auto const && filename : filenames | std::views::split(';'))
+    std::string_view const filenames_str{buffer.begin(), field_end};
+    std::vector<std::string> filename_list;
+    for (auto const && filename : filenames_str | std::views::split(';'))
     {
         auto const common_view = filename | std::views::common;
-        result.filenames.emplace_back(common_view.begin(), common_view.end());
+        filename_list.emplace_back(common_view.begin(), common_view.end());
     }
 
-    size_t tmp{};
+    // update input idx and append filesnames to build_data
+    result.idx = user_bin_filenames.size();
+    user_bin_filenames.push_back(std::move(filename_list));
 
-    // parse filename for user bin index
-    assert(result.filenames.size() == 1u);
-    assert(result.filenames[0][0] == 'U');
-    assert(result.filenames[0][1] == 'B');
-    assert(result.filenames[0][2] == '_');
-    std::from_chars(result.filenames[0].data() + 3 /* UB_ */,
-                    result.filenames[0].data() + result.filenames[0].size(),
-                    tmp);
-    result.user_bin_index = tmp;
+    size_t tmp{};
 
     do // read bin_indices
     {
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
-        result.bin_indices.push_back(tmp);
+        result.previous_TB_indices.push_back(tmp);
     }
     while (field_end != buffer_end && *field_end != '\t');
+
+    result.storage_TB_id = result.previous_TB_indices.back();
+    result.previous_TB_indices.pop_back();
 
     do // read number of technical bins
     {
         ++field_end; // skip tab or ;
         field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
-        result.number_of_bins.push_back(tmp);
+        result.number_of_technical_bins = tmp; // only the last number really counts
     }
     while (field_end != buffer_end && *field_end != '\t');
 

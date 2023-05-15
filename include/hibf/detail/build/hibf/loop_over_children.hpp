@@ -20,12 +20,11 @@
 namespace hibf
 {
 
-template <typename config_type>
-void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
+void loop_over_children(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                         hibf::interleaved_bloom_filter<> & ibf,
                         std::vector<int64_t> & ibf_positions,
                         lemon::ListDigraph::Node const & current_node,
-                        build_data<config_type> & data,
+                        build_data & data,
                         bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -46,16 +45,16 @@ void loop_over_children(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
         if (child != current_node_data.favourite_child)
         {
-            robin_hood::unordered_flat_set<size_t> kmers{};
+            robin_hood::unordered_flat_set<uint64_t> kmers{};
             size_t const ibf_pos = hierarchical_build(kmers, child, data, false);
             auto parent_bin_index = data.node_map[child].parent_bin_index;
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 ibf_positions[parent_bin_index] = ibf_pos;
-                insert_into_ibf(kmers, 1, parent_bin_index, ibf);
+                insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
                 if (!is_root)
-                    parent_kmers.insert(kmers.begin(), kmers.end());
+                    update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
             }
         }
     };

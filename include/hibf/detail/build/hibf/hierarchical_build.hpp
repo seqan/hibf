@@ -11,6 +11,7 @@
 
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/detail/build/hibf/build_data.hpp>
+#include <hibf/detail/build/hibf/compute_kmers.hpp>
 #include <hibf/detail/build/hibf/construct_ibf.hpp>
 #include <hibf/detail/build/hibf/insert_into_ibf.hpp>
 #include <hibf/detail/build/hibf/loop_over_children.hpp>
@@ -19,10 +20,15 @@
 namespace hibf
 {
 
-template <typename config_type>
-size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
+size_t hierarchical_build(lemon::ListDigraph::Node const & root_node, build_data & data)
+{
+    robin_hood::unordered_flat_set<uint64_t> root_kmers{};
+    return hierarchical_build(root_kmers, root_node, data, true);
+}
+
+size_t hierarchical_build(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                           lemon::ListDigraph::Node const & current_node,
-                          build_data<config_type> & data,
+                          build_data & data,
                           bool is_root)
 {
     auto & current_node_data = data.node_map[current_node];
@@ -31,20 +37,13 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
 
     std::vector<int64_t> ibf_positions(current_node_data.number_of_technical_bins, ibf_pos);
     std::vector<int64_t> filename_indices(current_node_data.number_of_technical_bins, -1);
-    robin_hood::unordered_flat_set<size_t> kmers{};
+    robin_hood::unordered_flat_set<uint64_t> kmers{};
 
-    auto compute_kmers = [&data, &kmers](chopper_pack_record const & record)
-    {
-        for (auto && hash_sequence : data.hibf_config.input[record.user_bin_index])
-            for (auto hash : hash_sequence)
-                kmers.insert(hash);
-    };
-
-    auto initialise_max_bin_kmers = [&](robin_hood::unordered_flat_set<size_t> & kmers,
-                                        std::vector<int64_t> & ibf_positions,
-                                        std::vector<int64_t> & filename_indices,
-                                        lemon::ListDigraph::Node const & node,
-                                        build_data<config_type> & data) -> size_t
+    auto initialise_max_bin_kmers = [](robin_hood::unordered_flat_set<uint64_t> & kmers,
+                                       std::vector<int64_t> & ibf_positions,
+                                       std::vector<int64_t> & filename_indices,
+                                       lemon::ListDigraph::Node const & node,
+                                       build_data & data) -> size_t
     {
         auto & node_data = data.node_map[node];
 
@@ -58,16 +57,15 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
         {
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = node_data.remaining_records[0];
-            compute_kmers(record);
-            update_user_bins(data, filename_indices, record);
+            compute_kmers(kmers, data, record);
+            update_user_bins(filename_indices, record);
 
-            return record.number_of_bins.back();
+            return record.number_of_technical_bins;
         }
     };
 
     // initialize lower level IBF
     size_t const max_bin_tbs = initialise_max_bin_kmers(kmers, ibf_positions, filename_indices, current_node, data);
-
     auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
     kmers.clear(); // reduce memory peak
 
@@ -80,23 +78,29 @@ size_t hierarchical_build(robin_hood::unordered_flat_set<size_t> & parent_kmers,
     {
         auto const & record = current_node_data.remaining_records[i];
 
-        if (is_root && record.number_of_bins.back() == 1) // no splitting needed
+        if (is_root && record.number_of_technical_bins == 1) // no splitting needed
         {
             insert_into_ibf(data, record, ibf);
         }
         else
         {
-            compute_kmers(record);
-            insert_into_ibf(kmers, record.number_of_bins.back(), record.bin_indices.back(), ibf);
+            compute_kmers(kmers, data, record);
+            insert_into_ibf(kmers,
+                            record.number_of_technical_bins,
+                            record.storage_TB_id,
+                            ibf,
+                            data.arguments.fill_ibf_timer);
+            if (!is_root)
+                update_parent_kmers(parent_kmers, kmers, data.arguments.merge_kmers_timer);
         }
 
-        update_user_bins(data, filename_indices, record);
+        update_user_bins(filename_indices, record);
         kmers.clear();
     }
 
-    data.hibf->ibf_vector[ibf_pos] = std::move(ibf);
-    data.hibf->next_ibf_id[ibf_pos] = std::move(ibf_positions);
-    data.hibf->user_bins.bin_indices_of_ibf(ibf_pos) = std::move(filename_indices);
+    data.hibf.ibf_vector[ibf_pos] = std::move(ibf);
+    data.hibf.next_ibf_id[ibf_pos] = std::move(ibf_positions);
+    data.hibf.user_bins.bin_indices_of_ibf(ibf_pos) = std::move(filename_indices);
 
     return ibf_pos;
 }
