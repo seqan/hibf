@@ -18,21 +18,11 @@
 namespace hibf
 {
 
-// forward
-class hierarchical_interleaved_bloom_filter;
-
-} // namespace hibf
-
-namespace hibf
-{
-
 struct build_data
 {
     std::atomic<size_t> ibf_number{};
 
     config const & hibf_config;
-
-    hierarchical_interleaved_bloom_filter * hibf;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};

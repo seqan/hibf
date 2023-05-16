@@ -9,7 +9,7 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-#include <sstream>
+#include <fstream>
 #include <string>
 
 #include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
