@@ -11,6 +11,8 @@
 
 #include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/detail/timer.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
@@ -19,7 +21,7 @@ namespace hibf
 void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
-                     seqan3::interleaved_bloom_filter<> & ibf,
+                     hibf::interleaved_bloom_filter<> & ibf,
                      timer<concurrent::yes> & fill_ibf_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
@@ -30,7 +32,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
     for (auto chunk : kmers | seqan::std::views::chunk(chunk_size))
     {
         assert(chunk_number < number_of_bins);
-        seqan3::bin_index const bin_idx{bin_index + chunk_number};
+        hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
         for (size_t const value : chunk)
             ibf.emplace(value, bin_idx);
@@ -40,15 +42,15 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
 }
 
 void insert_into_ibf(build_data const & data,
-                     chopper::layout::layout::user_bin const & record,
-                     seqan3::interleaved_bloom_filter<> & ibf)
+                     layout::layout::user_bin const & record,
+                     hibf::interleaved_bloom_filter<> & ibf)
 {
-    auto const bin_index = seqan3::bin_index{static_cast<size_t>(record.storage_TB_id)};
+    auto const bin_index = hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
     robin_hood::unordered_flat_set<uint64_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.input_fn(record.idx, std::inserter(values, values.begin()));
+    data.hibf_config.input_fn(record.idx, std::inserter(values, values.begin()));
     local_user_bin_io_timer.stop();
     data.user_bin_io_timer += local_user_bin_io_timer;
 

@@ -9,6 +9,7 @@
  * \brief Implements hibf::update_parent_kmers.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
+#pragma once
 
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/detail/timer.hpp>

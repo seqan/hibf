@@ -13,12 +13,12 @@
 #include <hibf/detail/build/hibf/node_data.hpp>
 #include <hibf/detail/timer.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/config.hpp>
 
 namespace hibf
 {
 
 // forward
-class hibf_config;
 class hierarchical_interleaved_bloom_filter;
 
 } // namespace hibf
@@ -26,20 +26,17 @@ class hierarchical_interleaved_bloom_filter;
 namespace hibf
 {
 
-using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
-
 struct build_data
 {
-    build_arguments const & arguments;
-
     std::atomic<size_t> ibf_number{};
 
-    hibf_config config;
+    config const & hibf_config;
+
+    hierarchical_interleaved_bloom_filter * hibf;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
 
-    hierarchical_interleaved_bloom_filter hibf{};
     std::vector<double> fp_correction{};
 
     // Timers do not copy the stored duration upon copy construction/assignment

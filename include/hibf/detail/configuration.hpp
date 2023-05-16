@@ -16,8 +16,6 @@ struct configuration
     /*!\name General Configuration
      * \{
      */
-    //!\brief The input file to chopper. Should contain one file path per line.
-    std::filesystem::path data_file;
 
     //!\brief Internal parameter that triggers some verbose debug output.
     bool debug{false};
@@ -95,7 +93,6 @@ private:
         uint32_t version{2};
         archive(CEREAL_NVP(version));
 
-        archive(CEREAL_NVP(data_file));
         archive(CEREAL_NVP(debug));
         archive(CEREAL_NVP(sketch_directory));
         archive(CEREAL_NVP(k));

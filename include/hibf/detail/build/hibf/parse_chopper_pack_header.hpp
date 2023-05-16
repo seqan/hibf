@@ -15,7 +15,7 @@
 #include <iosfwd>
 #include <string_view>
 
-#include <hibf/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 namespace hibf

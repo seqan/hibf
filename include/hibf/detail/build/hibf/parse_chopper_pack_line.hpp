@@ -11,15 +11,15 @@
 #include <ranges>
 #include <string>
 
-#include <hibf/detail/build/hibf/chopper_pack_record.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
 
-chopper::layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
+layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
                                                           std::vector<std::vector<std::string>> & user_bin_filenames)
 {
-    chopper::layout::layout::user_bin result{};
+    layout::layout::user_bin result{};
 
     // initialize parsing
     std::string_view const buffer{current_line};

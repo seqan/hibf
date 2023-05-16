@@ -12,74 +12,20 @@
 #include <ranges>
 #include <sstream>
 
+#include <hibf/config.hpp>
 #include <hibf/detail/build/hibf/hierarchical_build.hpp>
 #include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
+#include <hibf/detail/build/hibf/initialise_build_tree.hpp>
 #include <hibf/detail/configuration.hpp>
 #include <hibf/detail/data_store.hpp>
 #include <hibf/detail/layout/execute.hpp>
+#include <hibf/detail/layout/compute_fp_correction.hpp>
+#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
 #include <hibf/detail/layout/layout.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf
 {
-
-struct hibf_config
-{
-    /*!\name General Configuration
-     * \{
-     */
-    //!\brief A lambda how to hash your input. TODO: Detailed docu needed!
-    std::function<void(size_t const, insert_iterator &&)> input_fn;
-
-    //!\brief The number of hash functions for the IBFs.
-    size_t number_of_hash_functions{2};
-
-    //!\brief The desired false positive rate of the IBFs.
-    double maximum_false_positive_rate{0.05};
-
-    //!\brief The number of threads to use to compute merged HLL sketches.
-    size_t threads{1u};
-    //!\}
-
-    /*!\name Layout Configuration
-     * \{
-     */
-    //!\brief The number of bits the HyperLogLog sketch should use to distribute the values into bins.
-    uint8_t sketch_bits{12};
-
-    //!\brief The maximum number of technical bins on each IBF in the HIBF.
-    uint16_t tmax{64};
-
-    /*\brief A scaling factor to influence the amount of merged bins produced by the algorithm.
-     *
-     * The higher alpha, the more weight is added artificially to the low level IBFs and thus the optimal
-     * solution will contain less merged bins in the end because it costs more to merge bins.
-     */
-    double alpha{1.2};
-
-    //!\brief The maximal cardinality ratio in the clustering intervals.
-    double max_rearrangement_ratio{0.5};
-
-    //!\brief Whether to estimate the union of kmer sets to possibly improve the binning or not.
-    bool estimate_union{true};
-
-    //!\brief Whether to do a second sorting of the bins which takes into account similarity or not.
-    bool rearrange_user_bins{true};
-    //!\}
-
-    /*!\name Build Configuration
-     * \{
-     */
-    // Related to k-mers
-    bool disable_cutoffs{false};
-
-    //!\brief If given, no layout algorithm is esxecuted but the layout from file is used for building.
-    std::filesystem::path layout_file{};
-
-    // Related to IBF
-    // bool compressed{false};
-    //!\}
-};
 
 /*!\brief The HIBF binning directory. A data structure that efficiently answers set-membership queries for multiple
  *        bins.
@@ -336,8 +282,7 @@ public:
     operator=(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
     ~hierarchical_interleaved_bloom_filter() = default;            //!< Defaulted.
 
-    template <typename config_type>
-    hierarchical_interleaved_bloom_filter(config_type const & configuration)
+    hierarchical_interleaved_bloom_filter(config const & configuration)
     {
         auto layout = compute_layout(configuration);
         build_index(configuration, layout);
@@ -383,103 +328,81 @@ public:
     //!\endcond
 
 protected:
-    template <typename config_type>
-    hibf::layout::layout compute_layout(config_type const & config)
+    hibf::layout::layout compute_layout(config const & hibf_config)
     {
         hibf::layout::layout resulting_layout{};
 
-        hibf::configuration chopper_config{.sketch_bits = config.sketch_bits,
+        hibf::configuration chopper_config{.sketch_bits = hibf_config.sketch_bits,
                                            .disable_sketch_output = true,
-                                           .tmax = config.tmax,
-                                           .num_hash_functions = config.number_of_hash_functions,
-                                           .false_positive_rate = config.maximum_false_positive_rate,
-                                           .alpha = config.alpha,
-                                           .max_rearrangement_ratio = config.max_rearrangement_ratio,
-                                           .threads = config.threads,
-                                           .estimate_union = config.estimate_union,
-                                           .rearrange_user_bins = config.rearrange_user_bins};
+                                           .tmax = hibf_config.tmax,
+                                           .num_hash_functions = hibf_config.number_of_hash_functions,
+                                           .false_positive_rate = hibf_config.maximum_false_positive_rate,
+                                           .alpha = hibf_config.alpha,
+                                           .max_rearrangement_ratio = hibf_config.max_rearrangement_ratio,
+                                           .threads = hibf_config.threads,
+                                           .disable_estimate_union = hibf_config.disable_estimate_union,
+                                           .disable_rearrangement = hibf_config.disable_rearrangement};
 
         // The output streams facilitate writing the layout file in hierarchical structure.
         // hibf::execute currently writes the filled buffers to the output file.
         std::stringstream output_buffer;
         std::stringstream header_buffer;
 
-        size_t const number_of_user_bins = std::ranges::size(config.input);
-
         std::vector<std::string> filenames{};
         std::vector<size_t> kmer_counts{};
-        std::vector<chopper::sketch::hyperloglog> sketches{};
+        std::vector<sketch::hyperloglog> sketches{};
 
         // dummy init filenames
-        filenames.resize(number_of_user_bins);
-        for (size_t i = 0; i < number_of_user_bins; ++i)
+        filenames.resize(hibf_config.number_of_user_bins);
+        for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
             filenames[i] = "UB_" + std::to_string(i);
 
         // compute sketches
-        sketches.resize(number_of_user_bins);
-        kmer_counts.resize(number_of_user_bins);
+        sketches.resize(hibf_config.number_of_user_bins);
+        kmer_counts.resize(hibf_config.number_of_user_bins);
 
         // #pragma omp parallel for schedule(static) num_threads(config.threads)
-        for (size_t i = 0; i < number_of_user_bins; ++i)
+        for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
         {
-            hibf::sketch::hyperloglog sketch(config.sketch_bits);
+            hibf::sketch::hyperloglog sketch(hibf_config.sketch_bits);
 
-            for (auto && hash_sequence : config.input[i]) // multi range input
-                for (auto k_hash : hash_sequence)
-                    sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
+            // for (auto && hash_sequence : config.input[i]) // multi range input
+            //     for (auto k_hash : hash_sequence)
+            //         sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
 
             // #pragma omp critical
             sketches[i] = sketch;
-            // #pragma omp critical
-            kmer_counts[i] = sketch.estimate();
         }
 
-        chopper::sketch::estimate_kmer_counts(sketches, kmer_counts);
+        sketch::estimate_kmer_counts(sketches, kmer_counts);
 
-        chopper::data_store store{.false_positive_rate = chopper_config.false_positive_rate,
+        data_store store{.false_positive_rate = chopper_config.false_positive_rate,
                                   .hibf_layout = &resulting_layout,
                                   .kmer_counts = kmer_counts,
-                                  .sketches = sketches,
-                                  .merged_bin_max_ids = &resulting_layout.merged_bin_max_ids};
+                                  .sketches = sketches};
 
         size_t const max_hibf_id = hibf::execute(chopper_config, store);
-        data.hibf_layout.top_level_max_bin_id = max_hibf_id;
+        store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
-        return data.hibf_layout; // return layout as string for now, containing the file
+        return *store.hibf_layout; // return layout as string for now, containing the file
     }
 
-    template <typename input_data_type>
-    void build_index(hibf_config const & config, hibf::layout::layout & layout)
+    void build_index(config const & hibf_config, hibf::layout::layout & hibf_layout)
     {
-        build_data data{.arguments = arguments,
-                        .input_fn = [&](size_t const user_bin_id, hibf::insert_iterator && it) // GCOVR_EXCL_LINE
-                        {
-                            if (arguments.input_is_minimiser)
-                            {
-                                file_reader<file_types::minimiser> const reader{};
-                                reader.hash_into(filenames[user_bin_id], it);
-                            }
-                            else
-                            {
-                                file_reader<file_types::sequence> const reader{arguments.shape, arguments.window_size};
-                                reader.hash_into(filenames[user_bin_id], it);
-                            }
-                        },
-                        .hibf = this};
-
         size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
 
-        data.hibf = this;
-        data.hibf.ibf_vector.resize(number_of_ibfs);
-        data.hibf.user_bins.set_ibf_count(number_of_ibfs);
-        data.hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
-        data.hibf.next_ibf_id.resize(number_of_ibfs);
+        this->ibf_vector.resize(number_of_ibfs);
+        this->user_bins.set_ibf_count(number_of_ibfs);
+        this->user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+        this->next_ibf_id.resize(number_of_ibfs);
+
+        build_data data{.hibf_config = hibf_config, .hibf = this};
 
         initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
         lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
 
         size_t const t_max{data.node_map[root_node].number_of_technical_bins};
-        data.fp_correction = chopper::layout::compute_fp_correction(arguments.fpr, arguments.hash, t_max);
+        data.fp_correction = layout::compute_fp_correction(hibf_config.maximum_false_positive_rate, hibf_config.number_of_hash_functions, t_max);
 
         hierarchical_build(root_node, data);
     }

@@ -7,12 +7,12 @@
 
 #pragma once
 
-#include <chopper/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
 
-void update_user_bins(std::vector<int64_t> & filename_indices, chopper::layout::layout::user_bin const & record)
+void update_user_bins(std::vector<int64_t> & filename_indices, layout::layout::user_bin const & record)
 {
     std::fill_n(filename_indices.begin() + record.storage_TB_id, record.number_of_technical_bins, record.idx);
 }

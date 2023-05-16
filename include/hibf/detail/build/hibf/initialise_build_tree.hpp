@@ -12,13 +12,14 @@
 
 #include <cassert>
 
-#include <hibf/build/detail/update_content_node_data.hpp>
-#include <hibf/build/detail/update_header_node_data.hpp>
+#include <hibf/detail/build/hibf/update_content_node_data.hpp>
+#include <hibf/detail/build/hibf/update_header_node_data.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
 
-void initialise_build_tree(chopper::layout::layout & hibf_layout,
+void initialise_build_tree(layout::layout & hibf_layout,
                            lemon::ListDigraph & ibf_graph,
                            lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
