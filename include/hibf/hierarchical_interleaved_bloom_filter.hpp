@@ -371,13 +371,16 @@ protected:
         kmer_counts.resize(hibf_config.number_of_user_bins);
 
         // #pragma omp parallel for schedule(static) num_threads(config.threads)
+        robin_hood::unordered_flat_set<uint64_t> kmers;
         for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
         {
             hibf::sketch::hyperloglog sketch(hibf_config.sketch_bits);
 
-            // for (auto && hash_sequence : config.input[i]) // multi range input
-            //     for (auto k_hash : hash_sequence)
-            //         sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
+            kmers.clear();
+            hibf_config.input_fn(i, std::inserter(kmers, kmers.begin()));
+
+            for (auto k_hash : kmers)
+                sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
 
             // #pragma omp critical
             sketches[i] = sketch;
