@@ -70,9 +70,8 @@ void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::l
         assert(line.substr(1, prefix::merged_bin.size()) == prefix::merged_bin);
 
         // parse header line
-        std::string_view const indices_str{
-            line.begin() + 1 /*#*/ + prefix::merged_bin.size() + 1 /*_*/,
-            std::find(line.begin() + prefix::merged_bin.size() + 2, line.end(), ' ')};
+        std::string_view const indices_str{line.begin() + 1 /*#*/ + prefix::merged_bin.size() + 1 /*_*/,
+                                           std::find(line.begin() + prefix::merged_bin.size() + 2, line.end(), ' ')};
 
         assert(line.substr(prefix::merged_bin.size() + indices_str.size() + 3, 11) == "max_bin_id:");
         std::string_view const max_id_str{line.begin() + prefix::merged_bin.size() + indices_str.size() + 14,

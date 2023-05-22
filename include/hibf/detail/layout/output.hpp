@@ -8,7 +8,6 @@
 namespace hibf::layout
 {
 
-
 inline void write_config_to(configuration const & config, std::ostream & stream)
 {
     // write json file to temprorary string stream with cereal

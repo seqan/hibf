@@ -8,11 +8,10 @@
 #pragma once
 
 #include <hibf/contrib/robin_hood.hpp>
-
-#include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/detail/timer.hpp>
 #include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/timer.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf
 {

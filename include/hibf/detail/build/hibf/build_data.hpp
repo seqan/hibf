@@ -10,10 +10,10 @@
 #include <atomic>
 #include <hibf/std/new>
 
+#include <hibf/config.hpp>
 #include <hibf/detail/build/hibf/node_data.hpp>
 #include <hibf/detail/timer.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
-#include <hibf/config.hpp>
 
 namespace hibf
 {

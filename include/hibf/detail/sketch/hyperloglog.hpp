@@ -339,11 +339,11 @@ private:
         return arr;
     }();
 
-    uint64_t mask_{};                                                    ///< mask for the rank bits
-    double alphaMM_{};                                                   ///< alpha * m^2
-    float alphaMM_float_{};                                              ///< alpha * m^2
-    uint64_t m_{};                                                       ///< register size
-    uint8_t b_{};                                                        ///< register bit width
+    uint64_t mask_{};                                                           ///< mask for the rank bits
+    double alphaMM_{};                                                          ///< alpha * m^2
+    float alphaMM_float_{};                                                     ///< alpha * m^2
+    uint64_t m_{};                                                              ///< register size
+    uint8_t b_{};                                                               ///< register bit width
     std::vector<uint8_t, hibf::contrib::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
 };
 

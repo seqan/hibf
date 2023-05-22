@@ -10,7 +10,6 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-
 #pragma once
 
 #include <hibf/contrib/robin_hood.hpp>

@@ -12,11 +12,10 @@
 
 #pragma once
 
-
 #include <cassert>
 
-#include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/build/hibf/node_data.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {

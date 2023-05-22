@@ -8,8 +8,8 @@
 #pragma once
 
 #include <filesystem>
-#include <iterator>
 #include <functional>
+#include <iterator>
 
 #include <hibf/contrib/robin_hood.hpp>
 

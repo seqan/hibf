@@ -9,9 +9,5 @@
 
 #include <lemon/list_graph.h> /// Must be first include.
 
-
 namespace hibf
-{
-
-
-} // namespace hibf
+{} // namespace hibf

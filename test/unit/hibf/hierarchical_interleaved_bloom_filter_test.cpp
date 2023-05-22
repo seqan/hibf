@@ -9,7 +9,6 @@
 
 #include <hibf/config.hpp>
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp>
-
 #include <hibf/test/expect_range_eq.hpp>
 #include <hibf/test/seqan3.hpp>
 
@@ -18,7 +17,8 @@ TEST(hibf_test, test_specific_hash_values)
     // range of range of sequences
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
 
-    hibf::config config{.input_fn = [&](size_t const num, hibf::insert_iterator it)
+    hibf::config config{.input_fn =
+                            [&](size_t const num, hibf::insert_iterator it)
                         {
                             for (auto const hash : hashes[num])
                                 it = hash;
