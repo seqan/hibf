@@ -83,10 +83,10 @@
 #    endif // HIBF_DOXYGEN_ONLY(1)0
 
 #    ifndef HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
-#        if (__GNUC__ > 12)
+#        if (__GNUC__ > 13)
 #            pragma message                                                                                            \
-                "Your compiler is newer than the latest supported compiler version (gcc-12). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
-#        endif // (__GNUC__ > 12)
+                "Your compiler is newer than the latest supported compiler version (gcc-13). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
+#        endif // (__GNUC__ > 13)
 #    endif     // HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
 
 // ============================================================================
