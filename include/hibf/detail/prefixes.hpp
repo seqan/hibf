@@ -2,6 +2,8 @@
 
 #include <string_view>
 
+#include <hibf/platform.hpp>
+
 namespace hibf::prefix
 {
 

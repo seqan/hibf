@@ -12,6 +12,7 @@
 #include <iterator>
 
 #include <hibf/contrib/robin_hood.hpp>
+#include <hibf/platform.hpp>
 
 namespace hibf
 {

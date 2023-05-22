@@ -16,8 +16,8 @@
 namespace hibf
 {
 
-layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
-                                                 std::vector<std::vector<std::string>> & user_bin_filenames)
+inline layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
+                                                        std::vector<std::vector<std::string>> & user_bin_filenames)
 {
     layout::layout::user_bin result{};
 

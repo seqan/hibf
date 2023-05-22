@@ -30,7 +30,6 @@
 #include <hibf/detail/layout/execute.hpp>
 #include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/sketch/estimate_kmer_counts.hpp>
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf

@@ -5,6 +5,7 @@
 #include <vector>
 
 #include <hibf/detail/prefixes.hpp>
+#include <hibf/platform.hpp>
 
 namespace hibf::layout
 {

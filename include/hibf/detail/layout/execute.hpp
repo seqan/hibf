@@ -11,7 +11,7 @@
 namespace hibf
 {
 
-size_t execute(hibf::configuration & config, hibf::data_store & data)
+inline size_t execute(hibf::configuration & config, hibf::data_store & data)
 {
     if (config.disable_estimate_union)
         config.disable_rearrangement = true;

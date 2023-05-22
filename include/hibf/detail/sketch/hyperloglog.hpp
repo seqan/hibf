@@ -17,6 +17,7 @@
 
 #include <hibf/contrib/aligned_allocator.hpp>
 #include <hibf/contrib/xxhash/xxh3.h>
+#include <hibf/platform.hpp>
 
 #include <x86/avx.h>
 #include <x86/avx2.h>

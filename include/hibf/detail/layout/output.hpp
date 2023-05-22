@@ -1,6 +1,7 @@
 #pragma once
 
 #include <hibf/detail/configuration.hpp>
+#include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 #include <cereal/archives/json.hpp>

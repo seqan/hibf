@@ -18,12 +18,12 @@
 namespace hibf
 {
 
-hibf::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                                               robin_hood::unordered_flat_set<uint64_t> & kmers,
-                                               size_t const number_of_bins,
-                                               lemon::ListDigraph::Node const & node,
-                                               build_data & data,
-                                               bool is_root)
+inline hibf::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
+                                                      robin_hood::unordered_flat_set<uint64_t> & kmers,
+                                                      size_t const number_of_bins,
+                                                      lemon::ListDigraph::Node const & node,
+                                                      build_data & data,
+                                                      bool is_root)
 {
     auto & node_data = data.node_map[node];
 

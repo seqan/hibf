@@ -19,9 +19,9 @@
 namespace hibf
 {
 
-void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
-                   build_data const & data,
-                   layout::layout::user_bin const & record)
+inline void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
+                          build_data const & data,
+                          layout::layout::user_bin const & record)
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();

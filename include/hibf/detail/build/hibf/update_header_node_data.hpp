@@ -21,9 +21,9 @@
 namespace hibf
 {
 
-void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_bins,
-                             lemon::ListDigraph & ibf_graph,
-                             lemon::ListDigraph::NodeMap<node_data> & node_map)
+inline void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_bins,
+                                    lemon::ListDigraph & ibf_graph,
+                                    lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
     std::ranges::sort(header_max_bins,
