@@ -171,7 +171,7 @@ public:
     * \details
     * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
     */
-    class membership_agent
+    class membership_agent_type
     {
     private:
         //!\brief The type of the augmented hierarchical_interleaved_bloom_filter.
@@ -216,18 +216,18 @@ public:
         /*!\name Constructors, destructor and assignment
         * \{
         */
-        membership_agent() = default;                                     //!< Defaulted.
-        membership_agent(membership_agent const &) = default;             //!< Defaulted.
-        membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
-        membership_agent(membership_agent &&) = default;                  //!< Defaulted.
-        membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
-        ~membership_agent() = default;                                    //!< Defaulted.
+        membership_agent_type() = default;                                          //!< Defaulted.
+        membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
+        membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
+        membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
+        membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
+        ~membership_agent_type() = default;                                         //!< Defaulted.
 
-        /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
+        /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
         * \private
         * \param hibf The hierarchical_interleaved_bloom_filter.
         */
-        explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
+        explicit membership_agent_type(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
         {}
         //!\}
 
@@ -316,9 +316,9 @@ public:
     user_bins user_bins;
 
     //!\brief Returns a membership_agent to be used for counting.
-    membership_agent membership_agent() const
+    membership_agent_type membership_agent() const
     {
-        return typename hierarchical_interleaved_bloom_filter::membership_agent{*this};
+        return typename hierarchical_interleaved_bloom_filter::membership_agent_type{*this};
     }
 
     /*!\cond DEV
