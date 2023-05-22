@@ -18,8 +18,8 @@
 namespace hibf
 {
 
-layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
-                                               std::string const & chopper_pack_filename)
+inline layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                             std::string const & chopper_pack_filename)
 {
     layout::layout hibf_layout{};
 

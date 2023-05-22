@@ -16,6 +16,8 @@
 #include <cassert>
 #include <chrono>
 
+#include <hibf/platform.hpp>
+
 namespace hibf
 {
 

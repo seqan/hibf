@@ -17,7 +17,6 @@
 #include <iterator>
 #include <type_traits>
 
-
 #if SEQAN3_WORKAROUND_GCC_NO_CXX11_ABI
 #    include <string>
 

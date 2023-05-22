@@ -74,8 +74,7 @@ add_custom_command (OUTPUT ${PROJECT_BINARY_DIR}/coverage.xml
                     # Run tests.
                     COMMAND ${CMAKE_CTEST_COMMAND} -j ${HIBF_COVERAGE_PARALLEL_LEVEL} --output-on-failure
                     # Run gcovr and create XML report.
-                    COMMAND ${GCOVR_COMMAND} ${HIBF_GCOVR_ARGUMENTS} --xml --output
-                            ${PROJECT_BINARY_DIR}/coverage.xml
+                    COMMAND ${GCOVR_COMMAND} ${HIBF_GCOVR_ARGUMENTS} --xml --output ${PROJECT_BINARY_DIR}/coverage.xml
                     WORKING_DIRECTORY ${PROJECT_BINARY_DIR}
                     COMMENT "Processing code coverage counters and generating XML report."
                     COMMAND_EXPAND_LISTS)

@@ -11,6 +11,8 @@
 #include <tuple>
 #include <vector>
 
+#include <hibf/platform.hpp>
+
 namespace hibf
 {
 

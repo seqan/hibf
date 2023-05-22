@@ -7,19 +7,14 @@
 
 #pragma once
 
-#include <hibf/contrib/robin_hood.hpp>
-
-#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
-
 #include <lemon/list_graph.h> /// Must be first include.
 
+#include <hibf/contrib/robin_hood.hpp>
 #include <hibf/detail/build/hibf/build_data.hpp>
 #include <hibf/detail/build/hibf/hierarchical_build.hpp>
 #include <hibf/detail/build/hibf/insert_into_ibf.hpp>
 #include <hibf/detail/build/hibf/update_parent_kmers.hpp>
+#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
 
 namespace hibf
-{
-
-
-} // namespace hibf
+{} // namespace hibf

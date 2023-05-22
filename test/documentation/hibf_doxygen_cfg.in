@@ -154,7 +154,9 @@ FILE_PATTERNS          = *
 RECURSIVE              = YES
 EXCLUDE                =
 EXCLUDE_SYMLINKS       = NO
-EXCLUDE_PATTERNS       = */doc/*.cpp
+EXCLUDE_PATTERNS       = */doc/*.cpp \
+                         */contrib/* \
+                         */migration/*
 EXCLUDE_SYMBOLS        = ${HIBF_DOXYGEN_EXCLUDE_SYMBOLS}
 EXAMPLE_PATH           = ${HIBF_DOXYGEN_SOURCE_DIR}
 EXAMPLE_PATTERNS       = *
@@ -324,7 +326,7 @@ INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = "HIBF_DOXYGEN_ONLY(x)= x" \
                          ${HIBF_DOXYGEN_PREDEFINED_NDEBUG} \
                          HIBF_WORKAROUND_LITERAL=constexpr
-EXPAND_AS_DEFINED      = 
+EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = NO
 #---------------------------------------------------------------------------
 # Configuration options related to external references

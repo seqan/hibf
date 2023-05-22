@@ -36,7 +36,6 @@ foreach (submodule_dir ${HIBF_DEPENDENCY_INCLUDE_DIRS})
     # submodule is either a single module name, like sdsl-lite or a relative path to a folder ../../../usr
     # skip relative folders and only keep submodules that reside in the submodules folder
     if (NOT submodule MATCHES "^\\.\\.") # skip relative folders
-        install (DIRECTORY "${submodule_dir}"
-                 DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hibf/submodules/${submodule}")
+        install (DIRECTORY "${submodule_dir}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hibf/submodules/${submodule}")
     endif ()
 endforeach ()

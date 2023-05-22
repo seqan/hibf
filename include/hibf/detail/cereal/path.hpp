@@ -2,6 +2,8 @@
 
 #include <filesystem>
 
+#include <hibf/platform.hpp>
+
 #include <cereal/cereal.hpp>
 
 namespace cereal

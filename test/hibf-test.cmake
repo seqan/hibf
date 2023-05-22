@@ -79,8 +79,7 @@ endif ()
 # needed for performance test cases in hibf/test/performance
 if (NOT TARGET hibf::test::performance)
     add_library (hibf_test_performance INTERFACE)
-    target_link_libraries (hibf_test_performance INTERFACE "hibf::test" "benchmark_main"
-                                                                       "benchmark")
+    target_link_libraries (hibf_test_performance INTERFACE "hibf::test" "benchmark_main" "benchmark")
 
     if (HIBF_BENCHMARK_ALIGN_LOOPS)
         target_compile_options (hibf_test_performance INTERFACE "-falign-loops=32")

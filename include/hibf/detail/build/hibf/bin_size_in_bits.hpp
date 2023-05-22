@@ -10,19 +10,23 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#pragma once
+
 #include <cmath>
+
+#include <hibf/platform.hpp>
 
 namespace hibf
 {
 
-size_t bin_size_in_bits(size_t const number_of_kmers_to_be_stored,
-                        size_t const number_of_hash_functions,
-                        double const maximum_false_positive_rate)
+inline size_t bin_size_in_bits(size_t const number_of_kmers_to_be_stored,
+                               size_t const number_of_hash_functions,
+                               double const maximum_false_positive_rate)
 {
-        double const numerator{-static_cast<double>(number_of_kmers_to_be_stored * number_of_hash_functions)};
-        double const denominator{std::log(1 - std::exp(std::log(maximum_false_positive_rate) / number_of_hash_functions))};
-        double const result{std::ceil(numerator / denominator)};
-        return result;
+    double const numerator{-static_cast<double>(number_of_kmers_to_be_stored * number_of_hash_functions)};
+    double const denominator{std::log(1 - std::exp(std::log(maximum_false_positive_rate) / number_of_hash_functions))};
+    double const result{std::ceil(numerator / denominator)};
+    return result;
 }
 
 } // namespace hibf

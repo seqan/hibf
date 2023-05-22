@@ -13,25 +13,24 @@
 #include <sstream>
 
 #include <hibf/config.hpp>
-#include <hibf/detail/build/hibf/hierarchical_build.hpp>
-#include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
-#include <hibf/detail/build/hibf/initialise_build_tree.hpp>
-#include <hibf/detail/configuration.hpp>
-#include <hibf/detail/data_store.hpp>
-#include <hibf/detail/layout/execute.hpp>
-#include <hibf/detail/layout/compute_fp_correction.hpp>
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
-#include <hibf/detail/layout/layout.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/detail/build/hibf/build_data.hpp>
 #include <hibf/detail/build/hibf/compute_kmers.hpp>
 #include <hibf/detail/build/hibf/construct_ibf.hpp>
+#include <hibf/detail/build/hibf/hierarchical_build.hpp>
+#include <hibf/detail/build/hibf/initialise_build_tree.hpp>
 #include <hibf/detail/build/hibf/insert_into_ibf.hpp>
 #include <hibf/detail/build/hibf/loop_over_children.hpp>
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
-#include <hibf/detail/build/hibf/update_user_bins.hpp>
+#include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
 #include <hibf/detail/build/hibf/update_parent_kmers.hpp>
+#include <hibf/detail/build/hibf/update_user_bins.hpp>
+#include <hibf/detail/configuration.hpp>
+#include <hibf/detail/data_store.hpp>
+#include <hibf/detail/layout/compute_fp_correction.hpp>
+#include <hibf/detail/layout/execute.hpp>
+#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf
 {
@@ -171,7 +170,7 @@ public:
     * \details
     * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
     */
-    class membership_agent
+    class membership_agent_type
     {
     private:
         //!\brief The type of the augmented hierarchical_interleaved_bloom_filter.
@@ -201,8 +200,9 @@ public:
                         bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                     sum = 0u;
                 }
-                else if (bin + 1u == result.size() ||                                                    // last bin
-                        current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
+                else if (bin + 1u == result.size() || // last bin
+                         current_filename_index
+                             != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
                 {
                     if (sum >= threshold)
                         result_buffer.emplace_back(current_filename_index);
@@ -215,18 +215,18 @@ public:
         /*!\name Constructors, destructor and assignment
         * \{
         */
-        membership_agent() = default;                                     //!< Defaulted.
-        membership_agent(membership_agent const &) = default;             //!< Defaulted.
-        membership_agent & operator=(membership_agent const &) = default; //!< Defaulted.
-        membership_agent(membership_agent &&) = default;                  //!< Defaulted.
-        membership_agent & operator=(membership_agent &&) = default;      //!< Defaulted.
-        ~membership_agent() = default;                                    //!< Defaulted.
+        membership_agent_type() = default;                                          //!< Defaulted.
+        membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
+        membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
+        membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
+        membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
+        ~membership_agent_type() = default;                                         //!< Defaulted.
 
-        /*!\brief Construct a membership_agent for an existing hierarchical_interleaved_bloom_filter.
+        /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
         * \private
         * \param hibf The hierarchical_interleaved_bloom_filter.
         */
-        explicit membership_agent(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
+        explicit membership_agent_type(hibf_t const & hibf) : hibf_ptr(std::addressof(hibf))
         {}
         //!\}
 
@@ -251,13 +251,14 @@ public:
         * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
         */
         template <std::ranges::forward_range value_range_t>
-        [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
+        [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
+                                                                 size_t const threshold) & noexcept
         {
             assert(hibf_ptr != nullptr);
 
             static_assert(std::ranges::forward_range<value_range_t>, "The values must model forward_range.");
             static_assert(std::unsigned_integral<std::ranges::range_value_t<value_range_t>>,
-                        "An individual value must be an unsigned integral.");
+                          "An individual value must be an unsigned integral.");
 
             result_buffer.clear();
 
@@ -272,7 +273,7 @@ public:
         // is immediately destroyed.
         template <std::ranges::range value_range_t>
         [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
-                                                                size_t const threshold) && noexcept = delete;
+                                                                 size_t const threshold) && noexcept = delete;
         //!\}
     };
 
@@ -314,9 +315,9 @@ public:
     user_bins user_bins;
 
     //!\brief Returns a membership_agent to be used for counting.
-    membership_agent membership_agent() const
+    membership_agent_type membership_agent() const
     {
-        return typename hierarchical_interleaved_bloom_filter::membership_agent{*this};
+        return typename hierarchical_interleaved_bloom_filter::membership_agent_type{*this};
     }
 
     /*!\cond DEV
@@ -389,9 +390,9 @@ protected:
         sketch::estimate_kmer_counts(sketches, kmer_counts);
 
         data_store store{.false_positive_rate = chopper_config.false_positive_rate,
-                                  .hibf_layout = &resulting_layout,
-                                  .kmer_counts = kmer_counts,
-                                  .sketches = sketches};
+                         .hibf_layout = &resulting_layout,
+                         .kmer_counts = kmer_counts,
+                         .sketches = sketches};
 
         size_t const max_hibf_id = hibf::execute(chopper_config, store);
         store.hibf_layout->top_level_max_bin_id = max_hibf_id;
@@ -414,17 +415,18 @@ protected:
         lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
 
         size_t const t_max{data.node_map[root_node].number_of_technical_bins};
-        data.fp_correction = layout::compute_fp_correction(hibf_config.maximum_false_positive_rate, hibf_config.number_of_hash_functions, t_max);
+        data.fp_correction = layout::compute_fp_correction(hibf_config.maximum_false_positive_rate,
+                                                           hibf_config.number_of_hash_functions,
+                                                           t_max);
 
         hierarchical_build(root_node, data);
     }
 
 private:
-
     size_t hierarchical_build(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                            lemon::ListDigraph::Node const & current_node,
-                            build_data & data,
-                            bool is_root)
+                              lemon::ListDigraph::Node const & current_node,
+                              build_data & data,
+                              bool is_root)
     {
         auto & current_node_data = data.node_map[current_node];
 
@@ -435,17 +437,18 @@ private:
         robin_hood::unordered_flat_set<uint64_t> kmers{};
 
         auto initialise_max_bin_kmers = [this](robin_hood::unordered_flat_set<uint64_t> & kmers,
-                                        std::vector<int64_t> & ibf_positions,
-                                        std::vector<int64_t> & filename_indices,
-                                        lemon::ListDigraph::Node const & node,
-                                        build_data & data) -> size_t
+                                               std::vector<int64_t> & ibf_positions,
+                                               std::vector<int64_t> & filename_indices,
+                                               lemon::ListDigraph::Node const & node,
+                                               build_data & data) -> size_t
         {
             auto & node_data = data.node_map[node];
 
             if (node_data.favourite_child != lemon::INVALID) // max bin is a merged bin
             {
                 // recursively initialize favourite child first
-                ibf_positions[node_data.max_bin_index] = hierarchical_build(kmers, node_data.favourite_child, data, false);
+                ibf_positions[node_data.max_bin_index] =
+                    hierarchical_build(kmers, node_data.favourite_child, data, false);
                 return 1;
             }
             else // max bin is not a merged bin
@@ -466,11 +469,11 @@ private:
 
         // parse all other children (merged bins) of the current ibf
         auto loop_over_children = [this](robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                                    hibf::interleaved_bloom_filter<> & ibf,
-                                    std::vector<int64_t> & ibf_positions,
-                                    lemon::ListDigraph::Node const & current_node,
-                                    build_data & data,
-                                    bool is_root)
+                                         hibf::interleaved_bloom_filter<> & ibf,
+                                         std::vector<int64_t> & ibf_positions,
+                                         lemon::ListDigraph::Node const & current_node,
+                                         build_data & data,
+                                         bool is_root)
         {
             auto & current_node_data = data.node_map[current_node];
             std::vector<lemon::ListDigraph::Node> children{};
@@ -484,7 +487,15 @@ private:
             size_t const number_of_mutex = (data.node_map[current_node].number_of_technical_bins + 63) / 64;
             std::vector<std::mutex> local_ibf_mutex(number_of_mutex);
 
-            auto worker = [this, &children, &current_node_data, &parent_kmers, &data, &local_ibf_mutex, &ibf_positions, &ibf, &is_root](auto && index, auto &&)
+            auto worker = [this,
+                           &children,
+                           &current_node_data,
+                           &parent_kmers,
+                           &data,
+                           &local_ibf_mutex,
+                           &ibf_positions,
+                           &ibf,
+                           &is_root](auto && index, auto &&)
             {
                 auto & child = children[index];
 
@@ -538,11 +549,7 @@ private:
             else
             {
                 compute_kmers(kmers, data, record);
-                insert_into_ibf(kmers,
-                                record.number_of_technical_bins,
-                                record.storage_TB_id,
-                                ibf,
-                                data.fill_ibf_timer);
+                insert_into_ibf(kmers, record.number_of_technical_bins, record.storage_TB_id, ibf, data.fill_ibf_timer);
                 if (!is_root)
                     update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
             }
@@ -563,7 +570,6 @@ private:
         robin_hood::unordered_flat_set<uint64_t> root_kmers{};
         return hierarchical_build(root_kmers, root_node, data, true);
     }
-
 };
 
 } // namespace hibf

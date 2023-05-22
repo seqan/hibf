@@ -28,6 +28,7 @@ using ::std::ranges::views::chunk;
 #else
 
 #    include <algorithm>
+#    include <cassert>
 
 #    include "all_view.hpp"
 #    include "concepts.hpp"

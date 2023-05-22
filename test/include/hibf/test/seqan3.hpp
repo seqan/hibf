@@ -12,6 +12,8 @@
 
 #pragma once
 
+#include <hibf/platform.hpp>
+
 // SeqAn 3 [optional]
 /*!\def HIBF_HAS_SEQAN3
  * \brief Whether SeqAn3 library is available or not.

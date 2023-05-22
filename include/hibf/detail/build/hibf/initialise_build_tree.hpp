@@ -10,7 +10,7 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#include <cassert>
+#pragma once
 
 #include <hibf/detail/build/hibf/update_content_node_data.hpp>
 #include <hibf/detail/build/hibf/update_header_node_data.hpp>
@@ -19,9 +19,9 @@
 namespace hibf
 {
 
-void initialise_build_tree(layout::layout & hibf_layout,
-                           lemon::ListDigraph & ibf_graph,
-                           lemon::ListDigraph::NodeMap<node_data> & node_map)
+inline void initialise_build_tree(layout::layout & hibf_layout,
+                                  lemon::ListDigraph & ibf_graph,
+                                  lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
     // Add high level node
     auto high_level_node = ibf_graph.addNode(); // high-level node = root node

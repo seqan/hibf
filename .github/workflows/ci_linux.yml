@@ -31,6 +31,12 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: "gcc13"
+            cxx: "g++-13"
+            cc: "gcc-13"
+            build: unit
+            build_type: Release
+
           - name: "gcc12"
             cxx: "g++-12"
             cc: "gcc-12"
@@ -40,12 +46,6 @@ jobs:
           - name: "gcc11"
             cxx: "g++-11"
             cc: "gcc-11"
-            build: unit
-            build_type: Release
-
-          - name: "gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
             build: unit
             build_type: Release
 
@@ -87,6 +87,7 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                            -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF
           make -j2 gtest_build
 

@@ -11,9 +11,9 @@
 namespace hibf
 {
 
-size_t execute(hibf::configuration & config, hibf::data_store & data)
+inline size_t execute(hibf::configuration & config, hibf::data_store & data)
 {
-   if (config.disable_estimate_union)
+    if (config.disable_estimate_union)
         config.disable_rearrangement = true;
 
     if (config.tmax == 0) // no tmax was set by the user on the command line
@@ -33,7 +33,8 @@ size_t execute(hibf::configuration & config, hibf::data_store & data)
                   << "anyway, so we increased your number of technical bins to " << config.tmax << ".\n";
     }
 
-    data.fp_correction = hibf::layout::compute_fp_correction(config.false_positive_rate, config.num_hash_functions, config.tmax);
+    data.fp_correction =
+        hibf::layout::compute_fp_correction(config.false_positive_rate, config.num_hash_functions, config.tmax);
 
     size_t max_hibf_id = hibf::layout::hierarchical_binning{data, config}.execute();
 

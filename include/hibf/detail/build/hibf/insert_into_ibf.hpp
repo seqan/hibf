@@ -8,21 +8,21 @@
 #pragma once
 
 #include <hibf/contrib/robin_hood.hpp>
-
-#include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/detail/timer.hpp>
+#include <hibf/detail/build/hibf/build_data.hpp>
 #include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/timer.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
-                     size_t const number_of_bins,
-                     size_t const bin_index,
-                     hibf::interleaved_bloom_filter<> & ibf,
-                     timer<concurrent::yes> & fill_ibf_timer)
+inline void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
+                            size_t const number_of_bins,
+                            size_t const bin_index,
+                            hibf::interleaved_bloom_filter<> & ibf,
+                            timer<concurrent::yes> & fill_ibf_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
     size_t chunk_number{};
@@ -41,9 +41,9 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
     fill_ibf_timer += local_fill_ibf_timer;
 }
 
-void insert_into_ibf(build_data const & data,
-                     layout::layout::user_bin const & record,
-                     hibf::interleaved_bloom_filter<> & ibf)
+inline void insert_into_ibf(build_data const & data,
+                            layout::layout::user_bin const & record,
+                            hibf::interleaved_bloom_filter<> & ibf)
 {
     auto const bin_index = hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
     robin_hood::unordered_flat_set<uint64_t> values;

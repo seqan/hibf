@@ -31,9 +31,9 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: "gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "gcc13"
+            cxx: "g++-13"
+            cc: "gcc-13"
             build: coverage
             build_type: Debug
 
@@ -87,6 +87,7 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                            -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF \
                                             -DHIBF_COVERAGE_PARALLEL_LEVEL=2
           make -j2 gtest_build

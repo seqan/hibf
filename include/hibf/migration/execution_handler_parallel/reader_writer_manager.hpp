@@ -16,11 +16,10 @@
 #include <functional>
 #include <mutex>
 
-#include <hibf/migration/execution_handler_parallel/std_new.hpp>
-
-#include <hibf/migration/strong_type.hpp>
 #include <hibf/migration/execution_handler_parallel/latch.hpp>
 #include <hibf/migration/execution_handler_parallel/spin_delay.hpp>
+#include <hibf/migration/execution_handler_parallel/std_new.hpp>
+#include <hibf/migration/strong_type.hpp>
 
 namespace seqan3::detail
 {

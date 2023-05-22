@@ -50,8 +50,7 @@ if (HIBF_VERCEL_PREVIEW_DOC)
     set (HIBF_DOXYGEN_USE_MATHJAX "YES")
     set (HIBF_DOXYGEN_DOT_NUM_THREADS "2")
     set (HIBF_DOXYFILE_OPTION_POWERED_BY_VERCEL
-         "HTML_EXTRA_FILES       += ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg"
-    )
+         "HTML_EXTRA_FILES       += ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
     set (HIBF_FOOTER_HTML_OPTION_POWERED_BY_VERCEL
          "<li class='footer'><a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><img class='footer' src='$relpath^powered-by-vercel.svg' height='31' alt='Powered by Vercel' style='width:unset;'/></a></li>"
     )

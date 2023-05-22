@@ -130,9 +130,7 @@ find_path (HIBF_SUBMODULES_DIR
 if (HIBF_INCLUDE_DIR)
     hibf_config_print ("HIBF include dir found:   ${HIBF_INCLUDE_DIR}")
 else ()
-    hibf_config_error (
-        "HIBF include directory could not be found (HIBF_INCLUDE_DIR: '${HIBF_INCLUDE_DIR}')"
-    )
+    hibf_config_error ("HIBF include directory could not be found (HIBF_INCLUDE_DIR: '${HIBF_INCLUDE_DIR}')")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -160,8 +158,7 @@ endif ()
 # deactivate messages in check_*
 set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_INCLUDE_DIR}
-                             ${HIBF_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_INCLUDE_DIR} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
@@ -187,8 +184,7 @@ if (NOT HIBF_DISABLE_COMPILER_CHECK)
     if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         message (FATAL_ERROR "Only GCC is supported. "
                              "The detected compiler version is ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}. "
-                             "You can disable this error by passing -DHIBF_DISABLE_COMPILER_CHECK=ON to CMake."
-        )
+                             "You can disable this error by passing -DHIBF_DISABLE_COMPILER_CHECK=ON to CMake.")
     endif ()
 else ()
     set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_DISABLE_COMPILER_CHECK")
@@ -228,10 +224,8 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
 if (HIBF_CPP20_FLAG STREQUAL "BUILTIN")
     hibf_config_print ("C++ Standard-20 support:    builtin")
 elseif (HIBF_CPP20_FLAG)
-    set (HIBF_CXX_FLAGS
-         "${HIBF_CXX_FLAGS} ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
-    hibf_config_print (
-        "C++ Standard-20 support:    via ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
+    hibf_config_print ("C++ Standard-20 support:    via ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
 else ()
     hibf_config_error ("HIBF requires C++20, but your compiler does not support it.")
 endif ()
@@ -439,8 +433,7 @@ if (HIBF_FOUND AND NOT TARGET hibf::hibf)
     target_include_directories (hibf_hibf INTERFACE "${HIBF_INCLUDE_DIR}")
     # include everything except hibf/include/ as -isystem, i.e.
     # a system header which suppresses warnings of external libraries.
-    target_include_directories (hibf_hibf SYSTEM
-                                INTERFACE "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
+    target_include_directories (hibf_hibf SYSTEM INTERFACE "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
     add_library (hibf::hibf ALIAS hibf_hibf)
 endif ()
 

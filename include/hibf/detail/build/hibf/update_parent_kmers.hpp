@@ -13,13 +13,14 @@
 
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/detail/timer.hpp>
+#include <hibf/platform.hpp>
 
 namespace hibf
 {
 
-void update_parent_kmers(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                         robin_hood::unordered_flat_set<uint64_t> const & kmers,
-                         timer<concurrent::yes> & merge_kmers_timer)
+inline void update_parent_kmers(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
+                                robin_hood::unordered_flat_set<uint64_t> const & kmers,
+                                timer<concurrent::yes> & merge_kmers_timer)
 {
     timer<concurrent::no> local_merge_kmers_timer{};
     local_merge_kmers_timer.start();

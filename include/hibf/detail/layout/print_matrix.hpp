@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <hibf/platform.hpp>
+
 namespace hibf
 {
 

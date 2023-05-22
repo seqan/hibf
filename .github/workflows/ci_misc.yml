@@ -31,32 +31,32 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: "Snippet gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
+          - name: "Snippet gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
             build: snippet
             build_type: Release
             cxx_flags: "-std=c++2a"
             use_include_dependencies: "OFF"
 
-          - name: "Performance gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
+          - name: "Performance gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
             build: performance
             build_type: Release
             cxx_flags: "-std=c++2a"
             use_include_dependencies: "OFF"
 
-          - name: "Header gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "Header gcc13"
+            cxx: "g++-13"
+            cc: "gcc-13"
             build: header
             build_type: Release
             use_include_dependencies: "OFF"
 
-          - name: "Header gcc10"
-            cxx: "g++-10"
-            cc: "gcc-10"
+          - name: "Header gcc11"
+            cxx: "g++-11"
+            cc: "gcc-11"
             build: header
             build_type: Release
             cxx_flags: "-std=c++2a"
@@ -107,6 +107,7 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+                                            -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF \
                                             -DHIBF_BENCHMARK_MIN_TIME=0.01 \
                                             -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"

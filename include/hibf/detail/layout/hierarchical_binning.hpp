@@ -5,8 +5,8 @@
 
 #include <hibf/detail/configuration.hpp>
 #include <hibf/detail/layout/simple_binning.hpp>
-#include <hibf/next_multiple_of_64.hpp>
 #include <hibf/detail/prefixes.hpp>
+#include <hibf/next_multiple_of_64.hpp>
 
 /*!\brief Workaround bogus memcpy errors in GCC 12.1 and 12.2. (Wrestrict and Wstringop-overflow)
  * \see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105545

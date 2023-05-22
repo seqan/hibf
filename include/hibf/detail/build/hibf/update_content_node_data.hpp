@@ -12,18 +12,17 @@
 
 #pragma once
 
-
 #include <cassert>
 
-#include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/build/hibf/node_data.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
 
-void update_content_node_data(std::vector<layout::layout::user_bin> && layout_user_bins,
-                              lemon::ListDigraph & ibf_graph,
-                              lemon::ListDigraph::NodeMap<node_data> & node_map)
+inline void update_content_node_data(std::vector<layout::layout::user_bin> && layout_user_bins,
+                                     lemon::ListDigraph & ibf_graph,
+                                     lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
     // parse lines
     // -------------------------------------------------------------------------
