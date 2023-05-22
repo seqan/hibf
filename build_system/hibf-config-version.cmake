@@ -20,10 +20,8 @@ find_path (HIBF_INCLUDE_DIR
            HINTS "${HIBF_CLONE_DIR}/include")
 
 # extract version from hibf/version.hpp header
-file (STRINGS "${HIBF_INCLUDE_DIR}/hibf/version.hpp" HIBF_VERSION_HPP
-      REGEX "#define HIBF_VERSION_(MAJOR|MINOR|PATCH)")
-string (REGEX REPLACE "#define HIBF_VERSION_(MAJOR|MINOR|PATCH) " "" PACKAGE_VERSION
-                      "${HIBF_VERSION_HPP}")
+file (STRINGS "${HIBF_INCLUDE_DIR}/hibf/version.hpp" HIBF_VERSION_HPP REGEX "#define HIBF_VERSION_(MAJOR|MINOR|PATCH)")
+string (REGEX REPLACE "#define HIBF_VERSION_(MAJOR|MINOR|PATCH) " "" PACKAGE_VERSION "${HIBF_VERSION_HPP}")
 string (REGEX REPLACE ";" "." PACKAGE_VERSION "${PACKAGE_VERSION}")
 
 if (PACKAGE_VERSION VERSION_LESS PACKAGE_FIND_VERSION)
@@ -46,8 +44,7 @@ else ()
 endif ()
 
 # extract release candidate
-file (STRINGS "${HIBF_INCLUDE_DIR}/hibf/version.hpp" HIBF_RELEASE_CANDIDATE_HPP
-      REGEX "#define HIBF_RELEASE_CANDIDATE ")
+file (STRINGS "${HIBF_INCLUDE_DIR}/hibf/version.hpp" HIBF_RELEASE_CANDIDATE_HPP REGEX "#define HIBF_RELEASE_CANDIDATE ")
 string (REGEX REPLACE "#define HIBF_RELEASE_CANDIDATE " "" HIBF_RELEASE_CANDIDATE_VERSION
                       "${HIBF_RELEASE_CANDIDATE_HPP}")
 
@@ -85,6 +82,5 @@ if (NOT "${CMAKE_SIZEOF_VOID_P}" STREQUAL "8")
     # might not.
     # set(PACKAGE_VERSION "${PACKAGE_VERSION} (${installedBits}bit)")
     # set(PACKAGE_VERSION_UNSUITABLE TRUE)
-    message (AUTHOR_WARNING "HIBF does not support 32bit architectures; No guarantees; Patches are welcome."
-    )
+    message (AUTHOR_WARNING "HIBF does not support 32bit architectures; No guarantees; Patches are welcome.")
 endif ()

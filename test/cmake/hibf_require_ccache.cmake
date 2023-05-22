@@ -24,8 +24,7 @@ macro (hibf_require_ccache)
         list (PREPEND CMAKE_CXX_COMPILER_LAUNCHER "${CCACHE_PROGRAM}")
 
         # use ccache in external cmake projects
-        list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS
-              "-DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}")
+        list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER_LAUNCHER=${CMAKE_CXX_COMPILER_LAUNCHER}")
     endif ()
     unset (CCACHE_PROGRAM)
 endmacro ()

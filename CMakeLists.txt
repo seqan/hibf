@@ -31,8 +31,7 @@ endif ()
 
 find_package (HIBF 3.0 REQUIRED HINTS ${HIBF_MODULE_PATH})
 
-option (INSTALL_HIBF
-        "Enable installation of hibf. (Projects embedding hibf may want to turn this OFF.)" ON)
+option (INSTALL_HIBF "Enable installation of hibf. (Projects embedding hibf may want to turn this OFF.)" ON)
 
 if (INSTALL_HIBF)
     include (hibf-install)
