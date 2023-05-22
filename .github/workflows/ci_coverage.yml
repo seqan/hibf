@@ -31,9 +31,9 @@ jobs:
       fail-fast: true
       matrix:
         include:
-          - name: "gcc12"
-            cxx: "g++-12"
-            cc: "gcc-12"
+          - name: "gcc13"
+            cxx: "g++-13"
+            cc: "gcc-13"
             build: coverage
             build_type: Debug
 
