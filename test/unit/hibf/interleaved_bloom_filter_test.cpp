@@ -24,8 +24,7 @@ struct interleaved_bloom_filter_test : public ::testing::Test
     }
 };
 
-using ibf_types = ::testing::Types<hibf::interleaved_bloom_filter<hibf::data_layout::uncompressed>,
-                                   hibf::interleaved_bloom_filter<hibf::data_layout::compressed>>;
+using ibf_types = ::testing::Types<hibf::interleaved_bloom_filter>;
 
 TYPED_TEST_SUITE(interleaved_bloom_filter_test, ibf_types, );
 
