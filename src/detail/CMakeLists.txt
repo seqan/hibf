@@ -2,3 +2,4 @@ cmake_minimum_required (VERSION 3.15)
 
 add_subdirectory (layout)
 add_subdirectory (sketch)
+add_subdirectory (build)

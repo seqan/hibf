@@ -7,36 +7,15 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> /// Must be first include.
-
-#include <fstream>
 #include <string>
+#include <vector>
 
-#include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
-#include <hibf/detail/build/hibf/parse_chopper_pack_line.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
 {
 
-inline layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
-                                             std::string const & chopper_pack_filename)
-{
-    layout::layout hibf_layout{};
-
-    std::ifstream chopper_pack_file{chopper_pack_filename};
-
-    if (!chopper_pack_file.good() || !chopper_pack_file.is_open())
-        throw std::logic_error{"Could not open file " + chopper_pack_filename + " for reading"}; // GCOVR_EXCL_LINE
-
-    // parse header
-    // -------------------------------------------------------------------------
-    parse_chopper_pack_header(chopper_pack_file, hibf_layout);
-
-    std::string current_line;
-    while (std::getline(chopper_pack_file, current_line))
-        hibf_layout.user_bins.emplace_back(parse_chopper_pack_line(current_line, filenames));
-
-    return hibf_layout;
-}
+layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                      std::string const & chopper_pack_filename);
 
 } // namespace hibf

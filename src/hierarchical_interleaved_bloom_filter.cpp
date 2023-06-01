@@ -15,10 +15,8 @@
 #include <hibf/detail/build/hibf/build_data.hpp>
 #include <hibf/detail/build/hibf/compute_kmers.hpp>
 #include <hibf/detail/build/hibf/construct_ibf.hpp>
-#include <hibf/detail/build/hibf/hierarchical_build.hpp>
 #include <hibf/detail/build/hibf/initialise_build_tree.hpp>
 #include <hibf/detail/build/hibf/insert_into_ibf.hpp>
-#include <hibf/detail/build/hibf/loop_over_children.hpp>
 #include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
 #include <hibf/detail/build/hibf/update_parent_kmers.hpp>
 #include <hibf/detail/build/hibf/update_user_bins.hpp>
@@ -30,6 +28,7 @@
 #include <hibf/detail/sketch/estimate_kmer_counts.hpp>
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
 
 namespace hibf
 {

@@ -7,78 +7,13 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> /// Must be first include.
-
-#include <algorithm>
-#include <cassert>
-#include <hibf/std/charconv>
 #include <iosfwd>
-#include <string_view>
 
 #include <hibf/detail/layout/layout.hpp>
-#include <hibf/detail/prefixes.hpp>
 
 namespace hibf
 {
 
-inline void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout)
-{
-    auto parse_bin_indices = [](std::string_view const & buffer)
-    {
-        std::vector<size_t> result;
-
-        auto buffer_start = &buffer[0];
-        auto const buffer_end = buffer_start + buffer.size();
-
-        size_t tmp{};
-
-        while (buffer_start < buffer_end)
-        {
-            buffer_start = std::from_chars(buffer_start, buffer_end, tmp).ptr;
-            ++buffer_start; // skip ;
-            result.push_back(tmp);
-        }
-
-        return result;
-    }; // GCOVR_EXCL_LINE
-
-    auto parse_first_bin = [](std::string_view const & buffer)
-    {
-        size_t tmp{};
-        std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
-        return tmp;
-    }; // GCOVR_EXCL_LINE
-
-    std::string line;
-
-    while (std::getline(chopper_pack_file, line) && line.size() >= 2
-           && std::string_view{line}.substr(0, 1) == prefix::header
-           && std::string_view{line}.substr(1, 1) == prefix::header_config)
-        ; // skip config in header
-
-    assert(line[0] == '#'); // we are reading header lines
-    assert(line.substr(1, prefix::high_level.size()) == prefix::high_level);
-
-    // parse High Level max bin index
-    assert(line.substr(prefix::high_level.size() + 2, 11) == "max_bin_id:");
-    std::string_view const hibf_max_bin_str{line.begin() + 27, line.end()};
-    hibf_layout.top_level_max_bin_id = parse_first_bin(hibf_max_bin_str);
-
-    // first read and parse header records, in order to sort them before adding them to the graph
-    while (std::getline(chopper_pack_file, line) && line.substr(0, 6) != "#FILES")
-    {
-        assert(line.substr(1, prefix::merged_bin.size()) == prefix::merged_bin);
-
-        // parse header line
-        std::string_view const indices_str{line.begin() + 1 /*#*/ + prefix::merged_bin.size() + 1 /*_*/,
-                                           std::find(line.begin() + prefix::merged_bin.size() + 2, line.end(), ' ')};
-
-        assert(line.substr(prefix::merged_bin.size() + indices_str.size() + 3, 11) == "max_bin_id:");
-        std::string_view const max_id_str{line.begin() + prefix::merged_bin.size() + indices_str.size() + 14,
-                                          line.end()};
-
-        hibf_layout.max_bins.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
-    }
-}
+void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout);
 
 } // namespace hibf
