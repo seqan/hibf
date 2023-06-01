@@ -5,9 +5,9 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <hibf/detail/build/hibf/construct_ibf.hpp>
-#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
-#include <hibf/detail/build/hibf/update_parent_kmers.hpp>
+#include <hibf/detail/build/construct_ibf.hpp>
+#include <hibf/detail/build/insert_into_ibf.hpp>
+#include <hibf/detail/build/update_parent_kmers.hpp>
 
 namespace hibf
 {

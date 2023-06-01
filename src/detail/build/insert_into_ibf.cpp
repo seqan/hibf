@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 #include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
+#include <hibf/detail/build/insert_into_ibf.hpp>
 namespace hibf
 {
 

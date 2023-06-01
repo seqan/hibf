@@ -10,9 +10,9 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#include <hibf/detail/build/hibf/initialise_build_tree.hpp>
-#include <hibf/detail/build/hibf/update_content_node_data.hpp>
-#include <hibf/detail/build/hibf/update_header_node_data.hpp>
+#include <hibf/detail/build/initialise_build_tree.hpp>
+#include <hibf/detail/build/update_content_node_data.hpp>
+#include <hibf/detail/build/update_header_node_data.hpp>
 
 namespace hibf
 {

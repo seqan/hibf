@@ -10,7 +10,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/detail/build/hibf/compute_kmers.hpp>
+#include <hibf/detail/build/compute_kmers.hpp>
 
 namespace hibf
 {

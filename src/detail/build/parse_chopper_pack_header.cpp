@@ -11,7 +11,7 @@
 #include <hibf/std/charconv>
 #include <string_view>
 
-#include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 namespace hibf

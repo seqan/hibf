@@ -12,14 +12,14 @@
 
 #include <hibf/config.hpp>
 #include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/hibf/build_data.hpp>
-#include <hibf/detail/build/hibf/compute_kmers.hpp>
-#include <hibf/detail/build/hibf/construct_ibf.hpp>
-#include <hibf/detail/build/hibf/initialise_build_tree.hpp>
-#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
-#include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
-#include <hibf/detail/build/hibf/update_parent_kmers.hpp>
-#include <hibf/detail/build/hibf/update_user_bins.hpp>
+#include <hibf/detail/build/build_data.hpp>
+#include <hibf/detail/build/compute_kmers.hpp>
+#include <hibf/detail/build/construct_ibf.hpp>
+#include <hibf/detail/build/initialise_build_tree.hpp>
+#include <hibf/detail/build/insert_into_ibf.hpp>
+#include <hibf/detail/build/read_chopper_pack_file.hpp>
+#include <hibf/detail/build/update_parent_kmers.hpp>
+#include <hibf/detail/build/update_user_bins.hpp>
 #include <hibf/detail/configuration.hpp>
 #include <hibf/detail/data_store.hpp>
 #include <hibf/detail/layout/compute_fp_correction.hpp>

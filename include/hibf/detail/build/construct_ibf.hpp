@@ -10,8 +10,8 @@
 #include <lemon/list_graph.h> /// Must be first include.
 
 #include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/hibf/bin_size_in_bits.hpp>
-#include <hibf/detail/build/hibf/build_data.hpp>
+#include <hibf/detail/build/bin_size_in_bits.hpp>
+#include <hibf/detail/build/build_data.hpp>
 
 namespace hibf
 {

@@ -13,7 +13,7 @@
 #include <algorithm>
 #include <cassert>
 
-#include <hibf/detail/build/hibf/update_header_node_data.hpp>
+#include <hibf/detail/build/update_header_node_data.hpp>
 
 namespace hibf
 {

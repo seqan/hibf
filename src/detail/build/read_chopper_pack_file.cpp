@@ -7,9 +7,9 @@
 
 #include <fstream>
 
-#include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
-#include <hibf/detail/build/hibf/parse_chopper_pack_line.hpp>
-#include <hibf/detail/build/hibf/read_chopper_pack_file.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp>
+#include <hibf/detail/build/parse_chopper_pack_line.hpp>
+#include <hibf/detail/build/read_chopper_pack_file.hpp>
 
 namespace hibf
 {

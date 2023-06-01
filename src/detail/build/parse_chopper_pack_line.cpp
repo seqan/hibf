@@ -9,7 +9,7 @@
 #include <ranges>
 #include <string_view>
 
-#include <hibf/detail/build/hibf/parse_chopper_pack_line.hpp>
+#include <hibf/detail/build/parse_chopper_pack_line.hpp>
 
 namespace hibf
 {

@@ -12,7 +12,7 @@
 
 #include <cassert>
 
-#include <hibf/detail/build/hibf/update_content_node_data.hpp>
+#include <hibf/detail/build/update_content_node_data.hpp>
 
 namespace hibf
 {
