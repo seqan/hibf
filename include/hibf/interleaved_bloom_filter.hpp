@@ -719,7 +719,7 @@ public:
     //!\}
 };
 
-interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter::membership_agent() const
+inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter::membership_agent() const
 {
     return interleaved_bloom_filter::membership_agent_type{*this};
 }
