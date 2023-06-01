@@ -133,6 +133,16 @@ else ()
     hibf_config_error ("HIBF include directory could not be found (HIBF_INCLUDE_DIR: '${HIBF_INCLUDE_DIR}')")
 endif ()
 
+find_path (HIBF_SOURCE_DIR
+           NAMES hierarchical_interleaved_bloom_filter.cpp
+           HINTS "${HIBF_CLONE_DIR}/src")
+
+if (HIBF_SOURCE_DIR)
+    hibf_config_print ("HIBF source dir found:   ${HIBF_SOURCE_DIR}")
+else ()
+    hibf_config_error ("HIBF source directory could not be found (HIBF_SOURCE_DIR: '${HIBF_SOURCE_DIR}')")
+endif ()
+
 # ----------------------------------------------------------------------------
 # Detect if we are a clone of repository and if yes auto-add submodules
 # ----------------------------------------------------------------------------
@@ -424,16 +434,33 @@ set (HIBF_INCLUDE_DIRS ${HIBF_INCLUDE_DIR} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
 if (HIBF_FOUND AND NOT TARGET hibf::hibf)
     separate_arguments (HIBF_CXX_FLAGS_LIST UNIX_COMMAND "${HIBF_CXX_FLAGS}")
 
-    add_library (hibf_hibf INTERFACE)
-    target_compile_definitions (hibf_hibf INTERFACE ${HIBF_DEFINITIONS})
-    target_compile_options (hibf_hibf INTERFACE ${HIBF_CXX_FLAGS_LIST})
-    target_link_options (hibf_hibf INTERFACE ${HIBF_CXX_FLAGS_LIST})
-    target_link_libraries (hibf_hibf INTERFACE "${HIBF_LIBRARIES}")
+    add_library (hibf_hibf STATIC
+                 ${HIBF_SOURCE_DIR}/hierarchical_interleaved_bloom_filter.cpp
+                 ${HIBF_SOURCE_DIR}/detail/layout/simple_binning.cpp
+                 ${HIBF_SOURCE_DIR}/detail/layout/execute.cpp
+                 ${HIBF_SOURCE_DIR}/detail/layout/output.cpp
+                 ${HIBF_SOURCE_DIR}/detail/layout/compute_fp_correction.cpp
+                 ${HIBF_SOURCE_DIR}/detail/layout/hierarchical_binning.cpp
+                 ${HIBF_SOURCE_DIR}/detail/sketch/toolbox.cpp
+                 ${HIBF_SOURCE_DIR}/detail/sketch/hyperloglog.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/initialise_build_tree.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/insert_into_ibf.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/parse_chopper_pack_header.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/compute_kmers.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/read_chopper_pack_file.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/update_header_node_data.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/parse_chopper_pack_line.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/construct_ibf.cpp
+                 ${HIBF_SOURCE_DIR}/detail/build/update_content_node_data.cpp)
+    target_compile_definitions (hibf_hibf PUBLIC ${HIBF_DEFINITIONS})
+    target_compile_options (hibf_hibf PUBLIC ${HIBF_CXX_FLAGS_LIST})
+    target_link_options (hibf_hibf PUBLIC ${HIBF_CXX_FLAGS_LIST})
+    target_link_libraries (hibf_hibf PUBLIC "${HIBF_LIBRARIES}")
     # include hibf/include/ as -I, because hibf should never produce warnings.
-    target_include_directories (hibf_hibf INTERFACE "${HIBF_INCLUDE_DIR}")
+    target_include_directories (hibf_hibf PUBLIC "${HIBF_INCLUDE_DIR}")
     # include everything except hibf/include/ as -isystem, i.e.
     # a system header which suppresses warnings of external libraries.
-    target_include_directories (hibf_hibf SYSTEM INTERFACE "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
+    target_include_directories (hibf_hibf SYSTEM PUBLIC "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
     add_library (hibf::hibf ALIAS hibf_hibf)
 endif ()
 
