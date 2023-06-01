@@ -70,7 +70,7 @@ if (NOT TARGET hibf::test)
         endif ()
     endif ()
 
-    target_link_libraries (hibf_test INTERFACE "hibf::hibf" "hibfh" "pthread")
+    target_link_libraries (hibf_test INTERFACE "hibf::hibf" "hibf_lib" "pthread")
     target_include_directories (hibf_test INTERFACE "${HIBF_TEST_INCLUDE_DIR}")
     add_library (hibf::test ALIAS hibf_test)
 endif ()
