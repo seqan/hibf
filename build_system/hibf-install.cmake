@@ -27,6 +27,9 @@ install (FILES "${HIBF_CLONE_DIR}/build_system/hibf-config.cmake"
 # install hibf header files in /include/hibf
 install (DIRECTORY "${HIBF_INCLUDE_DIR}/hibf" TYPE INCLUDE)
 
+# install hibf lib file in /lib
+install (TARGETS hibf_hibf TYPE ARCHIVE)
+
 # install submodule header files, e.g. all external dependencies in /home/user/hibf/submodules/*,
 # in /include/hibf/submodules/<submodule>/include
 foreach (submodule_dir ${HIBF_DEPENDENCY_INCLUDE_DIRS})
