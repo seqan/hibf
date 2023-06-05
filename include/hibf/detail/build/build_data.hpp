@@ -8,7 +8,6 @@
 #pragma once
 
 #include <atomic>
-#include <hibf/std/new>
 
 #include <hibf/config.hpp>
 #include <hibf/detail/build/node_data.hpp>

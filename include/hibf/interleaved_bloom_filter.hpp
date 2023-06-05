@@ -15,8 +15,7 @@
 #include <algorithm>
 #include <bit>
 
-#include <hibf/migration/cereal.hpp>
-#include <hibf/migration/strong_type.hpp>
+#include <hibf/detail/cereal/concepts.hpp>
 
 #include <sdsl/bit_vectors.hpp>
 
@@ -24,30 +23,30 @@ namespace hibf
 {
 //!\brief A strong type that represents the number of bins for the hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
-struct bin_count : public detail::strong_type<size_t, bin_count, detail::strong_type_skill::convert>
+struct bin_count
 {
-    using detail::strong_type<size_t, bin_count, detail::strong_type_skill::convert>::strong_type;
+    size_t value;
 };
 
 //!\brief A strong type that represents the number of bits for each bin in the hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
-struct bin_size : public detail::strong_type<size_t, bin_size, detail::strong_type_skill::convert>
+struct bin_size
 {
-    using detail::strong_type<size_t, bin_size, detail::strong_type_skill::convert>::strong_type;
+    size_t value;
 };
 
 //!\brief A strong type that represents the number of hash functions for the hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
-struct hash_function_count : public detail::strong_type<size_t, hash_function_count, detail::strong_type_skill::convert>
+struct hash_function_count
 {
-    using detail::strong_type<size_t, hash_function_count, detail::strong_type_skill::convert>::strong_type;
+    size_t value;
 };
 
 //!\brief A strong type that represents the bin index for the hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
-struct bin_index : public detail::strong_type<size_t, bin_index, detail::strong_type_skill::convert>
+struct bin_index
 {
-    using detail::strong_type<size_t, bin_index, detail::strong_type_skill::convert>::strong_type;
+    size_t value;
 };
 
 /*!\brief The IBF binning directory. A data structure that efficiently answers set-membership queries for multiple bins.
@@ -206,9 +205,9 @@ public:
                              hibf::bin_size size,
                              hibf::hash_function_count funs = hibf::hash_function_count{2u})
     {
-        bins = bins_.get();
-        bin_size_ = size.get();
-        hash_funs = funs.get();
+        bins = bins_.value;
+        bin_size_ = size.value;
+        hash_funs = funs.value;
 
         if (bins == 0)
             throw std::logic_error{"The number of bins must be > 0."};
@@ -241,11 +240,11 @@ public:
      */
     void emplace(size_t const value, bin_index const bin) noexcept
     {
-        assert(bin.get() < bins);
+        assert(bin.value < bins);
         for (size_t i = 0; i < hash_funs; ++i)
         {
             size_t idx = hash_and_fit(value, hash_seeds[i]);
-            idx += bin.get();
+            idx += bin.value;
             assert(idx < data.size());
             data[idx] = 1;
         };
@@ -264,8 +263,8 @@ public:
      */
     void clear(bin_index const bin) noexcept
     {
-        assert(bin.get() < bins);
-        for (size_t idx = bin.get(), i = 0; i < bin_size_; idx += technical_bins, ++i)
+        assert(bin.value < bins);
+        for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
             data[idx] = 0;
     }
 
@@ -290,12 +289,12 @@ public:
                       "The reference type of the range to clear must be hibf::bin_index.");
 #ifndef NDEBUG
         for (auto && bin : bin_range)
-            assert(bin.get() < bins);
+            assert(bin.value < bins);
 #endif // NDEBUG
 
         for (size_t offset = 0, i = 0; i < bin_size_; offset += technical_bins, ++i)
             for (auto && bin : bin_range)
-                data[bin.get() + offset] = 0;
+                data[bin.value + offset] = 0;
     }
 
     /*!\brief Increases the number of bins stored in the Interleaved Bloom Filter.
@@ -323,7 +322,7 @@ public:
      */
     void increase_bin_number_to(bin_count const new_bins_)
     {
-        size_t new_bins = new_bins_.get();
+        size_t new_bins = new_bins_.value;
 
         if (new_bins < bins)
             throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
