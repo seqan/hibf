@@ -22,14 +22,6 @@
 
 namespace hibf
 {
-//!\brief Determines if the Interleaved Bloom Filter is compressed.
-//!\ingroup search_dream_index
-enum data_layout : bool
-{
-    uncompressed, //!< The Interleaved Bloom Filter is uncompressed.
-    compressed    //!< The Interleaved Bloom Filter is compressed.
-};
-
 //!\brief A strong type that represents the number of bins for the hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
 struct bin_count : public detail::strong_type<size_t, bin_count, detail::strong_type_skill::convert>
@@ -129,18 +121,11 @@ struct bin_index : public detail::strong_type<size_t, bin_index, detail::strong_
  * For example, calls to `emplace` from multiple threads are safe if `thread_1` accesses bins 0-63, `thread_2` bins
  * 64-127, and so on.
  */
-template <data_layout data_layout_mode_ = data_layout::uncompressed>
 class interleaved_bloom_filter
 {
 private:
-    //!\cond
-    template <data_layout data_layout_mode>
-    friend class interleaved_bloom_filter;
-    //!\endcond
-
     //!\brief The underlying datatype to use.
-    using data_type =
-        std::conditional_t<data_layout_mode_ == data_layout::uncompressed, sdsl::bit_vector, sdsl::sd_vector<>>;
+    using data_type = sdsl::bit_vector;
 
     //!\brief The number of bins specified by the user.
     size_t bins{};
@@ -187,13 +172,12 @@ private:
     }
 
 public:
-    //!\brief Indicates whether the Interleaved Bloom Filter is compressed.
-    static constexpr data_layout data_layout_mode = data_layout_mode_;
-
     class membership_agent_type; // documented upon definition below
 
     template <std::integral value_t>
     class counting_agent_type; // documented upon definition below
+
+    class binning_bitvector;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -221,7 +205,6 @@ public:
     interleaved_bloom_filter(hibf::bin_count bins_,
                              hibf::bin_size size,
                              hibf::hash_function_count funs = hibf::hash_function_count{2u})
-        requires (data_layout_mode == data_layout::uncompressed)
     {
         bins = bins_.get();
         bin_size_ = size.get();
@@ -238,43 +221,6 @@ public:
         bin_words = (bins + 63) >> 6;    // = ceil(bins/64)
         technical_bins = bin_words << 6; // = bin_words * 64
         data = sdsl::bit_vector(technical_bins * bin_size_);
-    }
-
-    /*!\brief Construct an uncompressed Interleaved Bloom Filter from a compressed one.
-     * \param[in] ibf The compressed hibf::interleaved_bloom_filter.
-     * \details
-     *
-     * ### Example
-     *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_constructor_uncompress.cpp
-     */
-    interleaved_bloom_filter(interleaved_bloom_filter<data_layout::compressed> const & ibf)
-        requires (data_layout_mode == data_layout::uncompressed)
-    {
-        std::tie(bins, technical_bins, bin_size_, hash_shift, bin_words, hash_funs) =
-            std::tie(ibf.bins, ibf.technical_bins, ibf.bin_size_, ibf.hash_shift, ibf.bin_words, ibf.hash_funs);
-
-        data = sdsl::bit_vector{ibf.data.begin(), ibf.data.end()};
-    }
-
-    /*!\brief Construct a compressed Interleaved Bloom Filter.
-     * \param[in] ibf The uncompressed hibf::interleaved_bloom_filter.
-     *
-     * \attention This constructor can only be used to construct **compressed** Interleaved Bloom Filters.
-     *
-     * \details
-     *
-     * ### Example
-     *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_constructor_compressed.cpp
-     */
-    interleaved_bloom_filter(interleaved_bloom_filter<data_layout::uncompressed> const & ibf)
-        requires (data_layout_mode == data_layout::compressed)
-    {
-        std::tie(bins, technical_bins, bin_size_, hash_shift, bin_words, hash_funs) =
-            std::tie(ibf.bins, ibf.technical_bins, ibf.bin_size_, ibf.hash_shift, ibf.bin_words, ibf.hash_funs);
-
-        data = sdsl::sd_vector<>{ibf.data};
     }
     //!\}
 
@@ -294,7 +240,6 @@ public:
      * \include test/snippet/search/dream_index/interleaved_bloom_filter_emplace.cpp
      */
     void emplace(size_t const value, bin_index const bin) noexcept
-        requires (data_layout_mode == data_layout::uncompressed)
     {
         assert(bin.get() < bins);
         for (size_t i = 0; i < hash_funs; ++i)
@@ -318,7 +263,6 @@ public:
      * \include test/snippet/search/dream_index/interleaved_bloom_filter_clear.cpp
      */
     void clear(bin_index const bin) noexcept
-        requires (data_layout_mode == data_layout::uncompressed)
     {
         assert(bin.get() < bins);
         for (size_t idx = bin.get(), i = 0; i < bin_size_; idx += technical_bins, ++i)
@@ -339,7 +283,6 @@ public:
      * \include test/snippet/search/dream_index/interleaved_bloom_filter_clear.cpp
      */
     template <typename rng_t>
-        requires (data_layout_mode == data_layout::uncompressed)
     void clear(rng_t && bin_range) noexcept
     {
         static_assert(std::ranges::forward_range<rng_t>, "The range of bins to clear must model a forward_range.");
@@ -379,7 +322,6 @@ public:
      * \include test/snippet/search/dream_index/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
     void increase_bin_number_to(bin_count const new_bins_)
-        requires (data_layout_mode == data_layout::uncompressed)
     {
         size_t new_bins = new_bins_.get();
 
@@ -433,10 +375,7 @@ public:
      * \include test/snippet/search/dream_index/membership_agent_construction.cpp
      * \sa hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains
      */
-    membership_agent_type membership_agent() const
-    {
-        return membership_agent_type{*this};
-    }
+    membership_agent_type membership_agent() const;
 
     /*!\brief Returns a hibf::interleaved_bloom_filter::counting_agent_type to be used for counting.
      * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
@@ -572,106 +511,8 @@ public:
     //!\endcond
 };
 
-/*!\brief Manages membership queries for the hibf::interleaved_bloom_filter.
- * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to on `ibf` invalidates the
- * membership_agent.
- *
- * \details
- *
- * ### Example
- *
- * \include test/snippet/search/dream_index/membership_agent_construction.cpp
- */
-template <data_layout data_layout_mode>
-class interleaved_bloom_filter<data_layout_mode>::membership_agent_type
-{
-private:
-    //!\brief The type of the augmented hibf::interleaved_bloom_filter.
-    using ibf_t = interleaved_bloom_filter<data_layout_mode>;
-
-    //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
-    ibf_t const * ibf_ptr{nullptr};
-
-public:
-    class binning_bitvector;
-
-    /*!\name Constructors, destructor and assignment
-     * \{
-     */
-    membership_agent_type() = default;                                          //!< Defaulted.
-    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
-    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
-    ~membership_agent_type() = default;                                         //!< Defaulted.
-
-    /*!\brief Construct a membership_agent_type from a hibf::interleaved_bloom_filter.
-     * \private
-     * \param ibf The hibf::interleaved_bloom_filter.
-     */
-    explicit membership_agent_type(ibf_t const & ibf) : ibf_ptr(std::addressof(ibf)), result_buffer(ibf.bin_count())
-    {}
-    //!\}
-
-    //!\brief Stores the result of bulk_contains().
-    binning_bitvector result_buffer;
-
-    /*!\name Lookup
-     * \{
-     */
-    /*!\brief Determines set membership of a given value.
-     * \param[in] value The raw value to process.
-     *
-     * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
-     * \attention Sequential calls to this function invalidate the previously returned reference.
-     *
-     * \details
-     *
-     * ### Example
-     *
-     * \include test/snippet/search/dream_index/membership_agent_bulk_contains.cpp
-     *
-     * ### Thread safety
-     *
-     * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::interleaved_bloom_filter::membership_agent_type for each thread.
-     */
-    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept
-    {
-        assert(ibf_ptr != nullptr);
-        assert(result_buffer.size() == ibf_ptr->bin_count());
-
-        std::array<size_t, 5> bloom_filter_indices;
-        std::memcpy(&bloom_filter_indices, &ibf_ptr->hash_seeds, sizeof(size_t) * ibf_ptr->hash_funs);
-
-        for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
-            bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, bloom_filter_indices[i]);
-
-        for (size_t batch = 0; batch < ibf_ptr->bin_words; ++batch)
-        {
-            size_t tmp{-1ULL};
-            for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
-            {
-                assert(bloom_filter_indices[i] < ibf_ptr->data.size());
-                tmp &= ibf_ptr->data.get_int(bloom_filter_indices[i]);
-                bloom_filter_indices[i] += 64;
-            }
-
-            result_buffer.data.set_int(batch << 6, tmp);
-        }
-
-        return result_buffer;
-    }
-
-    // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
-    // is immediately destroyed.
-    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) && noexcept = delete;
-    //!\}
-};
-
 //!\brief A bitvector representing the result of a call to `bulk_contains` of the hibf::interleaved_bloom_filter.
-template <data_layout data_layout_mode>
-class interleaved_bloom_filter<data_layout_mode>::membership_agent_type::binning_bitvector
+class interleaved_bloom_filter::binning_bitvector
 {
 private:
     //!\brief The underlying datatype to use.
@@ -784,6 +625,105 @@ public:
     //!\}
 };
 
+/*!\brief Manages membership queries for the hibf::interleaved_bloom_filter.
+ * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to on `ibf` invalidates the
+ * membership_agent.
+ *
+ * \details
+ *
+ * ### Example
+ *
+ * \include test/snippet/search/dream_index/membership_agent_construction.cpp
+ */
+class interleaved_bloom_filter::membership_agent_type
+{
+private:
+    //!\brief The type of the augmented hibf::interleaved_bloom_filter.
+    using ibf_t = interleaved_bloom_filter;
+
+    //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
+    ibf_t const * ibf_ptr{nullptr};
+
+public:
+    /*!\name Constructors, destructor and assignment
+     * \{
+     */
+    membership_agent_type() = default;                                          //!< Defaulted.
+    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
+    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
+    ~membership_agent_type() = default;                                         //!< Defaulted.
+
+    /*!\brief Construct a membership_agent_type from a hibf::interleaved_bloom_filter.
+     * \private
+     * \param ibf The hibf::interleaved_bloom_filter.
+     */
+    explicit membership_agent_type(ibf_t const & ibf) : ibf_ptr(std::addressof(ibf)), result_buffer(ibf.bin_count())
+    {}
+    //!\}
+
+    //!\brief Stores the result of bulk_contains().
+    binning_bitvector result_buffer;
+
+    /*!\name Lookup
+     * \{
+     */
+    /*!\brief Determines set membership of a given value.
+     * \param[in] value The raw value to process.
+     *
+     * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
+     * \attention Sequential calls to this function invalidate the previously returned reference.
+     *
+     * \details
+     *
+     * ### Example
+     *
+     * \include test/snippet/search/dream_index/membership_agent_bulk_contains.cpp
+     *
+     * ### Thread safety
+     *
+     * Concurrent invocations of this function are not thread safe, please create a
+     * hibf::interleaved_bloom_filter::membership_agent_type for each thread.
+     */
+    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept
+    {
+        assert(ibf_ptr != nullptr);
+        assert(result_buffer.size() == ibf_ptr->bin_count());
+
+        std::array<size_t, 5> bloom_filter_indices;
+        std::memcpy(&bloom_filter_indices, &ibf_ptr->hash_seeds, sizeof(size_t) * ibf_ptr->hash_funs);
+
+        for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
+            bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, bloom_filter_indices[i]);
+
+        for (size_t batch = 0; batch < ibf_ptr->bin_words; ++batch)
+        {
+            size_t tmp{-1ULL};
+            for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
+            {
+                assert(bloom_filter_indices[i] < ibf_ptr->data.size());
+                tmp &= ibf_ptr->data.get_int(bloom_filter_indices[i]);
+                bloom_filter_indices[i] += 64;
+            }
+
+            result_buffer.data.set_int(batch << 6, tmp);
+        }
+
+        return result_buffer;
+    }
+
+    // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
+    // is immediately destroyed.
+    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) && noexcept = delete;
+    //!\}
+};
+
+inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter::membership_agent() const
+{
+    return interleaved_bloom_filter::membership_agent_type{*this};
+}
+
 /*!\brief A data structure that behaves like a std::vector and can be used to consolidate the results of multiple calls
  *        to hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
  * \ingroup search_dream_index
@@ -817,10 +757,7 @@ private:
     //!\brief Is binning_bitvector_t a hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector?
     template <typename binning_bitvector_t>
     static constexpr bool is_binning_bitvector =
-        std::same_as<binning_bitvector_t,
-                     interleaved_bloom_filter<data_layout::uncompressed>::membership_agent_type::binning_bitvector>
-        || std::same_as<binning_bitvector_t,
-                        interleaved_bloom_filter<data_layout::compressed>::membership_agent_type::binning_bitvector>;
+        std::same_as<binning_bitvector_t, interleaved_bloom_filter::binning_bitvector>;
 
 public:
     /*!\name Constructors, destructor and assignment
@@ -962,13 +899,12 @@ private:
  *
  * \include test/snippet/search/dream_index/counting_agent.cpp
  */
-template <data_layout data_layout_mode>
 template <std::integral value_t>
-class interleaved_bloom_filter<data_layout_mode>::counting_agent_type
+class interleaved_bloom_filter::counting_agent_type
 {
 private:
     //!\brief The type of the augmented hibf::interleaved_bloom_filter.
-    using ibf_t = interleaved_bloom_filter<data_layout_mode>;
+    using ibf_t = interleaved_bloom_filter;
 
     //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
     ibf_t const * ibf_ptr{nullptr};

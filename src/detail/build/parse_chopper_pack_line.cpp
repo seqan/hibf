@@ -5,19 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#pragma once
-
 #include <hibf/std/charconv>
 #include <ranges>
-#include <string>
+#include <string_view>
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/build/parse_chopper_pack_line.hpp>
 
 namespace hibf
 {
 
-inline layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
-                                                        std::vector<std::vector<std::string>> & user_bin_filenames)
+layout::layout::user_bin parse_chopper_pack_line(std::string const & current_line,
+                                                 std::vector<std::vector<std::string>> & user_bin_filenames)
 {
     layout::layout::user_bin result{};
 

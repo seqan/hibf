@@ -7,9 +7,15 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <string>
+#include <vector>
 
-#include <hibf/platform.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
-{} // namespace hibf
+{
+
+layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                      std::string const & chopper_pack_filename);
+
+} // namespace hibf

@@ -10,20 +10,17 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#pragma once
-
 #include <algorithm>
 #include <cassert>
 
-#include <hibf/detail/build/hibf/node_data.hpp>
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/build/update_header_node_data.hpp>
 
 namespace hibf
 {
 
-inline void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_bins,
-                                    lemon::ListDigraph & ibf_graph,
-                                    lemon::ListDigraph::NodeMap<node_data> & node_map)
+void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_bins,
+                             lemon::ListDigraph & ibf_graph,
+                             lemon::ListDigraph::NodeMap<node_data> & node_map)
 {
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
     std::ranges::sort(header_max_bins,

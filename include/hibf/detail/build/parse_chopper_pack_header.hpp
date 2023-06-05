@@ -7,14 +7,13 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <iosfwd>
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/hibf/build_data.hpp>
-#include <hibf/detail/build/hibf/hierarchical_build.hpp>
-#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
-#include <hibf/detail/build/hibf/update_parent_kmers.hpp>
-#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
+#include <hibf/detail/layout/layout.hpp>
 
 namespace hibf
-{} // namespace hibf
+{
+
+void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout);
+
+} // namespace hibf

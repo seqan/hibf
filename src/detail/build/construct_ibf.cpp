@@ -5,25 +5,19 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#pragma once
-
-#include <lemon/list_graph.h> /// Must be first include.
-
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/hibf/bin_size_in_bits.hpp>
-#include <hibf/detail/build/hibf/build_data.hpp>
-#include <hibf/detail/build/hibf/insert_into_ibf.hpp>
-#include <hibf/detail/build/hibf/update_parent_kmers.hpp>
+#include <hibf/detail/build/construct_ibf.hpp>
+#include <hibf/detail/build/insert_into_ibf.hpp>
+#include <hibf/detail/build/update_parent_kmers.hpp>
 
 namespace hibf
 {
 
-inline hibf::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                                                      robin_hood::unordered_flat_set<uint64_t> & kmers,
-                                                      size_t const number_of_bins,
-                                                      lemon::ListDigraph::Node const & node,
-                                                      build_data & data,
-                                                      bool is_root)
+hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
+                                             robin_hood::unordered_flat_set<uint64_t> & kmers,
+                                             size_t const number_of_bins,
+                                             lemon::ListDigraph::Node const & node,
+                                             build_data & data,
+                                             bool is_root)
 {
     auto & node_data = data.node_map[node];
 
@@ -36,9 +30,9 @@ inline hibf::interleaved_bloom_filter<> construct_ibf(robin_hood::unordered_flat
 
     timer<concurrent::no> local_index_allocation_timer{};
     local_index_allocation_timer.start();
-    hibf::interleaved_bloom_filter<> ibf{bin_count,
-                                         bin_size,
-                                         hibf::hash_function_count{data.hibf_config.number_of_hash_functions}};
+    hibf::interleaved_bloom_filter ibf{bin_count,
+                                       bin_size,
+                                       hibf::hash_function_count{data.hibf_config.number_of_hash_functions}};
     local_index_allocation_timer.stop();
     data.index_allocation_timer += local_index_allocation_timer;
 

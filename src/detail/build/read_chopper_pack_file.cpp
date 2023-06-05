@@ -5,21 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#pragma once
-
-#include <lemon/list_graph.h> /// Must be first include.
-
 #include <fstream>
-#include <string>
 
-#include <hibf/detail/build/hibf/parse_chopper_pack_header.hpp>
-#include <hibf/detail/build/hibf/parse_chopper_pack_line.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp>
+#include <hibf/detail/build/parse_chopper_pack_line.hpp>
+#include <hibf/detail/build/read_chopper_pack_file.hpp>
 
 namespace hibf
 {
 
-inline layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
-                                             std::string const & chopper_pack_filename)
+layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+                                      std::string const & chopper_pack_filename)
 {
     layout::layout hibf_layout{};
 

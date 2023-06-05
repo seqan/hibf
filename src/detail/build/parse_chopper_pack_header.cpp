@@ -5,23 +5,19 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#pragma once
-
-#include <lemon/list_graph.h> /// Must be first include.
-
 #include <algorithm>
 #include <cassert>
+#include <fstream>
 #include <hibf/std/charconv>
-#include <iosfwd>
 #include <string_view>
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 namespace hibf
 {
 
-inline void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout)
+void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout)
 {
     auto parse_bin_indices = [](std::string_view const & buffer)
     {

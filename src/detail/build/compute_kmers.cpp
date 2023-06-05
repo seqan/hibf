@@ -10,18 +10,14 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#pragma once
-
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/hibf/build_data.hpp>
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/build/compute_kmers.hpp>
 
 namespace hibf
 {
 
-inline void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
-                          build_data const & data,
-                          layout::layout::user_bin const & record)
+void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
+                   build_data const & data,
+                   layout::layout::user_bin const & record)
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
