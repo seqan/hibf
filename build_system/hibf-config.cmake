@@ -128,7 +128,7 @@ find_path (HIBF_SUBMODULES_DIR
            HINTS "${HIBF_CLONE_DIR}" "${HIBF_INCLUDE_DIR}/hibf")
 
 if (HIBF_INCLUDE_DIR)
-    hibf_config_print ("HIBF include dir found:   ${HIBF_INCLUDE_DIR}")
+    hibf_config_print ("HIBF include dir found:     ${HIBF_INCLUDE_DIR}")
 else ()
     hibf_config_error ("HIBF include directory could not be found (HIBF_INCLUDE_DIR: '${HIBF_INCLUDE_DIR}')")
 endif ()
@@ -138,7 +138,7 @@ find_path (HIBF_SOURCE_DIR
            HINTS "${HIBF_CLONE_DIR}/src")
 
 if (HIBF_SOURCE_DIR)
-    hibf_config_print ("HIBF source dir found:   ${HIBF_SOURCE_DIR}")
+    hibf_config_print ("HIBF source dir found:      ${HIBF_SOURCE_DIR}")
 else ()
     hibf_config_error ("HIBF source directory could not be found (HIBF_SOURCE_DIR: '${HIBF_SOURCE_DIR}')")
 endif ()
@@ -155,7 +155,7 @@ if (HIBF_SUBMODULES_DIR)
     file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde/simde)
     foreach (submodule ${submodules})
         if (IS_DIRECTORY ${submodule})
-            hibf_config_print ("  …adding submodule include:  ${submodule}")
+            hibf_config_print ("  …adding submodule include: ${submodule}")
             set (HIBF_DEPENDENCY_INCLUDE_DIRS ${submodule} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
         endif ()
     endforeach ()
@@ -170,15 +170,6 @@ set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
 set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_INCLUDE_DIR} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
-
-# ----------------------------------------------------------------------------
-# Force-deactivate optional dependencies
-# ----------------------------------------------------------------------------
-
-# These two are "opt-in", because detected by CMake
-# If you want to force-require these, just do find_package (zlib REQUIRED) before find_package (hibf)
-option (HIBF_NO_ZLIB "Don't use ZLIB, even if present." OFF)
-option (HIBF_NO_BZIP2 "Don't use BZip2, even if present." OFF)
 
 # ----------------------------------------------------------------------------
 # Check supported compilers
@@ -311,46 +302,35 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
-# ZLIB dependency
+# xxHash dependency
 # ----------------------------------------------------------------------------
+find_path (HIBF_XXHASH_DIR
+           NAMES xxhash.h
+           HINTS "${HIBF_INCLUDE_DIR}/hibf/contrib/xxhash")
 
-if (NOT HIBF_NO_ZLIB)
-    find_package (ZLIB QUIET)
-endif ()
-
-if (ZLIB_FOUND)
-    set (HIBF_LIBRARIES ${HIBF_LIBRARIES} ${ZLIB_LIBRARIES})
-    set (HIBF_DEPENDENCY_INCLUDE_DIRS ${HIBF_DEPENDENCY_INCLUDE_DIRS} ${ZLIB_INCLUDE_DIRS})
-    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_HAS_ZLIB=1")
-    hibf_config_print ("Optional dependency:        ZLIB-${ZLIB_VERSION_STRING} found.")
+if (HIBF_XXHASH_DIR)
+    hibf_config_print ("Required dependency:        xxHash found.")
+    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DXXH_INLINE_ALL")
 else ()
-    hibf_config_print ("Optional dependency:        ZLIB not found.")
+    hibf_config_error ("Required dependency xxHash not found.")
 endif ()
+
+unset (HIBF_XXHASH_DIR)
 
 # ----------------------------------------------------------------------------
-# BZip2 dependency
+# robin-hood dependency
 # ----------------------------------------------------------------------------
+find_path (HIBF_ROBIN_HOOD_DIR
+           NAMES robin_hood.hpp
+           HINTS "${HIBF_INCLUDE_DIR}/hibf/contrib")
 
-if (NOT HIBF_NO_BZIP2)
-    find_package (BZip2 QUIET)
-endif ()
-
-if (NOT ZLIB_FOUND AND BZIP2_FOUND)
-    # NOTE (marehr): iostream_bzip2 uses the type `uInt`, which is defined by
-    # `zlib`. Therefore, `bzip2` will cause a ton of errors without `zlib`.
-    message (AUTHOR_WARNING "Disabling BZip2 [which was successfully found], "
-                            "because ZLIB was not found. BZip2 depends on ZLIB.")
-    unset (BZIP2_FOUND)
-endif ()
-
-if (BZIP2_FOUND)
-    set (HIBF_LIBRARIES ${HIBF_LIBRARIES} ${BZIP2_LIBRARIES})
-    set (HIBF_DEPENDENCY_INCLUDE_DIRS ${HIBF_DEPENDENCY_INCLUDE_DIRS} ${BZIP2_INCLUDE_DIRS})
-    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_HAS_BZIP2=1")
-    hibf_config_print ("Optional dependency:        BZip2-${BZIP2_VERSION_STRING} found.")
+if (HIBF_ROBIN_HOOD_DIR)
+    hibf_config_print ("Required dependency:        robin-hood found.")
 else ()
-    hibf_config_print ("Optional dependency:        BZip2 not found.")
+    hibf_config_error ("Required dependency robin-hood not found.")
 endif ()
+
+unset (HIBF_ROBIN_HOOD_DIR)
 
 # ----------------------------------------------------------------------------
 # System dependencies
@@ -395,9 +375,9 @@ try_compile (HIBF_PLATFORM_TEST #
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)
 
 if (HIBF_PLATFORM_TEST)
-    hibf_config_print ("HIBF platform.hpp build:  passed.")
+    hibf_config_print ("HIBF platform.hpp build:    passed.")
 else ()
-    hibf_config_error ("HIBF platform.hpp build:  failed!\n\
+    hibf_config_error ("HIBF platform.hpp build:    failed!\n\
                         ${HIBF_PLATFORM_TEST_OUTPUT}")
 endif ()
 
