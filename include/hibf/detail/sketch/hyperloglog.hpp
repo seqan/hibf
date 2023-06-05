@@ -16,7 +16,7 @@
 #include <vector>
 
 #include <hibf/contrib/aligned_allocator.hpp>
-#include <hibf/contrib/xxhash/xxh3.h>
+#include <hibf/contrib/xxhash/xxhash.h>
 #include <hibf/platform.hpp>
 
 namespace hibf::sketch
