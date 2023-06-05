@@ -29,7 +29,7 @@ else ()
     )
 endif ()
 
-find_package (HIBF 3.0 REQUIRED HINTS ${HIBF_MODULE_PATH})
+find_package (HIBF "${HIBF_PROJECT_VERSION}" REQUIRED HINTS ${HIBF_MODULE_PATH})
 
 option (INSTALL_HIBF "Enable installation of hibf. (Projects embedding hibf may want to turn this OFF.)" ON)
 
