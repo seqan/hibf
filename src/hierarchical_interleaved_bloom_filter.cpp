@@ -28,7 +28,6 @@
 #include <hibf/detail/sketch/estimate_kmer_counts.hpp>
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
-#include <hibf/migration/execution_handler_parallel/execution_handler_parallel.hpp>
 
 namespace hibf
 {
@@ -66,8 +65,8 @@ hibf::layout::layout compute_layout(config const & hibf_config)
     sketches.resize(hibf_config.number_of_user_bins);
     kmer_counts.resize(hibf_config.number_of_user_bins);
 
-    // #pragma omp parallel for schedule(static) num_threads(config.threads)
     robin_hood::unordered_flat_set<uint64_t> kmers;
+#pragma omp parallel for schedule(static) num_threads(hibf_config.threads) private(kmers)
     for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
     {
         hibf::sketch::hyperloglog sketch(hibf_config.sketch_bits);
@@ -151,7 +150,23 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         size_t const number_of_mutex = (data.node_map[current_node].number_of_technical_bins + 63) / 64;
         std::vector<std::mutex> local_ibf_mutex(number_of_mutex);
 
-        auto worker = [&](auto && index, auto &&)
+        size_t number_of_threads{};
+        std::vector<size_t> indices(children.size());
+        std::iota(indices.begin(), indices.end(), size_t{});
+
+        if (is_root)
+        {
+            // Shuffle indices: More likely to not block each other. Optimal: Interleave
+            std::shuffle(indices.begin(), indices.end(), std::mt19937_64{std::random_device{}()});
+            number_of_threads = data.hibf_config.threads;
+        }
+        else
+        {
+            number_of_threads = 1u;
+        }
+
+#pragma omp parallel for schedule(dynamic, 1) num_threads(number_of_threads)
+        for (auto && index : indices)
         {
             auto & child = children[index];
 
@@ -169,25 +184,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                         update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
                 }
             }
-        };
-
-        size_t number_of_threads{};
-        std::vector<size_t> indices(children.size());
-        std::iota(indices.begin(), indices.end(), size_t{});
-
-        if (is_root)
-        {
-            // Shuffle indices: More likely to not block each other. Optimal: Interleave
-            std::shuffle(indices.begin(), indices.end(), std::mt19937_64{std::random_device{}()});
-            number_of_threads = data.hibf_config.threads;
         }
-        else
-        {
-            number_of_threads = 1u;
-        }
-
-        seqan3::detail::execution_handler_parallel executioner{number_of_threads};
-        executioner.bulk_execute(std::move(worker), std::move(indices), []() {});
     };
 
     loop_over_children();

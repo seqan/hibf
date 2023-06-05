@@ -10,7 +10,7 @@
 #include <string>
 #include <vector>
 
-#include <hibf/migration/cereal.hpp>
+#include <hibf/detail/cereal/concepts.hpp>
 
 namespace hibf
 {
