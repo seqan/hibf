@@ -288,8 +288,32 @@ if (HIBF_IS_DEBUG)
     hibf_config_print ("Link Time Optimisation:     disabled")
     set (HIBF_HAS_LTO FALSE)
 else ()
-    include (CheckIPOSupported)
-    check_ipo_supported (RESULT HIBF_HAS_LTO)
+    # CMake's check_ipo_supported uses hardcoded lto flags
+    # macOS GCC supports -flto-auto, but not the hardcoded flag "-fno-fat-lto-objects"
+    if ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+        set (HIBF_LTO_FLAGS "-flto=auto")
+    else ()
+        set (HIBF_LTO_FLAGS "-flto=auto -ffat-lto-objects")
+    endif ()
+
+    set (LTO_CMAKE_SOURCE
+         "cmake_minimum_required(VERSION ${CMAKE_VERSION})\nproject(lto-test LANGUAGES CXX)
+          cmake_policy(SET CMP0069 NEW)\nadd_library(foo foo.cpp)\nadd_executable(boo main.cpp)
+          target_link_libraries(boo PUBLIC foo)")
+    set (LTO_FOO_CPP "int foo(){return 0x42;}")
+    set (LTO_MAIN_CPP "int foo();int main(){return foo();}")
+    set (testdir "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/lto-test")
+    set (bindir "${testdir}/bin")
+    set (srcdir "${testdir}/src")
+    file (MAKE_DIRECTORY "${bindir}")
+    file (MAKE_DIRECTORY "${srcdir}")
+    file (WRITE "${srcdir}/foo.cpp" "${LTO_FOO_CPP}")
+    file (WRITE "${srcdir}/main.cpp" "${LTO_MAIN_CPP}")
+    file (WRITE "${srcdir}/CMakeLists.txt" "${LTO_CMAKE_SOURCE}")
+    try_compile (HIBF_HAS_LTO "${bindir}"
+                 "${srcdir}" "lto-test"
+                 CMAKE_FLAGS "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DCMAKE_CXX_FLAGS:STRING=${HIBF_LTO_FLAGS}"
+                 OUTPUT_VARIABLE output)
     if (HIBF_HAS_LTO)
         hibf_config_print ("Link Time Optimisation:     enabled")
     else ()
@@ -456,16 +480,8 @@ if (HIBF_FOUND AND NOT TARGET hibf::hibf)
     # a system header which suppresses warnings of external libraries.
     target_include_directories (hibf_hibf SYSTEM PUBLIC "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
     if (HIBF_HAS_LTO)
-        set_property (TARGET hibf_hibf PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-        # (GCC>= 10.1) LTO will emit a warning when it cannot detect jobserver, and will fall back to using one thread:
-        # "lto-wrapper: warning: using serial compilation of 2 LTRANS jobs"
-        # https://gcc.gnu.org/pipermail/gcc-patches/2021-April/568500.html
-        # CMake>=3.24.0  accounts for this: https://github.com/Kitware/CMake/commit/fe57410b33de1e8640091f0a1ac3ddde81163882
-        if (CMAKE_VERSION VERSION_LESS 3.24)
-            list (TRANSFORM CMAKE_CXX_COMPILE_OPTIONS_IPO REPLACE "-flto" "-flto=auto")
-        endif ()
-        # CMake sets -fno-fat-lto-objects, but we actually want fat-lto-objects
-        list (TRANSFORM CMAKE_CXX_COMPILE_OPTIONS_IPO REPLACE "-fno-fat-lto-objects" "-ffat-lto-objects")
+        separate_arguments (HIBF_LTO_LIST UNIX_COMMAND "${HIBF_LTO_FLAGS}")
+        target_compile_options (hibf_hibf PRIVATE ${HIBF_LTO_LIST})
     endif ()
     add_library (hibf::hibf ALIAS hibf_hibf)
 endif ()
