@@ -11,9 +11,6 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-# require HIBF package
-find_package (HIBF REQUIRED HINTS ${CMAKE_CURRENT_LIST_DIR}/../build_system)
-
 include (CheckCXXSourceCompiles)
 include (FindPackageHandleStandardArgs)
 include (FindPackageMessage)
@@ -70,7 +67,7 @@ if (NOT TARGET hibf::test)
         endif ()
     endif ()
 
-    target_link_libraries (hibf_test INTERFACE "hibf::hibf" "pthread")
+    target_link_libraries (hibf_test INTERFACE "hibf" "pthread")
     target_include_directories (hibf_test INTERFACE "${HIBF_TEST_INCLUDE_DIR}")
     add_library (hibf::test ALIAS hibf_test)
 endif ()
@@ -145,3 +142,6 @@ include (hibf_require_ccache)
 include (hibf_require_benchmark)
 include (hibf_require_test)
 include (hibf_add_subdirectories)
+
+get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
