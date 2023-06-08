@@ -11,29 +11,28 @@
 
 cmake_minimum_required (VERSION 3.4)
 
-find_path (HIBF_MODULE_PATH "hibf-config.cmake" HINTS "${CMAKE_CURRENT_LIST_DIR}/build_system/")
-list (APPEND CMAKE_MODULE_PATH "${HIBF_MODULE_PATH}")
+include (cmake/version.cmake)
 
-include (hibf-config-version)
+project (HIBF
+         LANGUAGES CXX
+         VERSION "${HIBF_VERSION}"
+         DESCRIPTION "HIBF -- the modern C++ library for sequence analysis" # since cmake 3.9
+         HOMEPAGE_URL "https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter" # since cmake 3.12
+)
 
-if (CMAKE_VERSION VERSION_LESS 3.12)
-    project (hibf
-             LANGUAGES CXX
-             VERSION "${HIBF_PROJECT_VERSION}")
-else ()
-    project (hibf
-             LANGUAGES CXX
-             VERSION "${HIBF_PROJECT_VERSION}"
-             DESCRIPTION "HIBF -- the modern C++ library for sequence analysis" # since cmake 3.9
-             HOMEPAGE_URL "https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter" # since cmake 3.12
-    )
+if (HIBF_RELEASE_CANDIDATE_VERSION VERSION_GREATER "0")
+    set (HIBF_VERSION "${HIBF_VERSION}-rc.${HIBF_RELEASE_CANDIDATE_VERSION}")
 endif ()
 
-find_package (HIBF "${HIBF_PROJECT_VERSION}" REQUIRED HINTS ${HIBF_MODULE_PATH})
-
-option (INSTALL_HIBF "Enable installation of hibf. (Projects embedding hibf may want to turn this OFF.)" ON)
-
-if (INSTALL_HIBF)
-    include (hibf-install)
-    include (hibf-package)
+if (NOT CMAKE_BUILD_TYPE)
+    set (CMAKE_BUILD_TYPE
+         Release
+         CACHE STRING "Choose the type of build, options are: Debug Release Coverage RelWithDebInfo MinSizeRel." FORCE)
 endif ()
+
+include (GNUInstallDirs)
+include (cmake/cpack.cmake)
+
+set (HIBF_HEADER_PATH "${HIBF_SOURCE_DIR}/include")
+include (cmake/configuration.cmake)
+add_subdirectory (src)

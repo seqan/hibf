@@ -17,6 +17,8 @@ _hibf_cmake_format_documentation_only:
       -and -not -path "./submodules/*" `#Do not print hits for files in the "submodules" directory.` \
       -and -not -path "./build/*" `#Do not print hits for files in the "build" directory, pipe results.` | \
       xargs cmake-format --config-files .cmake-format.yaml --in-place # Call cmake-format on each result.
+    shell_on_staged_changes: |
+      git diff --name-only --diff-filter=ACMRT main | grep -E "(\.cmake|CMakeLists.txt)$" | xargs cmake-format --config-files .cmake-format.yaml --in-place
 # ^^^ SeqAn3
 # vvv cmake-format
 _help_parse: Options affecting listfile parsing

@@ -44,7 +44,7 @@
 #   HIBF_VERSION_MINOR    -- e.g. 0
 #   HIBF_VERSION_PATCH    -- e.g. 0
 #
-#   HIBF_INCLUDE_DIRS     -- to be passed to include_directories ()
+#   HIBF_HEADER_PATH     -- to be passed to include_directories ()
 #   HIBF_LIBRARIES        -- to be passed to target_link_libraries ()
 #   HIBF_DEFINITIONS      -- to be passed to add_definitions ()
 #   HIBF_CXX_FLAGS        -- to be added to CMAKE_CXX_FLAGS
@@ -54,7 +54,7 @@
 #   hibf::hibf          -- interface target where
 #                                  target_link_libraries(target hibf::hibf)
 #                              automatically sets
-#                                  target_include_directories(target $HIBF_INCLUDE_DIRS),
+#                                  target_include_directories(target $HIBF_HEADER_PATH),
 #                                  target_link_libraries(target $HIBF_LIBRARIES),
 #                                  target_compile_definitions(target $HIBF_DEFINITIONS) and
 #                                  target_compile_options(target $HIBF_CXX_FLAGS)
@@ -117,49 +117,16 @@ macro (hibf_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# Find HIBF include path
-# ----------------------------------------------------------------------------
-
-# Note that hibf-config.cmake can be standalone and thus HIBF_CLONE_DIR might be empty.
-# * `HIBF_CLONE_DIR` was already found in hibf-config-version.cmake
-# * `HIBF_INCLUDE_DIR` was already found in hibf-config-version.cmake
-find_path (HIBF_SUBMODULES_DIR
-           NAMES submodules
-           HINTS "${HIBF_CLONE_DIR}" "${HIBF_INCLUDE_DIR}/hibf")
-
-if (HIBF_INCLUDE_DIR)
-    hibf_config_print ("HIBF include dir found:     ${HIBF_INCLUDE_DIR}")
-else ()
-    hibf_config_error ("HIBF include directory could not be found (HIBF_INCLUDE_DIR: '${HIBF_INCLUDE_DIR}')")
-endif ()
-
-find_path (HIBF_SOURCE_DIR
-           NAMES hierarchical_interleaved_bloom_filter.cpp
-           HINTS "${HIBF_CLONE_DIR}/src")
-
-if (HIBF_SOURCE_DIR)
-    hibf_config_print ("HIBF source dir found:      ${HIBF_SOURCE_DIR}")
-else ()
-    hibf_config_error ("HIBF source directory could not be found (HIBF_SOURCE_DIR: '${HIBF_SOURCE_DIR}')")
-endif ()
-
-# ----------------------------------------------------------------------------
 # Detect if we are a clone of repository and if yes auto-add submodules
 # ----------------------------------------------------------------------------
 
-if (HIBF_CLONE_DIR)
-    hibf_config_print ("Detected as running from a repository checkout…")
-endif ()
-
-if (HIBF_SUBMODULES_DIR)
-    file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde/simde)
-    foreach (submodule ${submodules})
-        if (IS_DIRECTORY ${submodule})
-            hibf_config_print ("  …adding submodule include: ${submodule}")
-            set (HIBF_DEPENDENCY_INCLUDE_DIRS ${submodule} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
-        endif ()
-    endforeach ()
-endif ()
+file (GLOB submodules ${HIBF_SOURCE_DIR}/submodules/*/include ${HIBF_SOURCE_DIR}/submodules/simde/simde)
+foreach (submodule ${submodules})
+    if (IS_DIRECTORY ${submodule})
+        hibf_config_print ("  …adding submodule include: ${submodule}")
+        set (HIBF_DEPENDENCY_INCLUDE_DIRS ${submodule} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
+    endif ()
+endforeach ()
 
 # ----------------------------------------------------------------------------
 # Options for CheckCXXSourceCompiles
@@ -168,7 +135,7 @@ endif ()
 # deactivate messages in check_*
 set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_INCLUDE_DIR} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_HEADER_PATH} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
@@ -316,6 +283,7 @@ else ()
                  OUTPUT_VARIABLE output)
     if (HIBF_HAS_LTO)
         hibf_config_print ("Link Time Optimisation:     enabled")
+        separate_arguments (HIBF_LTO_FLAGS UNIX_COMMAND "${HIBF_LTO_FLAGS}")
     else ()
         hibf_config_print ("Link Time Optimisation:     not available")
     endif ()
@@ -329,10 +297,10 @@ set (THREADS_PREFER_PTHREAD_FLAG TRUE)
 find_package (Threads QUIET)
 
 if (Threads_FOUND)
-    set (HIBF_LIBRARIES ${HIBF_LIBRARIES} Threads::Threads)
     if ("${CMAKE_THREAD_LIBS_INIT}" STREQUAL "")
         hibf_config_print ("Thread support:             builtin.")
     else ()
+        set (HIBF_LIBRARIES ${HIBF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
         hibf_config_print ("Thread support:             via ${CMAKE_THREAD_LIBS_INIT}")
     endif ()
 else ()
@@ -344,7 +312,7 @@ endif ()
 # ----------------------------------------------------------------------------
 find_path (HIBF_XXHASH_DIR
            NAMES xxhash.h
-           HINTS "${HIBF_INCLUDE_DIR}/hibf/contrib/xxhash")
+           HINTS "${HIBF_HEADER_PATH}/hibf/contrib/xxhash")
 
 if (HIBF_XXHASH_DIR)
     hibf_config_print ("Required dependency:        xxHash found.")
@@ -360,7 +328,7 @@ unset (HIBF_XXHASH_DIR)
 # ----------------------------------------------------------------------------
 find_path (HIBF_ROBIN_HOOD_DIR
            NAMES robin_hood.hpp
-           HINTS "${HIBF_INCLUDE_DIR}/hibf/contrib")
+           HINTS "${HIBF_HEADER_PATH}/hibf/contrib")
 
 if (HIBF_ROBIN_HOOD_DIR)
     hibf_config_print ("Required dependency:        robin-hood found.")
@@ -407,7 +375,7 @@ try_compile (HIBF_PLATFORM_TEST #
              ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
              CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${HIBF_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_INCLUDE_DIR};${HIBF_DEPENDENCY_INCLUDE_DIRS}"
+                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH};${HIBF_DEPENDENCY_INCLUDE_DIRS}"
              COMPILE_DEFINITIONS ${HIBF_DEFINITIONS}
              LINK_LIBRARIES ${HIBF_LIBRARIES}
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)
@@ -419,94 +387,4 @@ else ()
                         ${HIBF_PLATFORM_TEST_OUTPUT}")
 endif ()
 
-# ----------------------------------------------------------------------------
-# Finish find_package call
-# ----------------------------------------------------------------------------
-
-find_package_handle_standard_args (${CMAKE_FIND_PACKAGE_NAME} REQUIRED_VARS HIBF_INCLUDE_DIR)
-
-# Set HIBF_* variables with the content of ${CMAKE_FIND_PACKAGE_NAME}_(FOUND|...|VERSION)
-# This needs to be done, because `find_package(HIBF)` might be called in any case-sensitive way and we want to
-# guarantee that HIBF_* are always set.
-foreach (package_var
-         FOUND
-         DIR
-         ROOT
-         CONFIG
-         VERSION
-         VERSION_MAJOR
-         VERSION_MINOR
-         VERSION_PATCH
-         VERSION_TWEAK
-         VERSION_COUNT)
-    set (HIBF_${package_var} "${${CMAKE_FIND_PACKAGE_NAME}_${package_var}}")
-endforeach ()
-
-# propagate HIBF_INCLUDE_DIR into HIBF_INCLUDE_DIRS
-set (HIBF_INCLUDE_DIRS ${HIBF_INCLUDE_DIR} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
-
-# ----------------------------------------------------------------------------
-# Export targets
-# ----------------------------------------------------------------------------
-
-if (HIBF_FOUND AND NOT TARGET hibf::hibf)
-    separate_arguments (HIBF_CXX_FLAGS_LIST UNIX_COMMAND "${HIBF_CXX_FLAGS}")
-
-    add_library (hibf_hibf STATIC
-                 ${HIBF_SOURCE_DIR}/hierarchical_interleaved_bloom_filter.cpp
-                 ${HIBF_SOURCE_DIR}/detail/layout/simple_binning.cpp
-                 ${HIBF_SOURCE_DIR}/detail/layout/execute.cpp
-                 ${HIBF_SOURCE_DIR}/detail/layout/output.cpp
-                 ${HIBF_SOURCE_DIR}/detail/layout/compute_fp_correction.cpp
-                 ${HIBF_SOURCE_DIR}/detail/layout/hierarchical_binning.cpp
-                 ${HIBF_SOURCE_DIR}/detail/sketch/toolbox.cpp
-                 ${HIBF_SOURCE_DIR}/detail/sketch/hyperloglog.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/initialise_build_tree.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/insert_into_ibf.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/parse_chopper_pack_header.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/compute_kmers.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/read_chopper_pack_file.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/update_header_node_data.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/parse_chopper_pack_line.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/construct_ibf.cpp
-                 ${HIBF_SOURCE_DIR}/detail/build/update_content_node_data.cpp)
-    target_compile_definitions (hibf_hibf PUBLIC ${HIBF_DEFINITIONS})
-    target_compile_options (hibf_hibf PUBLIC ${HIBF_CXX_FLAGS_LIST})
-    target_link_options (hibf_hibf PUBLIC ${HIBF_CXX_FLAGS_LIST})
-    target_link_libraries (hibf_hibf PUBLIC "${HIBF_LIBRARIES}")
-    # include hibf/include/ as -I, because hibf should never produce warnings.
-    target_include_directories (hibf_hibf PUBLIC "${HIBF_INCLUDE_DIR}")
-    # include everything except hibf/include/ as -isystem, i.e.
-    # a system header which suppresses warnings of external libraries.
-    target_include_directories (hibf_hibf SYSTEM PUBLIC "${HIBF_DEPENDENCY_INCLUDE_DIRS}")
-    if (HIBF_HAS_LTO)
-        separate_arguments (HIBF_LTO_LIST UNIX_COMMAND "${HIBF_LTO_FLAGS}")
-        target_compile_options (hibf_hibf PRIVATE ${HIBF_LTO_LIST})
-    endif ()
-    add_library (hibf::hibf ALIAS hibf_hibf)
-endif ()
-
-set (CMAKE_REQUIRED_QUIET ${CMAKE_REQUIRED_QUIET_SAVE})
-
-if (HIBF_FIND_DEBUG)
-    message ("Result for ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt")
-    message ("")
-    message ("  CMAKE_BUILD_TYPE            ${CMAKE_BUILD_TYPE}")
-    message ("  CMAKE_SOURCE_DIR            ${CMAKE_SOURCE_DIR}")
-    message ("  CMAKE_INCLUDE_PATH          ${CMAKE_INCLUDE_PATH}")
-    message ("  HIBF_INCLUDE_DIR          ${HIBF_INCLUDE_DIR}")
-    message ("")
-    message ("  ${CMAKE_FIND_PACKAGE_NAME}_FOUND                ${${CMAKE_FIND_PACKAGE_NAME}_FOUND}")
-    message ("  HIBF_HAS_ZLIB             ${ZLIB_FOUND}")
-    message ("  HIBF_HAS_BZIP2            ${BZIP2_FOUND}")
-    message ("")
-    message ("  HIBF_INCLUDE_DIRS         ${HIBF_INCLUDE_DIRS}")
-    message ("  HIBF_LIBRARIES            ${HIBF_LIBRARIES}")
-    message ("  HIBF_DEFINITIONS          ${HIBF_DEFINITIONS}")
-    message ("  HIBF_CXX_FLAGS            ${HIBF_CXX_FLAGS}")
-    message ("")
-    message ("  HIBF_VERSION              ${HIBF_VERSION}")
-    message ("  HIBF_VERSION_MAJOR        ${HIBF_VERSION_MAJOR}")
-    message ("  HIBF_VERSION_MINOR        ${HIBF_VERSION_MINOR}")
-    message ("  HIBF_VERSION_PATCH        ${HIBF_VERSION_PATCH}")
-endif ()
+separate_arguments (HIBF_CXX_FLAGS_LIST UNIX_COMMAND "${HIBF_CXX_FLAGS}")
