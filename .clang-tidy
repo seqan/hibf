@@ -1,0 +1,8 @@
+---
+Checks: "bugprone*,
+         performance*,
+         -bugprone-easily-swappable-parameters
+"
+WarningsAsErrors: ''
+HeaderFilterRegex: '.*/include/hibf/(.*.hpp|detail/.*|std/.*)'
+FormatStyle:     none

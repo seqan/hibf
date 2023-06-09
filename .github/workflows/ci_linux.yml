@@ -31,6 +31,13 @@ jobs:
       fail-fast: true
       matrix:
         include:
+          - name: "clang17"
+            cxx: "clang++-17"
+            cc: "clang-17"
+            build: unit
+            dependency: libomp-17-dev
+            build_type: Release
+
           - name: "gcc13"
             cxx: "g++-13"
             cc: "gcc-13"
@@ -66,7 +73,7 @@ jobs:
         run: sudo apt-get install --yes ccache
 
       - name: Install compiler ${{ matrix.cxx }}
-        run: sudo apt-get install --yes ${{ matrix.cxx }}
+        run: sudo apt-get install --yes ${{ matrix.cxx }} ${{ matrix.dependency }}
 
       - name: Load ccache
         uses: actions/cache@v3

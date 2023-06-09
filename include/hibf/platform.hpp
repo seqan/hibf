@@ -61,21 +61,17 @@
 // ============================================================================
 
 #if HIBF_COMPILER_IS_GCC
-#    if (__GNUC__ < 10)
-#        error "At least GCC 10 is needed."
-#    endif // (__GNUC__ < 10)
-
-#    if (__GNUC__ == 10 && __GNUC_MINOR__ <= 3)
-#        pragma GCC warning "Be aware that GCC < 10.4 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 10 && __GNUC_MINOR__ <= 3)
+#    if (__GNUC__ < 11)
+#        error "At least GCC 11 is needed."
+#    endif // (__GNUC__ < 11)
 
 #    if (__GNUC__ == 11 && __GNUC_MINOR__ <= 2)
 #        pragma GCC warning "Be aware that GCC < 11.3 might have bugs that cause compile failure."
 #    endif // (__GNUC__ == 11 && __GNUC_MINOR__ <= 2)
 
-#    if (__GNUC__ == 12 && __GNUC_MINOR__ <= 1)
-#        pragma GCC warning "Be aware that GCC < 12.2 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 12 && __GNUC_MINOR__ <= 1)
+#    if (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
+#        pragma GCC warning "Be aware that GCC < 12.3 might have bugs that cause compile failure."
+#    endif // (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
 
 #    if HIBF_DOXYGEN_ONLY(1) 0
 //!\brief This disables the warning you would get if your compiler is newer than the latest supported version.
@@ -88,15 +84,7 @@
                 "Your compiler is newer than the latest supported compiler version (gcc-13). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
 #        endif // (__GNUC__ > 13)
 #    endif     // HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
-
-// ============================================================================
-//  Compiler support other
-// ============================================================================
-
-#elif !defined(HIBF_DISABLE_COMPILER_CHECK)
-#    error                                                                                                             \
-        "Your compiler is not supported. Currently, only GCC is known to work. You can disable this error by setting -DHIBF_DISABLE_COMPILER_CHECK."
-#endif // HIBF_COMPILER_IS_GCC
+#endif
 
 // ============================================================================
 //  C++ standard and features

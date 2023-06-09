@@ -60,20 +60,12 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 # Check supported compilers
 # ----------------------------------------------------------------------------
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
-    hibf_config_error ("GCC < 10 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11)
+    hibf_config_error ("GCC < 11 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
-option (HIBF_DISABLE_COMPILER_CHECK "Skips the check for supported compilers." OFF)
-
-if (NOT HIBF_DISABLE_COMPILER_CHECK)
-    if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        hibf_config_error ("Only GCC is supported. "
-                           "The detected compiler version is ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}. "
-                           "You can disable this error by passing -DHIBF_DISABLE_COMPILER_CHECK=ON to CMake.")
-    endif ()
-else ()
-    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_DISABLE_COMPILER_CHECK")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
+    hibf_config_error ("Clang < 17 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -175,10 +167,11 @@ if (HIBF_IS_DEBUG OR NOT HIBF_LTO_BUILD)
 else ()
     # CMake's check_ipo_supported uses hardcoded lto flags
     # macOS GCC supports -flto-auto, but not the hardcoded flag "-fno-fat-lto-objects"
-    if ("${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
-        set (HIBF_LTO_FLAGS "-flto=auto")
-    else ()
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
+
         set (HIBF_LTO_FLAGS "-flto=auto -ffat-lto-objects")
+    else ()
+        set (HIBF_LTO_FLAGS "-flto=auto")
     endif ()
 
     set (LTO_CMAKE_SOURCE

@@ -29,8 +29,8 @@ public:
     hierarchical_binning(hierarchical_binning const &) = delete;             //!< Deleted. Would modify same data.
     hierarchical_binning & operator=(hierarchical_binning const &) = delete; //!< Deleted. Would modify same data.
     hierarchical_binning(hierarchical_binning &&) = default;                 //!< Defaulted.
-    hierarchical_binning & operator=(hierarchical_binning &&) = default;     //!< Defaulted.
-    ~hierarchical_binning() = default;                                       //!< Defaulted.
+    hierarchical_binning & operator=(hierarchical_binning &&) = delete; //!< Deleted. config has no move assignment.
+    ~hierarchical_binning() = default;                                  //!< Defaulted.
 
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.
      * \param[in, out] data_ Stores all data that is needed to compute the layout.

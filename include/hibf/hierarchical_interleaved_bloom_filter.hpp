@@ -171,12 +171,12 @@ public:
     /*!\name Constructors, destructor and assignment
         * \{
         */
-    membership_agent_type() = default;                                          //!< Defaulted.
-    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
-    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
-    ~membership_agent_type() = default;                                         //!< Defaulted.
+    membership_agent_type() = default;                                         //!< Defaulted.
+    membership_agent_type(membership_agent_type const &) = default;            //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
+    membership_agent_type(membership_agent_type &&) = default;                 //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type &&) = delete;      //!< Deleted. hibf_ptr is const.
+    ~membership_agent_type() = default;                                        //!< Defaulted.
 
     /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
         * \private
