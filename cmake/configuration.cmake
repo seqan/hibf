@@ -4,87 +4,14 @@
 # This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
 # shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
-#
-# This CMake module will try to find SeqAn and its dependencies.  You can use
-# it the same way you would use any other CMake module.
-#
-#   find_package (HIBF [REQUIRED] ...)
-#
-# Since this makes a difference for CMAKE, pay attention to the case
-# ("HIBF", "HIBF" and "hibf" are all valid, but other names not).
-#
-# SeqAn has the following platform requirements:
-#
-#   C++20
-#   pthread
-#
-# SeqAn requires the following libraries:
-#
-#   SDSL      -- the succinct data structure library
-#
-# SeqAn has the following optional dependencies:
-#
-#   ZLIB      -- zlib compression library
-#   BZip2     -- libbz2 compression library
-#   Cereal    -- Serialisation library
-#
-# If you don't wish for these to be detected (and used), you may define HIBF_NO_ZLIB,
-# HIBF_NO_BZIP2, and HIBF_NO_CEREAL respectively.
-#
-# If you wish to require the presence of ZLIB or BZip2, just check for the module before
-# finding HIBF, e.g. "find_package (ZLIB REQUIRED)" and "find_package (BZip2 REQUIRED)".
-# If you wish to require the presence of CEREAL, you may define HIBF_CEREAL.
-#
-# Once the search has been performed, the following variables will be set.
-#
-#   HIBF_FOUND            -- Indicate whether SeqAn was found and requirements met.
-#
-#   HIBF_VERSION          -- The version as string, e.g. "3.0.0"
-#   HIBF_VERSION_MAJOR    -- e.g. 3
-#   HIBF_VERSION_MINOR    -- e.g. 0
-#   HIBF_VERSION_PATCH    -- e.g. 0
-#
-#   HIBF_HEADER_PATH     -- to be passed to include_directories ()
-#   HIBF_LIBRARIES        -- to be passed to target_link_libraries ()
-#   HIBF_DEFINITIONS      -- to be passed to add_definitions ()
-#   HIBF_CXX_FLAGS        -- to be added to CMAKE_CXX_FLAGS
-#
-# Additionally, the following [IMPORTED][IMPORTED] targets are defined:
-#
-#   hibf::hibf          -- interface target where
-#                                  target_link_libraries(target hibf::hibf)
-#                              automatically sets
-#                                  target_include_directories(target $HIBF_HEADER_PATH),
-#                                  target_link_libraries(target $HIBF_LIBRARIES),
-#                                  target_compile_definitions(target $HIBF_DEFINITIONS) and
-#                                  target_compile_options(target $HIBF_CXX_FLAGS)
-#                              for a target.
-#
-#   [IMPORTED]: https://cmake.org/cmake/help/v3.10/prop_tgt/IMPORTED.html#prop_tgt:IMPORTED
-#
-# ============================================================================
 
 cmake_minimum_required (VERSION 3.4...3.12)
-
-# ----------------------------------------------------------------------------
-# Set initial variables
-# ----------------------------------------------------------------------------
-
-# make output globally quiet if required by find_package, this effects cmake functions like `check_*`
-set (CMAKE_REQUIRED_QUIET_SAVE ${CMAKE_REQUIRED_QUIET})
-set (CMAKE_REQUIRED_QUIET ${${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY})
 
 # ----------------------------------------------------------------------------
 # Greeter
 # ----------------------------------------------------------------------------
 
-string (ASCII 27 Esc)
-set (ColourBold "${Esc}[1m")
-set (ColourReset "${Esc}[m")
-
-if (NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
-    message (STATUS "${ColourBold}Finding HIBF and checking requirements:${ColourReset}")
-endif ()
+message (STATUS "Finding HIBF and checking requirements")
 
 # ----------------------------------------------------------------------------
 # Includes
@@ -92,7 +19,6 @@ endif ()
 
 include (CheckIncludeFileCXX)
 include (CheckCXXSourceCompiles)
-include (FindPackageHandleStandardArgs)
 include (CheckCXXCompilerFlag)
 
 # ----------------------------------------------------------------------------
@@ -100,31 +26,23 @@ include (CheckCXXCompilerFlag)
 # ----------------------------------------------------------------------------
 
 macro (hibf_config_print text)
-    if (NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
-        message (STATUS "  ${text}")
-    endif ()
+    message (STATUS "  ${text}")
 endmacro ()
 
 macro (hibf_config_error text)
-    if (${CMAKE_FIND_PACKAGE_NAME}_FIND_REQUIRED)
-        message (FATAL_ERROR ${text})
-    else ()
-        if (NOT ${CMAKE_FIND_PACKAGE_NAME}_FIND_QUIETLY)
-            message (WARNING ${text})
-        endif ()
-        return ()
-    endif ()
+    message (FATAL_ERROR "  ${text}")
+
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# Detect if we are a clone of repository and if yes auto-add submodules
+# Add submodules
 # ----------------------------------------------------------------------------
 
 file (GLOB submodules ${HIBF_SOURCE_DIR}/submodules/*/include ${HIBF_SOURCE_DIR}/submodules/simde/simde)
 foreach (submodule ${submodules})
     if (IS_DIRECTORY ${submodule})
         hibf_config_print ("  …adding submodule include: ${submodule}")
-        set (HIBF_DEPENDENCY_INCLUDE_DIRS ${submodule} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
+        set (HIBF_DEPENDENCY_HEADER_PATHS ${submodule} ${HIBF_DEPENDENCY_HEADER_PATHS})
     endif ()
 endforeach ()
 
@@ -135,7 +53,7 @@ endforeach ()
 # deactivate messages in check_*
 set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_HEADER_PATH} ${HIBF_DEPENDENCY_INCLUDE_DIRS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_HEADER_PATH} ${HIBF_DEPENDENCY_HEADER_PATHS})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
@@ -143,16 +61,16 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 # ----------------------------------------------------------------------------
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 10)
-    message (FATAL_ERROR "GCC < 10 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
+    hibf_config_error ("GCC < 10 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
 option (HIBF_DISABLE_COMPILER_CHECK "Skips the check for supported compilers." OFF)
 
 if (NOT HIBF_DISABLE_COMPILER_CHECK)
     if (NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        message (FATAL_ERROR "Only GCC is supported. "
-                             "The detected compiler version is ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}. "
-                             "You can disable this error by passing -DHIBF_DISABLE_COMPILER_CHECK=ON to CMake.")
+        hibf_config_error ("Only GCC is supported. "
+                           "The detected compiler version is ${CMAKE_CXX_COMPILER_ID} ${CMAKE_CXX_COMPILER_VERSION}. "
+                           "You can disable this error by passing -DHIBF_DISABLE_COMPILER_CHECK=ON to CMake.")
     endif ()
 else ()
     set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_DISABLE_COMPILER_CHECK")
@@ -165,7 +83,7 @@ endif ()
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 201709)
+     "#if !defined (__cplusplus) || (__cplusplus < 202002)
       #error NOCXX20
       #endif
       int main() {}")
@@ -251,9 +169,9 @@ else ()
     endif ()
 endif ()
 
-if (HIBF_IS_DEBUG)
+option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON)
+if (HIBF_IS_DEBUG OR NOT HIBF_LTO_BUILD)
     hibf_config_print ("Link Time Optimisation:     disabled")
-    set (HIBF_HAS_LTO FALSE)
 else ()
     # CMake's check_ipo_supported uses hardcoded lto flags
     # macOS GCC supports -flto-auto, but not the hardcoded flag "-fno-fat-lto-objects"
@@ -283,7 +201,7 @@ else ()
                  OUTPUT_VARIABLE output)
     if (HIBF_HAS_LTO)
         hibf_config_print ("Link Time Optimisation:     enabled")
-        separate_arguments (HIBF_LTO_FLAGS UNIX_COMMAND "${HIBF_LTO_FLAGS}")
+        set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_LTO_FLAGS}")
     else ()
         hibf_config_print ("Link Time Optimisation:     not available")
     endif ()
@@ -298,13 +216,13 @@ find_package (Threads QUIET)
 
 if (Threads_FOUND)
     if ("${CMAKE_THREAD_LIBS_INIT}" STREQUAL "")
-        hibf_config_print ("Thread support:             builtin.")
+        hibf_config_print ("Thread support:             builtin")
     else ()
         set (HIBF_LIBRARIES ${HIBF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
         hibf_config_print ("Thread support:             via ${CMAKE_THREAD_LIBS_INIT}")
     endif ()
 else ()
-    hibf_config_print ("Thread support:             not found.")
+    hibf_config_print ("Thread support:             not found")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -315,10 +233,10 @@ find_path (HIBF_XXHASH_DIR
            HINTS "${HIBF_HEADER_PATH}/hibf/contrib/xxhash")
 
 if (HIBF_XXHASH_DIR)
-    hibf_config_print ("Required dependency:        xxHash found.")
+    hibf_config_print ("Required dependency:        xxHash found")
     set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DXXH_INLINE_ALL")
 else ()
-    hibf_config_error ("Required dependency xxHash not found.")
+    hibf_config_error ("Required dependency:        xxHash not found")
 endif ()
 
 unset (HIBF_XXHASH_DIR)
@@ -331,9 +249,9 @@ find_path (HIBF_ROBIN_HOOD_DIR
            HINTS "${HIBF_HEADER_PATH}/hibf/contrib")
 
 if (HIBF_ROBIN_HOOD_DIR)
-    hibf_config_print ("Required dependency:        robin-hood found.")
+    hibf_config_print ("Required dependency:        robin-hood found")
 else ()
-    hibf_config_error ("Required dependency robin-hood not found.")
+    hibf_config_error ("Required dependency:        robin-hood not found")
 endif ()
 
 unset (HIBF_ROBIN_HOOD_DIR)
@@ -353,12 +271,12 @@ endif ()
 check_include_file_cxx (execinfo.h _HIBF_HAVE_EXECINFO)
 mark_as_advanced (_HIBF_HAVE_EXECINFO)
 if (_HIBF_HAVE_EXECINFO)
-    hibf_config_print ("Optional dependency:        libexecinfo found.")
+    hibf_config_print ("Optional dependency:        libexecinfo found")
     if ((${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD"))
         set (HIBF_LIBRARIES ${HIBF_LIBRARIES} execinfo elf)
     endif ()
 else ()
-    hibf_config_print ("Optional dependency:        libexecinfo not found.")
+    hibf_config_print ("Optional dependency:        libexecinfo not found")
 endif ()
 
 # ----------------------------------------------------------------------------
@@ -375,16 +293,15 @@ try_compile (HIBF_PLATFORM_TEST #
              ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
              CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${HIBF_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH};${HIBF_DEPENDENCY_INCLUDE_DIRS}"
+                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH};${HIBF_DEPENDENCY_HEADER_PATHS}"
              COMPILE_DEFINITIONS ${HIBF_DEFINITIONS}
              LINK_LIBRARIES ${HIBF_LIBRARIES}
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)
 
 if (HIBF_PLATFORM_TEST)
-    hibf_config_print ("HIBF platform.hpp build:    passed.")
+    hibf_config_print ("HIBF platform.hpp build:    passed")
 else ()
-    hibf_config_error ("HIBF platform.hpp build:    failed!\n\
-                        ${HIBF_PLATFORM_TEST_OUTPUT}")
+    hibf_config_error ("HIBF platform.hpp build:    failed\n${HIBF_PLATFORM_TEST_OUTPUT}")
 endif ()
 
-separate_arguments (HIBF_CXX_FLAGS_LIST UNIX_COMMAND "${HIBF_CXX_FLAGS}")
+separate_arguments (HIBF_CXX_FLAGS UNIX_COMMAND "${HIBF_CXX_FLAGS}")

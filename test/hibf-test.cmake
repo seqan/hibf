@@ -11,32 +11,10 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-include (CheckCXXSourceCompiles)
-include (FindPackageHandleStandardArgs)
-include (FindPackageMessage)
-
-option (HIBF_TEST_BUILD_OFFLINE "Skip the update step of external projects." OFF)
-
 # Force alignment of benchmarked loops so that numbers are reliable.
 # For large loops and erratic seeming bench results the value might
 # have to be adapted or the option deactivated.
 option (HIBF_BENCHMARK_ALIGN_LOOPS "Pass -falign-loops=32 to the benchmark builds." ON)
-
-# ----------------------------------------------------------------------------
-# Custom Build types
-# ----------------------------------------------------------------------------
-
-# -DCMAKE_BUILD_TYPE=FEDORA; our library did not compile for fedora quite a few times, because of that we created this
-# custom build type to emulate their flag set-up.
-# We omitted:
-#   -specs=/usr/lib/rpm/redhat/redhat-hardened-cc1
-#   -specs=/usr/lib/rpm/redhat/redhat-annobin-cc1
-#   set -mtune=native
-#   and -fcf-protection=check
-# See https://src.fedoraproject.org/rpms/redhat-rpm-config/blob/rawhide/f/buildflags.md for an overview
-set (CMAKE_CXX_FLAGS_FEDORA
-     "-O2 -flto -ffat-lto-objects -fexceptions -g -grecord-gcc-switches -pipe -Wall -Werror=format-security -Wp,-D_FORTIFY_SOURCE=2 -Wp,-D_GLIBCXX_ASSERTIONS -fstack-protector-strong -m64 -mtune=native -fasynchronous-unwind-tables -fstack-clash-protection -fcf-protection=check"
-)
 
 # ----------------------------------------------------------------------------
 # Paths to folders.
@@ -67,7 +45,7 @@ if (NOT TARGET hibf::test)
         endif ()
     endif ()
 
-    target_link_libraries (hibf_test INTERFACE "hibf" "pthread")
+    target_link_libraries (hibf_test INTERFACE "seqan::hibf")
     target_include_directories (hibf_test INTERFACE "${HIBF_TEST_INCLUDE_DIR}")
     add_library (hibf::test ALIAS hibf_test)
 endif ()
@@ -121,16 +99,6 @@ if (NOT TARGET hibf::test::header)
     target_compile_definitions (hibf_test_header INTERFACE -DHIBF_HEADER_TEST)
     add_library (hibf::test::header ALIAS hibf_test_header)
 endif ()
-
-# ----------------------------------------------------------------------------
-# Commonly shared options for external projects.
-# ----------------------------------------------------------------------------
-
-set (HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "")
-list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}")
-list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}")
-list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_INSTALL_PREFIX=${PROJECT_BINARY_DIR}")
-list (APPEND HIBF_EXTERNAL_PROJECT_CMAKE_ARGS "-DCMAKE_VERBOSE_MAKEFILE=${CMAKE_VERBOSE_MAKEFILE}")
 
 # ----------------------------------------------------------------------------
 # Commonly used macros for the different test modules in hibf.
