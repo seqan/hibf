@@ -103,12 +103,12 @@ private:
     bool const debug{false};
 
 public:
-    simple_binning() = default;                                   //!< Defaulted.
-    simple_binning(simple_binning const &) = default;             //!< Defaulted.
-    simple_binning & operator=(simple_binning const &) = default; //!< Defaulted.
-    simple_binning(simple_binning &&) = default;                  //!< Defaulted.
-    simple_binning & operator=(simple_binning &&) = default;      //!< Defaulted.
-    ~simple_binning() = default;                                  //!< Defaulted.
+    simple_binning() = default;                                  //!< Defaulted.
+    simple_binning(simple_binning const &) = default;            //!< Defaulted.
+    simple_binning & operator=(simple_binning const &) = delete; //!< Deleted. Some members are const.
+    simple_binning(simple_binning &&) = default;                 //!< Defaulted.
+    simple_binning & operator=(simple_binning &&) = delete;      //!< Deleted. Some members are const.
+    ~simple_binning() = default;                                 //!< Defaulted.
 
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.
      * \param[in] data_ Stores all data that is needed to compute the layout.

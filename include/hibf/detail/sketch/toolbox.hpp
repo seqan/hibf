@@ -60,12 +60,12 @@ public:
     std::vector<size_t> & positions;
 
 public:
-    toolbox() = default;                            //!< Defaulted.
-    toolbox(toolbox const &) = default;             //!< Defaulted.
-    toolbox & operator=(toolbox const &) = default; //!< Defaulted.
-    toolbox(toolbox &&) = default;                  //!< Defaulted.
-    toolbox & operator=(toolbox &&) = default;      //!< Defaulted.
-    ~toolbox() = default;                           //!< Defaulted.
+    toolbox() = delete;                            //!< Deleted. Some members are a reference.
+    toolbox(toolbox const &) = default;            //!< Defaulted.
+    toolbox & operator=(toolbox const &) = delete; //!< Deleted. Some members are a const reference.
+    toolbox(toolbox &&) = default;                 //!< Defaulted.
+    toolbox & operator=(toolbox &&) = delete;      //!< Deleted. Some members are a const reference.
+    ~toolbox() = default;                          //!< Defaulted.
 
     /*!\brief A sequence of user bins for which filenames and counts are given.
      * \param[in] kmer_counts_ counts of the k-mer sets of the bins corresponding to filenames
