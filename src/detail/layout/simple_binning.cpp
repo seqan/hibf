@@ -91,10 +91,7 @@ size_t simple_binning::execute()
     data->hibf_layout->user_bins.emplace_back(data->positions[0], data->previous.bin_indices, trace_i, bin_id);
 
     if (kmer_count_per_bin > max_size)
-    {
         max_id = bin_id;
-        max_size = kmer_count_per_bin;
-    }
 
     return max_id;
 }
