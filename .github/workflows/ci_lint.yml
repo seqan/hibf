@@ -75,7 +75,7 @@ jobs:
         id: changed_files
         run: |
           CPP_LIST=$(git diff --name-only --diff-filter=ACMRT ${{ github.event.pull_request.base.sha }} | \
-          { grep -v -E "(lib/)" || test $? = 1; } | \
+          { grep -v -E "(lib/|contrib/)" || test $? = 1; } | \
           { grep -E "(\.cpp|\.hpp)$" || test $? = 1; } | xargs)
           echo "cpp_list=$CPP_LIST" >> $GITHUB_OUTPUT
 
