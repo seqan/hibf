@@ -8,18 +8,25 @@
 # Minimum cmake version
 cmake_minimum_required (VERSION 3.7)
 
-### Find hibf
-include (../../build_system/hibf-config-version.cmake)
-set (HIBF_VERSION "${PACKAGE_VERSION}")
+include (../../cmake/version.cmake)
 
-project (hibf
+project (HIBF
          LANGUAGES NONE
-         VERSION "${HIBF_PROJECT_VERSION}")
+         VERSION "${HIBF_VERSION}")
 
-if (NOT EXISTS "${HIBF_INCLUDE_DIR}/hibf/version.hpp")
+if (HIBF_RELEASE_CANDIDATE_VERSION VERSION_GREATER "0")
+    set (HIBF_VERSION "${HIBF_VERSION}-rc.${HIBF_RELEASE_CANDIDATE_VERSION}")
+endif ()
+
+find_path (HIBF_HEADER_PATH
+           NAMES hibf/version.hpp
+           HINTS "${HIBF_SOURCE_DIR}/../../include")
+
+if (HIBF_HEADER_PATH)
+    message (STATUS "Found HIBF: ${HIBF_HEADER_PATH} (found version \"${HIBF_VERSION}\")")
+else ()
     message (FATAL_ERROR "Could not find HIBF. Not building documentation.")
 endif ()
-message (STATUS "Found: ${HIBF_INCLUDE_DIR} (${HIBF_VERSION})")
 
 set (HIBF_DOXYGEN_INPUT_DIR "${CMAKE_SOURCE_DIR}")
 

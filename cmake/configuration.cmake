@@ -11,7 +11,7 @@ cmake_minimum_required (VERSION 3.4...3.12)
 # Greeter
 # ----------------------------------------------------------------------------
 
-message (STATUS "Finding HIBF and checking requirements")
+message (STATUS "Finding HIBF (${HIBF_VERSION}) and checking requirements")
 
 # ----------------------------------------------------------------------------
 # Includes

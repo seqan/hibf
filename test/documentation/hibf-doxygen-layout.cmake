@@ -7,16 +7,16 @@
 
 cmake_minimum_required (VERSION 3.10)
 
-include (${HIBF_INCLUDE_DIR}/../test/cmake/hibf_test_files.cmake)
+include (${HIBF_HEADER_PATH}/../test/cmake/hibf_test_files.cmake)
 
 # Replaces documentation entries in variable `DOXYGEN_LAYOUT`
 #
 # Important: the variable of the parent scope must be named `DOXYGEN_LAYOUT` for this function to work properly.
 #
 # Example:
-# replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/about/" "About")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/about/" "About")
 #
-# (1) Find all 'index.md' files in ${HIBF_INCLUDE_DIR}/../doc/about/
+# (1) Find all 'index.md' files in ${HIBF_HEADER_PATH}/../doc/about/
 # (2) For each 'index.md'
 #     (a) Use the very first line, e.g. `# FOOOMOO {#fooooo_bar_ref}`,
 #         for the title, e.g. "FOOOMOO" and doxygen reference, e.g. "fooooo_bar_ref".
@@ -27,7 +27,7 @@ include (${HIBF_INCLUDE_DIR}/../test/cmake/hibf_test_files.cmake)
 #
 # Optionally, `HIDE_FROM_USER` can be used, to hide certain pages from the user documentation.
 # For example,
-# replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
 # Will hide the page containing {#setup_tests} in the first line from the user documentation.
 # HIDE_FROM_USER takes multiple values, e.g., `HIDE_FROM_USER "setup_tests" "setup"`
 #
@@ -36,7 +36,7 @@ function (replace_in_doxygen_layout doc_path doxygen_layout_tag)
     # <options> <single_value> are not used
     cmake_parse_arguments (ARGS "" "" "HIDE_FROM_USER" ${ARGN})
     # Will parse a call like
-    # replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
+    # replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
     # and put arguments of HIDE_FROM_USER in the variable ARGS_HIDE_FROM_USER
 
     set (DOXYGEN_LAYOUT_TAG_LINE
@@ -83,9 +83,9 @@ endfunction ()
 # Note: variable name DOXYGEN_LAYOUT must not be changed because it is directly used within `replace_in_doxygen_layout`
 file (READ "${HIBF_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml" DOXYGEN_LAYOUT)
 
-replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/about/" "About")
-replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
-replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/tutorial/" "Tutorial")
-replace_in_doxygen_layout ("${HIBF_INCLUDE_DIR}/../doc/howto/" "How-To")
+replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/about/" "About")
+replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
+replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/tutorial/" "Tutorial")
+replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/howto/" "How-To")
 
 file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in" ${DOXYGEN_LAYOUT})

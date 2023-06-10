@@ -8,7 +8,6 @@
 cmake_minimum_required (VERSION 3.10)
 
 ### Find doxygen and dependency to DOT tool
-message (STATUS "Searching for doxygen.")
 find_package (Doxygen REQUIRED)
 
 if (NOT ${DOXYGEN_FOUND})
@@ -36,7 +35,7 @@ endif ()
 set (HIBF_DOXYGEN_DOT_NUM_THREADS "0")
 
 ### Configure doc/developer targets.
-set (HIBF_DOXYGEN_SOURCE_DIR "${HIBF_CLONE_DIR}")
+set (HIBF_DOXYGEN_SOURCE_DIR "${HIBF_HEADER_PATH}/..")
 set (HIBF_DOXYFILE_IN ${HIBF_DOXYGEN_INPUT_DIR}/hibf_doxygen_cfg.in)
 set (HIBF_FOOTER_HTML_IN ${HIBF_DOXYGEN_INPUT_DIR}/hibf_footer.html.in)
 # DoxygenLayout.xml.in is created by hibf-doxygen-layout.cmake
