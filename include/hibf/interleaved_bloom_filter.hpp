@@ -199,7 +199,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_constructor.cpp
+     * \include test/snippet_migration/ibf/interleaved_bloom_filter_constructor.cpp
      */
     interleaved_bloom_filter(hibf::bin_count bins_,
                              hibf::bin_size size,
@@ -236,7 +236,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_emplace.cpp
+     * \include test/snippet_migration/ibf/interleaved_bloom_filter_emplace.cpp
      */
     void emplace(size_t const value, bin_index const bin) noexcept
     {
@@ -259,7 +259,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_clear.cpp
+     * \include test/snippet_migration/ibf/interleaved_bloom_filter_clear.cpp
      */
     void clear(bin_index const bin) noexcept
     {
@@ -279,7 +279,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_clear.cpp
+     * \include test/snippet_migration/ibf/interleaved_bloom_filter_clear.cpp
      */
     template <typename rng_t>
     void clear(rng_t && bin_range) noexcept
@@ -318,7 +318,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/interleaved_bloom_filter_increase_bin_number_to.cpp
+     * \include test/snippet_migration/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
     void increase_bin_number_to(bin_count const new_bins_)
     {
@@ -371,7 +371,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/membership_agent_construction.cpp
+     * \include test/snippet_migration/ibf/membership_agent_construction.cpp
      * \sa hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains
      */
     membership_agent_type membership_agent() const;
@@ -384,7 +384,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/counting_agent_construction.cpp
+     * \include test/snippet_migration/ibf/counting_agent_construction.cpp
      * \sa hibf::interleaved_bloom_filter::counting_agent_type::bulk_count
      */
     template <typename value_t = uint16_t>
@@ -494,7 +494,7 @@ public:
      * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
-     * \attention These functions are never called directly, see \ref serialisation for more details.
+     * \attention These functions are never called directly.
      */
     template <cereal_archive archive_t>
     void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
@@ -632,7 +632,7 @@ public:
  *
  * ### Example
  *
- * \include test/snippet/search/dream_index/membership_agent_construction.cpp
+ * \include test/snippet_migration/ibf/membership_agent_construction.cpp
  */
 class interleaved_bloom_filter::membership_agent_type
 {
@@ -678,7 +678,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/membership_agent_bulk_contains.cpp
+     * \include test/snippet_migration/ibf/membership_agent_bulk_contains.cpp
      *
      * ### Thread safety
      *
@@ -744,7 +744,7 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
  *
  * ### Example
  *
- * \include test/snippet/search/dream_index/counting_vector.cpp
+ * \include test/snippet_migration/ibf/counting_vector.cpp
  */
 template <std::integral value_t>
 class counting_vector : public std::vector<value_t>
@@ -782,7 +782,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/counting_vector.cpp
+     * \include test/snippet_migration/ibf/counting_vector.cpp
      */
     template <typename binning_bitvector_t>
         requires is_binning_bitvector<binning_bitvector_t>
@@ -824,7 +824,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/counting_vector.cpp
+     * \include test/snippet_migration/ibf/counting_vector.cpp
      */
     counting_vector & operator+=(counting_vector const & rhs)
     {
@@ -896,7 +896,7 @@ private:
  *
  * ### Example
  *
- * \include test/snippet/search/dream_index/counting_agent.cpp
+ * \include test/snippet_migration/ibf/counting_agent.cpp
  */
 template <std::integral value_t>
 class interleaved_bloom_filter::counting_agent_type
@@ -951,7 +951,7 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/search/dream_index/counting_agent.cpp
+     * \include test/snippet_migration/ibf/counting_agent.cpp
      *
      * ### Thread safety
      *

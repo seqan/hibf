@@ -1,17 +1,17 @@
 name: Documentation
 
 on:
-  # push:
-  #   branches:
-  #     - 'main'
-  # pull_request:
-  #   types:
-  #     - unlabeled
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
   workflow_dispatch:
 
 concurrency:
   group: documentation-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: false
+  cancel-in-progress: ${{ github.event_name != 'push' }}
 
 env:
   TZ: Europe/Berlin
