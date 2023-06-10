@@ -1,8 +1,8 @@
+#include <seqan3/alphabet/nucleotide/dna4.hpp>
 #include <seqan3/core/debug_stream.hpp>
 #include <seqan3/search/dream_index/interleaved_bloom_filter.hpp>
-#include <seqan3/alphabet/nucleotide/dna4.hpp>
-#include <seqan3/utility/views/chunk.hpp>
 #include <seqan3/search/views/kmer_hash.hpp>
+#include <seqan3/utility/views/chunk.hpp>
 
 using namespace seqan3::literals;
 
