@@ -4,6 +4,7 @@ set (HIBF_SOURCE_FILES
      detail/layout/execute.cpp
      detail/layout/output.cpp
      detail/layout/compute_fp_correction.cpp
+     detail/layout/compute_layout.cpp
      detail/layout/hierarchical_binning.cpp
      detail/sketch/toolbox.cpp
      detail/sketch/hyperloglog.cpp
