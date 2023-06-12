@@ -23,76 +23,12 @@
 #include <hibf/detail/configuration.hpp>
 #include <hibf/detail/data_store.hpp>
 #include <hibf/detail/layout/compute_fp_correction.hpp>
-#include <hibf/detail/layout/execute.hpp>
-#include <hibf/detail/layout/layout.hpp>
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
+#include <hibf/detail/layout/compute_layout.hpp>
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 
 namespace hibf
 {
-
-hibf::layout::layout compute_layout(config const & hibf_config)
-{
-    hibf::layout::layout resulting_layout{};
-
-    hibf::configuration chopper_config{.sketch_bits = hibf_config.sketch_bits,
-                                       .disable_sketch_output = true,
-                                       .tmax = hibf_config.tmax,
-                                       .num_hash_functions = hibf_config.number_of_hash_functions,
-                                       .false_positive_rate = hibf_config.maximum_false_positive_rate,
-                                       .alpha = hibf_config.alpha,
-                                       .max_rearrangement_ratio = hibf_config.max_rearrangement_ratio,
-                                       .threads = hibf_config.threads,
-                                       .disable_estimate_union = hibf_config.disable_estimate_union,
-                                       .disable_rearrangement = hibf_config.disable_rearrangement};
-
-    // The output streams facilitate writing the layout file in hierarchical structure.
-    // hibf::execute currently writes the filled buffers to the output file.
-    std::stringstream output_buffer;
-    std::stringstream header_buffer;
-
-    std::vector<std::string> filenames{};
-    std::vector<size_t> kmer_counts{};
-    std::vector<sketch::hyperloglog> sketches{};
-
-    // dummy init filenames
-    filenames.resize(hibf_config.number_of_user_bins);
-    for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
-        filenames[i] = "UB_" + std::to_string(i);
-
-    // compute sketches
-    sketches.resize(hibf_config.number_of_user_bins);
-    kmer_counts.resize(hibf_config.number_of_user_bins);
-
-    robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(static) num_threads(hibf_config.threads) private(kmers)
-    for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
-    {
-        hibf::sketch::hyperloglog sketch(hibf_config.sketch_bits);
-
-        kmers.clear();
-        hibf_config.input_fn(i, std::inserter(kmers, kmers.begin()));
-
-        for (auto k_hash : kmers)
-            sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
-
-        // #pragma omp critical
-        sketches[i] = sketch;
-    }
-
-    sketch::estimate_kmer_counts(sketches, kmer_counts);
-
-    data_store store{.false_positive_rate = chopper_config.false_positive_rate,
-                     .hibf_layout = &resulting_layout,
-                     .kmer_counts = kmer_counts,
-                     .sketches = sketches};
-
-    size_t const max_hibf_id = hibf::execute(chopper_config, store);
-    store.hibf_layout->top_level_max_bin_id = max_hibf_id;
-
-    return *store.hibf_layout; // return layout as string for now, containing the file
-}
 
 size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                           robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
@@ -252,7 +188,7 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config const & configuration)
 {
-    auto layout = compute_layout(configuration);
+    auto layout = layout::compute_layout(configuration);
     build_index(*this, configuration, layout);
 }
 
