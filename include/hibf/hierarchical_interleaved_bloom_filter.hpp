@@ -7,9 +7,22 @@
 
 #pragma once
 
-#include <hibf/config.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
-#include <hibf/user_bins_type.hpp>
+#include <algorithm>  // for __sort_fn, sort
+#include <cassert>    // for assert
+#include <cinttypes>  // for int64_t, uint16_t
+#include <concepts>   // for unsigned_integral
+#include <cstddef>    // for size_t
+#include <functional> // for identity, less
+#include <ranges>     // for forward_range, range, range_value_t
+#include <utility>    // for addressof
+#include <vector>     // for vector
+
+#include <hibf/config.hpp>                   // for config
+#include <hibf/detail/cereal/concepts.hpp>   // for cereal_archive
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/user_bins_type.hpp>           // for user_bins_type
+
+#include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
 namespace hibf
 {

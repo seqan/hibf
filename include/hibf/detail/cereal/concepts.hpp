@@ -7,11 +7,9 @@
 
 #pragma once
 
-#include <type_traits>
-
 #include <hibf/platform.hpp>
 
-#include <cereal/details/traits.hpp>
+#include <cereal/details/helpers.hpp> // for InputArchiveBase, OutputArchiveBase
 
 namespace hibf
 {

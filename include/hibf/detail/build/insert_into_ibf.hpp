@@ -7,11 +7,14 @@
 
 #pragma once
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/build_data.hpp>
-#include <hibf/detail/layout/layout.hpp>
-#include <hibf/detail/timer.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <cinttypes> // for uint64_t
+#include <cstddef>   // for size_t
+
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
+#include <hibf/detail/build/build_data.hpp>  // for build_data
+#include <hibf/detail/layout/layout.hpp>     // for layout
+#include <hibf/detail/timer.hpp>             // for concurrent, timer
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 
 namespace hibf
 {

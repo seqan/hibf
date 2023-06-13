@@ -1,7 +1,19 @@
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <iosfwd>     // for stringstream
+#include <iterator>   // for inserter
+#include <string>     // for operator+, to_string, basic_string, string
+#include <vector>     // for vector
+
+#include <hibf/contrib/robin_hood.hpp>   // for unordered_flat_set
+#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/detail/data_store.hpp>    // for data_store
 #include <hibf/detail/layout/compute_layout.hpp>
-#include <hibf/detail/layout/execute.hpp>
-#include <hibf/detail/layout/layout.hpp>
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
+#include <hibf/detail/layout/execute.hpp>              // for execute
+#include <hibf/detail/layout/layout.hpp>               // for layout
+#include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
 
 namespace hibf::layout
 {

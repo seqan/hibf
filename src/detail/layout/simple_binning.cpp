@@ -1,3 +1,7 @@
+#include <algorithm> // for max
+#include <limits>    // for numeric_limits
+
+#include <hibf/detail/layout/layout.hpp> // for layout
 #include <hibf/detail/layout/simple_binning.hpp>
 
 namespace hibf::layout

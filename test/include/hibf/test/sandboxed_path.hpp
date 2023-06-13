@@ -12,9 +12,10 @@
 
 #pragma once
 
-#include <algorithm>
-#include <filesystem>
-#include <numeric>
+#include <filesystem>   // for path, filesystem_error, operator/
+#include <memory>       // for allocator
+#include <system_error> // for make_error_code, errc
+#include <utility>      // for move, forward
 
 #include <hibf/platform.hpp>
 

@@ -5,9 +5,13 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, AssertionResult, Message, TestInfo, TestPartResult
 
-#include <hibf/test/temporary_snippet_file.hpp>
+#include <filesystem> // for current_path, operator/, path, exists
+#include <memory>     // for allocator
+#include <ostream>    // for basic_ostream::operator<<, basic_ostream, ifstream, stringst...
+
+#include <hibf/test/temporary_snippet_file.hpp> // for temporary_snippet_file
 
 TEST(temporary_snippet_file, no_content)
 {

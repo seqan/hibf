@@ -7,11 +7,14 @@
 
 #pragma once
 
-#include <lemon/list_graph.h>
+#include <lemon/core.h>       // for INVALID
+#include <lemon/list_graph.h> // for ListDigraph
 
-#include <vector>
+#include <cstddef> // for size_t
+#include <tuple>   // for tie, operator==, tuple
+#include <vector>  // for vector
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp> // for operator==, layout
 
 namespace hibf
 {

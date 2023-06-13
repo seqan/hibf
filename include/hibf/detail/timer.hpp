@@ -12,9 +12,10 @@
 
 #pragma once
 
-#include <atomic>
-#include <cassert>
-#include <chrono>
+#include <atomic>      // for atomic
+#include <cassert>     // for assert
+#include <chrono>      // for steady_clock, duration, operator-, time_point
+#include <type_traits> // for conditional_t
 
 #include <hibf/platform.hpp>
 

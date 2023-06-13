@@ -12,14 +12,19 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for EXPECT_PRED_FORMAT2, AssertionSuccess, AssertionResult, CmpHelperEQFailure
 
-#include <type_traits>
+#include <cassert>     // for assert
+#include <cstddef>     // for size_t
+#include <string>      // for string, allocator
+#include <tuple>       // for tuple
+#include <type_traits> // for type_identity
 
-#include <hibf/test/type_name_as_string.hpp>
+#include <hibf/test/type_name_as_string.hpp> // IWYU pragma: keep
 
 namespace hibf::test
 {
+struct expect_same_type;
 
 // https://stackoverflow.com/a/62984543
 #define EXPECT_SAME_TYPE_DEPAREN(X) EXPECT_SAME_TYPE_ESC(EXPECT_SAME_TYPE_ISH X)

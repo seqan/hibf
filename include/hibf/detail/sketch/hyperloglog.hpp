@@ -10,14 +10,19 @@
  * Modified a lot for a bugfix, improvements and functional changes (64 bit hashes)
  */
 
-#include <array>
-#include <cassert>
-#include <iostream>
-#include <vector>
+#include <algorithm> // for fill, max
+#include <array>     // for array
+#include <cassert>   // for assert
+#include <cinttypes> // for uint64_t, uint8_t
+#include <cstddef>   // for size_t
+#include <iostream>  // for basic_istream::read, basic_ostream::write, basic_ostream::flush
+#include <stdexcept> // for runtime_error, invalid_argument
+#include <string>    // for operator+, to_string
+#include <utility>   // for swap
+#include <vector>    // for vector
 
-#include <hibf/contrib/aligned_allocator.hpp>
-#include <hibf/contrib/xxhash/xxhash.h>
-#include <hibf/platform.hpp>
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/contrib/xxhash/xxhash.h>       // for XXH_INLINE_XXH3_64bits, XXH3_64bits
 
 namespace hibf::sketch
 {

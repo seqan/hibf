@@ -12,8 +12,10 @@
 
 #pragma once
 
-#include <hibf/detail/build/node_data.hpp>
-#include <hibf/detail/layout/layout.hpp>
+#include <lemon/list_graph.h> // for ListDigraph
+
+#include <hibf/detail/build/node_data.hpp> // for node_data
+#include <hibf/detail/layout/layout.hpp>   // for layout
 
 namespace hibf
 {

@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
-
-#include <hibf/detail/cereal/concepts.hpp>
+#include <cinttypes> // for int64_t
+#include <cstddef>   // for size_t
+#include <string>    // for string
+#include <vector>    // for vector
 
 namespace hibf
 {

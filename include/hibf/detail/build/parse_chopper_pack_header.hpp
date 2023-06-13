@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <iosfwd>
+#include <iosfwd> // for istream
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf
 {

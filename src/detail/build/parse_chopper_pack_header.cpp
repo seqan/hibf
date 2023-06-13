@@ -5,14 +5,18 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <algorithm>
-#include <cassert>
-#include <fstream>
-#include <hibf/std/charconv>
-#include <string_view>
+#include <algorithm>   // for find
+#include <cassert>     // for assert
+#include <charconv>    // for from_chars, from_chars_result
+#include <cstddef>     // for size_t
+#include <fstream>     // for basic_istream, istream
+#include <string>      // for basic_string, char_traits, getline, operator==
+#include <string_view> // for string_view, operator==, basic_string_view
+#include <vector>      // for vector
 
-#include <hibf/detail/build/parse_chopper_pack_header.hpp>
-#include <hibf/detail/prefixes.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp> // for parse_chopper_pack_header
+#include <hibf/detail/layout/layout.hpp>                   // for layout
+#include <hibf/detail/prefixes.hpp>                        // for merged_bin, header, header_config
 
 namespace hibf
 {

@@ -1,12 +1,13 @@
 #pragma once
 
-#include <filesystem>
+#include <cinttypes>  // for uint8_t, uint16_t, uint32_t
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
 
-#include <hibf/detail/cereal/path.hpp>
+#include <hibf/detail/cereal/path.hpp> // IWYU pragma: keep
 
-#include <cereal/cereal.hpp>
-#include <cereal/types/string.hpp>
-#include <cereal/types/vector.hpp>
+#include <cereal/access.hpp> // for access
+#include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
 namespace hibf
 {

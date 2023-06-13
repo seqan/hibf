@@ -1,9 +1,16 @@
-#include <iostream>
-#include <set>
+#include <cinttypes> // for uint16_t
+#include <cmath>     // for ceil, sqrt
+#include <cstddef>   // for size_t
+#include <iostream>  // for char_traits, operator<<, basic_ostream, cerr
+#include <stdexcept> // for invalid_argument
+#include <vector>    // for vector
 
-#include <hibf/detail/layout/compute_fp_correction.hpp>
-#include <hibf/detail/layout/execute.hpp>
-#include <hibf/detail/layout/hierarchical_binning.hpp>
+#include <hibf/detail/configuration.hpp>                // for configuration
+#include <hibf/detail/data_store.hpp>                   // for data_store
+#include <hibf/detail/layout/compute_fp_correction.hpp> // for compute_fp_correction
+#include <hibf/detail/layout/execute.hpp>               // for execute
+#include <hibf/detail/layout/hierarchical_binning.hpp>  // for hierarchical_binning
+#include <hibf/next_multiple_of_64.hpp>                 // for next_multiple_of_64
 
 namespace hibf
 {

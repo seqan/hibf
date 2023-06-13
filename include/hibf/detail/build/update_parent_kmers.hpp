@@ -11,8 +11,10 @@
  */
 #pragma once
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/timer.hpp>
+#include <cinttypes> // for uint64_t
+
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
+#include <hibf/detail/timer.hpp>       // for concurrent, timer
 #include <hibf/platform.hpp>
 
 namespace hibf

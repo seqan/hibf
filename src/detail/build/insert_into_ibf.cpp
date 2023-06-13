@@ -5,8 +5,24 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <hibf/contrib/std/chunk_view.hpp>
-#include <hibf/detail/build/insert_into_ibf.hpp>
+#include <cassert>    // for assert
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <iterator>   // for inserter, counted_iterator
+#include <ranges>     // for operator==
+
+#include <hibf/config.hpp>                          // for config
+#include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
+#include <hibf/contrib/std/all_view.hpp>            // for all_t
+#include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
+#include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
+#include <hibf/detail/build/build_data.hpp>         // for build_data
+#include <hibf/detail/build/insert_into_ibf.hpp>    // for insert_into_ibf
+#include <hibf/detail/layout/layout.hpp>            // for layout
+#include <hibf/detail/timer.hpp>                    // for concurrent, timer
+#include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
+
 namespace hibf
 {
 

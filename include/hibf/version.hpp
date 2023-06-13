@@ -7,8 +7,8 @@
 
 #pragma once
 
-#include <cstddef>
-#include <cstdint>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint8_t
 
 /*!\file
  * \brief Provides version macros and global variables.

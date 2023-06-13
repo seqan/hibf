@@ -10,7 +10,16 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <hibf/detail/build/compute_kmers.hpp>
+#include <cinttypes>  // for uint64_t
+#include <functional> // for function
+#include <iterator>   // for inserter
+
+#include <hibf/config.hpp>                     // for config
+#include <hibf/contrib/robin_hood.hpp>         // for unordered_flat_set
+#include <hibf/detail/build/build_data.hpp>    // for build_data
+#include <hibf/detail/build/compute_kmers.hpp> // for compute_kmers
+#include <hibf/detail/layout/layout.hpp>       // for layout
+#include <hibf/detail/timer.hpp>               // for concurrent, timer
 
 namespace hibf
 {

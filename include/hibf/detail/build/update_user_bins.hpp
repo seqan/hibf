@@ -7,7 +7,11 @@
 
 #pragma once
 
-#include <hibf/detail/layout/layout.hpp>
+#include <algorithm> // for fill_n
+#include <cinttypes> // for int64_t
+#include <vector>    // for vector
+
+#include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf
 {

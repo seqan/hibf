@@ -5,12 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for AssertionResult, Test, Message, TestPartResult, EXPECT_TRUE, CmpHelp...
 
-#include <regex>
+#include <cstdlib>    // for setenv
+#include <filesystem> // for exists, path, operator/, equivalent, permissions, temp_directory_path
+#include <ostream>    // for operator<<, basic_ostream, ofstream, ios
+#include <string>     // for char_traits, allocator, string
+#include <utility>    // for move
 
-#include <hibf/test/file_access.hpp>
-#include <hibf/test/tmp_directory.hpp>
+#include <hibf/test/file_access.hpp>    // for write_access
+#include <hibf/test/sandboxed_path.hpp> // for sandboxed_path
+#include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
 // check unique creation of paths
 TEST(tmp_directory, unique)

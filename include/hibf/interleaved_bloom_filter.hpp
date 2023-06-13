@@ -12,12 +12,25 @@
 
 #pragma once
 
-#include <algorithm>
-#include <bit>
+#include <algorithm>   // for fill
+#include <array>       // for array
+#include <bit>         // for countl_zero, countr_zero
+#include <cassert>     // for assert
+#include <cinttypes>   // for uint64_t, uint16_t
+#include <concepts>    // for integral, same_as, unsigned_integral
+#include <cstring>     // for size_t, memcpy
+#include <functional>  // for plus
+#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
+#include <stdexcept>   // for logic_error, invalid_argument
+#include <tuple>       // for tie, operator==, tuple
+#include <type_traits> // for remove_cvref_t
+#include <utility>     // for addressof
+#include <vector>      // for vector
 
-#include <hibf/detail/cereal/concepts.hpp>
+#include <hibf/detail/cereal/concepts.hpp> // for cereal_archive
 
-#include <sdsl/bit_vectors.hpp>
+#include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <sdsl/int_vector.hpp> // for bit_vector
 
 namespace hibf
 {
@@ -172,10 +185,8 @@ private:
 
 public:
     class membership_agent_type; // documented upon definition below
-
     template <std::integral value_t>
     class counting_agent_type; // documented upon definition below
-
     class binning_bitvector;
 
     /*!\name Constructors, destructor and assignment

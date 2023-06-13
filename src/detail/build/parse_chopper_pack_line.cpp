@@ -5,11 +5,16 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <hibf/std/charconv>
-#include <ranges>
-#include <string_view>
+#include <charconv>    // for from_chars, from_chars_result
+#include <cstddef>     // for size_t
+#include <ranges>      // for all_t, operator==, single_view, operator|, _Partial
+#include <string>      // for string
+#include <string_view> // for string_view
+#include <utility>     // for move
+#include <vector>      // for vector
 
-#include <hibf/detail/build/parse_chopper_pack_line.hpp>
+#include <hibf/detail/build/parse_chopper_pack_line.hpp> // for parse_chopper_pack_line
+#include <hibf/detail/layout/layout.hpp>                 // for layout
 
 namespace hibf
 {

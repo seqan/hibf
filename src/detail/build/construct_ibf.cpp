@@ -5,9 +5,24 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <hibf/detail/build/construct_ibf.hpp>
-#include <hibf/detail/build/insert_into_ibf.hpp>
-#include <hibf/detail/build/update_parent_kmers.hpp>
+#include <lemon/bits/array_map.h> // for ArrayMap
+#include <lemon/list_graph.h>     // for ListDigraph
+
+#include <cinttypes> // for uint64_t
+#include <cmath>     // for ceil
+#include <cstddef>   // for size_t
+#include <vector>    // for vector
+
+#include <hibf/config.hpp>                           // for config
+#include <hibf/contrib/robin_hood.hpp>               // for unordered_flat_set
+#include <hibf/detail/build/bin_size_in_bits.hpp>    // for bin_size_in_bits
+#include <hibf/detail/build/build_data.hpp>          // for build_data
+#include <hibf/detail/build/construct_ibf.hpp>       // for construct_ibf
+#include <hibf/detail/build/insert_into_ibf.hpp>     // for insert_into_ibf
+#include <hibf/detail/build/node_data.hpp>           // for node_data
+#include <hibf/detail/build/update_parent_kmers.hpp> // for update_parent_kmers
+#include <hibf/detail/timer.hpp>                     // for concurrent, timer
+#include <hibf/interleaved_bloom_filter.hpp>         // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
 
 namespace hibf
 {
