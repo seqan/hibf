@@ -10,11 +10,10 @@
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <iterator>   // for inserter, counted_iterator
-#include <ranges>     // for operator==
+#include <ranges>     // for all_t, operator==
 
 #include <hibf/config.hpp>                          // for config
 #include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
-#include <hibf/contrib/std/all_view.hpp>            // for all_t
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
 #include <hibf/detail/build/build_data.hpp>         // for build_data
