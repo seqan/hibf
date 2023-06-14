@@ -17,8 +17,17 @@
 
 namespace hibf::layout
 {
-
-layout compute_layout(config const & hibf_config)
+/**
+ * @brief Compute the layout and stores the kmer_counts and sketches in the respective vectors for further use.
+ *
+ * @param hibf_config The configuration to compute the layout.
+ * @param kmer_counts The vector that will store the kmer count( estimation)s after layout computation.
+ * @param sketches The vector that will store the sketches after layout computation.
+ * @return layout
+ */
+layout compute_layout(config const & hibf_config,
+                      std::vector<size_t> & kmer_counts,
+                      std::vector<sketch::hyperloglog> & sketches)
 {
     layout resulting_layout{};
 
@@ -37,9 +46,6 @@ layout compute_layout(config const & hibf_config)
     // hibf::execute currently writes the filled buffers to the output file.
     std::stringstream output_buffer;
     std::stringstream header_buffer;
-
-    std::vector<size_t> kmer_counts{};
-    std::vector<sketch::hyperloglog> sketches{};
 
     // compute sketches
     sketches.resize(hibf_config.number_of_user_bins);
@@ -72,6 +78,14 @@ layout compute_layout(config const & hibf_config)
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
     return *store.hibf_layout; // return layout as string for now, containing the file
+}
+
+layout compute_layout(config const & hibf_config)
+{
+    std::vector<size_t> kmer_counts{};
+    std::vector<sketch::hyperloglog> sketches{};
+
+    return compute_layout(hibf_config, kmer_counts, sketches);
 }
 
 } // namespace hibf::layout
