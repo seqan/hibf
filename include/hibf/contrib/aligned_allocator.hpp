@@ -178,7 +178,7 @@ public:
      */
     void deallocate(pointer const p, size_type const n) const noexcept
     {
-        size_t bytes_to_deallocate = n * sizeof(value_type);
+        [[maybe_unused]] size_t bytes_to_deallocate = n * sizeof(value_type);
 
         // Clang doesn't have __cpp_sized_deallocation defined by default even though this is a C++14! feature
         // > In Clang 3.7 and later, sized deallocation is only enabled if the user passes the `-fsized-deallocation`

@@ -24,22 +24,22 @@ class hierarchical_binning
 {
 private:
     //!\brief The user configuration passed down from the command line.
-    configuration const config{};
+    configuration config{};
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
-    data_store * const data{nullptr};
+    data_store * data{nullptr};
 
     //!\brief The number of user bins, initialised with the length of user_bin_kmer_counts.
-    size_t const num_user_bins{};
+    size_t num_user_bins{};
     //!\brief The number of technical bins requested by the user.
-    size_t const num_technical_bins{};
+    size_t num_technical_bins{};
 
 public:
     hierarchical_binning() = default;                                        //!< Defaulted.
     hierarchical_binning(hierarchical_binning const &) = delete;             //!< Deleted. Would modify same data.
     hierarchical_binning & operator=(hierarchical_binning const &) = delete; //!< Deleted. Would modify same data.
     hierarchical_binning(hierarchical_binning &&) = default;                 //!< Defaulted.
-    hierarchical_binning & operator=(hierarchical_binning &&) = delete; //!< Deleted. config has no move assignment.
-    ~hierarchical_binning() = default;                                  //!< Defaulted.
+    hierarchical_binning & operator=(hierarchical_binning &&) = default;     //!< Defaulted.
+    ~hierarchical_binning() = default;                                       //!< Defaulted.
 
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.
      * \param[in, out] data_ Stores all data that is needed to compute the layout.

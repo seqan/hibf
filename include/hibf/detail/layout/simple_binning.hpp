@@ -82,31 +82,31 @@ class simple_binning
 {
 private:
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
-    data_store const * data{nullptr};
+    data_store * data{nullptr};
 
     /*!\brief The number of User bins.
      *
      * The user may impose a structure on his sequence data in the form of *logical groups* (e.g. species).
      * When querying the IBF, the user is interested in an answer that differentiates between these groups.
      */
-    size_t const num_user_bins{};
+    size_t num_user_bins{};
 
     /*!\brief The number of Technical bins.
      *
      * A *Technical Bin* represents an actual bin in the binning directory.
      * In the IBF, it stores its kmers in a **single Bloom Filter** (which is interleaved with all the other BFs).
      */
-    size_t const num_technical_bins{};
+    size_t num_technical_bins{};
 
     //!\brief Debug output in layouting file.
-    bool const debug{false};
+    bool debug{false};
 
 public:
     simple_binning() = default;                                  //!< Defaulted.
-    simple_binning(simple_binning const &) = default;            //!< Defaulted.
-    simple_binning & operator=(simple_binning const &) = delete; //!< Deleted. Some members are const.
+    simple_binning(simple_binning const &) = delete;             //!< Deleted. Would modify same data.
+    simple_binning & operator=(simple_binning const &) = delete; //!< Deleted. Would modify same data.
     simple_binning(simple_binning &&) = default;                 //!< Defaulted.
-    simple_binning & operator=(simple_binning &&) = delete;      //!< Deleted. Some members are const.
+    simple_binning & operator=(simple_binning &&) = default;     //!< Defaulted.
     ~simple_binning() = default;                                 //!< Defaulted.
 
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.

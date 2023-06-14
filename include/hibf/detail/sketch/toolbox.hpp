@@ -60,30 +60,30 @@ public:
     using distance_matrix = std::vector<entry>;
 
     //!\brief A pointer to kmer counts associated with the above files used to layout user bin into technical bins.
-    std::vector<size_t> const & kmer_counts;
+    std::vector<size_t> const * kmer_counts; // Pointed to data should not be modified.
 
     //!\brief HyperLogLog sketches on the k-mer sets of the sequences from the files of filenames.
-    std::vector<hyperloglog> const & sketches;
+    std::vector<hyperloglog> const * sketches; // Pointed to data should not be modified.
 
     //!\brief HyperLogLog sketches on the k-mer sets of the sequences from the files of filenames.
-    std::vector<size_t> & positions;
+    std::vector<size_t> * positions; // Modified by rearranging.
 
 public:
-    toolbox() = delete;                            //!< Deleted. Some members are a reference.
-    toolbox(toolbox const &) = default;            //!< Defaulted.
-    toolbox & operator=(toolbox const &) = delete; //!< Deleted. Some members are a const reference.
-    toolbox(toolbox &&) = default;                 //!< Defaulted.
-    toolbox & operator=(toolbox &&) = delete;      //!< Deleted. Some members are a const reference.
-    ~toolbox() = default;                          //!< Defaulted.
+    toolbox() = default;                            //!< Defaulted.
+    toolbox(toolbox const &) = default;             //!< Defaulted.
+    toolbox & operator=(toolbox const &) = default; //!< Defaulted.
+    toolbox(toolbox &&) = default;                  //!< Defaulted.
+    toolbox & operator=(toolbox &&) = default;      //!< Defaulted.
+    ~toolbox() = default;                           //!< Defaulted.
 
     /*!\brief A sequence of user bins for which filenames and counts are given.
      * \param[in] kmer_counts_ counts of the k-mer sets of the bins corresponding to filenames
      * \param[in] sketches_ sketches of the bins corresponding to filenames
-     * \param[in] positions_ The realtive positions of the input information to correctly access sketches and counts.
+     * \param[in] positions_ The realtive positions of the input information to correctly access sketches and counts->
      */
-    toolbox(std::vector<size_t> const & kmer_counts_,
-            std::vector<hyperloglog> const & sketches_,
-            std::vector<size_t> & positions_) :
+    toolbox(std::vector<size_t> const * kmer_counts_,
+            std::vector<hyperloglog> const * sketches_,
+            std::vector<size_t> * positions_) :
         kmer_counts{kmer_counts_},
         sketches{sketches_},
         positions{positions_}
@@ -92,14 +92,14 @@ public:
     //!\brief Sorts filenames and cardinalities by looking only at the cardinalities.
     void sort_by_cardinalities()
     {
-        assert(positions.size() <= kmer_counts.size());
+        assert(positions->size() <= kmer_counts->size());
 
         auto cardinality_compare = [this](size_t const index1, size_t const index2)
         {
-            return kmer_counts[index1] > kmer_counts[index2];
+            return (*kmer_counts)[index1] > (*kmer_counts)[index2];
         };
 
-        std::sort(positions.begin(), positions.end(), cardinality_compare);
+        std::sort(positions->begin(), positions->end(), cardinality_compare);
     }
 
     /*!\brief Restore the HLL sketches from the files in hll_dir and target_filenames into target container.
@@ -212,16 +212,16 @@ public:
      */
     void rearrange_bins(double const max_ratio, size_t const num_threads)
     {
-
         std::vector<size_t> permutation;
 
         size_t first = 0;
         size_t last = 1;
 
-        while (first < positions.size())
+        while (first < positions->size())
         {
             // size difference is too large or sequence is over -> do the clustering
-            if (last == positions.size() || kmer_counts[positions[first]] * max_ratio > kmer_counts[positions[last]])
+            if (last == positions->size()
+                || (*kmer_counts)[(*positions)[first]] * max_ratio > (*kmer_counts)[(*positions)[last]])
             {
                 // if this is not the first group, we want one bin overlap
                 cluster_bins(permutation, first, last, num_threads);
@@ -236,7 +236,7 @@ public:
             while (swap_index < i)
                 swap_index = permutation[swap_index];
 
-            std::swap(positions[i], positions[swap_index]);
+            std::swap((*positions)[i], (*positions)[swap_index]);
         }
     }
 

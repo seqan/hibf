@@ -22,7 +22,7 @@ size_t simple_binning::execute()
     size_t const extra_bins = num_technical_bins - num_user_bins + 1;
 
     // initialize first column (first row is initialized with inf)
-    double const ub_cardinality = static_cast<double>(data->kmer_counts[data->positions[0]]);
+    double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[0]]);
     for (size_t i = 0; i < extra_bins; ++i)
     {
         size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fp_correction[i + 1]);
@@ -32,7 +32,7 @@ size_t simple_binning::execute()
     // we must iterate column wise
     for (size_t j = 1; j < num_user_bins; ++j)
     {
-        double const ub_cardinality = static_cast<double>(data->kmer_counts[data->positions[j]]);
+        double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[j]]);
 
         for (size_t i = j; i < j + extra_bins; ++i)
         {
@@ -68,7 +68,7 @@ size_t simple_binning::execute()
     while (trace_j > 0)
     {
         size_t next_i = trace[trace_i][trace_j];
-        size_t const kmer_count = data->kmer_counts[data->positions[trace_j]];
+        size_t const kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
         size_t const number_of_bins = (trace_i - next_i);
         size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
@@ -89,7 +89,7 @@ size_t simple_binning::execute()
         --trace_j;
     }
     ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins
-    size_t const kmer_count = data->kmer_counts[data->positions[0]];
+    size_t const kmer_count = (*data->kmer_counts)[data->positions[0]];
     size_t const kmer_count_per_bin = (kmer_count + trace_i - 1) / trace_i;
 
     data->hibf_layout->user_bins.emplace_back(data->positions[0], data->previous.bin_indices, trace_i, bin_id);

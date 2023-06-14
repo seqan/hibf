@@ -64,8 +64,8 @@ layout compute_layout(config const & hibf_config,
 
     data_store store{.false_positive_rate = chopper_config.false_positive_rate,
                      .hibf_layout = &resulting_layout,
-                     .kmer_counts = kmer_counts,
-                     .sketches = sketches};
+                     .kmer_counts = std::addressof(kmer_counts),
+                     .sketches = std::addressof(sketches)};
 
     size_t const max_hibf_id = hibf::execute(chopper_config, store);
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
