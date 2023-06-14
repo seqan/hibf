@@ -17,14 +17,7 @@
 
 namespace hibf::layout
 {
-/**
- * @brief Compute the layout and stores the kmer_counts and sketches in the respective vectors for further use.
- *
- * @param hibf_config The configuration to compute the layout.
- * @param kmer_counts The vector that will store the kmer count( estimation)s after layout computation.
- * @param sketches The vector that will store the sketches after layout computation.
- * @return layout
- */
+
 layout compute_layout(config const & hibf_config,
                       std::vector<size_t> & kmer_counts,
                       std::vector<sketch::hyperloglog> & sketches)
