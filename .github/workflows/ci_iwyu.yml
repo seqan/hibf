@@ -29,6 +29,7 @@ jobs:
           fetch-depth: 1
           submodules: true
           path: hibf
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
       - name: Setup toolchain
         uses: seqan/actions/setup-toolchain@main
@@ -116,6 +117,7 @@ jobs:
         if: ${{ steps.changed_files.outputs.cpp_list }}
         uses: peter-evans/create-pull-request@v5
         with:
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
           path: ${{ github.workspace }}/hibf
           commit-message: "[MISC] IWYU"
           committer: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
