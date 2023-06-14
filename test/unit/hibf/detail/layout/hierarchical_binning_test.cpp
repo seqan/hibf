@@ -5,7 +5,7 @@
 #include <vector>
 
 #include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/layout/compute_fp_correction.hpp>
+#include <hibf/detail/layout/compute_fpr_correction.hpp>
 #include <hibf/detail/layout/hierarchical_binning.hpp>
 #include <hibf/test/expect_range_eq.hpp>
 
@@ -20,7 +20,7 @@ TEST(hierarchical_binning_test, small_example)
 
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:3
 
@@ -49,7 +49,7 @@ TEST(hierarchical_binning_test, another_example)
     std::vector<size_t> kmer_counts{50, 1000, 1000, 50, 5, 10, 10, 5};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -79,7 +79,7 @@ TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -103,7 +103,7 @@ TEST(hierarchical_binning_test, knuts_example)
     std::vector<size_t> kmer_counts{60, 600, 1000, 800, 800};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u);
@@ -130,7 +130,7 @@ TEST(hierarchical_binning_test, four_level_hibf)
     std::vector<size_t> kmer_counts{11090, 5080, 3040, 1020, 510, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -162,7 +162,7 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u);
@@ -189,7 +189,7 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin_and_leads_to_recursive_call)
     std::vector<size_t> kmer_counts{500, 500, 500, 500, 500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fp_correction = hibf::layout::compute_fp_correction(0.05, 2, config.tmax);
+    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
     hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u);

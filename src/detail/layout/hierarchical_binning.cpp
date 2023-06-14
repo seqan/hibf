@@ -56,7 +56,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[0]]);
     for (size_t i = 0; i < num_technical_bins; ++i)
     {
-        size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fp_correction[i + 1]);
+        size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
         matrix[i][0] = corrected_ub_cardinality / (i + 1);
         trace[i][0] = {0u, 0u}; // unnecessary?
     }
@@ -122,7 +122,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 // score: The current maximum technical bin size for the high-level IBF (score for the matrix M)
                 // full_score: The score to minimize -> score * #TB-high_level + low_level_memory footprint
                 size_t const corrected_ub_cardinality =
-                    static_cast<size_t>(ub_cardinality * data->fp_correction[(i - i_prime)]);
+                    static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
                 size_t score = std::max<size_t>(corrected_ub_cardinality / (i - i_prime), matrix[i_prime][j - 1]);
                 size_t full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_matrix[i_prime][j - 1];
 

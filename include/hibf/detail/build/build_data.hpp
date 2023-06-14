@@ -29,7 +29,7 @@ struct build_data
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
 
-    std::vector<double> fp_correction{};
+    std::vector<double> fpr_correction{};
 
     // Timers do not copy the stored duration upon copy construction/assignment
     mutable timer<concurrent::yes> wall_clock_timer{};

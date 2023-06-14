@@ -63,7 +63,7 @@ struct data_store
     }();
 
     //!\brief The false positive correction based on fp_rate, num_hash_functions and requested_max_tb.
-    std::vector<double> fp_correction{};
+    std::vector<double> fpr_correction{};
 
     //!\brief Information about previous levels of the IBF if the algorithm is called recursively.
     previous_level previous{};
