@@ -110,6 +110,7 @@ jobs:
           passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
+          workdir: ${{ github.workspace }}/hibf
 
       - name: Open PR
         if: ${{ steps.changed_files.outputs.cpp_list }}
