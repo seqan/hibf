@@ -192,9 +192,9 @@ public:
     ~membership_agent_type() = default;                                        //!< Defaulted.
 
     /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
-        * \private
-        * \param hibf The hierarchical_interleaved_bloom_filter.
-        */
+     * \private
+     * \param hibf The hierarchical_interleaved_bloom_filter.
+     */
     explicit membership_agent_type(hierarchical_interleaved_bloom_filter const & hibf) : hibf_ptr(std::addressof(hibf))
     {}
     //!\}
@@ -203,22 +203,22 @@ public:
     std::vector<int64_t> result_buffer;
 
     /*!\name Lookup
-        * \{
-        */
+     * \{
+     */
     /*!\brief Determines set membership of given values, and returns the user bin indices of occurrences.
-        * \param[in] values The values to process; must model std::ranges::forward_range.
-        * \param[in] threshold Report a user bin if there are at least this many hits.
-        *
-        * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
-        * \attention Sequential calls to this function invalidate the previously returned reference.
-        *
-        * \details
-        *
-        * ### Thread safety
-        *
-        * Concurrent invocations of this function are not thread safe, please create a
-        * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
-        */
+     * \param[in] values The values to process; must model std::ranges::forward_range.
+     * \param[in] threshold Report a user bin if there are at least this many hits.
+     *
+     * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
+     * \attention Sequential calls to this function invalidate the previously returned reference.
+     *
+     * \details
+     *
+     * ### Thread safety
+     *
+     * Concurrent invocations of this function are not thread safe, please create a
+     * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
+     */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
     {

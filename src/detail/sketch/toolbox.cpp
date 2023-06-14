@@ -20,10 +20,10 @@ void toolbox::cluster_bins(std::vector<size_t> & permutation,
                            size_t const num_threads)
 {
     assert(num_threads >= 1);
-    assert(positions.size() <= sketches.size());
+    assert(positions->size() <= sketches->size());
     assert((first == 0) == permutation.empty());
 
-    size_t const n = sketches.size();
+    size_t const n = sketches->size();
     size_t const chunk_size = std::floor(std::sqrt(n));
 
     size_t const prune_steps = chunk_size;
@@ -65,8 +65,8 @@ void toolbox::cluster_bins(std::vector<size_t> & permutation,
     for (size_t id = first; id < last; ++id)
     {
         // id i is at the index i - first
-        clustering.push_back({none, none, sketches[positions[id]]});
-        estimates.emplace_back(sketches[positions[id]].estimate());
+        clustering.push_back({none, none, (*sketches)[(*positions)[id]]});
+        estimates.emplace_back((*sketches)[(*positions)[id]].estimate());
     }
 
     // if this is not the first group, we want to have one overlapping bin
@@ -80,12 +80,12 @@ void toolbox::cluster_bins(std::vector<size_t> & permutation,
         // stored in vectors. Therefore we give previous_rightmost a different id (==last). This is
         // fine, because we only need the HLL sketch of the actual index. previous_rightmost will be ignored
         // in the traceback anyway and won't be added to the permutation in this step.
-        size_t actual_previous_rightmost = permutation.back();
+        size_t const actual_previous_rightmost = permutation.back();
         ++new_id;
         previous_rightmost = new_id;
 
-        clustering.push_back({none, none, sketches[positions[actual_previous_rightmost]]});
-        estimates.emplace_back(sketches[positions[actual_previous_rightmost]].estimate());
+        clustering.push_back({none, none, (*sketches)[(*positions)[actual_previous_rightmost]]});
+        estimates.emplace_back((*sketches)[(*positions)[actual_previous_rightmost]].estimate());
     }
 
     // initialize priority queues in the distance matrix (sequentially)
