@@ -1,0 +1,127 @@
+name: IWYU
+
+on:
+  schedule:
+    - cron: "0 4 * * MON"
+  workflow_dispatch:
+
+concurrency:
+  group: iwyu-actions
+  cancel-in-progress: true
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    name: IWYU
+    runs-on: ubuntu-22.04
+    timeout-minutes: 120
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+          submodules: true
+          path: hibf
+
+      - name: Setup toolchain
+        uses: seqan/actions/setup-toolchain@main
+        with:
+          compiler: clang-17
+          ccache_size: 75M
+
+      - name: Install Dependencies
+        run: |
+          install libomp-17-dev libclang-17-dev
+          sudo ln -s /usr/lib/llvm-17/lib/clang/17 /usr/lib/llvm-17/lib/clang/17.0.0
+
+      - name: Install CMake
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.16.9
+
+      - name: Build IWYU
+        run: |
+          clang-17 -print-resource-dir
+          mkdir iwyu
+          cd iwyu
+          git clone https://github.com/include-what-you-use/include-what-you-use.git
+          mkdir build
+          cd build
+          cmake ../include-what-you-use -G "Unix Makefiles" \
+                                        -DCMAKE_BUILD_TYPE=Release \
+                                        -DCMAKE_INSTALL_PREFIX=/usr \
+                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-17 \
+                                        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
+                                        -DCMAKE_C_COMPILER_LAUNCHER=ccache
+          make -j2
+          sudo make install
+
+      - name: Configure Test
+        run: |
+          mkdir build
+          cd build
+          cmake ../hibf/test/iwyu -DCMAKE_BUILD_TYPE=Release \
+                                  -DHIBF_NATIVE_BUILD=OFF \
+                                  -DHIBF_VERBOSE_TESTS=OFF
+
+      - name: Run Test
+        run: |
+          ccache -z
+          cd build
+          make -j2 2> out.txt
+          ccache -sv
+
+      - name: Apply changes
+        run: |
+          fix_includes.py --nosafe_headers \
+                          --comments \
+                          --noreorder \
+                          --ignore_re ".*/include/hibf/contrib/.*" < build/out.txt
+
+      - name: Add changes
+        id: changed_files
+        run: |
+          cd hibf
+          git add .
+          CPP_LIST=$(git diff --name-only HEAD | { grep -E "(\.cpp|\.hpp)$" || test $? = 1; } | xargs)
+          echo "cpp_list=$CPP_LIST" >> $GITHUB_OUTPUT
+
+      - name: Run clang-format
+        if: ${{ steps.changed_files.outputs.cpp_list }}
+        run: |
+          sudo apt-get remove --yes libllvm15*
+          install clang-format-15
+          cd hibf
+          clang-format-15 --style=file -i ${{ steps.changed_files.outputs.cpp_list }}
+          git add .
+
+      - name: Import GPG key
+        if: ${{ steps.changed_files.outputs.cpp_list }}
+        uses: crazy-max/ghaction-import-gpg@v5
+        with:
+          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Open PR
+        if: ${{ steps.changed_files.outputs.cpp_list }}
+        uses: peter-evans/create-pull-request@v5
+        with:
+          path: ${{ github.workspace }}/hibf
+          commit-message: "[MISC] IWYU"
+          committer: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
+          author: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
+          branch: "actions/iwyu"
+          delete-branch: true
+          title: "[MISC] IWYU"
+          body: "Auto-generated include-what-you-use changes"
+
+

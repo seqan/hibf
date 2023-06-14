@@ -15,7 +15,6 @@
 #include <functional> // for identity, less
 #include <ranges>     // for forward_range, range, range_value_t
 #include <utility>    // for addressof
-#include <vector>     // for vector
 
 #include <hibf/config.hpp>                   // for config
 #include <hibf/detail/cereal/concepts.hpp>   // for cereal_archive
