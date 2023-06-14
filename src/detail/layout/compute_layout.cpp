@@ -38,14 +38,8 @@ layout compute_layout(config const & hibf_config)
     std::stringstream output_buffer;
     std::stringstream header_buffer;
 
-    std::vector<std::string> filenames{};
     std::vector<size_t> kmer_counts{};
     std::vector<sketch::hyperloglog> sketches{};
-
-    // dummy init filenames
-    filenames.resize(hibf_config.number_of_user_bins);
-    for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
-        filenames[i] = "UB_" + std::to_string(i);
 
     // compute sketches
     sketches.resize(hibf_config.number_of_user_bins);
