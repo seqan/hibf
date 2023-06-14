@@ -5,9 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, EXPECT_EQ, TestInfo, EXPECT_NO_THROW
 
-#include <hibf/test/sandboxed_path.hpp>
+#include <filesystem> // for path, filesystem_error, remove_all, create_directory_symlink, exists
+#include <iterator>   // for begin, end
+#include <string>     // for basic_string, allocator, char_traits, string
+#include <utility>    // for move
+
+#include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
 
 namespace fs = std::filesystem;
 using sandboxed_path = hibf::test::sandboxed_path;

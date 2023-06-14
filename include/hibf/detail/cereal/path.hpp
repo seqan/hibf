@@ -1,10 +1,11 @@
 #pragma once
 
-#include <filesystem>
+#include <filesystem> // for path
+#include <string>     // for string
 
 #include <hibf/platform.hpp>
 
-#include <cereal/cereal.hpp>
+#include <cereal/macros.hpp> // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
 
 namespace cereal
 {

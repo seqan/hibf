@@ -7,10 +7,10 @@
 
 #pragma once
 
-#include <string>
-#include <vector>
+#include <string> // for string
+#include <vector> // for vector
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf
 {

@@ -5,10 +5,19 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, EXPECT_EQ, TYPED_TEST
 
-#include <hibf/interleaved_bloom_filter.hpp>
-#include <hibf/test/expect_range_eq.hpp>
+#include <algorithm> // for for_each
+#include <array>     // for array
+#include <cstddef>   // for size_t
+#include <ranges>    // for iota_view, operator==, _Iota, iota
+#include <stdexcept> // for logic_error, invalid_argument
+#include <vector>    // for vector, allocator
+
+#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
+#include <hibf/test/expect_range_eq.hpp>     // for EXPECT_RANGE_EQ, expect_range_eq
+
+#include <sdsl/io.hpp> // for size_in_mega_bytes
 
 template <typename ibf_type>
 struct interleaved_bloom_filter_test : public ::testing::Test

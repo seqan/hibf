@@ -5,9 +5,13 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for AssertionResult, TestInfo, Message, TEST_F, TestPartResult, EXPECT_EQ
 
-#include <hibf/test/file_access.hpp>
+#include <filesystem> // for remove, path, temp_directory_path, permissions, perm_options, perms
+#include <iosfwd>     // for fstream, ios, ofstream
+#include <memory>     // for allocator
+
+#include <hibf/test/file_access.hpp> // for write_access, read_access
 
 struct file_access_test : public ::testing::Test
 {

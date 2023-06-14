@@ -7,12 +7,15 @@
 
 #pragma once
 
-#include <atomic>
+#include <lemon/list_graph.h> // for ListDigraph
 
-#include <hibf/config.hpp>
-#include <hibf/detail/build/node_data.hpp>
-#include <hibf/detail/timer.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <atomic>  // for atomic_fetch_add, atomic
+#include <cstddef> // for size_t
+#include <vector>  // for vector
+
+#include <hibf/config.hpp>                 // for config
+#include <hibf/detail/build/node_data.hpp> // for node_data
+#include <hibf/detail/timer.hpp>           // for concurrent, timer
 
 namespace hibf
 {

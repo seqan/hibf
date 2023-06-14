@@ -12,12 +12,22 @@
 
 #pragma once
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for EXPECT_PRED_FORMAT2, AssertionSuccess, AssertionResult, CmpHelperEQFailure
 
-#include <algorithm>
-#include <ranges>
+#include <algorithm> // for copy, equal
+#include <concepts>  // for same_as
+#include <iterator>  // for back_inserter
+#include <ostream>   // for operator<<, ostream
+#include <ranges>    // for range, range_value_t
+#include <utility>   // for forward
+#include <vector>    // for vector
 
 #include <hibf/platform.hpp>
+
+namespace hibf::test
+{
+struct expect_range_eq;
+} // namespace hibf::test
 
 namespace std
 {

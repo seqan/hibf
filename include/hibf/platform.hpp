@@ -12,10 +12,6 @@
 
 #pragma once
 
-#include <cinttypes>
-#include <ciso646> // makes _LIBCPP_VERSION available
-#include <cstddef> // makes __GLIBCXX__ available
-
 // macro cruft
 //!\cond
 #define HIBF_STR_HELPER(x) #x
@@ -91,7 +87,7 @@
 // ============================================================================
 
 #if __has_include(<version>)
-#    include <version>
+#    include <version> // for _GLIBCXX_USE_CXX11_ABI
 #endif
 
 // C++ standard [required]

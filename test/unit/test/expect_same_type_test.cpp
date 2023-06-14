@@ -5,10 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest-spi.h> // provides test utility to test google test itself
-#include <gtest/gtest.h>
+#include <gtest/gtest-spi.h> // for EXPECT_NONFATAL_FAILURE
+#include <gtest/gtest.h>     // for Test, AssertionResult, Message, TestPartResult, TestInfo, TEST
 
-#include <hibf/test/expect_same_type.hpp>
+#include <memory>      // for allocator
+#include <tuple>       // for tuple
+#include <type_traits> // for type_identity
+
+#include <hibf/test/expect_same_type.hpp> // for expect_same_type, EXPECT_SAME_TYPE_VANEXPECT_SAME_TYPE_ISH, EXPECT...
 
 TEST(expect_same_type, braces_with_many_commas)
 {

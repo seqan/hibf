@@ -5,27 +5,35 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <lemon/bits/array_map.h> // for ArrayMap
+#include <lemon/core.h>           // for INVALID
+#include <lemon/list_graph.h>     // for ListDigraph
 
-#include <ranges>
-#include <sstream>
+#include <algorithm> // for shuffle
+#include <cinttypes> // for uint64_t, int64_t
+#include <cstddef>   // for size_t
+#include <mutex>     // for mutex, lock_guard
+#include <numeric>   // for iota
+#include <random>    // for random_device, mt19937_64
+#include <utility>   // for move
+#include <vector>    // for vector
 
-#include <hibf/config.hpp>
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/build_data.hpp>
-#include <hibf/detail/build/compute_kmers.hpp>
-#include <hibf/detail/build/construct_ibf.hpp>
-#include <hibf/detail/build/initialise_build_tree.hpp>
-#include <hibf/detail/build/insert_into_ibf.hpp>
-#include <hibf/detail/build/read_chopper_pack_file.hpp>
-#include <hibf/detail/build/update_parent_kmers.hpp>
-#include <hibf/detail/build/update_user_bins.hpp>
-#include <hibf/detail/configuration.hpp>
-#include <hibf/detail/data_store.hpp>
-#include <hibf/detail/layout/compute_fp_correction.hpp>
-#include <hibf/detail/layout/compute_layout.hpp>
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/config.hpp>                                // for config
+#include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
+#include <hibf/detail/build/build_data.hpp>               // for build_data
+#include <hibf/detail/build/compute_kmers.hpp>            // for compute_kmers
+#include <hibf/detail/build/construct_ibf.hpp>            // for construct_ibf
+#include <hibf/detail/build/initialise_build_tree.hpp>    // for initialise_build_tree
+#include <hibf/detail/build/insert_into_ibf.hpp>          // for insert_into_ibf
+#include <hibf/detail/build/node_data.hpp>                // for node_data
+#include <hibf/detail/build/update_parent_kmers.hpp>      // for update_parent_kmers
+#include <hibf/detail/build/update_user_bins.hpp>         // for update_user_bins
+#include <hibf/detail/layout/compute_fp_correction.hpp>   // for compute_fp_correction
+#include <hibf/detail/layout/compute_layout.hpp>          // for compute_layout
+#include <hibf/detail/layout/layout.hpp>                  // for layout
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
+#include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace hibf
 {

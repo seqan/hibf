@@ -7,11 +7,14 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> /// Must be first include.
+#include <lemon/list_graph.h> // for ListDigraph
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/bin_size_in_bits.hpp>
-#include <hibf/detail/build/build_data.hpp>
+#include <cinttypes> // for uint64_t
+#include <cstddef>   // for size_t
+
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
+#include <hibf/detail/build/build_data.hpp>  // for build_data
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 
 namespace hibf
 {

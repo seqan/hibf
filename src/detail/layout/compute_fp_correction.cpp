@@ -1,8 +1,10 @@
-#include <cassert>
-#include <cmath>
+#include <cassert> // for assert
+#include <cmath>   // for log1p, exp, log
+#include <cstddef> // for size_t
+#include <vector>  // for vector
 
-#include <hibf/detail/layout/compute_fp_correction.hpp>
-#include <hibf/next_multiple_of_64.hpp>
+#include <hibf/detail/layout/compute_fp_correction.hpp> // for compute_fp_correction
+#include <hibf/next_multiple_of_64.hpp>                 // for next_multiple_of_64
 
 namespace hibf::layout
 {

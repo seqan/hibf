@@ -1,4 +1,7 @@
+#include <limits> // for numeric_limits
+
 #include <hibf/detail/layout/hierarchical_binning.hpp>
+#include <hibf/detail/sketch/toolbox.hpp> // for toolbox
 
 namespace hibf::layout
 {

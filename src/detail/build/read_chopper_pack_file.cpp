@@ -5,11 +5,15 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <fstream>
+#include <fstream>   // for basic_istream, ifstream
+#include <stdexcept> // for logic_error
+#include <string>    // for char_traits, allocator, operator+, getline, string
+#include <vector>    // for vector
 
-#include <hibf/detail/build/parse_chopper_pack_header.hpp>
-#include <hibf/detail/build/parse_chopper_pack_line.hpp>
-#include <hibf/detail/build/read_chopper_pack_file.hpp>
+#include <hibf/detail/build/parse_chopper_pack_header.hpp> // for parse_chopper_pack_header
+#include <hibf/detail/build/parse_chopper_pack_line.hpp>   // for parse_chopper_pack_line
+#include <hibf/detail/build/read_chopper_pack_file.hpp>    // for read_chopper_pack_file
+#include <hibf/detail/layout/layout.hpp>                   // for layout
 
 namespace hibf
 {

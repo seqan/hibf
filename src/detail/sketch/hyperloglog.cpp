@@ -1,7 +1,15 @@
-#include <hibf/detail/sketch/hyperloglog.hpp>
+#include <array>     // for array
+#include <cassert>   // for assert
+#include <cinttypes> // for uint8_t, uint32_t
+#include <cmath>     // for log
+#include <cstddef>   // for size_t
+#include <vector>    // for vector
 
-#include <x86/avx.h>
-#include <x86/avx2.h>
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+
+#include <x86/avx.h>  // for simde_mm256_add_ps, simde_mm256_set_ps, simde__m256i, simde_mm...
+#include <x86/avx2.h> // for simde_mm256_max_epu8
 
 namespace hibf::sketch
 {

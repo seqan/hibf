@@ -1,10 +1,11 @@
 #pragma once
 
-#include <iosfwd>
-#include <string>
-#include <vector>
+#include <concepts> // for derived_from
+#include <cstddef>  // for size_t
+#include <iosfwd>   // for ostream
+#include <vector>   // for vector, operator==
 
-#include <hibf/detail/prefixes.hpp>
+#include <hibf/detail/prefixes.hpp> // for header, merged_bin
 #include <hibf/platform.hpp>
 
 namespace hibf::layout

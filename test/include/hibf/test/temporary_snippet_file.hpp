@@ -12,10 +12,13 @@
 
 #pragma once
 
-#include <filesystem>
-#include <fstream>
+#include <filesystem>  // for current_path
+#include <fstream>     // for ofstream
+#include <string_view> // for string_view
+#include <utility>     // for forward
 
-#include <hibf/test/tmp_directory.hpp>
+#include <hibf/test/sandboxed_path.hpp> // for sandboxed_path, operator/
+#include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
 namespace hibf::test
 {

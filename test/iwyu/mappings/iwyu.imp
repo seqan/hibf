@@ -1,0 +1,15 @@
+# Copied from https://github.com/include-what-you-use/include-what-you-use
+# Changed mapping in stl.c.headers.imp from public->public to private->public such that CPP-includes are prefered
+# Adapted other mappings for visibility errors
+# Added mapping for gtest and std::filesystem
+[
+  { ref: gcc.libc.imp },
+  { ref: gcc.symbols.imp },
+  { ref: gcc.stl.headers.imp },
+  { ref: stl.c.headers.imp },
+  { ref: libcxx.imp },
+  # Use <gtest/gtest.h>
+  { include: ["\"gtest/gtest.h\"", private, "<gtest/gtest.h>", public ] },
+  # using namespace fs = std::filesystem; would use <chrono> otherwise
+  { symbol: [ "std::filesystem", private, "<filesystem>", public ] },
+]

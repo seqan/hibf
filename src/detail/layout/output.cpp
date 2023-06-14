@@ -1,9 +1,16 @@
-#include <iostream>
+#include <cstddef>     // for size_t
+#include <iostream>    // for operator<<, basic_ostream, basic_istream, ostream, stringstream
+#include <string>      // for char_traits, operator<<, getline, string
+#include <string_view> // for operator<<
+#include <vector>      // for vector
 
-#include <hibf/detail/layout/output.hpp>
-#include <hibf/detail/prefixes.hpp>
+#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/detail/layout/layout.hpp> // for layout, operator<<
+#include <hibf/detail/layout/output.hpp> // for write_config_to, write_layout_content_to, write_layout_header_to
+#include <hibf/detail/prefixes.hpp>      // for header, header_config, first_header_line
 
-#include <cereal/archives/json.hpp>
+#include <cereal/archives/json.hpp> // for JSONOutputArchive
+#include <cereal/cereal.hpp>        // for make_nvp, OutputArchive
 
 namespace hibf::layout
 {

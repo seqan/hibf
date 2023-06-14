@@ -10,10 +10,20 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#include <algorithm>
-#include <cassert>
+#include <lemon/bits/array_map.h> // for ArrayMap
+#include <lemon/core.h>           // for INVALID
+#include <lemon/list_graph.h>     // for ListDigraph
 
-#include <hibf/detail/build/update_header_node_data.hpp>
+#include <algorithm>  // for __sort_fn, sort
+#include <cassert>    // for assert
+#include <functional> // for identity
+#include <ranges>     // for __prev_fn, prev
+#include <utility>    // for move
+#include <vector>     // for vector
+
+#include <hibf/detail/build/node_data.hpp>               // for node_data
+#include <hibf/detail/build/update_header_node_data.hpp> // for update_header_node_data
+#include <hibf/detail/layout/layout.hpp>                 // for layout
 
 namespace hibf
 {

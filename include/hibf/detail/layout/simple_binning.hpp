@@ -1,14 +1,13 @@
 #pragma once
 
-#include <algorithm>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <numeric>
-#include <vector>
+#include <cassert>   // for assert
+#include <cstddef>   // for size_t
+#include <stdexcept> // for runtime_error
+#include <utility>   // for addressof
+#include <vector>    // for vector
 
-#include <hibf/detail/data_store.hpp>
-#include <hibf/next_multiple_of_64.hpp>
+#include <hibf/detail/data_store.hpp>   // for data_store
+#include <hibf/next_multiple_of_64.hpp> // for next_multiple_of_64
 
 namespace hibf::layout
 {

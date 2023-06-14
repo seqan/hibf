@@ -7,11 +7,13 @@
 
 #pragma once
 
-#include <filesystem>
-#include <functional>
-#include <iterator>
+#include <cinttypes>  // for uint16_t, uint64_t, uint8_t
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <functional> // for function
+#include <iterator>   // for insert_iterator
 
-#include <hibf/contrib/robin_hood.hpp>
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
 #include <hibf/platform.hpp>
 
 namespace hibf

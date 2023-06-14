@@ -1,10 +1,12 @@
 #pragma once
 
-#include <iosfwd>
-#include <vector>
+#include <cstddef> // for size_t
+#include <iosfwd>  // for ostream
+#include <string>  // for string
+#include <vector>  // for vector
 
-#include <hibf/detail/configuration.hpp>
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf::layout
 {

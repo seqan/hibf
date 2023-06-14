@@ -10,9 +10,16 @@
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
-#include <hibf/detail/build/initialise_build_tree.hpp>
-#include <hibf/detail/build/update_content_node_data.hpp>
-#include <hibf/detail/build/update_header_node_data.hpp>
+#include <lemon/core.h>       // for INVALID
+#include <lemon/list_graph.h> // for ListDigraph
+
+#include <utility> // for move
+
+#include <hibf/detail/build/initialise_build_tree.hpp>    // for initialise_build_tree
+#include <hibf/detail/build/node_data.hpp>                // for node_data
+#include <hibf/detail/build/update_content_node_data.hpp> // for update_content_node_data
+#include <hibf/detail/build/update_header_node_data.hpp>  // for update_header_node_data
+#include <hibf/detail/layout/layout.hpp>                  // for layout
 
 namespace hibf
 {

@@ -12,7 +12,8 @@
 
 #pragma once
 
-#include <cmath>
+#include <cmath>   // for log, ceil, exp
+#include <cstddef> // for size_t
 
 #include <hibf/platform.hpp>
 

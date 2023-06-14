@@ -13,13 +13,16 @@
 #pragma once
 
 #if defined(__GNUC__) || defined(__clang__)
-#    include <cxxabi.h>
-#endif // defined(__GNUC__) || defined(__clang__)
+#    include <cxxabi.h> // for __cxa_demangle
+#endif                  // defined(__GNUC__) || defined(__clang__)
 
-#include <functional>
-#include <memory>
-#include <string>
-#include <typeinfo>
+#include <cstdlib>     // for free
+#include <functional>  // for function
+#include <memory>      // for allocator, unique_ptr
+#include <string>      // for operator+, char_traits, string, to_string
+#include <type_traits> // for remove_reference_t
+#include <typeinfo>    // for type_info
+#include <utility>     // for addressof
 
 #include <hibf/platform.hpp>
 
