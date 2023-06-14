@@ -18,12 +18,14 @@
 #include <cassert>     // for assert
 #include <cinttypes>   // for uint64_t, uint16_t
 #include <concepts>    // for integral, same_as, unsigned_integral
+#include <cstring>     // for size_t, memcpy
 #include <functional>  // for plus
 #include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
 #include <stdexcept>   // for logic_error, invalid_argument
 #include <tuple>       // for tie, operator==, tuple
 #include <type_traits> // for remove_cvref_t
 #include <utility>     // for addressof
+#include <vector>      // for vector
 
 #include <hibf/detail/cereal/concepts.hpp> // for cereal_archive
 
