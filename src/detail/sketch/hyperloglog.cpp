@@ -19,26 +19,19 @@ double hyperloglog::estimate() const
     // compute indicator formula
     double sum = 0.0;
     for (uint8_t c : M_)
-    {
         sum += exp2_rcp[c];
-    }
     double estimate = alphaMM_ / sum;
 
     // use linear counting of zeros for small values
     if (estimate <= 2.5 * m_)
     {
-        uint32_t zeros = 0;
+        uint32_t zeros{};
 
         for (size_t i = 0; i < m_; ++i)
-        {
-            if (!M_[i])
-                ++zeros;
-        }
+            zeros += (M_[i] == 0u);
 
         if (zeros != 0u)
-        {
             estimate = m_ * std::log(static_cast<double>(m_) / static_cast<double>(zeros));
-        }
     }
     return estimate;
 }
@@ -126,18 +119,13 @@ double hyperloglog::merge_and_estimate_SIMD(hyperloglog const & other)
     // use linear counting of zeros for small values
     if (estimate <= 2.5 * m_)
     {
-        uint32_t zeros = 0u;
+        uint32_t zeros{};
 
         for (size_t i = 0; i < m_; ++i)
-        {
-            if (!M_[i])
-                ++zeros;
-        }
+            zeros += (M_[i] == 0u);
 
         if (zeros != 0u)
-        {
             estimate = m_ * std::log(static_cast<double>(m_) / static_cast<double>(zeros));
-        }
     }
 
     return estimate;
