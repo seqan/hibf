@@ -56,6 +56,8 @@ hibf_append_gcovr_args ("--root" "${CMAKE_CURRENT_LIST_DIR}")
 hibf_append_gcovr_args ("${PROJECT_BINARY_DIR}")
 # Include all files whose path match '${HIBF_SOURCE_DIR}/include/hibf/.*'.
 hibf_append_gcovr_args ("--filter" "${HIBF_SOURCE_DIR}/include/hibf")
+# Exclude all files whose path match '${HIBF_SOURCE_DIR}/include/hibf/contrib/.*'.
+hibf_append_gcovr_args ("--exclude" "${HIBF_SOURCE_DIR}/include/hibf/contrib")
 # Include all files whose path match '${HIBF_SOURCE_DIR}/src/.*'.
 hibf_append_gcovr_args ("--filter" "${HIBF_SOURCE_DIR}/src")
 # Include all files whose path match '${HIBF_SOURCE_DIR}/test/include/hibf/test/.*'.
