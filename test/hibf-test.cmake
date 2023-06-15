@@ -71,24 +71,6 @@ if (NOT TARGET hibf::test::unit)
     add_library (hibf::test::unit ALIAS hibf_test_unit)
 endif ()
 
-# hibf::test::coverage specifies required flags, includes and libraries
-# needed for coverage test cases in hibf/test/coverage
-if (NOT TARGET hibf::test::coverage)
-    add_library (hibf_test_coverage INTERFACE)
-    target_compile_options (hibf_test_coverage INTERFACE "--coverage" "-fprofile-arcs" "-ftest-coverage")
-    # -fprofile-abs-path requires at least gcc8, it forces gcov to report absolute instead of relative paths.
-    # gcovr has trouble detecting the headers otherwise.
-    # ccache is not aware of this option, so it needs to be skipped with `--ccache-skip`.
-    find_program (CCACHE_PROGRAM ccache)
-    if (CCACHE_PROGRAM)
-        target_compile_options (hibf_test_coverage INTERFACE "--ccache-skip" "-fprofile-abs-path")
-    else ()
-        target_compile_options (hibf_test_coverage INTERFACE "-fprofile-abs-path")
-    endif ()
-    target_link_libraries (hibf_test_coverage INTERFACE "hibf::test::unit" "gcov")
-    add_library (hibf::test::coverage ALIAS hibf_test_coverage)
-endif ()
-
 # hibf::test::header specifies required flags, includes and libraries
 # needed for header test cases in hibf/test/header
 if (NOT TARGET hibf::test::header)

@@ -33,7 +33,7 @@ jobs:
           - name: "gcc13"
             compiler: "gcc-13"
             build: coverage
-            build_type: Debug
+            build_type: Coverage
 
     steps:
       # How many commits do we need to fetch to also fetch the branch point?
@@ -61,32 +61,51 @@ jobs:
       - name: Install gcovr
         run: |
           sudo update-alternatives --install /usr/bin/gcov gcov /usr/bin/${CC/gcc/gcov} 100
-          pip install gcovr==5.2
+          pip install gcovr==6.0
 
       - name: Configure tests
         run: |
           mkdir build
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                             -DHIBF_NATIVE_BUILD=OFF \
-                                            -DHIBF_VERBOSE_TESTS=OFF \
-                                            -DHIBF_COVERAGE_PARALLEL_LEVEL=2
+                                            -DHIBF_VERBOSE_TESTS=OFF
           make -j2 gtest_build
 
       - name: Build tests
         env:
           CCACHE_IGNOREOPTIONS: "-fprofile-abs-path"
-          GCOV: ${{ github.workspace }}/.github/workflows/scripts/gcov.sh
         run: |
           ccache -z
           cd build
           make -k -j2
           ccache -sv
 
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j2 --output-on-failure
+
+      - name: Generate coverage report
+        run: |
+          gcovr --gcov-executable ${{ github.workspace }}/.github/workflows/scripts/gcov.sh \
+                --root ${{ github.workspace }}/test/coverage \
+                ${{ github.workspace }}/build \
+                --filter ${{ github.workspace }}/include \
+                --filter ${{ github.workspace }}/test/include \
+                --filter ${{ github.workspace }}/src \
+                --exclude ${{ github.workspace }}/include/hibf/contrib \
+                --exclude-lines-by-pattern '^\s*$' \
+                --exclude-lines-by-pattern '^\s*};$' \
+                --exclude-unreachable-branches \
+                --exclude-throw-branches \
+                -j 2 \
+                --xml \
+                --output ${{ github.workspace }}/build/coverage_report.xml
+
       - name: Submit coverage build
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
-          files: ${{ github.workspace }}/build/coverage.xml
+          files: ${{ github.workspace }}/build/coverage_report.xml
           fail_ci_if_error: false

@@ -40,14 +40,14 @@ void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::l
         }
 
         return result;
-    }; // GCOVR_EXCL_LINE
+    };
 
     auto parse_first_bin = [](std::string_view const & buffer)
     {
         size_t tmp{};
         std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
         return tmp;
-    }; // GCOVR_EXCL_LINE
+    };
 
     std::string line;
 
