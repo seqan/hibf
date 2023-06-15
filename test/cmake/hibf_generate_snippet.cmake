@@ -25,9 +25,9 @@ cmake_minimum_required (VERSION 3.10)
 # * all ${placeholder} will be replaced by the specified `-Dplaceholder=value` value
 # * see `cmake`s [configure_file](https://cmake.org/cmake/help/latest/command/configure_file.html) for more detail
 function (hibf_generate_snippet source_snippet)
-    if (NOT HIBF_CLONE_DIR)
+    if (NOT HIBF_SOURCE_DIR)
         message (AUTHOR_WARNING "hibf_generate_snippet can't be used if "
-                                "HIBF_CLONE_DIR (i.e. no git checkout) is not defined.")
+                                "HIBF_SOURCE_DIR (i.e. no git checkout) is not defined.")
         return ()
     endif ()
     # e.g. source_snippet: <...>/@target_alphabet@_implicit_conversion_from_@source_alphabet@.cpp.in
@@ -55,5 +55,5 @@ function (hibf_generate_snippet source_snippet)
     string (CONFIGURE "${target_snippet}" target_snippet @ONLY)
 
     # substitute source_snippet with all definitions
-    configure_file ("${HIBF_CLONE_DIR}/${source_snippet}" "${HIBF_CLONE_DIR}/${target_snippet}")
+    configure_file ("${HIBF_SOURCE_DIR}/${source_snippet}" "${HIBF_SOURCE_DIR}/${target_snippet}")
 endfunction ()
