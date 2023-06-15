@@ -54,10 +54,10 @@ endmacro ()
 hibf_append_gcovr_args ("--root" "${CMAKE_CURRENT_LIST_DIR}")
 # The build directory.
 hibf_append_gcovr_args ("${PROJECT_BINARY_DIR}")
-# Include all files whose path match '${HIBF_CLONE_DIR}/include/hibf/.*'.
-hibf_append_gcovr_args ("--filter" "${HIBF_CLONE_DIR}/include/hibf")
-# Include all files whose path match '${HIBF_CLONE_DIR}/test/include/hibf/test/.*'.
-hibf_append_gcovr_args ("--filter" "${HIBF_CLONE_DIR}/test/include/hibf/test")
+# Include all files whose path match '${HIBF_SOURCE_DIR}/include/hibf/.*'.
+hibf_append_gcovr_args ("--filter" "${HIBF_SOURCE_DIR}/include/hibf")
+# Include all files whose path match '${HIBF_SOURCE_DIR}/test/include/hibf/test/.*'.
+hibf_append_gcovr_args ("--filter" "${HIBF_SOURCE_DIR}/test/include/hibf/test")
 # Remove line coverage for all lines that match '^\s*$', i.e. empty lines.
 hibf_append_gcovr_args ("--exclude-lines-by-pattern" [['^\\s*$']])
 # Remove line coverage for all lines that match "^\s*[{}]{0,2}\s*;*\s*(//.*)?$", i.e. lines with a single '{' or '}'
