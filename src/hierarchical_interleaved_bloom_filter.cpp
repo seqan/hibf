@@ -28,7 +28,7 @@
 #include <hibf/detail/build/node_data.hpp>                // for node_data
 #include <hibf/detail/build/update_parent_kmers.hpp>      // for update_parent_kmers
 #include <hibf/detail/build/update_user_bins.hpp>         // for update_user_bins
-#include <hibf/detail/layout/compute_fp_correction.hpp>   // for compute_fp_correction
+#include <hibf/detail/layout/compute_fpr_correction.hpp>  // for compute_fpr_correction
 #include <hibf/detail/layout/compute_layout.hpp>          // for compute_layout
 #include <hibf/detail/layout/layout.hpp>                  // for layout
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
@@ -187,9 +187,9 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
 
     size_t const t_max{data.node_map[root_node].number_of_technical_bins};
-    data.fp_correction = layout::compute_fp_correction(hibf_config.maximum_false_positive_rate,
-                                                       hibf_config.number_of_hash_functions,
-                                                       t_max);
+    data.fpr_correction = layout::compute_fpr_correction({.fpr = hibf_config.maximum_false_positive_rate,
+                                                          .hash_count = hibf_config.number_of_hash_functions,
+                                                          .t_max = t_max});
 
     hierarchical_build(hibf, root_node, data);
 }

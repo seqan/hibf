@@ -25,7 +25,7 @@ size_t simple_binning::execute()
     double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[0]]);
     for (size_t i = 0; i < extra_bins; ++i)
     {
-        size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fp_correction[i + 1]);
+        size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
         matrix[i][0] = corrected_ub_cardinality / (i + 1);
     }
 
@@ -41,7 +41,7 @@ size_t simple_binning::execute()
             for (size_t i_prime = j - 1; i_prime < i; ++i_prime)
             {
                 size_t const corrected_ub_cardinality =
-                    static_cast<size_t>(ub_cardinality * data->fp_correction[(i - i_prime)]);
+                    static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
                 size_t score = std::max<size_t>(corrected_ub_cardinality / (i - i_prime), matrix[i_prime][j - 1]);
 
                 // std::cout << "j:" << j << " i:" << i << " i':" << i_prime << " score:" << score << std::endl;

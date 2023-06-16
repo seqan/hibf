@@ -147,7 +147,7 @@ private:
                              .kmer_counts = data->kmer_counts,
                              .sketches = data->sketches,
                              .positions = {data->positions[trace_j]},
-                             .fp_correction = data->fp_correction};
+                             .fpr_correction = data->fpr_correction};
 
         return libf_data;
     }
