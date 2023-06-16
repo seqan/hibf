@@ -79,9 +79,9 @@ size_t simple_binning::execute()
         size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
         hibf_layout.user_bins.emplace_back(data->positions[trace_j],
-                                                  data->previous.bin_indices,
-                                                  number_of_bins,
-                                                  bin_id);
+                                           data->previous.bin_indices,
+                                           number_of_bins,
+                                           bin_id);
 
         if (kmer_count_per_bin > max_size)
         {
