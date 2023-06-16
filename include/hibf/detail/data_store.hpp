@@ -1,11 +1,15 @@
 #pragma once
 
-#include <string>
-#include <vector>
+#include <algorithm> // for copy, fill_n, max
+#include <cassert>   // for assert
+#include <cinttypes> // for uint64_t
+#include <cstddef>   // for size_t
+#include <numeric>   // for iota
+#include <string>    // for string
+#include <vector>    // for vector
 
-#include <hibf/detail/configuration.hpp>
-#include <hibf/detail/layout/layout.hpp>
-#include <hibf/detail/sketch/toolbox.hpp>
+#include <hibf/detail/layout/layout.hpp>      // for layout
+#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace hibf
 {

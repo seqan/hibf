@@ -1,13 +1,14 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, TestInfo, EXPECT_EQ
 
-#include <fstream>
-#include <sstream>
-#include <vector>
+#include <cstddef> // for size_t
+#include <vector>  // for vector, allocator
 
-#include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/layout/compute_fpr_correction.hpp>
-#include <hibf/detail/layout/hierarchical_binning.hpp>
-#include <hibf/test/expect_range_eq.hpp>
+#include <hibf/detail/configuration.hpp>                 // for configuration
+#include <hibf/detail/data_store.hpp>                    // for data_store
+#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
+#include <hibf/detail/layout/layout.hpp>                 // for layout
+#include <hibf/test/expect_range_eq.hpp>                 // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(hierarchical_binning_test, small_example)
 {

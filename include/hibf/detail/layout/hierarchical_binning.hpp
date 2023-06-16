@@ -1,21 +1,14 @@
 #pragma once
 
-#include <algorithm> // for min
-#include <cassert>   // for assert
-#include <cmath>     // for log, ceil
-#include <cstddef>   // for size_t
-#include <iomanip>   // for operator<<, setprecision, fixed
-#include <ostream>   // for basic_ostream, stringstream
-#include <string>    // for allocator, char_traits, operator+, string
-#include <utility>   // for addressof, pair
-#include <vector>    // for vector
+#include <cassert> // for assert
+#include <cstddef> // for size_t
+#include <string>  // for string
+#include <utility> // for addressof, pair
+#include <vector>  // for vector
 
-#include <hibf/detail/configuration.hpp>         // for configuration
-#include <hibf/detail/data_store.hpp>            // for data_store
-#include <hibf/detail/layout/layout.hpp>         // for layout
-#include <hibf/detail/layout/simple_binning.hpp> // for simple_binning
-#include <hibf/next_multiple_of_64.hpp>          // for next_multiple_of_64
-#include <hibf/platform.hpp>                     // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/detail/data_store.hpp>    // for data_store
+#include <hibf/platform.hpp>             // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace hibf::layout
 {
