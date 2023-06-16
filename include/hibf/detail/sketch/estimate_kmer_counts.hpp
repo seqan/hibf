@@ -1,8 +1,9 @@
 #pragma once
 
-#include <vector>
+#include <cstddef> // for size_t
+#include <vector>  // for vector
 
-#include <hibf/detail/sketch/hyperloglog.hpp>
+#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace hibf::sketch
 {

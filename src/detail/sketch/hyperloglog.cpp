@@ -1,12 +1,18 @@
+#include <algorithm> // for fill, max
 #include <array>     // for array
 #include <bit>       // for countl_zero
 #include <cassert>   // for assert
-#include <cinttypes> // for uint8_t, uint32_t
+#include <cinttypes> // for uint8_t, uint64_t, uint32_t
 #include <cmath>     // for log
 #include <cstddef>   // for size_t
+#include <istream>   // for basic_istream::read, basic_ostream::write, basic_ostream::flush
+#include <stdexcept> // for runtime_error, invalid_argument
+#include <string>    // for operator+, to_string
+#include <utility>   // for swap
 #include <vector>    // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/contrib/xxhash/xxhash.h>       // for XXH_INLINE_XXH3_64bits, XXH3_64bits
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
 #include <x86/avx.h>  // for simde_mm256_add_ps, simde_mm256_set_ps, simde__m256i, simde_mm...
