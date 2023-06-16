@@ -98,9 +98,6 @@ private:
      */
     size_t num_technical_bins{};
 
-    //!\brief Debug output in layouting file.
-    bool debug{false};
-
 public:
     simple_binning() = default;                                  //!< Defaulted.
     simple_binning(simple_binning const &) = delete;             //!< Deleted. Would modify same data.
@@ -112,7 +109,6 @@ public:
     /*!\brief The constructor from user bin names, their kmer counts and a configuration.
      * \param[in] data_ Stores all data that is needed to compute the layout.
      * \param[in] num_bins (optional) The number of technical bins.
-     * \param[in] debug_ (optional) Enables debug output in layouting file.
      *
      * If the `num_bins` parameter is omitted or set to 0, then number of technical bins used in this algorithm
      * is automatically set to the next multiple of 64 given the number of user bins (e.g. \#UB = 88 -> \#TB = 124).
@@ -120,11 +116,10 @@ public:
      * \attention The number of technical bins must be greater or equal to the number of user bins!
      *            If you want to use less technical bins than user bins, see the hierarchical_binning algorithm.
      */
-    simple_binning(data_store & data_, size_t const num_bins = 0, bool const debug_ = false) :
+    simple_binning(data_store & data_, size_t const num_bins = 0) :
         data{std::addressof(data_)},
         num_user_bins{data->positions.size()},
-        num_technical_bins{num_bins ? num_bins : next_multiple_of_64(num_user_bins)},
-        debug{debug_}
+        num_technical_bins{num_bins ? num_bins : next_multiple_of_64(num_user_bins)}
     {
         assert(data != nullptr);
 
