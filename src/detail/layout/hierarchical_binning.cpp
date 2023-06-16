@@ -30,11 +30,14 @@ size_t hierarchical_binning::execute()
 
     if (!data->user_bins_arranged)
     {
-        sketch::toolbox sketch_toolbox{data->kmer_counts, data->sketches, std::addressof(data->positions)};
-        sketch_toolbox.sort_by_cardinalities();
+        sketch::toolbox::sort_by_cardinalities(*data->sketches, *data->kmer_counts, data->positions);
 
         if (!config.disable_estimate_union && !config.disable_rearrangement)
-            sketch_toolbox.rearrange_bins(config.max_rearrangement_ratio, config.threads);
+            sketch::toolbox::rearrange_bins(*data->sketches,
+                                            *data->kmer_counts,
+                                            data->positions,
+                                            config.max_rearrangement_ratio,
+                                            config.threads);
 
         data->user_bins_arranged = true;
     }
