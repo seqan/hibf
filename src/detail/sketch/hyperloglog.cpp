@@ -5,7 +5,7 @@
 #include <cinttypes> // for uint8_t, uint64_t, uint32_t
 #include <cmath>     // for log
 #include <cstddef>   // for size_t
-#include <istream>   // for basic_istream::read, basic_ostream::write, basic_ostream::flush
+#include <iostream>  // for istream, ostream
 #include <stdexcept> // for runtime_error, invalid_argument
 #include <string>    // for operator+, to_string
 #include <utility>   // for swap

@@ -13,7 +13,7 @@
 #include <array>     // for array
 #include <cinttypes> // for uint64_t, uint8_t
 #include <cstddef>   // for size_t
-#include <iostream>  // for istream, ostream
+#include <iosfwd>    // for istream, ostream
 #include <vector>    // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
