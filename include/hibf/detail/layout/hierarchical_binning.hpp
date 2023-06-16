@@ -64,20 +64,12 @@ private:
     /*!\brief Returns the number of technical bins given a number of user bins.
      * \param[in] requested_num_ub The number of user bins.
      */
-    [[nodiscard]] size_t needed_technical_bins(size_t const requested_num_ub) const
-    {
-        return std::min<size_t>(next_multiple_of_64(requested_num_ub), config.tmax);
-    }
+    [[nodiscard]] size_t needed_technical_bins(size_t const requested_num_ub) const;
 
     /*!\brief Returns the maximum number of needed levels when merging `num_ubs_in_merge` many user bins.
      * \param[in] num_ubs_in_merge The number of user bins in the merge.
      */
-    [[nodiscard]] size_t max_merge_levels(size_t const num_ubs_in_merge) const
-    {
-        size_t const lower_lvl_tbs = needed_technical_bins(num_ubs_in_merge);
-        double const levels = std::log(num_ubs_in_merge) / std::log(lower_lvl_tbs);
-        return static_cast<size_t>(std::ceil(levels));
-    }
+    [[nodiscard]] size_t max_merge_levels(size_t const num_ubs_in_merge) const;
 
     /*!\brief Initialize the matrices M (hig_level_ibf), L (low_level_ibfs) and T (trace)
      *
@@ -132,78 +124,17 @@ private:
     //!\brief Backtracks the trace matrix and writes the resulting binning into the output file.
     size_t backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace);
 
-    std::string to_string_with_precision(double const value) const
-    {
-        // TODO std::to_chars after https://github.com/seqan/product_backlog/issues/396
-        std::stringstream stream;
-        stream << std::fixed << std::setprecision(2) << value;
-        return stream.str();
-    };
+    std::string to_string_with_precision(double const value) const;
 
-    data_store initialise_libf_data(size_t const trace_j) const
-    {
-        data_store libf_data{.false_positive_rate = data->false_positive_rate,
-                             .hibf_layout = data->hibf_layout,
-                             .kmer_counts = data->kmer_counts,
-                             .sketches = data->sketches,
-                             .positions = {data->positions[trace_j]},
-                             .fpr_correction = data->fpr_correction};
+    data_store initialise_libf_data(size_t const trace_j) const;
 
-        return libf_data;
-    }
+    void process_merged_bin(data_store & libf_data, size_t const bin_id) const;
 
-    void process_merged_bin(data_store & libf_data, size_t const bin_id) const
-    {
-        update_libf_data(libf_data, bin_id);
+    void update_libf_data(data_store & libf_data, size_t const bin_id) const;
 
-        // now do the binning for the low-level IBF:
-        size_t const lower_max_bin = add_lower_level(libf_data);
+    size_t add_lower_level(data_store & libf_data) const;
 
-        data->hibf_layout->max_bins.emplace_back(libf_data.previous.bin_indices, lower_max_bin);
-    }
-
-    void update_libf_data(data_store & libf_data, size_t const bin_id) const
-    {
-        bool const is_top_level = data->previous.empty();
-
-        libf_data.previous = data->previous;
-        libf_data.previous.bin_indices.push_back(bin_id);
-
-#if HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wrestrict"
-#endif // HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-
-        libf_data.previous.num_of_bins += (is_top_level ? "" : ";") + std::string{"1"};
-
-#if HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-#    pragma GCC diagnostic pop
-#endif // HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-    }
-
-    size_t add_lower_level(data_store & libf_data) const
-    {
-        // now do the binning for the low-level IBF:
-        if (libf_data.positions.size() > config.tmax)
-        {
-            // recursively call hierarchical binning if there are still too many UBs
-            return hierarchical_binning{libf_data, config}.execute(); // return id of maximum technical bin
-        }
-        else
-        {
-            // use simple binning to distribute remaining UBs
-            return simple_binning{libf_data, 0, config.debug}.execute(); // return id of maximum technical bin
-        }
-    }
-
-    void update_max_id(size_t & max_id, size_t & max_size, size_t const new_id, size_t const new_size) const
-    {
-        if (new_size > max_size)
-        {
-            max_id = new_id;
-            max_size = new_size;
-        }
-    }
+    void update_max_id(size_t & max_id, size_t & max_size, size_t const new_id, size_t const new_size) const;
 };
 
 } // namespace hibf::layout
