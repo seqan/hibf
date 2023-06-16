@@ -18,8 +18,11 @@ TEST(hierarchical_binning_test, small_example)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 1000, 500, 500, 500, 500, 500, 500};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
 
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
     hibf::layout::hierarchical_binning algo{data, config};
@@ -48,7 +51,10 @@ TEST(hierarchical_binning_test, another_example)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{50, 1000, 1000, 50, 5, 10, 10, 5};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
@@ -78,7 +84,10 @@ TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
@@ -102,7 +111,10 @@ TEST(hierarchical_binning_test, knuts_example)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{60, 600, 1000, 800, 800};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
@@ -129,7 +141,10 @@ TEST(hierarchical_binning_test, four_level_hibf)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{11090, 5080, 3040, 1020, 510, 500};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
@@ -161,7 +176,10 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 
@@ -188,7 +206,10 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin_and_leads_to_recursive_call)
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500, 500, 500, 500, 500};
-    hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+    std::vector<hibf::sketch::hyperloglog> sketches{};
+    hibf::data_store data{.hibf_layout = std::ref(hibf_layout),
+                          .kmer_counts = std::cref(kmer_counts),
+                          .sketches = std::cref(sketches)};
 
     data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
 

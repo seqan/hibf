@@ -23,7 +23,7 @@ size_t execute(hibf::configuration & config, hibf::data_store & data)
     if (config.tmax == 0) // no tmax was set by the user on the command line
     {
         // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
-        if (size_t number_samples = data.kmer_counts->size();
+        if (size_t number_samples = data.kmer_counts.get().size();
             number_samples >= 1ULL << 32) // sqrt is bigger than uint16_t
             throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
         else

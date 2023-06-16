@@ -64,14 +64,14 @@ layout compute_layout(config const & hibf_config,
     sketch::estimate_kmer_counts(sketches, kmer_counts);
 
     data_store store{.false_positive_rate = chopper_config.false_positive_rate,
-                     .hibf_layout = &resulting_layout,
-                     .kmer_counts = std::addressof(kmer_counts),
-                     .sketches = std::addressof(sketches)};
+                     .hibf_layout = std::ref(resulting_layout),
+                     .kmer_counts = std::cref(kmer_counts),
+                     .sketches = std::cref(sketches)};
 
     size_t const max_hibf_id = hibf::execute(chopper_config, store);
-    store.hibf_layout->top_level_max_bin_id = max_hibf_id;
+    store.hibf_layout.get().top_level_max_bin_id = max_hibf_id;
 
-    return *store.hibf_layout; // return layout as string for now, containing the file
+    return store.hibf_layout.get(); // return layout as string for now, containing the file
 }
 
 layout compute_layout(config const & hibf_config)

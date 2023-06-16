@@ -30,11 +30,11 @@ size_t hierarchical_binning::execute()
 
     if (!data->user_bins_arranged)
     {
-        sketch::toolbox::sort_by_cardinalities(*data->sketches, *data->kmer_counts, data->positions);
+        sketch::toolbox::sort_by_cardinalities(data->sketches.get(), data->kmer_counts.get(), data->positions);
 
         if (!config.disable_estimate_union && !config.disable_rearrangement)
-            sketch::toolbox::rearrange_bins(*data->sketches,
-                                            *data->kmer_counts,
+            sketch::toolbox::rearrange_bins(data->sketches.get(),
+                                            data->kmer_counts.get(),
                                             data->positions,
                                             config.max_rearrangement_ratio,
                                             config.threads);
@@ -81,9 +81,10 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
                                           std::vector<std::vector<std::pair<size_t, size_t>>> & trace)
 {
     assert(data != nullptr);
+    auto const & kmer_counts = data->kmer_counts.get();
 
     // initialize first column
-    double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[0]]);
+    double const ub_cardinality = static_cast<double>(kmer_counts[data->positions[0]]);
     for (size_t i = 0; i < num_technical_bins; ++i)
     {
         size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
@@ -92,17 +93,17 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     }
 
     // initialize first row
-    size_t sum = (*data->kmer_counts)[data->positions[0]];
+    size_t sum = kmer_counts[data->positions[0]];
     if (!config.disable_estimate_union)
     {
         sketch::toolbox::precompute_initial_union_estimates(data->union_estimates,
-                                                            *data->sketches,
-                                                            *data->kmer_counts,
+                                                            data->sketches.get(),
+                                                            kmer_counts,
                                                             data->positions);
 
         for (size_t j = 1; j < num_user_bins; ++j)
         {
-            sum += (*data->kmer_counts)[data->positions[j]];
+            sum += kmer_counts[data->positions[j]];
             matrix[0][j] = data->union_estimates[j];
             ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
             trace[0][j] = {0u, j - 1}; // unnecessary?
@@ -113,8 +114,8 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
         for (size_t j = 1; j < num_user_bins; ++j)
         {
             assert(j < data->positions.size());
-            assert(data->positions[j] < data->kmer_counts->size());
-            sum += (*data->kmer_counts)[data->positions[j]];
+            assert(data->positions[j] < kmer_counts.size());
+            sum += kmer_counts[data->positions[j]];
             matrix[0][j] = sum;
             ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
             trace[0][j] = {0u, j - 1}; // unnecessary?
@@ -127,17 +128,18 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                                      std::vector<std::vector<std::pair<size_t, size_t>>> & trace)
 {
     assert(data != nullptr);
+    auto const & kmer_counts = data->kmer_counts.get();
 
     // we must iterate column wise
     for (size_t j = 1; j < num_user_bins; ++j)
     {
-        size_t const current_weight = (*data->kmer_counts)[data->positions[j]];
+        size_t const current_weight = kmer_counts[data->positions[j]];
         double const ub_cardinality = static_cast<double>(current_weight);
 
         if (!config.disable_estimate_union)
             sketch::toolbox::precompute_union_estimates_for(data->union_estimates,
-                                                            *data->sketches,
-                                                            *data->kmer_counts,
+                                                            data->sketches.get(),
+                                                            kmer_counts,
                                                             data->positions,
                                                             j);
 
@@ -188,7 +190,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
             // I may merge the current user bin j into the former
             while (j_prime != 0 && ((i - trace[i][j_prime].first) < 2) && get_weight() < minimum)
             {
-                weight += (*data->kmer_counts)[data->positions[j_prime]];
+                weight += kmer_counts[data->positions[j_prime]];
                 --j_prime;
 
                 // score: The current maximum technical bin size for the high-level IBF (score for the matrix M)
@@ -219,6 +221,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
 size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace)
 {
     assert(data != nullptr);
+    auto const & kmer_counts = data->kmer_counts.get();
 
     // backtracking starts at the bottom right corner:
     size_t trace_i = num_technical_bins - 1;
@@ -236,7 +239,7 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         size_t next_i = trace[trace_i][trace_j].first;
         size_t next_j = trace[trace_i][trace_j].second;
 
-        size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
+        size_t kmer_count = kmer_counts[data->positions[trace_j]];
         size_t number_of_bins = (trace_i - next_i);
 
         if (number_of_bins == 1 && next_j != trace_j - 1u) // merged bin
@@ -247,7 +250,7 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
             --trace_j;
             while (trace_j != next_j)
             {
-                kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
+                kmer_count += kmer_counts[data->positions[trace_j]];
                 libf_data.positions.push_back(data->positions[trace_j]);
                 // std::cout << "," << trace_j;
                 --trace_j;
@@ -264,10 +267,10 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         {
             size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
-            data->hibf_layout->user_bins.emplace_back(data->positions[trace_j],
-                                                      data->previous.bin_indices,
-                                                      number_of_bins,
-                                                      bin_id);
+            data->hibf_layout.get().user_bins.emplace_back(data->positions[trace_j],
+                                                           data->previous.bin_indices,
+                                                           number_of_bins,
+                                                           bin_id);
 
             // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << kmer_count_per_bin << std::endl;
 
@@ -284,14 +287,14 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     assert(trace_i == 0 || trace_j == 0);
     if (trace_i == 0u && trace_j > 0u) // the last UBs get merged into the remaining TB
     {
-        size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
+        size_t kmer_count = kmer_counts[data->positions[trace_j]];
         auto libf_data = initialise_libf_data(trace_j);
 
         // std::cout << "merged [" << trace_j;
         while (trace_j > 0)
         {
             --trace_j;
-            kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
+            kmer_count += kmer_counts[data->positions[trace_j]];
             libf_data.positions.push_back(data->positions[trace_j]);
             // std::cout << "," << trace_j;
         }
@@ -308,14 +311,14 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     {
         // we only arrive here if the first user bin (UB-0) wasn't merged with some before so it is safe to assume
         // that the bin was split (even if only into 1 bin).
-        size_t const kmer_count = (*data->kmer_counts)[data->positions[0]];
+        size_t const kmer_count = kmer_counts[data->positions[0]];
         size_t const number_of_tbs = trace_i + 1;
         size_t const average_bin_size = (kmer_count + number_of_tbs - 1) / number_of_tbs; // round up
 
-        data->hibf_layout->user_bins.emplace_back(data->positions[0],
-                                                  data->previous.bin_indices,
-                                                  number_of_tbs,
-                                                  bin_id);
+        data->hibf_layout.get().user_bins.emplace_back(data->positions[0],
+                                                       data->previous.bin_indices,
+                                                       number_of_tbs,
+                                                       bin_id);
 
         update_max_id(high_level_max_id, high_level_max_size, bin_id, average_bin_size);
         // std::cout << "split " << trace_j << " into " << trace_i << ": " << kmer_count / number_of_tbs << std::endl;
@@ -351,7 +354,7 @@ void hierarchical_binning::process_merged_bin(data_store & libf_data, size_t con
     // now do the binning for the low-level IBF:
     size_t const lower_max_bin = add_lower_level(libf_data);
 
-    data->hibf_layout->max_bins.emplace_back(libf_data.previous.bin_indices, lower_max_bin);
+    data->hibf_layout.get().max_bins.emplace_back(libf_data.previous.bin_indices, lower_max_bin);
 }
 
 void hierarchical_binning::update_libf_data(data_store & libf_data, size_t const bin_id) const

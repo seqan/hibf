@@ -41,13 +41,13 @@ struct data_store
     double false_positive_rate{};
 
     //!\brief The layout that is built by layout::hierarchical_binning.
-    layout::layout * hibf_layout; // Will be modified by {simple,hierarchical}_binning.
+    std::reference_wrapper<layout::layout> hibf_layout; // Will be modified by {simple,hierarchical}_binning.
 
     //!\brief The kmer counts associated with the above files used to layout user bin into technical bins.
-    std::vector<size_t> const * kmer_counts{}; // Pointed to data should not be modified.
+    std::reference_wrapper<std::vector<size_t> const> kmer_counts; // Pointed to data should not be modified.
 
     //!\brief The hyperloglog sketches of all input files to estimate their size and similarities.
-    std::vector<sketch::hyperloglog> const * sketches{}; // Pointed to data should not be modified.
+    std::reference_wrapper<std::vector<sketch::hyperloglog> const> sketches; // Pointed to data should not be modified.
     //!\}
 
     /*!\name Local Storage one IBF in the HIBF.
@@ -61,7 +61,7 @@ struct data_store
     std::vector<size_t> positions = [this]()
     {
         std::vector<size_t> ps;
-        ps.resize(this->kmer_counts->size());
+        ps.resize(this->kmer_counts.get().size());
         std::iota(ps.begin(), ps.end(), 0);
         return ps;
     }();
