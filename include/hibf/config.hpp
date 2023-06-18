@@ -62,10 +62,10 @@ struct config
     double max_rearrangement_ratio{0.5};
 
     //!\brief Whether to estimate the union of kmer sets to possibly improve the binning or not.
-    bool disable_estimate_union{true};
+    bool disable_estimate_union{false};
 
     //!\brief Whether to do a second sorting of the bins which takes into account similarity or not.
-    bool disable_rearrangement{true};
+    bool disable_rearrangement{false};
     //!\}
 
     /*!\name Build Configuration
