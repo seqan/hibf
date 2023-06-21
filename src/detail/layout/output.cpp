@@ -1,4 +1,4 @@
-#include <cstddef>     // for size_t
+#include <cstddef> // for size_t
 #include <fstream>
 #include <sstream>
 #include <string>      // for char_traits, operator<<, getline, string
