@@ -19,4 +19,8 @@ void write_user_bin_line_to(layout::user_bin const &, std::vector<std::string> c
 
 void write_layout_content_to(layout const &, std::vector<std::string> const &, std::ostream &);
 
+void write_layout_file(layout const & hibf_layout,
+                       std::vector<std::string> const & filenames,
+                       configuration const & config);
+
 } // namespace hibf::layout

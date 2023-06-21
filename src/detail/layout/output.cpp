@@ -1,5 +1,6 @@
 #include <cstddef>     // for size_t
-#include <iostream>    // for operator<<, basic_ostream, basic_istream, ostream, stringstream
+#include <fstream>
+#include <sstream>
 #include <string>      // for char_traits, operator<<, getline, string
 #include <string_view> // for operator<<
 #include <vector>      // for vector
@@ -59,6 +60,16 @@ void write_layout_content_to(layout const & hibf_layout,
     stream << prefix::header << "FILES\tBIN_INDICES\tNUMBER_OF_BINS\n";
     for (auto const & user_bin : hibf_layout.user_bins)
         write_user_bin_line_to(user_bin, filenames, stream);
+}
+
+void write_layout_file(layout const & hibf_layout,
+                       std::vector<std::string> const & filenames,
+                       configuration const & config)
+{
+    std::ofstream fout{config.output_filename};
+    write_config_to(config, fout);
+    write_layout_header_to(hibf_layout, hibf_layout.top_level_max_bin_id, fout);
+    write_layout_content_to(hibf_layout, filenames, fout);
 }
 
 } // namespace hibf::layout
