@@ -9,11 +9,13 @@
 
 #include <iosfwd> // for istream
 
+#include <hibf/config.hpp>
+#include <hibf/detail/configuration.hpp>                   // for configuration
 #include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf
 {
 
-void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout);
+void parse_chopper_pack_header(std::istream & chopper_pack_file, configuration & config, hibf::layout::layout & hibf_layout);
 
 } // namespace hibf

@@ -10,12 +10,15 @@
 #include <string> // for string
 #include <vector> // for vector
 
+#include <hibf/config.hpp>
+#include <hibf/detail/configuration.hpp>                   // for configuration
 #include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf
 {
 
-layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+layout::layout read_chopper_pack_file(configuration & config,
+                                      std::vector<std::vector<std::string>> & filenames,
                                       std::string const & chopper_pack_filename);
 
 } // namespace hibf

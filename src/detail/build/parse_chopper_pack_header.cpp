@@ -18,10 +18,13 @@
 #include <hibf/detail/layout/layout.hpp>                   // for layout
 #include <hibf/detail/prefixes.hpp>                        // for merged_bin, header, header_config
 
+#include <cereal/archives/json.hpp> // for JSONOutputArchive
+#include <cereal/cereal.hpp>        // for make_nvp, OutputArchive
+
 namespace hibf
 {
 
-void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::layout & hibf_layout)
+void parse_chopper_pack_header(std::istream & chopper_pack_file, configuration & chopper_config, hibf::layout::layout & hibf_layout)
 {
     auto parse_bin_indices = [](std::string_view const & buffer)
     {
@@ -50,13 +53,24 @@ void parse_chopper_pack_header(std::istream & chopper_pack_file, hibf::layout::l
     };
 
     std::string line;
+    std::stringstream config_str;
 
-    while (std::getline(chopper_pack_file, line) && line.size() >= 2
+    std::getline(chopper_pack_file, line);
+    assert(line == "##CONFIG:");
+
+    while (std::getline(chopper_pack_file, line) && line.size() >= 3
            && std::string_view{line}.substr(0, 1) == prefix::header
-           && std::string_view{line}.substr(1, 1) == prefix::header_config)
-        ; // skip config in header
+           && std::string_view{line}.substr(1, 1) == prefix::header_config
+           && line != "##ENDCONFIG")
+        config_str << line.substr(2); // remove prefix::header & prefix::header_config
 
-    assert(line[0] == '#'); // we are reading header lines
+    assert(line == "##ENDCONFIG");
+
+    cereal::JSONInputArchive iarchive(config_str);
+    iarchive(chopper_config);
+
+    std::getline(chopper_pack_file, line); // skip "##ENDCONFIG"
+    assert(line[0] == '#'); // still reading header lines
     assert(line.substr(1, prefix::high_level.size()) == prefix::high_level);
 
     // parse High Level max bin index

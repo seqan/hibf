@@ -18,7 +18,8 @@
 namespace hibf
 {
 
-layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & filenames,
+layout::layout read_chopper_pack_file(configuration & chopper_config,
+                                      std::vector<std::vector<std::string>> & filenames,
                                       std::string const & chopper_pack_filename)
 {
     layout::layout hibf_layout{};
@@ -30,7 +31,7 @@ layout::layout read_chopper_pack_file(std::vector<std::vector<std::string>> & fi
 
     // parse header
     // -------------------------------------------------------------------------
-    parse_chopper_pack_header(chopper_pack_file, hibf_layout);
+    parse_chopper_pack_header(chopper_pack_file, chopper_config, hibf_layout);
 
     std::string current_line;
     while (std::getline(chopper_pack_file, current_line))
