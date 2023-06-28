@@ -4,9 +4,8 @@
 
 TEST(parse_chopper_pack_header_test, basic)
 {
-    std::stringstream chopper_pack_file
-    {
-     R"expected_layout(##CONFIG:
+    std::stringstream chopper_pack_file{
+        R"expected_layout(##CONFIG:
 ##{
 ##    "config": {
 ##        "version": 2,
@@ -46,8 +45,7 @@ seq19	1	1
 seq18	2	1
 seq17	3	1
 seq95	126	2
-)expected_layout"
-    };
+)expected_layout"};
     hibf::configuration chopper_config;
     hibf::layout::layout hibf_layout;
 

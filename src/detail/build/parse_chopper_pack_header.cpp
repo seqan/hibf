@@ -24,7 +24,9 @@
 namespace hibf
 {
 
-void parse_chopper_pack_header(std::istream & chopper_pack_file, configuration & chopper_config, hibf::layout::layout & hibf_layout)
+void parse_chopper_pack_header(std::istream & chopper_pack_file,
+                               configuration & chopper_config,
+                               hibf::layout::layout & hibf_layout)
 {
     auto parse_bin_indices = [](std::string_view const & buffer)
     {
@@ -60,8 +62,7 @@ void parse_chopper_pack_header(std::istream & chopper_pack_file, configuration &
 
     while (std::getline(chopper_pack_file, line) && line.size() >= 3
            && std::string_view{line}.substr(0, 1) == prefix::header
-           && std::string_view{line}.substr(1, 1) == prefix::header_config
-           && line != "##ENDCONFIG")
+           && std::string_view{line}.substr(1, 1) == prefix::header_config && line != "##ENDCONFIG")
         config_str << line.substr(2); // remove prefix::header & prefix::header_config
 
     assert(line == "##ENDCONFIG");
@@ -70,7 +71,7 @@ void parse_chopper_pack_header(std::istream & chopper_pack_file, configuration &
     iarchive(chopper_config);
 
     std::getline(chopper_pack_file, line); // skip "##ENDCONFIG"
-    assert(line[0] == '#'); // still reading header lines
+    assert(line[0] == '#');                // still reading header lines
     assert(line.substr(1, prefix::high_level.size()) == prefix::high_level);
 
     // parse High Level max bin index
