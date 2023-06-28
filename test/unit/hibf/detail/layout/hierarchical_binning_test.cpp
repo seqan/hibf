@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector, allocator
 
-#include <hibf/detail/configuration.hpp>                 // for configuration
+#include <hibf/config.hpp>                               // for hibf_configuration
 #include <hibf/detail/data_store.hpp>                    // for data_store
 #include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
@@ -12,17 +12,18 @@
 
 TEST(hierarchical_binning_test, small_example)
 {
-    hibf::configuration config;
-    config.tmax = 4;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.tmax = 4;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 1000, 500, 500, 500, 500, 500, 500};
 
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
-    hibf::layout::hierarchical_binning algo{data, config};
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:3
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{1}, 22}, {{2}, 22}};
@@ -42,17 +43,18 @@ TEST(hierarchical_binning_test, small_example)
 
 TEST(hierarchical_binning_test, another_example)
 {
-    hibf::configuration config;
-    config.tmax = 5;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.tmax = 5;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{50, 1000, 1000, 50, 5, 10, 10, 5};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{0, 0}, 56}, {{0}, 0}};
@@ -72,17 +74,18 @@ TEST(hierarchical_binning_test, another_example)
 
 TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 {
-    hibf::configuration config;
-    config.tmax = 4;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.tmax = 4;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 0u); // #HIGH_LEVEL_IBF max_bin_id:1
 
     std::vector<hibf::layout::layout::user_bin> expected_user_bins{{3, {}, 1, 0},
@@ -95,18 +98,19 @@ TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 
 TEST(hierarchical_binning_test, knuts_example)
 {
-    hibf::configuration config;
-    config.alpha = 1;
-    config.tmax = 5;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.alpha = 1;
+    hibf_config.tmax = 5;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{60, 600, 1000, 800, 800};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 1u);
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{0}, 63}};
@@ -123,17 +127,18 @@ TEST(hierarchical_binning_test, knuts_example)
 
 TEST(hierarchical_binning_test, four_level_hibf)
 {
-    hibf::configuration config;
-    config.tmax = 2;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.tmax = 2;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{11090, 5080, 3040, 1020, 510, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{0, 0, 0, 0}, 33},
@@ -154,18 +159,19 @@ TEST(hierarchical_binning_test, four_level_hibf)
 
 TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 {
-    hibf::configuration config;
-    config.alpha = 1;
-    config.tmax = 2;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.alpha = 1;
+    hibf_config.tmax = 2;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 0u);
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{0}, 0}, {{1}, 0}};
@@ -181,18 +187,19 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 
 TEST(hierarchical_binning_test, tb0_is_a_merged_bin_and_leads_to_recursive_call)
 {
-    hibf::configuration config;
-    config.alpha = 1;
-    config.tmax = 2;
-    config.disable_estimate_union = true; // also disables rearrangement
+    hibf::config hibf_config;
+    hibf_config.alpha = 1;
+    hibf_config.tmax = 2;
+    hibf_config.disable_estimate_union = true; // also disables rearrangement
 
     hibf::layout::layout hibf_layout{};
     std::vector<size_t> kmer_counts{500, 500, 500, 500, 500, 500, 500, 500};
     hibf::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
 
-    data.fpr_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.fpr_correction =
+        hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = hibf_config.tmax});
 
-    hibf::layout::hierarchical_binning algo{data, config};
+    hibf::layout::hierarchical_binning algo{data, hibf_config};
     EXPECT_EQ(algo.execute(), 0u);
 
     std::vector<hibf::layout::layout::max_bin> expected_max_bins{{{0, 0}, 0},

@@ -8,7 +8,6 @@
 
 #include <hibf/config.hpp>                             // for config
 #include <hibf/contrib/robin_hood.hpp>                 // for unordered_flat_set
-#include <hibf/detail/configuration.hpp>               // for configuration
 #include <hibf/detail/data_store.hpp>                  // for data_store
 #include <hibf/detail/layout/compute_layout.hpp>       // for compute_layout
 #include <hibf/detail/layout/execute.hpp>              // for execute
@@ -24,17 +23,6 @@ layout compute_layout(config const & hibf_config,
                       std::vector<sketch::hyperloglog> & sketches)
 {
     layout resulting_layout{};
-
-    hibf::configuration chopper_config{.sketch_bits = hibf_config.sketch_bits,
-                                       .disable_sketch_output = true,
-                                       .tmax = hibf_config.tmax,
-                                       .num_hash_functions = hibf_config.number_of_hash_functions,
-                                       .false_positive_rate = hibf_config.maximum_false_positive_rate,
-                                       .alpha = hibf_config.alpha,
-                                       .max_rearrangement_ratio = hibf_config.max_rearrangement_ratio,
-                                       .threads = hibf_config.threads,
-                                       .disable_estimate_union = hibf_config.disable_estimate_union,
-                                       .disable_rearrangement = hibf_config.disable_rearrangement};
 
     // The output streams facilitate writing the layout file in hierarchical structure.
     // hibf::execute currently writes the filled buffers to the output file.
@@ -63,12 +51,12 @@ layout compute_layout(config const & hibf_config,
 
     sketch::estimate_kmer_counts(sketches, kmer_counts);
 
-    data_store store{.false_positive_rate = chopper_config.false_positive_rate,
+    data_store store{.false_positive_rate = hibf_config.maximum_false_positive_rate,
                      .hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),
                      .sketches = std::addressof(sketches)};
 
-    size_t const max_hibf_id = hibf::execute(chopper_config, store);
+    size_t const max_hibf_id = hibf::execute(hibf_config, store);
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
     return *store.hibf_layout; // return layout as string for now, containing the file

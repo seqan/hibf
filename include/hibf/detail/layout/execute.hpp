@@ -2,12 +2,12 @@
 
 #include <cstddef> // for size_t
 
-#include <hibf/detail/configuration.hpp> // for configuration
-#include <hibf/detail/data_store.hpp>    // for data_store
+#include <hibf/config.hpp>            // for config
+#include <hibf/detail/data_store.hpp> // for data_store
 
 namespace hibf
 {
 
-size_t execute(configuration &, data_store &);
+size_t execute(config const &, data_store &);
 
 } // namespace hibf

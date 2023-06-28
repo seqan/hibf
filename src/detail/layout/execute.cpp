@@ -5,7 +5,7 @@
 #include <stdexcept> // for invalid_argument
 #include <vector>    // for vector
 
-#include <hibf/detail/configuration.hpp>                 // for configuration
+#include <hibf/config.hpp>                               // for config
 #include <hibf/detail/data_store.hpp>                    // for data_store
 #include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/detail/layout/execute.hpp>                // for execute
@@ -15,33 +15,37 @@
 namespace hibf
 {
 
-size_t execute(hibf::configuration & config, hibf::data_store & data)
+size_t execute(hibf::config const & hibf_config, hibf::data_store & data)
 {
-    if (config.disable_estimate_union)
-        config.disable_rearrangement = true;
+    hibf::config hibf_config_copy{hibf_config};
 
-    if (config.tmax == 0) // no tmax was set by the user on the command line
+    if (hibf_config_copy.disable_estimate_union)
+        hibf_config_copy.disable_rearrangement = true;
+
+    if (hibf_config_copy.tmax == 0) // no tmax was set by the user on the command line
     {
         // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
         if (size_t number_samples = data.kmer_counts->size();
             number_samples >= 1ULL << 32) // sqrt is bigger than uint16_t
             throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
         else
-            config.tmax = hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_samples))));
+            hibf_config_copy.tmax =
+                hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_samples))));
     }
-    else if (config.tmax % 64 != 0)
+    else if (hibf_config_copy.tmax % 64 != 0)
     {
-        config.tmax = hibf::next_multiple_of_64(config.tmax);
+        hibf_config_copy.tmax = hibf::next_multiple_of_64(hibf_config_copy.tmax);
         std::cerr << "[HIBF LAYOUT WARNING]: Your requested number of technical bins was not a multiple of 64. "
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
-                  << "anyway, so we increased your number of technical bins to " << config.tmax << ".\n";
+                  << "anyway, so we increased your number of technical bins to " << hibf_config_copy.tmax << ".\n";
     }
 
-    data.fpr_correction = layout::compute_fpr_correction({.fpr = config.false_positive_rate, // prevent clang-format
-                                                          .hash_count = config.num_hash_functions,
-                                                          .t_max = config.tmax});
+    data.fpr_correction =
+        layout::compute_fpr_correction({.fpr = hibf_config_copy.maximum_false_positive_rate, // prevent clang-format
+                                        .hash_count = hibf_config_copy.number_of_hash_functions,
+                                        .t_max = hibf_config_copy.tmax});
 
-    return hibf::layout::hierarchical_binning{data, config}.execute();
+    return hibf::layout::hierarchical_binning{data, hibf_config}.execute();
 }
 
 } // namespace hibf

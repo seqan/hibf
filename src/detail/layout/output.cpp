@@ -4,7 +4,7 @@
 #include <string_view> // for operator<<
 #include <vector>      // for vector
 
-#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/config.hpp>               // for config
 #include <hibf/detail/layout/layout.hpp> // for layout, operator<<
 #include <hibf/detail/layout/output.hpp> // for write_config_to, write_layout_content_to, write_layout_header_to
 #include <hibf/detail/prefixes.hpp>      // for header, header_config, first_header_line
@@ -15,12 +15,12 @@
 namespace hibf::layout
 {
 
-void write_config_to(configuration const & config, std::ostream & stream)
+void write_config_to(config const & hibf_config, std::ostream & stream)
 {
     // write json file to temprorary string stream with cereal
     std::stringstream config_stream{};
     cereal::JSONOutputArchive output(config_stream); // stream to cout
-    output(cereal::make_nvp("config", config));
+    output(cereal::make_nvp("config", hibf_config));
 
     // write config
     stream << prefix::header << prefix::header_config << "CONFIG:\n";

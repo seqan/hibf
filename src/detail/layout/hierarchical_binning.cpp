@@ -9,7 +9,7 @@
 #include <utility>   // for pair, addressof
 #include <vector>    // for vector
 
-#include <hibf/detail/configuration.hpp>               // for configuration
+#include <hibf/config.hpp>                             // for config
 #include <hibf/detail/data_store.hpp>                  // for data_store
 #include <hibf/detail/layout/hierarchical_binning.hpp> // for hierarchical_binning
 #include <hibf/detail/layout/layout.hpp>               // for layout
@@ -32,12 +32,12 @@ size_t hierarchical_binning::execute()
     {
         sketch::toolbox::sort_by_cardinalities(*data->sketches, *data->kmer_counts, data->positions);
 
-        if (!config.disable_estimate_union && !config.disable_rearrangement)
+        if (!hibf_config.disable_estimate_union && !hibf_config.disable_rearrangement)
             sketch::toolbox::rearrange_bins(*data->sketches,
                                             *data->kmer_counts,
                                             data->positions,
-                                            config.max_rearrangement_ratio,
-                                            config.threads);
+                                            hibf_config.max_rearrangement_ratio,
+                                            hibf_config.threads);
 
         data->user_bins_arranged = true;
     }
@@ -66,7 +66,7 @@ size_t hierarchical_binning::execute()
 
 [[nodiscard]] size_t hierarchical_binning::needed_technical_bins(size_t const requested_num_ub) const
 {
-    return std::min<size_t>(next_multiple_of_64(requested_num_ub), config.tmax);
+    return std::min<size_t>(next_multiple_of_64(requested_num_ub), hibf_config.tmax);
 }
 
 [[nodiscard]] size_t hierarchical_binning::max_merge_levels(size_t const num_ubs_in_merge) const
@@ -93,7 +93,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
 
     // initialize first row
     size_t sum = (*data->kmer_counts)[data->positions[0]];
-    if (!config.disable_estimate_union)
+    if (!hibf_config.disable_estimate_union)
     {
         sketch::toolbox::precompute_initial_union_estimates(data->union_estimates,
                                                             *data->sketches,
@@ -134,7 +134,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
         size_t const current_weight = (*data->kmer_counts)[data->positions[j]];
         double const ub_cardinality = static_cast<double>(current_weight);
 
-        if (!config.disable_estimate_union)
+        if (!hibf_config.disable_estimate_union)
             sketch::toolbox::precompute_union_estimates_for(data->union_estimates,
                                                             *data->sketches,
                                                             *data->kmer_counts,
@@ -154,7 +154,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 size_t const corrected_ub_cardinality =
                     static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
                 size_t score = std::max<size_t>(corrected_ub_cardinality / (i - i_prime), matrix[i_prime][j - 1]);
-                size_t full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_matrix[i_prime][j - 1];
+                size_t full_score = score * (i + 1) /*#TBs*/ + hibf_config.alpha * ll_matrix[i_prime][j - 1];
 
                 // std::cout << " ++ j:" << j << " i:" << i << " i':" << i_prime << " score:" << score << std::endl;
 
@@ -181,7 +181,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 // if we use the union estimate we plug in that value instead of the sum (weight)
                 // union_estimates[j_prime] is the union of {j_prime, ..., j}
                 // the + 1 is necessary because j_prime is decremented directly after weight is updated
-                return config.disable_estimate_union ? weight : data->union_estimates[j_prime + 1];
+                return hibf_config.disable_estimate_union ? weight : data->union_estimates[j_prime + 1];
             };
 
             // if the user bin j-1 was not split into multiple technical bins!
@@ -196,7 +196,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 // full_score: The score to minimize -> score * #TB-high_level + low_level_memory footprint
                 size_t const score = std::max<size_t>(matrix[i - 1][j_prime], get_weight());
                 size_t const ll_kmers = ll_matrix[i - 1][j_prime] + max_merge_levels(j - j_prime) * weight;
-                size_t const full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_kmers;
+                size_t const full_score = score * (i + 1) /*#TBs*/ + hibf_config.alpha * ll_kmers;
 
                 // seqan3::debug_stream << " -- " << "j_prime:" << j_prime
                 //                      << " -> full_score:" << full_score << " (M_{i-1,j'}=" << score << ")"
@@ -376,10 +376,10 @@ void hierarchical_binning::update_libf_data(data_store & libf_data, size_t const
 size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
 {
     // now do the binning for the low-level IBF:
-    if (libf_data.positions.size() > config.tmax)
+    if (libf_data.positions.size() > hibf_config.tmax)
     {
         // recursively call hierarchical binning if there are still too many UBs
-        return hierarchical_binning{libf_data, config}.execute(); // return id of maximum technical bin
+        return hierarchical_binning{libf_data, hibf_config}.execute(); // return id of maximum technical bin
     }
     else
     {

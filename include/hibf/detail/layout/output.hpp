@@ -5,13 +5,13 @@
 #include <string>  // for string
 #include <vector>  // for vector
 
-#include <hibf/detail/configuration.hpp> // for configuration
+#include <hibf/config.hpp>               // for config
 #include <hibf/detail/layout/layout.hpp> // for layout
 
 namespace hibf::layout
 {
 
-void write_config_to(configuration const &, std::ostream &);
+void write_config_to(config const &, std::ostream &);
 
 void write_layout_header_to(layout const &, size_t const, std::ostream &);
 

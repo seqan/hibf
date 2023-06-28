@@ -6,9 +6,9 @@
 #include <utility> // for addressof, pair
 #include <vector>  // for vector
 
-#include <hibf/detail/configuration.hpp> // for configuration
-#include <hibf/detail/data_store.hpp>    // for data_store
-#include <hibf/platform.hpp>             // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/config.hpp>            // for hibf_configuration
+#include <hibf/detail/data_store.hpp> // for data_store
+#include <hibf/platform.hpp>          // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace hibf::layout
 {
@@ -16,8 +16,8 @@ namespace hibf::layout
 class hierarchical_binning
 {
 private:
-    //!\brief The user configuration passed down from the command line.
-    configuration config{};
+    //!\brief The user hibf_configuration passed down from the command line.
+    config hibf_config{};
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
     data_store * data{nullptr};
 
@@ -34,18 +34,18 @@ public:
     hierarchical_binning & operator=(hierarchical_binning &&) = default;     //!< Defaulted.
     ~hierarchical_binning() = default;                                       //!< Defaulted.
 
-    /*!\brief The constructor from user bin names, their kmer counts and a configuration.
+    /*!\brief The constructor from user bin names, their kmer counts and a hibf_configuration.
      * \param[in, out] data_ Stores all data that is needed to compute the layout.
-     * \param[in] config_ A configuration object that holds information from the user that influence the computation.
+     * \param[in] hibf_config_ A hibf_configuration object that holds information from the user that influence the computation.
      *
      * Each entry in the names_ and input vector respectively is considered a user bin (both vectors must have the
      * same length).
      */
-    hierarchical_binning(data_store & data_, configuration const & config_) :
-        config{config_},
+    hierarchical_binning(data_store & data_, config const & hibf_config_) :
+        hibf_config{hibf_config_},
         data{std::addressof(data_)},
         num_user_bins{data->positions.size()},
-        num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
+        num_technical_bins{data->previous.empty() ? hibf_config.tmax : needed_technical_bins(num_user_bins)}
     {
         assert(data != nullptr);
     }

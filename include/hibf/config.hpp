@@ -14,7 +14,11 @@
 #include <iterator>   // for insert_iterator
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
+#include <hibf/detail/cereal/path.hpp> // IWYU pragma: keep
 #include <hibf/platform.hpp>
+
+#include <cereal/access.hpp> // for access
+#include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
 namespace hibf
 {
@@ -80,6 +84,31 @@ struct config
     // Related to IBF
     // bool compressed{false};
     //!\}
+
+private:
+    friend class cereal::access;
+
+    template <typename archive_t>
+    void serialize(archive_t & archive)
+    {
+        uint32_t version{1};
+        archive(CEREAL_NVP(version));
+
+        archive(CEREAL_NVP(number_of_user_bins));
+        archive(CEREAL_NVP(number_of_hash_functions));
+        archive(CEREAL_NVP(maximum_false_positive_rate));
+        archive(CEREAL_NVP(threads));
+
+        archive(CEREAL_NVP(sketch_bits));
+        archive(CEREAL_NVP(tmax));
+        archive(CEREAL_NVP(alpha));
+        archive(CEREAL_NVP(max_rearrangement_ratio));
+        archive(CEREAL_NVP(disable_estimate_union));
+        archive(CEREAL_NVP(disable_rearrangement));
+
+        archive(CEREAL_NVP(disable_cutoffs));
+        archive(CEREAL_NVP(layout_file));
+    }
 };
 
 } // namespace hibf
