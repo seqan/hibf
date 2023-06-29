@@ -1,6 +1,9 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, EXPECT_NEAR, TestInfo
 
-#include <hibf/detail/layout/compute_fpr_correction.hpp>
+#include <cstddef> // for size_t
+#include <vector>  // for vector, allocator
+
+#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 
 TEST(fp_correction_test, one_bin)
 {

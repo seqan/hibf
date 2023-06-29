@@ -1,18 +1,11 @@
 #pragma once
 
-#include <algorithm>  // for sort
-#include <cassert>    // for assert
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
-#include <filesystem> // for path, operator/
-#include <fstream>    // for ifstream, ios
+#include <filesystem> // for path
 #include <functional> // for greater
-#include <limits>     // for numeric_limits
 #include <queue>      // for priority_queue
-#include <random>     // for uniform_int_distribution, mt19937_64
-#include <stdexcept>  // for runtime_error
-#include <string>     // for basic_string, allocator, operator+, string
-#include <utility>    // for swap
+#include <string>     // for string
 #include <vector>     // for vector
 
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map
