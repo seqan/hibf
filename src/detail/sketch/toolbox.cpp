@@ -4,8 +4,8 @@
 #include <cmath>      // for floor, sqrt
 #include <cstddef>    // for size_t
 #include <filesystem> // for path, operator/
+#include <fstream>    // for ifstream, ios
 #include <functional> // for greater
-#include <fstream> // for ifstream, ios
 #include <limits>     // for numeric_limits
 #include <omp.h>      // for omp_get_thread_num
 #include <random>     // for uniform_int_distribution, mt19937_64
