@@ -1,11 +1,13 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, TestInfo, Message, TestPartResult, TEST, EXPECT_EQ
 
-#include <sstream>
-#include <vector>
+#include <cstddef>   // for size_t
+#include <stdexcept> // for runtime_error
+#include <vector>    // for allocator, vector
 
-#include <hibf/detail/data_store.hpp> // for data_store
-#include <hibf/detail/layout/simple_binning.hpp>
-#include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/detail/data_store.hpp>            // for data_store
+#include <hibf/detail/layout/layout.hpp>         // for layout
+#include <hibf/detail/layout/simple_binning.hpp> // for simple_binning
+#include <hibf/test/expect_range_eq.hpp>         // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(simple_binning_test, small_example)
 {

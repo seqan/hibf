@@ -1,8 +1,12 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, TestInfo, EXPECT_EQ, Message, TEST, TestPartResult
 
-#include <sstream>
+#include <cstddef>     // for size_t
+#include <sstream>     // for operator<<, char_traits, basic_ostream, basic_stringstream, strings...
+#include <string>      // for allocator, string
+#include <string_view> // for operator<<
+#include <vector>      // for vector
 
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/detail/layout/layout.hpp> // for layout, operator<<
 
 TEST(layout_test, printing_max_bins)
 {
