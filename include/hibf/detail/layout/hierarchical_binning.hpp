@@ -41,14 +41,7 @@ public:
      * Each entry in the names_ and input vector respectively is considered a user bin (both vectors must have the
      * same length).
      */
-    hierarchical_binning(data_store & data_, hibf::config const & config_) :
-        config{config_},
-        data{std::addressof(data_)},
-        num_user_bins{data->positions.size()},
-        num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
-    {
-        assert(data != nullptr);
-    }
+    hierarchical_binning(data_store & data_, hibf::config const & config_);
 
     //!\brief Executes the hierarchical binning algorithm and layouts user bins into technical bins.
     size_t execute();

@@ -9,17 +9,51 @@
 #include <utility>   // for pair, addressof
 #include <vector>    // for vector
 
-#include <hibf/config.hpp>                             // for config
-#include <hibf/detail/data_store.hpp>                  // for data_store
-#include <hibf/detail/layout/hierarchical_binning.hpp> // for hierarchical_binning
-#include <hibf/detail/layout/layout.hpp>               // for layout
-#include <hibf/detail/layout/simple_binning.hpp>       // for simple_binning
-#include <hibf/detail/sketch/toolbox.hpp>              // for toolbox
-#include <hibf/next_multiple_of_64.hpp>                // for next_multiple_of_64
-#include <hibf/platform.hpp>                           // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/config.hpp>                               // for config
+#include <hibf/detail/data_store.hpp>                    // for data_store
+#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
+#include <hibf/detail/layout/layout.hpp>                 // for layout
+#include <hibf/detail/layout/simple_binning.hpp>         // for simple_binning
+#include <hibf/detail/sketch/toolbox.hpp>                // for toolbox
+#include <hibf/next_multiple_of_64.hpp>                  // for next_multiple_of_64
+#include <hibf/platform.hpp>                             // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace hibf::layout
 {
+
+hierarchical_binning::hierarchical_binning(data_store & data_, hibf::config const & config_) :
+    config{config_},
+    data{std::addressof(data_)},
+    num_user_bins{data->positions.size()},
+    num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
+{
+    assert(data != nullptr);
+
+    if (config.disable_estimate_union)
+        config.disable_rearrangement = true;
+
+    if (config.tmax == 0) // no tmax was set by the user on the command line
+    {
+        // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
+        if (size_t number_samples = data->kmer_counts->size();
+            number_samples >= 1ULL << 32) // sqrt is bigger than uint16_t
+            throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
+        else
+            config.tmax = hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_samples))));
+    }
+    else if (config.tmax % 64 != 0)
+    {
+        config.tmax = hibf::next_multiple_of_64(config.tmax);
+        std::cerr << "[HIBF LAYOUT WARNING]: Your requested number of technical bins was not a multiple of 64. "
+                  << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
+                  << "anyway, so we increased your number of technical bins to " << config.tmax << ".\n";
+    }
+
+    data->fpr_correction = compute_fpr_correction({.fpr = config.maximum_false_positive_rate, // prevent clang-format
+                                                   .hash_count = config.number_of_hash_functions,
+                                                   .t_max = config.tmax});
+}
 
 size_t hierarchical_binning::execute()
 {
