@@ -18,9 +18,8 @@
 namespace hibf::layout
 {
 
-layout compute_layout(config const & hibf_config,
-                      std::vector<size_t> & kmer_counts,
-                      std::vector<sketch::hyperloglog> & sketches)
+layout
+compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::vector<sketch::hyperloglog> & sketches)
 {
     layout resulting_layout{};
 
@@ -30,17 +29,17 @@ layout compute_layout(config const & hibf_config,
     std::stringstream header_buffer;
 
     // compute sketches
-    sketches.resize(hibf_config.number_of_user_bins);
-    kmer_counts.resize(hibf_config.number_of_user_bins);
+    sketches.resize(config.number_of_user_bins);
+    kmer_counts.resize(config.number_of_user_bins);
 
     robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(static) num_threads(hibf_config.threads) private(kmers)
-    for (size_t i = 0; i < hibf_config.number_of_user_bins; ++i)
+#pragma omp parallel for schedule(static) num_threads(config.threads) private(kmers)
+    for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
-        hibf::sketch::hyperloglog sketch(hibf_config.sketch_bits);
+        hibf::sketch::hyperloglog sketch(config.sketch_bits);
 
         kmers.clear();
-        hibf_config.input_fn(i, std::inserter(kmers, kmers.begin()));
+        config.input_fn(i, std::inserter(kmers, kmers.begin()));
 
         for (auto k_hash : kmers)
             sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
@@ -51,23 +50,23 @@ layout compute_layout(config const & hibf_config,
 
     sketch::estimate_kmer_counts(sketches, kmer_counts);
 
-    data_store store{.false_positive_rate = hibf_config.maximum_false_positive_rate,
+    data_store store{.false_positive_rate = config.maximum_false_positive_rate,
                      .hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),
                      .sketches = std::addressof(sketches)};
 
-    size_t const max_hibf_id = hibf::execute(hibf_config, store);
+    size_t const max_hibf_id = hibf::execute(config, store);
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
     return *store.hibf_layout; // return layout as string for now, containing the file
 }
 
-layout compute_layout(config const & hibf_config)
+layout compute_layout(config const & config)
 {
     std::vector<size_t> kmer_counts{};
     std::vector<sketch::hyperloglog> sketches{};
 
-    return compute_layout(hibf_config, kmer_counts, sketches);
+    return compute_layout(config, kmer_counts, sketches);
 }
 
 } // namespace hibf::layout

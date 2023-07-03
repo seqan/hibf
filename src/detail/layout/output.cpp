@@ -15,12 +15,12 @@
 namespace hibf::layout
 {
 
-void write_config_to(config const & hibf_config, std::ostream & stream)
+void write_config_to(config const & config, std::ostream & stream)
 {
     // write json file to temprorary string stream with cereal
     std::stringstream config_stream{};
     cereal::JSONOutputArchive output(config_stream); // stream to cout
-    output(cereal::make_nvp("config", hibf_config));
+    output(cereal::make_nvp("config", config));
 
     // write config
     stream << prefix::header << prefix::header_config << "CONFIG:\n";

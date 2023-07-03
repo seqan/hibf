@@ -58,7 +58,7 @@ void insert_into_ibf(build_data const & data,
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.hibf_config.input_fn(record.idx, std::inserter(values, values.begin()));
+    data.config.input_fn(record.idx, std::inserter(values, values.begin()));
     local_user_bin_io_timer.stop();
     data.user_bin_io_timer += local_user_bin_io_timer;
 

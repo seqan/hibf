@@ -24,7 +24,7 @@ struct build_data
 {
     std::atomic<size_t> ibf_number{};
 
-    config const & hibf_config;
+    hibf::config const & config;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
