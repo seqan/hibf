@@ -102,7 +102,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             // Shuffle indices: More likely to not block each other. Optimal: Interleave
             std::shuffle(indices.begin(), indices.end(), std::mt19937_64{std::random_device{}()});
-            number_of_threads = data.hibf_config.threads;
+            number_of_threads = data.config.threads;
         }
         else
         {
@@ -171,7 +171,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 }
 
 void build_index(hierarchical_interleaved_bloom_filter & hibf,
-                 config const & hibf_config,
+                 config const & config,
                  hibf::layout::layout & hibf_layout)
 {
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
@@ -181,15 +181,14 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
     hibf.next_ibf_id.resize(number_of_ibfs);
 
-    build_data data{.hibf_config = hibf_config};
+    build_data data{.config = config};
 
     initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
     lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
 
     size_t const t_max{data.node_map[root_node].number_of_technical_bins};
-    data.fpr_correction = layout::compute_fpr_correction({.fpr = hibf_config.maximum_false_positive_rate,
-                                                          .hash_count = hibf_config.number_of_hash_functions,
-                                                          .t_max = t_max});
+    data.fpr_correction = layout::compute_fpr_correction(
+        {.fpr = config.maximum_false_positive_rate, .hash_count = config.number_of_hash_functions, .t_max = t_max});
 
     hierarchical_build(hibf, root_node, data);
 }

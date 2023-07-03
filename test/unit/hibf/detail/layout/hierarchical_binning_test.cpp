@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector, allocator
 
-#include <hibf/detail/configuration.hpp>                 // for configuration
+#include <hibf/config.hpp>                               // for config
 #include <hibf/detail/data_store.hpp>                    // for data_store
 #include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
@@ -12,7 +12,7 @@
 
 TEST(hierarchical_binning_test, small_example)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.tmax = 4;
     config.disable_estimate_union = true; // also disables rearrangement
 
@@ -42,7 +42,7 @@ TEST(hierarchical_binning_test, small_example)
 
 TEST(hierarchical_binning_test, another_example)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.tmax = 5;
     config.disable_estimate_union = true; // also disables rearrangement
 
@@ -72,7 +72,7 @@ TEST(hierarchical_binning_test, another_example)
 
 TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.tmax = 4;
     config.disable_estimate_union = true; // also disables rearrangement
 
@@ -95,7 +95,7 @@ TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 
 TEST(hierarchical_binning_test, knuts_example)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.alpha = 1;
     config.tmax = 5;
     config.disable_estimate_union = true; // also disables rearrangement
@@ -123,7 +123,7 @@ TEST(hierarchical_binning_test, knuts_example)
 
 TEST(hierarchical_binning_test, four_level_hibf)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.tmax = 2;
     config.disable_estimate_union = true; // also disables rearrangement
 
@@ -154,7 +154,7 @@ TEST(hierarchical_binning_test, four_level_hibf)
 
 TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.alpha = 1;
     config.tmax = 2;
     config.disable_estimate_union = true; // also disables rearrangement
@@ -181,7 +181,7 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 
 TEST(hierarchical_binning_test, tb0_is_a_merged_bin_and_leads_to_recursive_call)
 {
-    hibf::configuration config;
+    hibf::config config;
     config.alpha = 1;
     config.tmax = 2;
     config.disable_estimate_union = true; // also disables rearrangement

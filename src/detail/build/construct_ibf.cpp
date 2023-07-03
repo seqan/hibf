@@ -38,8 +38,8 @@ hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint
 
     size_t const kmers_per_bin{static_cast<size_t>(std::ceil(static_cast<double>(kmers.size()) / number_of_bins))};
     double const bin_bits{static_cast<double>(bin_size_in_bits(kmers_per_bin,
-                                                               data.hibf_config.number_of_hash_functions,
-                                                               data.hibf_config.maximum_false_positive_rate))};
+                                                               data.config.number_of_hash_functions,
+                                                               data.config.maximum_false_positive_rate))};
     hibf::bin_size const bin_size{static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
     hibf::bin_count const bin_count{node_data.number_of_technical_bins};
 
@@ -47,7 +47,7 @@ hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint
     local_index_allocation_timer.start();
     hibf::interleaved_bloom_filter ibf{bin_count,
                                        bin_size,
-                                       hibf::hash_function_count{data.hibf_config.number_of_hash_functions}};
+                                       hibf::hash_function_count{data.config.number_of_hash_functions}};
     local_index_allocation_timer.stop();
     data.index_allocation_timer += local_index_allocation_timer;
 
