@@ -44,7 +44,7 @@ size_t execute(hibf::config const & config, hibf::data_store & data)
                                         .hash_count = config_copy.number_of_hash_functions,
                                         .t_max = config_copy.tmax});
 
-    return hibf::layout::hierarchical_binning{data, config}.execute();
+    return hibf::layout::hierarchical_binning{data, config_copy}.execute();
 }
 
 } // namespace hibf
