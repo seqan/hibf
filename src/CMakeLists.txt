@@ -2,7 +2,6 @@ set (HIBF_SOURCE_FILES
      hierarchical_interleaved_bloom_filter.cpp
      detail/layout/simple_binning.cpp
      detail/layout/execute.cpp
-     detail/layout/output.cpp
      detail/layout/compute_fpr_correction.cpp
      detail/layout/compute_layout.cpp
      detail/layout/hierarchical_binning.cpp
