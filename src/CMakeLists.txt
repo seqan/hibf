@@ -10,11 +10,8 @@ set (HIBF_SOURCE_FILES
      detail/sketch/hyperloglog.cpp
      detail/build/initialise_build_tree.cpp
      detail/build/insert_into_ibf.cpp
-     detail/build/parse_chopper_pack_header.cpp
      detail/build/compute_kmers.cpp
-     detail/build/read_chopper_pack_file.cpp
      detail/build/update_header_node_data.cpp
-     detail/build/parse_chopper_pack_line.cpp
      detail/build/construct_ibf.cpp
      detail/build/update_content_node_data.cpp)
 
