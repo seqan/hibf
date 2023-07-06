@@ -3,8 +3,8 @@
 [![build status][1]][2]
 [![codecov][3]][4]
 [![license][5]][6]
-[![latest release][7]][8]
 ![platforms][9]
+<!-- [![latest release][7]][8] -->
 
 <!--
     Above uses reference-style links with numbers.
@@ -33,35 +33,25 @@
 [8]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/releases/latest
 [9]: https://img.shields.io/badge/platform-linux%20%7C%20bsd%20%7C%20osx-informational.svg
 
+This library contains the HIBF and layout algorithm.
+
 ## Quick start
 
-You may want to replace `HIBF` with your library name:
+To use the HIBF lib in your app:
 
-```bash
-# Rename files
-find $(pwd) -type f -not -path '*/\.git/*' -iname "hibf*" -exec bash -c 'mv $1 ${1/hibf/<your_lib>}' bash {} \;
-# Rename directories
-find $(pwd) -type d -not -path '*/\.git/*' -iname "hibf*" -exec bash -c 'mv $1 ${1/hibf/<your_lib>}' bash {} \;
-# Rename occurrences in files
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/HIBF/<YOUR_LIB>/g' {} \;
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/HIBF/<Your_Lib>/g' {} \;
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/hibf/<your_lib>/g' {} \;
-# Rename URLs
-find $(pwd) -type f -not -path '*/\.git/*' -exec sed -i 's/seqan\/library-template/<repo_owner>\/<repo_name>/g' {} \;
+```cmake
+include (FetchContent)
+FetchContent_Declare (
+    hibf_fetch_content
+    GIT_REPOSITORY "https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter"
+    GIT_TAG "main")
+option (INSTALL_HIBF "" OFF)
+FetchContent_MakeAvailable (hibf_fetch_content)
+
+# ...
+
+target_link_libraries (<your_app> PUBLIC seqan::hibf)
 ```
-
-## Updating
-
-Pull history of the template:
-```bash
-git remote add template https://github.com/seqan/library-template
-git fetch template
-git rebase --onto template/main SHA_of_first_commit_in_your_repo main
-# e.g. `git rebase --onto template/main 45a5e1dce4b440fc64fd1cd8d96c0370053b985a main`
-```
-The first commit is usually the one where you update all the names.
-
-After this, `git merge template/main` can be used to merge changes.
 
 ## Sponsorships
 
