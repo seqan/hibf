@@ -55,12 +55,6 @@ void sort_by_cardinalities(std::vector<hyperloglog> const & sketches,
                            std::vector<size_t> const & counts,
                            std::vector<size_t> & positions);
 
-/*!\brief Restore the HLL sketches from the files in hll_dir and target_filenames into target container.
- */
-void read_hll_files_into(std::filesystem::path const & hll_dir,
-                         std::vector<std::string> const & target_filenames,
-                         std::vector<hyperloglog> & target);
-
 /*!\brief Estimate the cardinality of the union for a single user bin j with all prior ones j' < j.
  * \param[out] estimates output row
  * \param[in] sketches The hyperloglog sketches of the respective user bins.
