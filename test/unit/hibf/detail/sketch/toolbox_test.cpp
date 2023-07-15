@@ -1,9 +1,8 @@
 #include <gtest/gtest.h>
 
 #include <hibf/detail/sketch/toolbox.hpp>
-
-#include <hibf/test/tmp_directory.hpp>  // for tmp_directory
-#include <hibf/test/expect_range_eq.hpp>     // for EXPECT_RANGE_EQ, expect_range_eq
+#include <hibf/test/expect_range_eq.hpp> // for EXPECT_RANGE_EQ, expect_range_eq
+#include <hibf/test/tmp_directory.hpp>   // for tmp_directory
 
 // inherits from toolbox to test private members
 struct toolbox_test : public ::testing::Test
@@ -15,33 +14,25 @@ struct toolbox_test : public ::testing::Test
     {
         std::vector<hibf::sketch::hyperloglog> result(test_kmer_counts.size());
 
-        std::vector<std::string> const small_input
-        {
-            {
-                "ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-                "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-                "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-                "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-                "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
-            },
-            {
-                "ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-                "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-                "ATATCGATCGAGCGAGGCAGGCAGCGATCGAGCGAGCGCATGCAGCGACTAGCTACGACAGCTACTATCAGCAGCGAGCG"
-                "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-                "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-                "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
-            },
-            {
-                "ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-                "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-                "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-                "ATCGATCACGATCAGCGAGCGATATCTTATCGTAGGCATCGAGCATCGAGGAGCGATCTATCTATCTATCATCTATCTAT"
-                "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-                "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
-                "G"
-            }
-        };
+        std::vector<std::string> const small_input{
+            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
+             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
+             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
+             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
+             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
+            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
+             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
+             "ATATCGATCGAGCGAGGCAGGCAGCGATCGAGCGAGCGCATGCAGCGACTAGCTACGACAGCTACTATCAGCAGCGAGCG"
+             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
+             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
+             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
+            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
+             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
+             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
+             "ATCGATCACGATCAGCGAGCGATATCTTATCGTAGGCATCGAGCATCGAGGAGCGATCTATCTATCTATCATCTATCTAT"
+             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
+             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
+             "G"}};
 
         for (std::string_view seq : small_input)
         {
@@ -81,31 +72,31 @@ TEST_F(toolbox_test, precompute_union_estimates_for)
     std::vector<uint64_t> estimates(4);
 
     hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
-                                                             test_sketches,
-                                                             test_kmer_counts,
-                                                             test_positions,
-                                                             0);
+                                                          test_sketches,
+                                                          test_kmer_counts,
+                                                          test_positions,
+                                                          0);
     EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{500, 0, 0, 0}));
 
     hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
-                                                             test_sketches,
-                                                             test_kmer_counts,
-                                                             test_positions,
-                                                             1);
+                                                          test_sketches,
+                                                          test_kmer_counts,
+                                                          test_positions,
+                                                          1);
     EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 600, 0, 0}));
 
     hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
-                                                             test_sketches,
-                                                             test_kmer_counts,
-                                                             test_positions,
-                                                             2);
+                                                          test_sketches,
+                                                          test_kmer_counts,
+                                                          test_positions,
+                                                          2);
     EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 658, 700, 0}));
 
     hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
-                                                             test_sketches,
-                                                             test_kmer_counts,
-                                                             test_positions,
-                                                             3);
+                                                          test_sketches,
+                                                          test_kmer_counts,
+                                                          test_positions,
+                                                          3);
     EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 658, 658, 800}));
 }
 
@@ -113,10 +104,10 @@ TEST_F(toolbox_test, random_shuffle)
 {
     hibf::sketch::toolbox::prio_queue default_pq{};
     hibf::sketch::toolbox::distance_matrix dist{{0, default_pq},
-                                                   {1, default_pq},
-                                                   {2, default_pq},
-                                                   {3, default_pq},
-                                                   {4, default_pq}};
+                                                {1, default_pq},
+                                                {2, default_pq},
+                                                {3, default_pq},
+                                                {4, default_pq}};
     robin_hood::unordered_flat_map<size_t, size_t> ids{{0, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}};
 
     hibf::sketch::toolbox::random_shuffle(dist, ids);
@@ -141,10 +132,10 @@ TEST_F(toolbox_test, prune)
 {
     hibf::sketch::toolbox::prio_queue default_pq{};
     hibf::sketch::toolbox::distance_matrix dist{{0, default_pq},
-                                                   {1, default_pq},
-                                                   {2, default_pq},
-                                                   {3, default_pq},
-                                                   {4, default_pq}};
+                                                {1, default_pq},
+                                                {2, default_pq},
+                                                {3, default_pq},
+                                                {4, default_pq}};
     robin_hood::unordered_flat_map<size_t, size_t> remaining_ids{{0, 0}, {1, 1}, {2, 2}, {3, 3}, {4, 4}};
 
     // since remaining_ids contains all_ids, prune shouldn't do anything. All ids are valid.
@@ -194,12 +185,12 @@ TEST_F(toolbox_test, rotate)
      *   (f,f)  (f,f) (f,f) (f,f) the leaves are the UBs to be clustered
      */
     std::vector<hibf::sketch::toolbox::clustering_node> clustering{{f, f, s},
-                                                                      {f, f, s},
-                                                                      {f, f, s},
-                                                                      {f, f, s}, // the leaves come first
-                                                                      {5, 6, s},
-                                                                      {0, 1, s},
-                                                                      {2, 3, s}};
+                                                                   {f, f, s},
+                                                                   {f, f, s},
+                                                                   {f, f, s}, // the leaves come first
+                                                                   {5, 6, s},
+                                                                   {0, 1, s},
+                                                                   {2, 3, s}};
 
     // previous_rightmost is already at the very left. Nothing has to be rotated.
     hibf::sketch::toolbox::rotate(clustering, 0 /*previous_rightmost*/, 0 /*interval_start*/, 4 /*root_id*/);
@@ -238,16 +229,20 @@ TEST_F(toolbox_test, trace)
      *   (f,f)  (f,f) (f,f) (f,f) the leaves are the UBs to be clustered
      */
     std::vector<hibf::sketch::toolbox::clustering_node> clustering{{f, f, s},
-                                                                      {f, f, s},
-                                                                      {f, f, s},
-                                                                      {f, f, s}, // the leaves come first
-                                                                      {5, 6, s},
-                                                                      {1, 3, s},
-                                                                      {2, 0, s}};
+                                                                   {f, f, s},
+                                                                   {f, f, s},
+                                                                   {f, f, s}, // the leaves come first
+                                                                   {5, 6, s},
+                                                                   {1, 3, s},
+                                                                   {2, 0, s}};
 
     std::vector<size_t> permutation{};
 
-    hibf::sketch::toolbox::trace(clustering, permutation, 2 /*previous_rightmost*/, 0 /*interval_start*/, 4 /*root_id*/);
+    hibf::sketch::toolbox::trace(clustering,
+                                 permutation,
+                                 2 /*previous_rightmost*/,
+                                 0 /*interval_start*/,
+                                 4 /*root_id*/);
 
     EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{1, 3, 0}));
 }
@@ -256,16 +251,34 @@ TEST_F(toolbox_test, cluster_bins)
 {
     { // whole range
         std::vector<size_t> permutation{};
-        hibf::sketch::toolbox::cluster_bins(test_sketches, test_kmer_counts, test_positions, permutation, 0 /*interval start*/, 3 /*interval_end*/, 1 /*number of threads*/);
+        hibf::sketch::toolbox::cluster_bins(test_sketches,
+                                            test_kmer_counts,
+                                            test_positions,
+                                            permutation,
+                                            0 /*interval start*/,
+                                            3 /*interval_end*/,
+                                            1 /*number of threads*/);
         // index 3 is not part of current permutation so it can participate in "the next interval"
         EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{2, 0, 1}));
     }
 
     { // intervals
         std::vector<size_t> permutation{};
-        hibf::sketch::toolbox::cluster_bins(test_sketches, test_kmer_counts, test_positions, permutation, 0 /*interval start*/, 1 /*interval_end*/, 1 /*number of threads*/);
+        hibf::sketch::toolbox::cluster_bins(test_sketches,
+                                            test_kmer_counts,
+                                            test_positions,
+                                            permutation,
+                                            0 /*interval start*/,
+                                            1 /*interval_end*/,
+                                            1 /*number of threads*/);
         EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{0}));
-        hibf::sketch::toolbox::cluster_bins(test_sketches, test_kmer_counts, test_positions, permutation, 1 /*interval start*/, 3 /*interval_end*/, 1 /*number of threads*/);
+        hibf::sketch::toolbox::cluster_bins(test_sketches,
+                                            test_kmer_counts,
+                                            test_positions,
+                                            permutation,
+                                            1 /*interval start*/,
+                                            3 /*interval_end*/,
+                                            1 /*number of threads*/);
         EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{0, 1, 2}));
     }
 }
