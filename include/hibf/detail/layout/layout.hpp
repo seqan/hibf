@@ -44,10 +44,27 @@ struct layout
 
     struct user_bin
     {
-        size_t idx{};                              // The index of the user bin corresponding to the order in data
         std::vector<size_t> previous_TB_indices{}; // previous technical bin indices which refer to merged bin indices.
-        size_t number_of_technical_bins{};         // 1 == signle bin, >1 == split_bin
-        size_t storage_TB_id{}; // the id of the technical bin that the user bin is actullly stored in
+        size_t storage_TB_id{};                    // id of the technical bin that the user bin is actuallly stored in
+        size_t number_of_technical_bins{};         // 1 == single bin, >1 == split_bin
+        size_t idx{};                              // The index of the user bin corresponding to the order in data
+
+        user_bin() = default;
+        user_bin(user_bin const &) = default;
+        user_bin(user_bin &&) = default;
+        user_bin & operator=(user_bin const &) = default;
+        user_bin & operator=(user_bin &&) = default;
+        ~user_bin() = default;
+
+        user_bin(size_t const idx_,
+                 std::vector<size_t> const & previous_TB_indices_,
+                 size_t const number_of_technical_bins_,
+                 size_t const storage_TB_id_) :
+            previous_TB_indices{previous_TB_indices_},
+            storage_TB_id{storage_TB_id_},
+            number_of_technical_bins{number_of_technical_bins_},
+            idx{idx_}
+        {}
 
         friend auto operator<=>(user_bin const &, user_bin const &) = default;
 
