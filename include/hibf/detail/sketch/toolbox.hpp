@@ -3,10 +3,8 @@
 #include <algorithm>  // for max
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
-#include <filesystem> // for path
 #include <functional> // for greater
 #include <queue>      // for priority_queue
-#include <string>     // for string
 #include <vector>     // for vector
 
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map

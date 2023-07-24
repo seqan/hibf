@@ -1,11 +1,19 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, TestInfo, Message, TestPartResult, TEST, EXPECT_EQ, EXPE...
 
-#include <fstream>
-#include <ranges>
-#include <unordered_set>
+#include <cinttypes>     // for uint8_t
+#include <cstddef>       // for size_t
+#include <filesystem>    // for path
+#include <fstream>       // for ofstream, ifstream, basic_ostream::write, ios
+#include <ranges>        // for iota_view, operator==, _Iota, iota
+#include <stdexcept>     // for runtime_error, invalid_argument
+#include <string>        // for allocator, basic_string, hash, string, char_traits, operator==
+#include <string_view>   // for string_view
+#include <unordered_set> // for unordered_set
+#include <vector>        // for vector
 
-#include <hibf/detail/sketch/hyperloglog.hpp>
-#include <hibf/test/tmp_directory.hpp> // for tmp_directory
+#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/test/sandboxed_path.hpp>       // for operator/, sandboxed_path
+#include <hibf/test/tmp_directory.hpp>        // for tmp_directory
 
 TEST(hyperloglog, bit_widths)
 {
