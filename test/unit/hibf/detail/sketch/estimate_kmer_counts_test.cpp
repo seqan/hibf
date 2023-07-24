@@ -1,8 +1,13 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, EXPECT_EQ, TestInfo
 
-#include <vector>
+#include <cinttypes>   // for uint8_t
+#include <cstddef>     // for size_t
+#include <string>      // for basic_string, string
+#include <string_view> // for string_view
+#include <vector>      // for allocator, vector
 
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp>
+#include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
 
 TEST(estimate_kmer_counts_test, small_example)
 {

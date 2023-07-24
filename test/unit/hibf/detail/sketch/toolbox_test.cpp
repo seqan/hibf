@@ -1,8 +1,18 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Message, TestPartResult, EXPECT_EQ, TestInfo, TEST_F, Test
 
-#include <hibf/detail/sketch/toolbox.hpp>
-#include <hibf/test/expect_range_eq.hpp> // for EXPECT_RANGE_EQ, expect_range_eq
-#include <hibf/test/tmp_directory.hpp>   // for tmp_directory
+#include <cinttypes>   // for uint64_t
+#include <cstddef>     // for size_t
+#include <functional>  // for greater
+#include <limits>      // for numeric_limits
+#include <string>      // for allocator, basic_string, string
+#include <string_view> // for string_view
+#include <tuple>       // for tie, make_tuple
+#include <vector>      // for vector
+
+#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map
+#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/detail/sketch/toolbox.hpp>     // for clustering_node, entry, precompute_union_estimates_for, cluste...
+#include <hibf/test/expect_range_eq.hpp>      // for expect_range_eq, EXPECT_RANGE_EQ
 
 // inherits from toolbox to test private members
 struct toolbox_test : public ::testing::Test

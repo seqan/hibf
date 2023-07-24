@@ -1,9 +1,10 @@
 #pragma once
 
-#include <concepts> // for derived_from
-#include <cstddef>  // for size_t
-#include <iosfwd>   // for ostream
-#include <vector>   // for vector, operator==
+#include <algorithm> // for copy
+#include <concepts>  // for derived_from
+#include <cstddef>   // for size_t
+#include <iosfwd>    // for ostream
+#include <vector>    // for vector, operator==
 
 #include <hibf/detail/prefixes.hpp> // for header, merged_bin
 #include <hibf/platform.hpp>
