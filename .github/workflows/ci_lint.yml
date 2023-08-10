@@ -55,8 +55,8 @@ jobs:
       cancel-in-progress: true
     runs-on: ubuntu-22.04
     steps:
-      - name: "Cancel Coverage"
-        run: echo "Cancelling Coverage"
+      - name: "Cancel Documentation"
+        run: echo "Cancelling Documentation"
   lint:
     name: Lint
     concurrency:
