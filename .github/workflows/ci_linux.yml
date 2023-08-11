@@ -50,6 +50,11 @@ jobs:
             build: unit
             build_type: Release
 
+          - name: "IntelLLVM"
+            compiler: "intel"
+            build: unit
+            build_type: Release
+
     steps:
       - name: Checkout
         uses: actions/checkout@v3
