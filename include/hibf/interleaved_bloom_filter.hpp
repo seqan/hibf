@@ -728,6 +728,7 @@ public:
 
         // https://godbolt.org/z/1nbhvqeGj
         // Having the loop inside is faster.
+        // GCOVR_EXCL_START
         switch (bin_words)
         {
         case 1u: // 1 AND (64 bit)
@@ -809,6 +810,7 @@ public:
                     raw[batch] &= ibf_raw[batch];
             }
         }
+        // GCOVR_EXCL_STOP
 
         return result_buffer;
     }
