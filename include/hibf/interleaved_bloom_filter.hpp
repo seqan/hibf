@@ -654,6 +654,9 @@ private:
     //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
     ibf_t const * ibf_ptr{nullptr};
 
+    //!\brief Stores access positions of augmented hibf::interleaved_bloom_filter.
+    std::array<size_t, 5> bloom_filter_indices;
+
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -701,23 +704,110 @@ public:
         assert(ibf_ptr != nullptr);
         assert(result_buffer.size() == ibf_ptr->bin_count());
 
-        std::array<size_t, 5> bloom_filter_indices;
-        std::memcpy(&bloom_filter_indices, &ibf_ptr->hash_seeds, sizeof(size_t) * ibf_ptr->hash_funs);
+        // Needed for auto-vectorization of loop. ibf_ptr->bin_words could change bewtween loops.
+        size_t const bin_words = ibf_ptr->bin_words;
+        size_t const hash_funs = ibf_ptr->hash_funs;
 
-        for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
-            bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, bloom_filter_indices[i]);
+#ifndef NDEBUG
+        assert(bin_words != 0u);
+        assert(hash_funs != 0u);
+#else
+        // Removes case for bin_words == 0u. The same statment inside the switch-case wouldn't have that effect.
+        if (bin_words == 0u)
+            __builtin_unreachable();
+        if (hash_funs == 0u)
+            __builtin_unreachable();
+#endif
 
-        for (size_t batch = 0; batch < ibf_ptr->bin_words; ++batch)
+        for (size_t i = 0; i < hash_funs; ++i)
+            bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) >> 6;
+
+        uint64_t * const raw = result_buffer.raw_data().data(); // TODO: std::assume_aligned<64> once memory-aligned
+        uint64_t const * const ibf_data = ibf_ptr->data.data(); // TODO: std::assume_aligned<64> once memory-aligned
+        std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words);
+
+        // https://godbolt.org/z/1nbhvqeGj
+        // Having the loop inside is faster.
+        switch (bin_words)
         {
-            size_t tmp{-1ULL};
-            for (size_t i = 0; i < ibf_ptr->hash_funs; ++i)
+        case 1u: // 1 AND (64 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
             {
-                assert(bloom_filter_indices[i] < ibf_ptr->data.size());
-                tmp &= ibf_ptr->data.get_int(bloom_filter_indices[i]);
-                bloom_filter_indices[i] += 64;
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+                raw[0] &= ibf_raw[0];
             }
-
-            result_buffer.data.set_int(batch << 6, tmp);
+            break;
+        case 2u: // 1 SSE4 instruction (128 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 2u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 3u: // 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 3u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 4u: // 1 AVX2 instruction (256 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 4u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 5u: // 1 AVX2 instruction (256 bit) + 1 AND (64 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 5u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 6u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 6u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 7u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 7u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        case 8u: // 1 AVX512 instruction (512 bit)
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < 8u; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
+            break;
+        default: // Auto vectorize. Might create different versions.
+            for (size_t i = 1; i < hash_funs; ++i)
+            {
+                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+                for (size_t batch = 0; batch < bin_words; ++batch)
+                    raw[batch] &= ibf_raw[batch];
+            }
         }
 
         return result_buffer;
