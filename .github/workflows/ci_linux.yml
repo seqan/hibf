@@ -54,6 +54,7 @@ jobs:
             compiler: "intel"
             build: unit
             build_type: Release
+            cxx_flags: "-Xclang=-Wno-pass-failed"
 
     steps:
       - name: Checkout
@@ -83,7 +84,8 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DHIBF_NATIVE_BUILD=OFF \
-                                            -DHIBF_VERBOSE_TESTS=OFF
+                                            -DHIBF_VERBOSE_TESTS=OFF \
+                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           make -j2 gtest_build
 
       - name: Build tests
