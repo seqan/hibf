@@ -8,9 +8,6 @@
 cmake_minimum_required (VERSION 3.10...3.22)
 project (hibf_test_coverage CXX)
 
-include (../cmake/hibf_require_ccache.cmake)
-hibf_require_ccache ()
-
 # Add a custom build type: Coverage
 
 set (CMAKE_CXX_FLAGS_COVERAGE

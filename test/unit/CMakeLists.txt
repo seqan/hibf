@@ -46,7 +46,6 @@ macro (hibf_test unit_test_cpp)
     unset (test_name)
 endmacro ()
 
-hibf_require_ccache ()
 hibf_require_test ()
 
 add_subdirectories ()

@@ -22,9 +22,5 @@ FetchContent_Populate (sharg)
 list (APPEND CMAKE_PREFIX_PATH "${sharg_SOURCE_DIR}/build_system")
 find_package (sharg 1.0 REQUIRED)
 
-## ccache
-include ("${HIBF_ROOT_DIR}/test/cmake/hibf_require_ccache.cmake")
-hibf_require_ccache ()
-
 add_executable (fpr_quality fpr_quality.cpp)
 target_link_libraries (fpr_quality seqan::hibf sharg::sharg)

@@ -124,7 +124,6 @@ macro (hibf_header_test component header_base_path exclude_regex)
     unset (header_target)
 endmacro ()
 
-hibf_require_ccache ()
 hibf_require_benchmark ()
 hibf_require_test ()
 

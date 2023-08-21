@@ -21,12 +21,11 @@ macro (hibf_require_ccache)
     set (HIBF_FPROFILE_ABS_PATH "-fprofile-abs-path")
     if (HIBF_USE_CCACHE)
         find_program (CCACHE_PROGRAM ccache)
-        find_package_message (CCACHE_PROGRAM_PRE "Finding program ccache" "[${CCACHE_PROGRAM}]")
 
         if (NOT CCACHE_PROGRAM)
-            find_package_message (CCACHE_PROGRAM "Finding program ccache - Failed" "[${CCACHE_PROGRAM}]")
+            find_package_message (CCACHE_PROGRAM "  Ccache program:             not available" "[${CCACHE_PROGRAM}]")
         else ()
-            find_package_message (CCACHE_PROGRAM "Finding program ccache - Success" "[${CCACHE_PROGRAM}]")
+            find_package_message (CCACHE_PROGRAM "  Ccache program:             available" "[${CCACHE_PROGRAM}]")
             set (HIBF_FPROFILE_ABS_PATH "--ccache-skip -fprofile-abs-path")
             # New option since cmake >= 3.4:
             # https://cmake.org/cmake/help/latest/variable/CMAKE_LANG_COMPILER_LAUNCHER.html

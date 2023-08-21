@@ -28,7 +28,6 @@ macro (hibf_benchmark benchmark_cpp)
     unset (test_name)
 endmacro ()
 
-hibf_require_ccache ()
 hibf_require_benchmark ()
 
 add_subdirectories ()
