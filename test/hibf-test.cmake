@@ -88,7 +88,6 @@ endif ()
 
 include (hibf_test_component)
 include (hibf_test_files)
-include (hibf_require_ccache)
 include (hibf_require_benchmark)
 include (hibf_require_test)
 include (hibf_add_subdirectories)
