@@ -93,7 +93,7 @@ void init_parser(sharg::parser & parser, config & cfg)
 
 size_t split_bin_size_in_bits(config const & cfg)
 {
-    return hibf::bin_size_in_bits(cfg.split_elements_per_bin, cfg.hash, cfg.fpr);
+    return hibf::bin_size_in_bits({.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.split_elements_per_bin});
 }
 
 void print_results(size_t const fp_count, config const & cfg)
@@ -107,9 +107,10 @@ void print_results(size_t const fp_count, config const & cfg)
 
 void single_tb(config const & cfg)
 {
-    hibf::interleaved_bloom_filter ibf{hibf::bin_count{1u},
-                                       hibf::bin_size{hibf::bin_size_in_bits(cfg.elements, cfg.hash, cfg.fpr)},
-                                       hibf::hash_function_count{cfg.hash}};
+    hibf::interleaved_bloom_filter ibf{
+        hibf::bin_count{1u},
+        hibf::bin_size{hibf::bin_size_in_bits({.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.elements})},
+        hibf::hash_function_count{cfg.hash}};
     auto agent = ibf.membership_agent();
 
     // Generate elements many random kmer values.

@@ -20,12 +20,17 @@
 namespace hibf
 {
 
-inline size_t bin_size_in_bits(size_t const number_of_kmers_to_be_stored,
-                               size_t const number_of_hash_functions,
-                               double const maximum_false_positive_rate)
+struct bin_size_parameters
 {
-    double const numerator{-static_cast<double>(number_of_kmers_to_be_stored * number_of_hash_functions)};
-    double const denominator{std::log(1 - std::exp(std::log(maximum_false_positive_rate) / number_of_hash_functions))};
+    double fpr{};
+    size_t hash_count{};
+    size_t elements{};
+};
+
+inline size_t bin_size_in_bits(bin_size_parameters const & params)
+{
+    double const numerator{-static_cast<double>(params.elements * params.hash_count)};
+    double const denominator{std::log(1 - std::exp(std::log(params.fpr) / params.hash_count))};
     double const result{std::ceil(numerator / denominator)};
     return result;
 }
