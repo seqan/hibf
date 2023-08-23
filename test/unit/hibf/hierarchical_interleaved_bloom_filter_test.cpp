@@ -9,7 +9,8 @@
 
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <vector>     // for vector, allocator
+#include <sstream>
+#include <vector> // for vector, allocator
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
@@ -30,6 +31,52 @@ TEST(hibf_test, test_specific_hash_values)
                         .disable_rearrangement = true};
 
     hibf::hierarchical_interleaved_bloom_filter hibf{config};
+
+    {
+        std::vector<size_t> query{1, 2, 3, 4, 5};
+
+        auto agent = hibf.membership_agent();
+        auto result = agent.bulk_contains(query, 2);
+
+        EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    }
+}
+
+TEST(hibf_test, build_from_layout)
+{
+    // range of range of sequences
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
+
+    auto input_fn = [&](size_t const num, hibf::insert_iterator it)
+    {
+        for (auto const hash : hashes[num])
+            it = hash;
+    };
+
+    std::stringstream stream{"@HIBF_CONFIG\n"
+                             "@{\n"
+                             "@    \"hibf_config\": {\n"
+                             "@        \"version\": 1,\n"
+                             "@        \"number_of_user_bins\": 2,\n"
+                             "@        \"number_of_hash_functions\": 2,\n"
+                             "@        \"maximum_false_positive_rate\": 0.05,\n"
+                             "@        \"threads\": 1,\n"
+                             "@        \"sketch_bits\": 12,\n"
+                             "@        \"tmax\": 64,\n"
+                             "@        \"alpha\": 1.2,\n"
+                             "@        \"max_rearrangement_ratio\": 0.5,\n"
+                             "@        \"disable_estimate_union\": false,\n"
+                             "@        \"disable_rearrangement\": true,\n"
+                             "@        \"disable_cutoffs\": false\n"
+                             "@    }\n"
+                             "@}\n"
+                             "@HIBF_CONFIG_END\n"
+                             "#TOP_LEVEL_IBF fullest_technical_bin_idx:0\n"
+                             "#USER_BIN_IDX\tTECHNICAL_BIN_INDICES\tNUMBER_OF_TECHNICAL_BINS\n"
+                             "1\t0\t34\n"
+                             "0\t34\t30\n"};
+
+    hibf::hierarchical_interleaved_bloom_filter hibf{input_fn, stream};
 
     {
         std::vector<size_t> query{1, 2, 3, 4, 5};
