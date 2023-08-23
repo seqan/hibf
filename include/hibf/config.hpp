@@ -78,9 +78,6 @@ struct config
     // Related to k-mers
     bool disable_cutoffs{false};
 
-    //!\brief If given, no layout algorithm is esxecuted but the layout from file is used for building.
-    std::filesystem::path layout_file{};
-
     // Related to IBF
     // bool compressed{false};
     //!\}
@@ -107,7 +104,6 @@ private:
         archive(CEREAL_NVP(disable_rearrangement));
 
         archive(CEREAL_NVP(disable_cutoffs));
-        archive(CEREAL_NVP(layout_file));
     }
 };
 
