@@ -11,6 +11,7 @@
 #include <cstddef>    // for size_t
 #include <filesystem> // for path
 #include <functional> // for function
+#include <iosfwd>     // for ostream
 #include <iterator>   // for insert_iterator
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
@@ -81,6 +82,9 @@ struct config
     // Related to IBF
     // bool compressed{false};
     //!\}
+
+    void read_from(std::istream & stream);
+    void write_to(std::ostream & stream) const;
 
 private:
     friend class cereal::access;
