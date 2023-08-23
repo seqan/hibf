@@ -21,9 +21,9 @@ TEST(layout_test, printing_max_bins)
     for (auto const & mb : layout.max_bins)
         ss << mb << "\n";
 
-    std::string expected = R"mb(#MERGED_BIN_ max_bin_id:0
-#MERGED_BIN_2 max_bin_id:2
-#MERGED_BIN_1;2;3;4 max_bin_id:22
+    std::string expected = R"mb(#LOWER_LEVEL_IBF_ fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
+#LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
 )mb";
 
     EXPECT_EQ(ss.str(), expected);
