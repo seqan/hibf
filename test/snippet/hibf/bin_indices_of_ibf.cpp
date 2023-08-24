@@ -33,7 +33,7 @@ void print_range(range_t && range)
 
 int main()
 {
-    hibf::hierarchical_interleaved_bloom_filter hibf{};
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{};
 
     hibf.user_bins.set_ibf_count(2);
 

@@ -5,9 +5,9 @@
 #include <hibf/config.hpp>            // for config
 #include <hibf/detail/data_store.hpp> // for data_store
 
-namespace hibf
+namespace seqan::hibf
 {
 
 size_t execute(config const &, data_store &);
 
-} // namespace hibf
+} // namespace seqan::hibf

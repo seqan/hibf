@@ -5,7 +5,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 struct fpr_correction_parameters
@@ -20,4 +20,4 @@ struct fpr_correction_parameters
  */
 std::vector<double> compute_fpr_correction(fpr_correction_parameters const & params);
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

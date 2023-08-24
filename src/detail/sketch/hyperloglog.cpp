@@ -18,7 +18,7 @@
 #include <x86/avx.h>  // for simde_mm256_add_ps, simde_mm256_set_ps, simde__m256i, simde_mm...
 #include <x86/avx2.h> // for simde_mm256_max_epu8
 
-namespace hibf::sketch
+namespace seqan::hibf::sketch
 {
 
 hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
@@ -239,4 +239,4 @@ void hyperloglog::restore(std::istream & is)
     }
 }
 
-} // namespace hibf::sketch
+} // namespace seqan::hibf::sketch

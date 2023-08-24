@@ -6,7 +6,7 @@
 #include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/next_multiple_of_64.hpp>                  // for next_multiple_of_64
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 std::vector<double> compute_fpr_correction(fpr_correction_parameters const & params)
@@ -32,4 +32,4 @@ std::vector<double> compute_fpr_correction(fpr_correction_parameters const & par
     return fpr_correction;
 }
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

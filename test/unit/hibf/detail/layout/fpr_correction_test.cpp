@@ -8,7 +8,7 @@
 TEST(fp_correction_test, one_bin)
 {
 
-    auto fp_correction = hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2u, .t_max = 8u});
+    auto fp_correction = seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2u, .t_max = 8u});
 
     std::vector<size_t> const values{9123, 123, 12, 87123, 8123, 4660};
 
@@ -19,7 +19,7 @@ TEST(fp_correction_test, one_bin)
 
 TEST(fp_correction_test, example_split)
 {
-    auto fp_correction = hibf::layout::compute_fpr_correction({.fpr = 0.01, .hash_count = 5u, .t_max = 256u});
+    auto fp_correction = seqan::hibf::layout::compute_fpr_correction({.fpr = 0.01, .hash_count = 5u, .t_max = 256u});
 
     double const abs_error = 0.00001;
     EXPECT_NEAR(fp_correction[1], 1.0, abs_error);

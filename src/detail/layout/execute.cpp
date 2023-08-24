@@ -12,12 +12,12 @@
 #include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
 #include <hibf/next_multiple_of_64.hpp>                  // for next_multiple_of_64
 
-namespace hibf
+namespace seqan::hibf
 {
 
-size_t execute(hibf::config const & config, hibf::data_store & data)
+size_t execute(seqan::hibf::config const & config, seqan::hibf::data_store & data)
 {
-    hibf::config config_copy{config};
+    seqan::hibf::config config_copy{config};
 
     if (config_copy.disable_estimate_union)
         config_copy.disable_rearrangement = true;
@@ -29,11 +29,12 @@ size_t execute(hibf::config const & config, hibf::data_store & data)
             number_samples >= 1ULL << 32) // sqrt is bigger than uint16_t
             throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
         else
-            config_copy.tmax = hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_samples))));
+            config_copy.tmax =
+                seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_samples))));
     }
     else if (config_copy.tmax % 64 != 0)
     {
-        config_copy.tmax = hibf::next_multiple_of_64(config_copy.tmax);
+        config_copy.tmax = seqan::hibf::next_multiple_of_64(config_copy.tmax);
         std::cerr << "[HIBF LAYOUT WARNING]: Your requested number of technical bins was not a multiple of 64. "
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
                   << "anyway, so we increased your number of technical bins to " << config_copy.tmax << ".\n";
@@ -44,7 +45,7 @@ size_t execute(hibf::config const & config, hibf::data_store & data)
                                         .hash_count = config_copy.number_of_hash_functions,
                                         .t_max = config_copy.tmax});
 
-    return hibf::layout::hierarchical_binning{data, config_copy}.execute();
+    return seqan::hibf::layout::hierarchical_binning{data, config_copy}.execute();
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

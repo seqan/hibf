@@ -33,7 +33,7 @@
 #include <hibf/platform.hpp>
 #include <hibf/test/sandboxed_path.hpp> // for sandboxed_path
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 #if defined(_WIN32)
 namespace
@@ -138,7 +138,7 @@ public:
     //!\}
 
     /*!\brief Returns a reference to the path object.
-     * \return hibf::test::sandboxed_path containing the path of the file.
+     * \return seqan::hibf::test::sandboxed_path containing the path of the file.
      */
     sandboxed_path path() const
     {
@@ -177,4 +177,4 @@ private:
     std::optional<sandboxed_path> directory_path;
 };
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

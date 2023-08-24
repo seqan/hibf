@@ -12,7 +12,7 @@ TEST(config_test, write_to)
 {
     std::stringstream ss{};
 
-    hibf::config configuration;
+    seqan::hibf::config configuration;
 
     configuration.number_of_user_bins = 123456789;
     configuration.number_of_hash_functions = 4;
@@ -71,7 +71,7 @@ TEST(config_test, read_from)
                          "@}\n"
                          "@HIBF_CONFIG_END\n"};
 
-    hibf::config configuration;
+    seqan::hibf::config configuration;
     configuration.read_from(ss);
 
     EXPECT_EQ(configuration.number_of_user_bins, 123456789);
@@ -113,7 +113,7 @@ TEST(config_test, read_from_with_more_meta)
                          "@}\n"
                          "@HIBF_CONFIG_END\n"};
 
-    hibf::config configuration;
+    seqan::hibf::config configuration;
     configuration.read_from(ss);
 
     EXPECT_EQ(configuration.number_of_user_bins, 123456789);

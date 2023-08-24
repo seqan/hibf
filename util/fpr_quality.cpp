@@ -93,7 +93,8 @@ void init_parser(sharg::parser & parser, config & cfg)
 
 size_t split_bin_size_in_bits(config const & cfg)
 {
-    return hibf::bin_size_in_bits({.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.split_elements_per_bin});
+    return seqan::hibf::bin_size_in_bits(
+        {.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.split_elements_per_bin});
 }
 
 void print_results(size_t const fp_count, config const & cfg)
@@ -107,10 +108,10 @@ void print_results(size_t const fp_count, config const & cfg)
 
 void single_tb(config const & cfg)
 {
-    hibf::interleaved_bloom_filter ibf{
-        hibf::bin_count{1u},
-        hibf::bin_size{hibf::bin_size_in_bits({.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.elements})},
-        hibf::hash_function_count{cfg.hash}};
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{1u},
+                                              seqan::hibf::bin_size{seqan::hibf::bin_size_in_bits(
+                                                  {.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.elements})},
+                                              seqan::hibf::hash_function_count{cfg.hash}};
     auto agent = ibf.membership_agent();
 
     // Generate elements many random kmer values.
@@ -123,7 +124,7 @@ void single_tb(config const & cfg)
         inserted_values.emplace(distrib(gen));
 
     for (uint64_t const value : inserted_values)
-        ibf.emplace(value, hibf::bin_index{0u});
+        ibf.emplace(value, seqan::hibf::bin_index{0u});
 
     // Check all possible kmer values.
     size_t fp_count{};
@@ -141,9 +142,9 @@ void single_tb(config const & cfg)
 
 void multiple_tb(config const & cfg, size_t const bin_size)
 {
-    hibf::interleaved_bloom_filter ibf{hibf::bin_count{cfg.splits},
-                                       hibf::bin_size{bin_size},
-                                       hibf::hash_function_count{cfg.hash}};
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{cfg.splits},
+                                              seqan::hibf::bin_size{bin_size},
+                                              seqan::hibf::hash_function_count{cfg.hash}};
     auto agent = ibf.membership_agent();
 
     // Generate elements many random kmer values.
@@ -158,7 +159,7 @@ void multiple_tb(config const & cfg, size_t const bin_size)
     // Distribute across all bins.
     size_t counter{};
     for (uint64_t const value : all_values)
-        ibf.emplace(value, hibf::bin_index{counter++ / cfg.split_elements_per_bin});
+        ibf.emplace(value, seqan::hibf::bin_index{counter++ / cfg.split_elements_per_bin});
 
     // Check all possible kmer values.
     size_t fp_count{};
@@ -215,7 +216,7 @@ int main(int argc, char ** argv)
     multiple_tb(cfg, split_bin_size_in_bits(cfg));
 
     std::cout << "=== Split into " << cfg.splits << " bins corrected ===\n";
-    double const fpr_correction =
-        hibf::layout::compute_fpr_correction({.fpr = cfg.fpr, .hash_count = cfg.hash, .t_max = cfg.splits})[cfg.splits];
+    double const fpr_correction = seqan::hibf::layout::compute_fpr_correction(
+        {.fpr = cfg.fpr, .hash_count = cfg.hash, .t_max = cfg.splits})[cfg.splits];
     multiple_tb(cfg, std::ceil(split_bin_size_in_bits(cfg) * fpr_correction));
 }

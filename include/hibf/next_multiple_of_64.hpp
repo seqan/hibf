@@ -4,7 +4,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf
+namespace seqan::hibf
 {
 
 /*!\brief Returns the smallest integer that is greater or equal to `value` and a multiple of 64. Returns 0 for value 0.
@@ -15,4 +15,4 @@ namespace hibf
     return ((value + 63) >> 6) << 6;
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

@@ -10,14 +10,14 @@
 #include <hibf/detail/data_store.hpp> // for data_store
 #include <hibf/platform.hpp>          // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 class hierarchical_binning
 {
 private:
     //!\brief The user config passed down from the command line.
-    hibf::config config{};
+    seqan::hibf::config config{};
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
     data_store * data{nullptr};
 
@@ -41,7 +41,7 @@ public:
      * Each entry in the names_ and input vector respectively is considered a user bin (both vectors must have the
      * same length).
      */
-    hierarchical_binning(data_store & data_, hibf::config const & config_) :
+    hierarchical_binning(data_store & data_, seqan::hibf::config const & config_) :
         config{config_},
         data{std::addressof(data_)},
         num_user_bins{data->positions.size()},
@@ -130,4 +130,4 @@ private:
     void update_max_id(size_t & max_id, size_t & max_size, size_t const new_id, size_t const new_size) const;
 };
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

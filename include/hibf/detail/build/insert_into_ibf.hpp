@@ -16,18 +16,18 @@
 #include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 
-namespace hibf
+namespace seqan::hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
 void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
-                     hibf::interleaved_bloom_filter & ibf,
+                     seqan::hibf::interleaved_bloom_filter & ibf,
                      timer<concurrent::yes> & fill_ibf_timer);
 
 void insert_into_ibf(build_data const & data,
                      layout::layout::user_bin const & record,
-                     hibf::interleaved_bloom_filter & ibf);
+                     seqan::hibf::interleaved_bloom_filter & ibf);
 
-} // namespace hibf
+} // namespace seqan::hibf

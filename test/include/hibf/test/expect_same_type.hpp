@@ -22,7 +22,7 @@
 
 #include <hibf/test/type_name_as_string.hpp> // IWYU pragma: keep
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 struct expect_same_type;
 
@@ -34,7 +34,7 @@ struct expect_same_type;
 #define EXPECT_SAME_TYPE_VANEXPECT_SAME_TYPE_ISH
 
 #define EXPECT_SAME_TYPE(val1, val2)                                                                                   \
-    EXPECT_PRED_FORMAT2(::hibf::test::expect_same_type{},                                                              \
+    EXPECT_PRED_FORMAT2(::seqan::hibf::test::expect_same_type{},                                                       \
                         (std::type_identity<EXPECT_SAME_TYPE_DEPAREN(val1)>{}),                                        \
                         (std::type_identity<EXPECT_SAME_TYPE_DEPAREN(val2)>{}));
 
@@ -64,9 +64,9 @@ struct expect_same_type
 
         return ::testing::internal::CmpHelperEQFailure(remove_wrap_type_identity(lhs_expression).c_str(),
                                                        remove_wrap_type_identity(rhs_expression).c_str(),
-                                                       hibf::detail::type_name_as_string<lhs_t>,
-                                                       hibf::detail::type_name_as_string<rhs_t>);
+                                                       seqan::hibf::detail::type_name_as_string<lhs_t>,
+                                                       seqan::hibf::detail::type_name_as_string<rhs_t>);
     }
 };
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

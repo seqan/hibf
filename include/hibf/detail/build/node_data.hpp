@@ -16,7 +16,7 @@
 
 #include <hibf/detail/layout/layout.hpp> // for operator==, layout
 
-namespace hibf
+namespace seqan::hibf
 {
 
 struct node_data // rename:ibf_data? or ibf_node_data
@@ -47,4 +47,4 @@ struct node_data // rename:ibf_data? or ibf_node_data
     }
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

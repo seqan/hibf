@@ -22,14 +22,14 @@
 #include <hibf/detail/timer.hpp>                    // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
 
-namespace hibf
+namespace seqan::hibf
 {
 
 // automatically does naive splitting if number_of_bins > 1
 void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
-                     hibf::interleaved_bloom_filter & ibf,
+                     seqan::hibf::interleaved_bloom_filter & ibf,
                      timer<concurrent::yes> & fill_ibf_timer)
 {
     size_t const chunk_size = kmers.size() / number_of_bins + 1;
@@ -40,7 +40,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
     for (auto chunk : kmers | seqan::std::views::chunk(chunk_size))
     {
         assert(chunk_number < number_of_bins);
-        hibf::bin_index const bin_idx{bin_index + chunk_number};
+        seqan::hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
         for (size_t const value : chunk)
             ibf.emplace(value, bin_idx);
@@ -51,9 +51,9 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
 
 void insert_into_ibf(build_data const & data,
                      layout::layout::user_bin const & record,
-                     hibf::interleaved_bloom_filter & ibf)
+                     seqan::hibf::interleaved_bloom_filter & ibf)
 {
-    auto const bin_index = hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
+    auto const bin_index = seqan::hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
     robin_hood::unordered_flat_set<uint64_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};
@@ -70,4 +70,4 @@ void insert_into_ibf(build_data const & data,
     data.fill_ibf_timer += local_fill_ibf_timer;
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

@@ -17,7 +17,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 
 //!\brief Checks wheter there is read access to a path.
@@ -53,4 +53,4 @@ inline bool write_access(std::filesystem::path const & file)
     }
 }
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

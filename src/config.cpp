@@ -14,7 +14,7 @@
 
 #include <cereal/archives/json.hpp>
 
-namespace hibf
+namespace seqan::hibf
 {
 
 void config::read_from(std::istream & stream)
@@ -31,8 +31,8 @@ void config::read_from(std::istream & stream)
     while (std::getline(stream, line) && line != prefix::meta_hibf_config_end)
     {
         assert(line.size() >= 2);
-        assert(std::string_view{line}.substr(0, 1) == hibf::prefix::meta_header);
-        config_str << line.substr(1); // remove hibf::prefix::meta_header
+        assert(std::string_view{line}.substr(0, 1) == seqan::hibf::prefix::meta_header);
+        config_str << line.substr(1); // remove seqan::hibf::prefix::meta_header
     }
 
     assert(line == prefix::meta_hibf_config_end);
@@ -57,4 +57,4 @@ void config::write_to(std::ostream & stream) const
            << prefix::meta_hibf_config_end << '\n';
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

@@ -26,7 +26,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::detail
+namespace seqan::hibf::detail
 {
 
 /*!\brief Defines the human-readable name of the given type using the
@@ -85,4 +85,4 @@ inline std::string const type_name_as_string = []()
     return demangled_name;
 }();
 
-} // namespace hibf::detail
+} // namespace seqan::hibf::detail

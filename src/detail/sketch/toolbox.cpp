@@ -14,7 +14,7 @@
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 #include <hibf/detail/sketch/toolbox.hpp>     // for clustering_node, entry, neighbor, prio_queue, distance_matrix
 
-namespace hibf::sketch::toolbox
+namespace seqan::hibf::sketch::toolbox
 {
 
 void sort_by_cardinalities(std::vector<hyperloglog> const & sketches,
@@ -457,4 +457,4 @@ void trace(std::vector<clustering_node> const & clustering,
     trace(clustering, permutation, previous_rightmost, first, curr.right);
 }
 
-} // namespace hibf::sketch::toolbox
+} // namespace seqan::hibf::sketch::toolbox

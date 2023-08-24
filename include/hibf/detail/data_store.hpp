@@ -11,7 +11,7 @@
 #include <hibf/detail/layout/layout.hpp>      // for layout
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
-namespace hibf
+namespace seqan::hibf
 {
 
 struct data_store
@@ -79,4 +79,4 @@ struct data_store
     //!\}
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

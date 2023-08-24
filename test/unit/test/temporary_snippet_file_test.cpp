@@ -16,7 +16,7 @@
 TEST(temporary_snippet_file, no_content)
 {
     std::filesystem::path const original_path = std::filesystem::current_path();
-    hibf::test::temporary_snippet_file tmp_file{"test.txt"};
+    seqan::hibf::test::temporary_snippet_file tmp_file{"test.txt"};
     std::filesystem::path const new_path = std::filesystem::current_path();
 
     EXPECT_FALSE(std::filesystem::exists(new_path / "test.txt"));
@@ -26,7 +26,7 @@ TEST(temporary_snippet_file, no_content)
 TEST(temporary_snippet_file, with_content)
 {
     std::filesystem::path const path = std::filesystem::current_path();
-    hibf::test::temporary_snippet_file tmp_file{"test.txt", "some content\n", "more"};
+    seqan::hibf::test::temporary_snippet_file tmp_file{"test.txt", "some content\n", "more"};
     std::filesystem::path const new_path = std::filesystem::current_path();
 
     EXPECT_TRUE(std::filesystem::exists(new_path / "test.txt"));

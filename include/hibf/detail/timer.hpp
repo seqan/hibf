@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides hibf::timer.
+ * \brief Provides seqan::hibf::timer.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -19,7 +19,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf
+namespace seqan::hibf
 {
 
 enum class concurrent
@@ -104,4 +104,4 @@ private:
     rep_t ticks{};
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

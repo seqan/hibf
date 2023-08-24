@@ -13,7 +13,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf
+namespace seqan::hibf
 {
 
 struct chopper_pack_record
@@ -45,4 +45,4 @@ struct chopper_pack_record
     }
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

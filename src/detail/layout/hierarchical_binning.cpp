@@ -18,7 +18,7 @@
 #include <hibf/next_multiple_of_64.hpp>                // for next_multiple_of_64
 #include <hibf/platform.hpp>                           // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 size_t hierarchical_binning::execute()
@@ -400,4 +400,4 @@ void hierarchical_binning::update_max_id(size_t & max_id,
     }
 }
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

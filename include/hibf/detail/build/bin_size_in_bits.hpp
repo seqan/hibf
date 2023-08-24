@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Implements hibf::bin_size_in_bits.
+ * \brief Implements seqan::hibf::bin_size_in_bits.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -17,7 +17,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf
+namespace seqan::hibf
 {
 
 struct bin_size_parameters
@@ -35,4 +35,4 @@ inline size_t bin_size_in_bits(bin_size_parameters const & params)
     return result;
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

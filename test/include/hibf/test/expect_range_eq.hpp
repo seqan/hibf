@@ -24,10 +24,10 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 struct expect_range_eq;
-} // namespace hibf::test
+} // namespace seqan::hibf::test
 
 namespace std
 {
@@ -42,10 +42,10 @@ void PrintTo(t const & value, std::ostream * out)
 
 } // namespace std
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 
-#define EXPECT_RANGE_EQ(val1, val2) EXPECT_PRED_FORMAT2(::hibf::test::expect_range_eq{}, val1, val2);
+#define EXPECT_RANGE_EQ(val1, val2) EXPECT_PRED_FORMAT2(::seqan::hibf::test::expect_range_eq{}, val1, val2);
 
 struct expect_range_eq
 {
@@ -72,4 +72,4 @@ struct expect_range_eq
     }
 };
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test
