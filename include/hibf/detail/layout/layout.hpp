@@ -27,7 +27,7 @@ struct layout
             requires std::derived_from<stream_type, std::ostream>
         friend stream_type & operator<<(stream_type & stream, max_bin const & object)
         {
-            stream << prefix::header << prefix::merged_bin << '_';
+            stream << prefix::layout_header << prefix::layout_lower_level << '_';
             auto it = object.previous_TB_indices.begin();
             auto end = object.previous_TB_indices.end();
             // If not empty, we join with ';'
@@ -37,7 +37,7 @@ struct layout
                 while (++it != end)
                     stream << ';' << *it;
             }
-            stream << " max_bin_id:" << object.id;
+            stream << " " << prefix::layout_fullest_technical_bin_idx << object.id;
 
             return stream;
         }
@@ -85,6 +85,9 @@ struct layout
             return stream;
         }
     };
+
+    void read_from(std::istream & stream);
+    void write_to(std::ostream & stream) const;
 
     size_t top_level_max_bin_id{};
     std::vector<max_bin> max_bins{};

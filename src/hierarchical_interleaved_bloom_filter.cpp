@@ -199,4 +199,19 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
     build_index(*this, configuration, layout);
 }
 
+hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
+    std::function<void(size_t const, insert_iterator &&)> input_fn,
+    std::istream & layout_stream)
+{
+    // read config and layout from file
+    config configuration;
+    layout::layout hibf_layout;
+    configuration.read_from(layout_stream);
+    hibf_layout.read_from(layout_stream);
+
+    configuration.input_fn = input_fn; // set input as it cannot be serialized.
+
+    build_index(*this, configuration, hibf_layout);
+}
+
 } // namespace hibf

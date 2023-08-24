@@ -11,6 +11,7 @@
 #include <cstddef>    // for size_t
 #include <filesystem> // for path
 #include <functional> // for function
+#include <iosfwd>     // for ostream
 #include <iterator>   // for insert_iterator
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
@@ -78,12 +79,12 @@ struct config
     // Related to k-mers
     bool disable_cutoffs{false};
 
-    //!\brief If given, no layout algorithm is esxecuted but the layout from file is used for building.
-    std::filesystem::path layout_file{};
-
     // Related to IBF
     // bool compressed{false};
     //!\}
+
+    void read_from(std::istream & stream);
+    void write_to(std::ostream & stream) const;
 
 private:
     friend class cereal::access;
@@ -107,7 +108,6 @@ private:
         archive(CEREAL_NVP(disable_rearrangement));
 
         archive(CEREAL_NVP(disable_cutoffs));
-        archive(CEREAL_NVP(layout_file));
     }
 };
 
