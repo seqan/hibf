@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides seqan::std::views::join_with.
+ * \brief Provides seqan::stl::views::join_with.
  */
 
 // File might be included from multiple libraries.
@@ -18,12 +18,12 @@
 
 #ifdef __cpp_lib_ranges_join_with
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
 using ::std::ranges::views::join_with;
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 
 #else
 
@@ -36,7 +36,7 @@ using ::std::ranges::views::join_with;
 #    include "detail/exposition_only.hpp"
 #    include "detail/non_propagating_cache.hpp"
 
-namespace seqan::std::detail::join_with
+namespace seqan::stl::detail::join_with
 {
 
 template <class R, class P>
@@ -68,18 +68,18 @@ struct cache_helper<InnerRng>
     non_propagating_cache<::std::remove_cv_t<InnerRng>> inner_;
 };
 
-} // namespace seqan::std::detail::join_with
+} // namespace seqan::stl::detail::join_with
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 template <::std::ranges::input_range V, ::std::ranges::forward_range Pattern>
     requires ::std::ranges::view<V> && ::std::ranges::input_range<::std::ranges::range_reference_t<V>>
               && ::std::ranges::view<Pattern>
-              && seqan::std::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
+              && seqan::stl::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
 class join_with_view :
     public ::std::ranges::view_interface<join_with_view<V, Pattern>>,
-    private seqan::std::detail::join_with::cache_helper<::std::ranges::range_reference_t<V>>
+    private seqan::stl::detail::join_with::cache_helper<::std::ranges::range_reference_t<V>>
 {
 private:
     using InnerRng = ::std::ranges::range_reference_t<V>;
@@ -128,8 +128,8 @@ public:
         // the sentinels of the non-const view and const range are the same.
         // If ::std::is_reference_v<InnerRng>, we do not have a cache to store the value. Hence, we do not change
         // any members and can use the const iterator.
-        constexpr bool use_const = seqan::std::detail::simple_view<V> && ::std::is_reference_v<InnerRng>
-                                && seqan::std::detail::simple_view<Pattern>;
+        constexpr bool use_const = seqan::stl::detail::simple_view<V> && ::std::is_reference_v<InnerRng>
+                                && seqan::stl::detail::simple_view<Pattern>;
         return iterator<use_const>{*this, ::std::ranges::begin(base_)};
     }
 
@@ -142,7 +142,7 @@ public:
 
     constexpr auto end()
     {
-        constexpr bool is_simple = seqan::std::detail::simple_view<V> && seqan::std::detail::simple_view<Pattern>;
+        constexpr bool is_simple = seqan::stl::detail::simple_view<V> && seqan::stl::detail::simple_view<Pattern>;
         if constexpr (::std::ranges::forward_range<V> && ::std::is_reference_v<InnerRng>
                       && ::std::ranges::forward_range<InnerRng> && ::std::ranges::common_range<V>
                       && ::std::ranges::common_range<InnerRng>)
@@ -165,25 +165,25 @@ public:
 };
 
 template <class R, class P>
-join_with_view(R &&, P &&) -> join_with_view<seqan::std::views::all_t<R>, seqan::std::views::all_t<P>>;
+join_with_view(R &&, P &&) -> join_with_view<seqan::stl::views::all_t<R>, seqan::stl::views::all_t<P>>;
 
 template <::std::ranges::input_range R>
 join_with_view(R &&, ::std::ranges::range_value_t<::std::ranges::range_reference_t<R>>)
-    -> join_with_view<seqan::std::views::all_t<R>,
+    -> join_with_view<seqan::stl::views::all_t<R>,
                       ::std::ranges::single_view<::std::ranges::range_value_t<::std::ranges::range_reference_t<R>>>>;
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::detail::join_with
+namespace seqan::stl::detail::join_with
 {
 
 template <bool Const, typename V, typename Pattern>
 struct helper
 {
-    using Parent = seqan::std::detail::maybe_const<Const, seqan::std::ranges::join_with_view<V, Pattern>>;
-    using Base = seqan::std::detail::maybe_const<Const, V>;
+    using Parent = seqan::stl::detail::maybe_const<Const, seqan::stl::ranges::join_with_view<V, Pattern>>;
+    using Base = seqan::stl::detail::maybe_const<Const, V>;
     using InnerBase = ::std::ranges::range_reference_t<Base>;
-    using PatternBase = seqan::std::detail::maybe_const<Const, Pattern>;
+    using PatternBase = seqan::stl::detail::maybe_const<Const, Pattern>;
 
     using OuterIter = ::std::ranges::iterator_t<Base>;
     using InnerIter = ::std::ranges::iterator_t<InnerBase>;
@@ -237,22 +237,22 @@ template <bool Const, typename V, typename Pattern>
 struct iterator_category_t<Const, V, Pattern, false>
 {};
 
-} // namespace seqan::std::detail::join_with
+} // namespace seqan::stl::detail::join_with
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 template <::std::ranges::input_range V, ::std::ranges::forward_range Pattern>
     requires ::std::ranges::view<V> && ::std::ranges::input_range<::std::ranges::range_reference_t<V>>
           && ::std::ranges::view<Pattern>
-          && seqan::std::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
+          && seqan::stl::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
 template <bool Const>
 class join_with_view<V, Pattern>::iterator :
-    public seqan::std::detail::join_with::
-        iterator_category_t<Const, V, Pattern, seqan::std::detail::join_with::helper<Const, V, Pattern>::ref_is_glvalue>
+    public seqan::stl::detail::join_with::
+        iterator_category_t<Const, V, Pattern, seqan::stl::detail::join_with::helper<Const, V, Pattern>::ref_is_glvalue>
 {
 private:
-    using helper_t = seqan::std::detail::join_with::helper<Const, V, Pattern>;
+    using helper_t = seqan::stl::detail::join_with::helper<Const, V, Pattern>;
     using Parent = helper_t::Parent;
     using Base = helper_t::Base;
     using InnerBase = helper_t::InnerBase;
@@ -338,8 +338,8 @@ public:
         !ref_is_glvalue,
         ::std::input_iterator_tag,
         ::std::conditional_t<
-            ::std::ranges::bidirectional_range<Base> && seqan::std::detail::join_with::bidirectional_common<InnerBase>
-                && seqan::std::detail::join_with::bidirectional_common<PatternBase>,
+            ::std::ranges::bidirectional_range<Base> && seqan::stl::detail::join_with::bidirectional_common<InnerBase>
+                && seqan::stl::detail::join_with::bidirectional_common<PatternBase>,
             ::std::bidirectional_iterator_tag,
             ::std::conditional_t<::std::ranges::forward_range<Base> && ::std::ranges::forward_range<InnerBase>,
                                  ::std::forward_iterator_tag,
@@ -405,8 +405,8 @@ public:
 
     constexpr iterator & operator--()
         requires ref_is_glvalue && ::std::ranges::bidirectional_range<Base>
-              && seqan::std::detail::join_with::bidirectional_common<InnerBase>
-              && seqan::std::detail::join_with::bidirectional_common<PatternBase>
+              && seqan::stl::detail::join_with::bidirectional_common<InnerBase>
+              && seqan::stl::detail::join_with::bidirectional_common<PatternBase>
     {
         if (outer_it_ == ::std::ranges::end(parent_->base_))
         {
@@ -456,8 +456,8 @@ public:
 
     constexpr iterator operator--(int)
         requires ref_is_glvalue && ::std::ranges::bidirectional_range<Base>
-              && seqan::std::detail::join_with::bidirectional_common<InnerBase>
-              && seqan::std::detail::join_with::bidirectional_common<PatternBase>
+              && seqan::stl::detail::join_with::bidirectional_common<InnerBase>
+              && seqan::stl::detail::join_with::bidirectional_common<PatternBase>
     {
         iterator tmp = *this;
         --*this;
@@ -487,13 +487,13 @@ public:
 template <::std::ranges::input_range V, ::std::ranges::forward_range Pattern>
     requires ::std::ranges::view<V> && ::std::ranges::input_range<::std::ranges::range_reference_t<V>>
           && ::std::ranges::view<Pattern>
-          && seqan::std::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
+          && seqan::stl::detail::join_with::compatible_joinable_ranges<::std::ranges::range_reference_t<V>, Pattern>
 template <bool Const>
 class join_with_view<V, Pattern>::sentinel
 {
 private:
-    using Parent = seqan::std::detail::maybe_const<Const, join_with_view>;
-    using Base = seqan::std::detail::maybe_const<Const, V>;
+    using Parent = seqan::stl::detail::maybe_const<Const, join_with_view>;
+    using Base = seqan::stl::detail::maybe_const<Const, V>;
     ::std::ranges::sentinel_t<Base> end_ = ::std::ranges::sentinel_t<Base>();
 
     friend class join_with_view<V, Pattern>;
@@ -510,7 +510,7 @@ public:
 
     template <bool OtherConst>
         requires ::std::sentinel_for<::std::ranges::sentinel_t<Base>,
-                                     ::std::ranges::iterator_t<seqan::std::detail::maybe_const<OtherConst, V>>>
+                                     ::std::ranges::iterator_t<seqan::stl::detail::maybe_const<OtherConst, V>>>
     friend constexpr bool operator==(iterator<OtherConst> const & x, sentinel const & y)
     {
         return x.outer_it_ == y.end_;
@@ -522,24 +522,24 @@ struct join_with_fn
     template <typename Pattern>
     constexpr auto operator()(Pattern && pattern) const
     {
-        return seqan::std::detail::adaptor_from_functor{*this, ::std::forward<Pattern>(pattern)};
+        return seqan::stl::detail::adaptor_from_functor{*this, ::std::forward<Pattern>(pattern)};
     }
 
-    template <seqan::std::ranges::viewable_range urng_t, typename Pattern>
+    template <seqan::stl::ranges::viewable_range urng_t, typename Pattern>
     constexpr auto operator()(urng_t && urange, Pattern && pattern) const
     {
         return join_with_view{::std::forward<urng_t>(urange), ::std::forward<Pattern>(pattern)};
     }
 };
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
-inline constexpr auto join_with = seqan::std::ranges::join_with_fn{};
+inline constexpr auto join_with = seqan::stl::ranges::join_with_fn{};
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 
 #endif // ifdef __cpp_lib_ranges_join_with
 

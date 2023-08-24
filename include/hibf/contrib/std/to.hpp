@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides seqan::std::ranges::to.
+ * \brief Provides seqan::stl::ranges::to.
  */
 
 // File might be included from multiple libraries.
@@ -18,21 +18,21 @@
 
 #ifdef __cpp_lib_ranges_to_container
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 using ::std::from_range_t;
 
 inline constexpr from_range_t from_range{};
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 using ::std::ranges::to;
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
 #else
 
@@ -40,7 +40,7 @@ using ::std::ranges::to;
 
 #    include "detail/adaptor_from_functor.hpp"
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 struct from_range_t
@@ -50,9 +50,9 @@ struct from_range_t
 
 inline constexpr from_range_t from_range{};
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
-namespace seqan::std::detail::to
+namespace seqan::stl::detail::to
 {
 
 // clang-format off
@@ -107,9 +107,9 @@ template <typename It>
 concept has_input_iterator_category =
     ::std::derived_from<typename ::std::iterator_traits<It>::iterator_category, ::std::input_iterator_tag>;
 
-} // namespace seqan::std::detail::to
+} // namespace seqan::stl::detail::to
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 template <class C, ::std::ranges::input_range R, class... Args>
@@ -121,22 +121,22 @@ constexpr C to(R && r, Args &&... args)
     {
         if constexpr (::std::constructible_from<C, R, Args...>)
             return C(::std::forward<R>(r), ::std::forward<Args>(args)...);
-        else if constexpr (::std::constructible_from<C, seqan::std::from_range_t, R, Args...>)
-            return C(seqan::std::from_range, ::std::forward<R>(r), ::std::forward<Args>(args)...);
+        else if constexpr (::std::constructible_from<C, seqan::stl::from_range_t, R, Args...>)
+            return C(seqan::stl::from_range, ::std::forward<R>(r), ::std::forward<Args>(args)...);
         else if constexpr (::std::ranges::common_range<R>
-                           && seqan::std::detail::to::has_input_iterator_category<::std::ranges::iterator_t<R>>
+                           && seqan::stl::detail::to::has_input_iterator_category<::std::ranges::iterator_t<R>>
                            && ::std::constructible_from<C,
                                                         ::std::ranges::iterator_t<R>,
                                                         ::std::ranges::sentinel_t<R>,
                                                         Args...>)
             return C(::std::ranges::begin(r), ::std::ranges::end(r), ::std::forward<Args>(args)...);
         else if constexpr (::std::constructible_from<C, Args...>
-                           && seqan::std::detail::to::container_insertable<C, ::std::ranges::range_reference_t<R>>)
+                           && seqan::stl::detail::to::container_insertable<C, ::std::ranges::range_reference_t<R>>)
         {
             C c(::std::forward<Args>(args)...);
-            if constexpr (::std::ranges::sized_range<R> && seqan::std::detail::to::reservable_container<C>)
+            if constexpr (::std::ranges::sized_range<R> && seqan::stl::detail::to::reservable_container<C>)
                 c.reserve(static_cast<::std::ranges::range_size_t<C>>(::std::ranges::size(r)));
-            ::std::ranges::copy(r, seqan::std::detail::to::container_inserter<::std::ranges::range_reference_t<R>>(c));
+            ::std::ranges::copy(r, seqan::stl::detail::to::container_inserter<::std::ranges::range_reference_t<R>>(c));
             return c;
         }
     }
@@ -158,25 +158,25 @@ constexpr auto to(R && r, Args &&... args)
     if constexpr (requires { C(::std::declval<R>(), ::std::declval<Args>()...); })
         return to<decltype(C(::std::declval<R>(), ::std::declval<Args>()...))>(::std::forward<R>(r),
                                                                                ::std::forward<Args>(args)...);
-    else if constexpr (requires { C(seqan::std::from_range, ::std::declval<R>(), ::std::declval<Args>()...); })
-        return to<decltype(C(seqan::std::from_range, ::std::declval<R>(), ::std::declval<Args>()...))>(
+    else if constexpr (requires { C(seqan::stl::from_range, ::std::declval<R>(), ::std::declval<Args>()...); })
+        return to<decltype(C(seqan::stl::from_range, ::std::declval<R>(), ::std::declval<Args>()...))>(
             ::std::forward<R>(r),
             ::std::forward<Args>(args)...);
     else if constexpr (requires {
-                           C(::std::declval<seqan::std::detail::to::input_iterator<R>>(),
-                             ::std::declval<seqan::std::detail::to::input_iterator<R>>(),
+                           C(::std::declval<seqan::stl::detail::to::input_iterator<R>>(),
+                             ::std::declval<seqan::stl::detail::to::input_iterator<R>>(),
                              ::std::declval<Args>()...);
                        })
-        return to<decltype(C(::std::declval<seqan::std::detail::to::input_iterator<R>>(),
-                             ::std::declval<seqan::std::detail::to::input_iterator<R>>(),
+        return to<decltype(C(::std::declval<seqan::stl::detail::to::input_iterator<R>>(),
+                             ::std::declval<seqan::stl::detail::to::input_iterator<R>>(),
                              ::std::declval<Args>()...))>(::std::forward<R>(r), ::std::forward<Args>(args)...);
     else
         __builtin_unreachable();
 }
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::detail::to
+namespace seqan::stl::detail::to
 {
 
 template <class C>
@@ -186,13 +186,13 @@ struct to_fn1
     template <class... Args>
     constexpr auto operator()(Args &&... args) const
     {
-        return seqan::std::detail::adaptor_from_functor{*this, ::std::forward<Args>(args)...};
+        return seqan::stl::detail::adaptor_from_functor{*this, ::std::forward<Args>(args)...};
     }
 
     template <::std::ranges::input_range R, class... Args>
     constexpr auto operator()(R && r, Args &&... args) const
     {
-        return seqan::std::ranges::to<C>(::std::forward<R>(r), ::std::forward<Args>(args)...);
+        return seqan::stl::ranges::to<C>(::std::forward<R>(r), ::std::forward<Args>(args)...);
     }
 };
 
@@ -202,35 +202,35 @@ struct to_fn2
     template <class... Args>
     constexpr auto operator()(Args &&... args) const
     {
-        return seqan::std::detail::adaptor_from_functor{*this, ::std::forward<Args>(args)...};
+        return seqan::stl::detail::adaptor_from_functor{*this, ::std::forward<Args>(args)...};
     }
 
     template <::std::ranges::input_range R, class... Args>
     constexpr auto operator()(R && r, Args &&... args) const
     {
-        return seqan::std::ranges::to<C>(::std::forward<R>(r), ::std::forward<Args>(args)...);
+        return seqan::stl::ranges::to<C>(::std::forward<R>(r), ::std::forward<Args>(args)...);
     }
 };
 
-} // namespace seqan::std::detail::to
+} // namespace seqan::stl::detail::to
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 template <class C, class... Args>
     requires (!::std::ranges::view<C>)
 constexpr auto to(Args &&... args)
 {
-    return seqan::std::detail::to::to_fn1<C>{}(::std::forward<Args>(args)...);
+    return seqan::stl::detail::to::to_fn1<C>{}(::std::forward<Args>(args)...);
 }
 
 template <template <class...> class C, class... Args>
 constexpr auto to(Args &&... args)
 {
-    return seqan::std::detail::to::to_fn2<C>{}(::std::forward<Args>(args)...);
+    return seqan::stl::detail::to::to_fn2<C>{}(::std::forward<Args>(args)...);
 }
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
 #endif // ifdef __cpp_lib_ranges_to_container
 

@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides seqan::std::detail::adaptor_base and seqan::std::detail::combined_adaptor
+ * \brief Provides seqan::stl::detail::adaptor_base and seqan::stl::detail::combined_adaptor
  * \author Hannes Hauswedell <hannes.hauswedell AT fu-berlin.de>
  */
 
@@ -17,7 +17,7 @@
 #include <ranges>
 #include <tuple>
 
-namespace seqan::std::detail
+namespace seqan::stl::detail
 {
 
 // ============================================================================
@@ -210,6 +210,6 @@ public:
     //!\}
 };
 
-} // namespace seqan::std::detail
+} // namespace seqan::stl::detail
 
 #endif // SEQAN_STD_DETAIL_ADAPTOR_BASE

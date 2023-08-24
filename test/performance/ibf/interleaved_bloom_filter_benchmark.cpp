@@ -77,7 +77,7 @@ void emplace_benchmark(::benchmark::State & state)
 
     for (auto _ : state)
     {
-        for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
+        for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
             ibf.emplace(hash, seqan::hibf::bin_index{bin});
     }
 
@@ -96,7 +96,7 @@ void clear_benchmark(::benchmark::State & state)
                                                         {
                                                             return seqan::hibf::bin_index{i};
                                                         })
-                                                  | seqan::std::ranges::to<std::vector>();
+                                                  | seqan::stl::ranges::to<std::vector>();
 
     for (auto _ : state)
     {
@@ -119,7 +119,7 @@ void clear_range_benchmark(::benchmark::State & state)
                                                         {
                                                             return seqan::hibf::bin_index{i};
                                                         })
-                                                  | seqan::std::ranges::to<std::vector>();
+                                                  | seqan::stl::ranges::to<std::vector>();
 
     for (auto _ : state)
     {
@@ -133,7 +133,7 @@ void bulk_contains_benchmark(::benchmark::State & state)
 {
     auto && [bin_indices, hash_values, ibf] = set_up(state);
 
-    for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
+    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
         ibf.emplace(hash, seqan::hibf::bin_index{bin});
 
     auto agent = ibf.membership_agent();
@@ -153,7 +153,7 @@ void bulk_count_benchmark(::benchmark::State & state)
 {
     auto && [bin_indices, hash_values, ibf] = set_up(state);
 
-    for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
+    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
         ibf.emplace(hash, seqan::hibf::bin_index{bin});
 
     auto agent = ibf.counting_agent();
