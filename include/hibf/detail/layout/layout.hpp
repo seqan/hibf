@@ -9,7 +9,7 @@
 #include <hibf/detail/prefixes.hpp> // for header, merged_bin
 #include <hibf/platform.hpp>
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 // Currently, the layout is structured by user bin.
@@ -94,4 +94,4 @@ struct layout
     std::vector<user_bin> user_bins{};
 };
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

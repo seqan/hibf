@@ -22,7 +22,7 @@
 #    pragma GCC warning "Non-C++17 compliant compiler! Please open an issue with your compiler and platform!"
 #endif // __cpp_aligned_new < 201606
 
-namespace hibf::contrib
+namespace seqan::hibf::contrib
 {
 
 /*!\brief Allocates uninitialized storage whose memory-alignment is specified by *alignment*.
@@ -151,14 +151,14 @@ public:
     }
 
     /*!\brief Deallocates the storage referenced by the pointer p, which must be a pointer obtained by an earlier call
-     * to hibf::aligned_allocator::allocate.
+     * to seqan::hibf::aligned_allocator::allocate.
      *
      * \param[in] p The pointer to the memory to be deallocated.
      * \param[in] n The number of elements to be deallocated.
      *
      * \details
      *
-     * The argument `n` must be equal to the first argument of the call to hibf::aligned_allocator::allocate that
+     * The argument `n` must be equal to the first argument of the call to seqan::hibf::aligned_allocator::allocate that
      * originally produced `p`, otherwise the behavior is undefined. This function calls
      * [operator delete](https://en.cppreference.com/w/cpp/memory/new/operator_delete) to deallocate the memory of
      * specified size.
@@ -237,4 +237,4 @@ public:
     //!\}
 };
 
-} // namespace hibf::contrib
+} // namespace seqan::hibf::contrib

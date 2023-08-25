@@ -12,7 +12,7 @@
 #include <string>    // for string
 #include <vector>    // for vector
 
-namespace hibf
+namespace seqan::hibf
 {
 
 //!\brief Bookkeeping for user and technical bins.
@@ -86,4 +86,4 @@ public:
     //!\endcond
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

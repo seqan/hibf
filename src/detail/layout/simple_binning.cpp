@@ -8,7 +8,7 @@
 #include <hibf/detail/layout/layout.hpp>         // for layout
 #include <hibf/detail/layout/simple_binning.hpp> // for simple_binning
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 size_t simple_binning::execute()
@@ -104,4 +104,4 @@ size_t simple_binning::execute()
     return max_id;
 }
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

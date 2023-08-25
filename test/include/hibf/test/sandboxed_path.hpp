@@ -6,7 +6,7 @@
 // ------------------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides hibf::test::sandboxed_path and related free functions.
+ * \brief Provides seqan::hibf::test::sandboxed_path and related free functions.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -19,18 +19,18 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 
 /*!\brief Utility class to stay inside a sandbox path.
  *
- * hibf::sandboxed_path provides the same functionality as std::filesystem::path, but restricts
+ * seqan::hibf::sandboxed_path provides the same functionality as std::filesystem::path, but restricts
  * the access to a specified directory. This results in the following invariant, which is checked
  * for at appropiate places, and some caveats.
  *
  *  Invariant:
- *  - hibf::sandboxed_path is always converted to an absolute path
- *  - hibf::sandboxed_path always points to a file or directory inside a given sandbox directory
+ *  - seqan::hibf::sandboxed_path is always converted to an absolute path
+ *  - seqan::hibf::sandboxed_path always points to a file or directory inside a given sandbox directory
  *  - The sandbox directory is immutable during the life cycle of a sandboxed_path
  *
  * Caveat:
@@ -455,11 +455,11 @@ public:
     void clear() = delete; //!< Not implemented. Invariant requires the path to be an absolute path.
 };
 
-/*!\brief Append a path to a hibf::test::sanboxed_path.
+/*!\brief Append a path to a seqan::hibf::test::sanboxed_path.
  * \tparam path_t The type of the path to append.
- * \param lhs The hibf::test::sandboxed_path.
+ * \param lhs The seqan::hibf::test::sandboxed_path.
  * \param rhs The path to append.
- * \relates hibf::test::sandboxed_path *
+ * \relates seqan::hibf::test::sandboxed_path *
  *
  * This work the same as std::filesystem::operator/(std::filesystem::path&)
  * and additionally checks the invariant.
@@ -471,4 +471,4 @@ sandboxed_path operator/(sandboxed_path lhs, Rhs const & rhs)
     return lhs;
 }
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

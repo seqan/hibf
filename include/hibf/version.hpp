@@ -50,7 +50,7 @@
     HIBF_VERSION_CSTRING_HELPER_FUNC(HIBF_VERSION_MAJOR, HIBF_VERSION_MINOR, HIBF_VERSION_PATCH)                       \
     HIBF_RELEASE_CANDIDATE_HELPER(HIBF_RELEASE_CANDIDATE)
 
-namespace hibf
+namespace seqan::hibf
 {
 
 //!\brief The major version.
@@ -66,7 +66,7 @@ constexpr std::size_t hibf_version = HIBF_VERSION;
 //!\brief The full version as null terminated string.
 constexpr char const * hibf_version_cstring = HIBF_VERSION_CSTRING;
 
-} // namespace hibf
+} // namespace seqan::hibf
 
 #undef HIBF_VERSION_CSTRING_HELPER_STR
 #undef HIBF_VERSION_CSTRING_HELPER_FUNC

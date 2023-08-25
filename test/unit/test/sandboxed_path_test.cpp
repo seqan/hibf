@@ -15,7 +15,7 @@
 #include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
 
 namespace fs = std::filesystem;
-using sandboxed_path = hibf::test::sandboxed_path;
+using sandboxed_path = seqan::hibf::test::sandboxed_path;
 
 // initialization
 TEST(sandboxed_path_init, init)

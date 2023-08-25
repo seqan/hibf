@@ -21,7 +21,7 @@
 #include <cereal/access.hpp> // for access
 #include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
-namespace hibf
+namespace seqan::hibf
 {
 
 using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
@@ -111,4 +111,4 @@ private:
     }
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

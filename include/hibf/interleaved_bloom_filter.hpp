@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides hibf::interleaved_bloom_filter.
+ * \brief Provides seqan::hibf::interleaved_bloom_filter.
  */
 
 #pragma once
@@ -32,30 +32,30 @@
 #include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <sdsl/int_vector.hpp> // for bit_vector
 
-namespace hibf
+namespace seqan::hibf
 {
-//!\brief A strong type that represents the number of bins for the hibf::interleaved_bloom_filter.
+//!\brief A strong type that represents the number of bins for the seqan::hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
 struct bin_count
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the number of bits for each bin in the hibf::interleaved_bloom_filter.
+//!\brief A strong type that represents the number of bits for each bin in the seqan::hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
 struct bin_size
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the number of hash functions for the hibf::interleaved_bloom_filter.
+//!\brief A strong type that represents the number of hash functions for the seqan::hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
 struct hash_function_count
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the bin index for the hibf::interleaved_bloom_filter.
+//!\brief A strong type that represents the bin index for the seqan::hibf::interleaved_bloom_filter.
 //!\ingroup search_dream_index
 struct bin_index
 {
@@ -64,8 +64,8 @@ struct bin_index
 
 /*!\brief The IBF binning directory. A data structure that efficiently answers set-membership queries for multiple bins.
  * \ingroup search_dream_index
- * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See hibf::data_layout.
- * \implements hibf::cerealisable
+ * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See seqan::hibf::data_layout.
+ * \implements seqan::hibf::cerealisable
  *
  * \details
  *
@@ -109,18 +109,18 @@ struct bin_index
  * the binningvector, a bitvector of length `b` where the `i`'th bit indicates set membership in the `i`'th bin.
  *
  * ### Querying
- * To query the Interleaved Bloom Filter for a value, call hibf::interleaved_bloom_filter::membership_agent() and use
- * the returned hibf::interleaved_bloom_filter::membership_agent_type.
+ * To query the Interleaved Bloom Filter for a value, call seqan::hibf::interleaved_bloom_filter::membership_agent() and use
+ * the returned seqan::hibf::interleaved_bloom_filter::membership_agent_type.
  *
  * To count the occurrences of a range of values in the Interleaved Bloom Filter, call
- * hibf::interleaved_bloom_filter::counting_agent() and use
- * the returned hibf::interleaved_bloom_filter::counting_agent_type.
+ * seqan::hibf::interleaved_bloom_filter::counting_agent() and use
+ * the returned seqan::hibf::interleaved_bloom_filter::counting_agent_type.
  *
  * ### Compression
  *
  * The Interleaved Bloom Filter can be compressed by passing `data_layout::compressed` as template argument.
- * The compressed `hibf::interleaved_bloom_filter<hibf::data_layout::compressed>` can only be constructed from a
- * `hibf::interleaved_bloom_filter`, in which case the underlying bitvector is compressed.
+ * The compressed `seqan::hibf::interleaved_bloom_filter<seqan::hibf::data_layout::compressed>` can only be constructed from a
+ * `seqan::hibf::interleaved_bloom_filter`, in which case the underlying bitvector is compressed.
  * The compressed Interleaved Bloom Filter is immutable, i.e. only querying is supported.
  *
  * ### Thread safety
@@ -212,9 +212,9 @@ public:
      *
      * \include test/snippet_migration/ibf/interleaved_bloom_filter_constructor.cpp
      */
-    interleaved_bloom_filter(hibf::bin_count bins_,
-                             hibf::bin_size size,
-                             hibf::hash_function_count funs = hibf::hash_function_count{2u})
+    interleaved_bloom_filter(seqan::hibf::bin_count bins_,
+                             seqan::hibf::bin_size size,
+                             seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u})
     {
         bins = bins_.value;
         bin_size_ = size.value;
@@ -281,7 +281,7 @@ public:
 
     /*!\brief Clears a range of bins.
      * \tparam rng_t The type of the range. Must model std::ranges::forward_range and the reference type must be
-     *               hibf::bin_index.
+     *               seqan::hibf::bin_index.
      * \param[in] bin_range The range of bins to clear.
      *
      * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
@@ -297,7 +297,7 @@ public:
     {
         static_assert(std::ranges::forward_range<rng_t>, "The range of bins to clear must model a forward_range.");
         static_assert(std::same_as<std::remove_cvref_t<std::ranges::range_reference_t<rng_t>>, bin_index>,
-                      "The reference type of the range to clear must be hibf::bin_index.");
+                      "The reference type of the range to clear must be seqan::hibf::bin_index.");
 #ifndef NDEBUG
         for (auto && bin : bin_range)
             assert(bin.value < bins);
@@ -314,18 +314,18 @@ public:
      *
      * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
      * \attention The new number of bins must be greater or equal to the current number of bins.
-     * \attention This function invalidates all hibf::interleaved_bloom_filter::membership_agent_type constructed for
+     * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::membership_agent_type constructed for
      * this Interleaved Bloom Filter.
      *
      * \details
      *
-     * The resulting `hibf::interleaved_bloom_filter` has an increased size proportional to the increase in the
+     * The resulting `seqan::hibf::interleaved_bloom_filter` has an increased size proportional to the increase in the
      * `bin_words` (the number of 64-bit words needed to represent `bins` many bins), e.g.
-     * resizing a `hibf::interleaved_bloom_filter` with 40 bins to 73 bins also increases the `bin_words` from 1 to
-     * 2 and hence the new `hibf::interleaved_bloom_filter` will be twice the size.
+     * resizing a `seqan::hibf::interleaved_bloom_filter` with 40 bins to 73 bins also increases the `bin_words` from 1 to
+     * 2 and hence the new `seqan::hibf::interleaved_bloom_filter` will be twice the size.
      * This increase in size is necessary to avoid invalidating all computed hash functions.
      * If you want to add more bins while keeping the size constant, you need to rebuild the
-     * `hibf::interleaved_bloom_filter`.
+     * `seqan::hibf::interleaved_bloom_filter`.
      *
      * ### Example
      *
@@ -374,29 +374,29 @@ public:
     /*!\name Lookup
      * \{
      */
-    /*!\brief Returns a hibf::interleaved_bloom_filter::membership_agent_type to be used for lookup.
-     * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
-     * `hibf::interleaved_bloom_filter::membership_agent_type`s constructed for this Interleaved Bloom Filter.
+    /*!\brief Returns a seqan::hibf::interleaved_bloom_filter::membership_agent_type to be used for lookup.
+     * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
+     * `seqan::hibf::interleaved_bloom_filter::membership_agent_type`s constructed for this Interleaved Bloom Filter.
      *
      * \details
      *
      * ### Example
      *
      * \include test/snippet_migration/ibf/membership_agent_construction.cpp
-     * \sa hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains
+     * \sa seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains
      */
     membership_agent_type membership_agent() const;
 
-    /*!\brief Returns a hibf::interleaved_bloom_filter::counting_agent_type to be used for counting.
-     * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
-     * `hibf::interleaved_bloom_filter::counting_agent_type`s constructed for this Interleaved Bloom Filter.
+    /*!\brief Returns a seqan::hibf::interleaved_bloom_filter::counting_agent_type to be used for counting.
+     * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
+     * `seqan::hibf::interleaved_bloom_filter::counting_agent_type`s constructed for this Interleaved Bloom Filter.
      *
      * \details
      *
      * ### Example
      *
      * \include test/snippet_migration/ibf/counting_agent_construction.cpp
-     * \sa hibf::interleaved_bloom_filter::counting_agent_type::bulk_count
+     * \sa seqan::hibf::interleaved_bloom_filter::counting_agent_type::bulk_count
      */
     template <typename value_t = uint16_t>
     counting_agent_type<value_t> counting_agent() const
@@ -445,8 +445,8 @@ public:
      * \{
      */
     /*!\brief Test for equality.
-     * \param[in] lhs A `hibf::interleaved_bloom_filter`.
-     * \param[in] rhs `hibf::interleaved_bloom_filter` to compare to.
+     * \param[in] lhs A `seqan::hibf::interleaved_bloom_filter`.
+     * \param[in] rhs `seqan::hibf::interleaved_bloom_filter` to compare to.
      * \returns `true` if equal, `false` otherwise.
      */
     friend bool operator==(interleaved_bloom_filter const & lhs, interleaved_bloom_filter const & rhs) noexcept
@@ -468,8 +468,8 @@ public:
     }
 
     /*!\brief Test for inequality.
-     * \param[in] lhs A `hibf::interleaved_bloom_filter`.
-     * \param[in] rhs `hibf::interleaved_bloom_filter` to compare to.
+     * \param[in] lhs A `seqan::hibf::interleaved_bloom_filter`.
+     * \param[in] rhs `seqan::hibf::interleaved_bloom_filter` to compare to.
      * \returns `true` if unequal, `false` otherwise.
      */
     friend bool operator!=(interleaved_bloom_filter const & lhs, interleaved_bloom_filter const & rhs) noexcept
@@ -502,7 +502,7 @@ public:
 
     /*!\cond DEV
      * \brief Serialisation support function.
-     * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
+     * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
      * \attention These functions are never called directly.
@@ -521,7 +521,7 @@ public:
     //!\endcond
 };
 
-//!\brief A bitvector representing the result of a call to `bulk_contains` of the hibf::interleaved_bloom_filter.
+//!\brief A bitvector representing the result of a call to `bulk_contains` of the seqan::hibf::interleaved_bloom_filter.
 class interleaved_bloom_filter::binning_bitvector
 {
 private:
@@ -635,8 +635,8 @@ public:
     //!\}
 };
 
-/*!\brief Manages membership queries for the hibf::interleaved_bloom_filter.
- * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to on `ibf` invalidates the
+/*!\brief Manages membership queries for the seqan::hibf::interleaved_bloom_filter.
+ * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to on `ibf` invalidates the
  * membership_agent.
  *
  * \details
@@ -648,13 +648,13 @@ public:
 class interleaved_bloom_filter::membership_agent_type
 {
 private:
-    //!\brief The type of the augmented hibf::interleaved_bloom_filter.
+    //!\brief The type of the augmented seqan::hibf::interleaved_bloom_filter.
     using ibf_t = interleaved_bloom_filter;
 
-    //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
+    //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
     ibf_t const * ibf_ptr{nullptr};
 
-    //!\brief Stores access positions of augmented hibf::interleaved_bloom_filter.
+    //!\brief Stores access positions of augmented seqan::hibf::interleaved_bloom_filter.
     std::array<size_t, 5> bloom_filter_indices;
 
 public:
@@ -668,9 +668,9 @@ public:
     membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
     ~membership_agent_type() = default;                                         //!< Defaulted.
 
-    /*!\brief Construct a membership_agent_type from a hibf::interleaved_bloom_filter.
+    /*!\brief Construct a membership_agent_type from a seqan::hibf::interleaved_bloom_filter.
      * \private
-     * \param ibf The hibf::interleaved_bloom_filter.
+     * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
     explicit membership_agent_type(ibf_t const & ibf) : ibf_ptr(std::addressof(ibf)), result_buffer(ibf.bin_count())
     {}
@@ -697,7 +697,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::interleaved_bloom_filter::membership_agent_type for each thread.
+     * seqan::hibf::interleaved_bloom_filter::membership_agent_type for each thread.
      */
     [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept
     {
@@ -827,19 +827,19 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
 }
 
 /*!\brief A data structure that behaves like a std::vector and can be used to consolidate the results of multiple calls
- *        to hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
+ *        to seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
  * \ingroup search_dream_index
  * \tparam value_t The type of the count. Must model std::integral.
  *
  * \details
  *
- * When using the hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains operation, a common use case is to
+ * When using the seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains operation, a common use case is to
  * add up, for example, the results for all k-mers in a query. This yields, for each bin, the number of k-mers of a
  * query that are in the respective bin. Such information can be used to apply further filtering or abundance estimation
  * based on the k-mer counts.
  *
- * The hibf::counting_vector offers an easy way to add up the individual
- * hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector by offering an `+=` operator.
+ * The seqan::hibf::counting_vector offers an easy way to add up the individual
+ * seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector by offering an `+=` operator.
  *
  * The `value_t` template parameter should be chosen in a way that no overflow occurs if all calls to `bulk_contains`
  * return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina reads, whereas
@@ -856,7 +856,7 @@ private:
     //!\brief The base type.
     using base_t = std::vector<value_t>;
 
-    //!\brief Is binning_bitvector_t a hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector?
+    //!\brief Is binning_bitvector_t a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector?
     template <typename binning_bitvector_t>
     static constexpr bool is_binning_bitvector =
         std::same_as<binning_bitvector_t, interleaved_bloom_filter::binning_bitvector>;
@@ -875,10 +875,10 @@ public:
     using base_t::base_t;
     //!\}
 
-    /*!\brief Bin-wise adds the bits of a hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+    /*!\brief Bin-wise adds the bits of a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
      * \tparam binning_bitvector_t The type of the right-hand side.
-     *         Must be hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \param binning_bitvector The hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     *         Must be seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      *
      * \details
@@ -900,10 +900,10 @@ public:
     }
 
     /*!\brief Bin-wise subtracts the bits of a
-     *        hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     *        seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
      * \tparam binning_bitvector_t The type of the right-hand side.
-     *         Must be hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \param binning_bitvector The hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     *         Must be seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      */
     template <typename binning_bitvector_t>
@@ -919,9 +919,9 @@ public:
         return *this;
     }
 
-    /*!\brief Bin-wise addition of two `hibf::counting_vector`s.
-     * \param rhs The other hibf::counting_vector.
-     * \attention The hibf::counting_vector must be at least as big as `rhs`.
+    /*!\brief Bin-wise addition of two `seqan::hibf::counting_vector`s.
+     * \param rhs The other seqan::hibf::counting_vector.
+     * \attention The seqan::hibf::counting_vector must be at least as big as `rhs`.
      *
      * \details
      *
@@ -938,9 +938,9 @@ public:
         return *this;
     }
 
-    /*!\brief Bin-wise substraction of two `hibf::counting_vector`s.
-     * \param rhs The other hibf::counting_vector.
-     * \attention The hibf::counting_vector must be at least as big as `rhs`.
+    /*!\brief Bin-wise substraction of two `seqan::hibf::counting_vector`s.
+     * \param rhs The other seqan::hibf::counting_vector.
+     * \attention The seqan::hibf::counting_vector must be at least as big as `rhs`.
      */
     counting_vector & operator-=(counting_vector const & rhs)
     {
@@ -960,7 +960,7 @@ public:
     }
 
 private:
-    //!\brief Enumerates all bins of a hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+    //!\brief Enumerates all bins of a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
     template <typename binning_bitvector_t, typename on_bin_fn_t>
     void for_each_set_bin(binning_bitvector_t && binning_bitvector, on_bin_fn_t && on_bin_fn)
     {
@@ -992,8 +992,8 @@ private:
     }
 };
 
-/*!\brief Manages counting ranges of values for the hibf::interleaved_bloom_filter.
- * \attention Calling hibf::interleaved_bloom_filter::increase_bin_number_to invalidates the counting_agent_type.
+/*!\brief Manages counting ranges of values for the seqan::hibf::interleaved_bloom_filter.
+ * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to invalidates the counting_agent_type.
  *
  * \details
  *
@@ -1005,13 +1005,13 @@ template <std::integral value_t>
 class interleaved_bloom_filter::counting_agent_type
 {
 private:
-    //!\brief The type of the augmented hibf::interleaved_bloom_filter.
+    //!\brief The type of the augmented seqan::hibf::interleaved_bloom_filter.
     using ibf_t = interleaved_bloom_filter;
 
-    //!\brief A pointer to the augmented hibf::interleaved_bloom_filter.
+    //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
     ibf_t const * ibf_ptr{nullptr};
 
-    //!\brief Store a hibf::interleaved_bloom_filter::membership_agent to call `bulk_contains`.
+    //!\brief Store a seqan::hibf::interleaved_bloom_filter::membership_agent to call `bulk_contains`.
     membership_agent_type membership_agent;
 
 public:
@@ -1025,9 +1025,9 @@ public:
     counting_agent_type & operator=(counting_agent_type &&) = default;      //!< Defaulted.
     ~counting_agent_type() = default;                                       //!< Defaulted.
 
-    /*!\brief Construct a counting_agent_type for an existing hibf::interleaved_bloom_filter.
+    /*!\brief Construct a counting_agent_type for an existing seqan::hibf::interleaved_bloom_filter.
      * \private
-     * \param ibf The hibf::interleaved_bloom_filter.
+     * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
     explicit counting_agent_type(ibf_t const & ibf) :
         ibf_ptr(std::addressof(ibf)),
@@ -1059,7 +1059,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::interleaved_bloom_filter::counting_agent_type for each thread.
+     * seqan::hibf::interleaved_bloom_filter::counting_agent_type for each thread.
      */
     template <std::ranges::range value_range_t>
     [[nodiscard]] counting_vector<value_t> const & bulk_count(value_range_t && values) & noexcept
@@ -1086,4 +1086,4 @@ public:
     //!\}
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

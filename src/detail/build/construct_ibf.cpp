@@ -24,15 +24,15 @@
 #include <hibf/detail/timer.hpp>                     // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>         // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
 
-namespace hibf
+namespace seqan::hibf
 {
 
-hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                                             robin_hood::unordered_flat_set<uint64_t> & kmers,
-                                             size_t const number_of_bins,
-                                             lemon::ListDigraph::Node const & node,
-                                             build_data & data,
-                                             bool is_root)
+seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
+                                                    robin_hood::unordered_flat_set<uint64_t> & kmers,
+                                                    size_t const number_of_bins,
+                                                    lemon::ListDigraph::Node const & node,
+                                                    build_data & data,
+                                                    bool is_root)
 {
     auto & node_data = data.node_map[node];
 
@@ -40,14 +40,15 @@ hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint
     double const bin_bits{static_cast<double>(bin_size_in_bits({.fpr = data.config.maximum_false_positive_rate,
                                                                 .hash_count = data.config.number_of_hash_functions,
                                                                 .elements = kmers_per_bin}))};
-    hibf::bin_size const bin_size{static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
-    hibf::bin_count const bin_count{node_data.number_of_technical_bins};
+    seqan::hibf::bin_size const bin_size{
+        static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
+    seqan::hibf::bin_count const bin_count{node_data.number_of_technical_bins};
 
     timer<concurrent::no> local_index_allocation_timer{};
     local_index_allocation_timer.start();
-    hibf::interleaved_bloom_filter ibf{bin_count,
-                                       bin_size,
-                                       hibf::hash_function_count{data.config.number_of_hash_functions}};
+    seqan::hibf::interleaved_bloom_filter ibf{bin_count,
+                                              bin_size,
+                                              seqan::hibf::hash_function_count{data.config.number_of_hash_functions}};
     local_index_allocation_timer.stop();
     data.index_allocation_timer += local_index_allocation_timer;
 
@@ -58,4 +59,4 @@ hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint
     return ibf;
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Implements hibf::update_header_node_data.
+ * \brief Implements seqan::hibf::update_header_node_data.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
@@ -25,7 +25,7 @@
 #include <hibf/detail/build/update_header_node_data.hpp> // for update_header_node_data
 #include <hibf/detail/layout/layout.hpp>                 // for layout
 
-namespace hibf
+namespace seqan::hibf
 {
 
 void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_bins,
@@ -69,4 +69,4 @@ void update_header_node_data(std::vector<layout::layout::max_bin> && header_max_
     }
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

@@ -18,7 +18,7 @@
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 
-namespace hibf::sketch
+namespace seqan::hibf::sketch
 {
 
 /** @class hyperloglog
@@ -123,12 +123,12 @@ private:
         return arr;
     }();
 
-    uint64_t mask_{};                                                           ///< mask for the rank bits
-    double alphaMM_{};                                                          ///< alpha * m^2
-    float alphaMM_float_{};                                                     ///< alpha * m^2
-    uint64_t m_{};                                                              ///< register size
-    uint8_t b_{};                                                               ///< register bit width
-    std::vector<uint8_t, hibf::contrib::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
+    uint64_t mask_{};                                                                  ///< mask for the rank bits
+    double alphaMM_{};                                                                 ///< alpha * m^2
+    float alphaMM_float_{};                                                            ///< alpha * m^2
+    uint64_t m_{};                                                                     ///< register size
+    uint8_t b_{};                                                                      ///< register bit width
+    std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
 };
 
-} // namespace hibf::sketch
+} // namespace seqan::hibf::sketch

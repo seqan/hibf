@@ -7,7 +7,7 @@
 #include <hibf/detail/layout/layout.hpp>      // for layout
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 /*!\brief Computes the layout and stores the kmer_counts and sketches in the respective vectors for further use.
@@ -21,4 +21,4 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
 
 layout compute_layout(config const & config);
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

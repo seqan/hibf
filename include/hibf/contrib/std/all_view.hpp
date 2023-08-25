@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides seqan::std::views::{all, all_t}, and seqan::std::ranges::owning_view.
+ * \brief Provides seqan::stl::views::{all, all_t}, and seqan::stl::ranges::owning_view.
  */
 
 // File might be included from multiple libraries.
@@ -18,33 +18,33 @@
 
 #if __cpp_lib_ranges >= 202110L
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 using ::std::ranges::owning_view;
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
 using ::std::ranges::views::all;
 using ::std::ranges::views::all_t;
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 #else
 #    include "concepts.hpp"
 #    include "detail/adaptor_base.hpp"
 #    include "detail/exposition_only.hpp"
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 /*!\brief A move-only view that takes unique ownership of a range.
  * \sa https://en.cppreference.com/w/cpp/ranges/owning_view
  */
 template <::std::ranges::range rng_t>
-    requires ::std::movable<rng_t> && (!seqan::std::detail::is_initializer_list<::std::remove_cvref_t<rng_t>>)
+    requires ::std::movable<rng_t> && (!seqan::stl::detail::is_initializer_list<::std::remove_cvref_t<rng_t>>)
 class owning_view : public ::std::ranges::view_interface<owning_view<rng_t>>
 {
 private:
@@ -158,13 +158,13 @@ public:
     }
 };
 
-/*!\brief The functor for seqan::std::views::all.
+/*!\brief The functor for seqan::stl::views::all.
  */
-class all_fn : public seqan::std::detail::adaptor_base<all_fn>
+class all_fn : public seqan::stl::detail::adaptor_base<all_fn>
 {
 private:
     //!\brief Befriend the base class.
-    friend seqan::std::detail::adaptor_base<all_fn>;
+    friend seqan::stl::detail::adaptor_base<all_fn>;
 
     //!\brief Checks whether a type is a view.
     template <typename t>
@@ -179,7 +179,7 @@ private:
     static constexpr bool valid_for_owning_view = requires { owning_view(::std::declval<t>()); };
 
 public:
-    using seqan::std::detail::adaptor_base<all_fn>::adaptor_base;
+    using seqan::stl::detail::adaptor_base<all_fn>::adaptor_base;
 
     /*!\brief Returns a view that includes all elements of the range argument.
      * \sa https://en.cppreference.com/w/cpp/ranges/all_view
@@ -191,7 +191,7 @@ public:
      *   * A ::std::ranges::ref_view of `rng` if that expression is valid.
      *   * Otherwise, a seqan3::detail::owning_view of `rng`.
      */
-    template <seqan::std::ranges::viewable_range rng_t>
+    template <seqan::stl::ranges::viewable_range rng_t>
         requires decays_to_view<rng_t> || valid_for_ref_view<rng_t> || valid_for_owning_view<rng_t>
     static auto impl(rng_t && rng)
     {
@@ -204,21 +204,21 @@ public:
     }
 };
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
 /*!\copydoc all_fn::impl
  */
-inline constexpr auto all = seqan::std::ranges::all_fn{};
+inline constexpr auto all = seqan::stl::ranges::all_fn{};
 
 /*!\brief Returns the type that results from appying seqan3::detail::all to a range.
  */
-template <seqan::std::ranges::viewable_range rng_t>
+template <seqan::stl::ranges::viewable_range rng_t>
 using all_t = decltype(all(::std::declval<rng_t>()));
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 
 #endif // __cpp_lib_ranges >= 202110L
 

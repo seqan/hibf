@@ -24,19 +24,19 @@
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
-namespace hibf
+namespace seqan::hibf
 {
 
 /*!\brief The HIBF binning directory. A data structure that efficiently answers set-membership queries for multiple
  *        bins.
  * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See
- *                           [hibf::data_layout](https://docs.seqan.de/seqan/3.0.3/group__submodule__dream__index.html#gae9cb143481c46a1774b3cdf5d9fdb518).
- * \see [hibf::interleaved_bloom_filter][1]
+ *                           [seqan::hibf::data_layout](https://docs.seqan.de/seqan/3.0.3/group__submodule__dream__index.html#gae9cb143481c46a1774b3cdf5d9fdb518).
+ * \see [seqan::hibf::interleaved_bloom_filter][1]
  * \details
  *
- * This class improves the [hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
+ * This class improves the [seqan::hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
  * to establish a hierarchical structure. This structure can then be used to split or merge user bins and distribute
- * them over a variable number of technical bins. In the [hibf::interleaved_bloom_filter][1], the number of user bins
+ * them over a variable number of technical bins. In the [seqan::hibf::interleaved_bloom_filter][1], the number of user bins
  * and technical bins is always the same. This causes performance degradation when there are many user bins or the user
  * bins are unevenly distributed.
  *
@@ -52,7 +52,7 @@ namespace hibf
  *
  * # Hierarchical Interleaved Bloom Filter (HIBF)
  *
- * In constrast to the [hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
+ * In constrast to the [seqan::hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
  * , or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
  * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
  * to further distinguish between merged bins.
@@ -66,13 +66,13 @@ namespace hibf
  *
  * ## Querying
  * To query the Hierarchical Interleaved Bloom Filter for values, call
- * hibf::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
- * hibf::hierarchical_interleaved_bloom_filter::membership_agent.
- * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+ * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
+ * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent.
+ * In contrast to the [seqan::hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
  *
  * To count the occurrences in each user bin of a range of values in the Hierarchical Interleaved Bloom Filter, call
- * hibf::hierarchical_interleaved_bloom_filter::counting_agent() and use
- * the returned hibf::hierarchical_interleaved_bloom_filter::counting_agent_type.
+ * seqan::hibf::hierarchical_interleaved_bloom_filter::counting_agent() and use
+ * the returned seqan::hibf::hierarchical_interleaved_bloom_filter::counting_agent_type.
  *
  * ## Thread safety
  *
@@ -85,10 +85,10 @@ namespace hibf
 class hierarchical_interleaved_bloom_filter
 {
 public:
-    /*!\brief Manages membership queries for the hibf::hierarchical_interleaved_bloom_filter.
-    * \see hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
+    /*!\brief Manages membership queries for the seqan::hibf::hierarchical_interleaved_bloom_filter.
+    * \see seqan::hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
-    * In contrast to the [hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+    * In contrast to the [seqan::hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
     */
     class membership_agent_type;
 
@@ -109,7 +109,7 @@ public:
     /*!\brief [Advanced] Constructs the HIBF from a layout file (stream) and a given input function
      * \details
      * This constructor makes it possible to construct an hibf from a given layout file instead of calculating the
-     * layout based on the input function. A hibf::config object is not needed as it is assumed to be stored in the
+     * layout based on the input function. A seqan::hibf::config object is not needed as it is assumed to be stored in the
      * layout file. A layout file can be constructed manually or via chopper (https://github.com/seqan/chopper)
      * or raptor-layout (https://github.com/seqan/raptor).
      */
@@ -137,13 +137,13 @@ public:
 
     /*!\cond DEV
      * \brief Serialisation support function.
-     * \tparam archive_t Type of `archive`; must satisfy hibf::cereal_archive.
+     * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
      * \attention These functions are never called directly.
      * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
      */
-    template <hibf::cereal_archive archive_t>
+    template <seqan::hibf::cereal_archive archive_t>
     void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
     {
         archive(ibf_vector);
@@ -227,7 +227,7 @@ public:
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
+     * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
@@ -261,4 +261,4 @@ hierarchical_interleaved_bloom_filter::membership_agent() const
     return typename hierarchical_interleaved_bloom_filter::membership_agent_type{*this};
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

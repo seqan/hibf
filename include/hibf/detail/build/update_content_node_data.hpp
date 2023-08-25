@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Implements hibf::update_content_node_data.
+ * \brief Implements seqan::hibf::update_content_node_data.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
@@ -19,11 +19,11 @@
 #include <hibf/detail/build/node_data.hpp> // for node_data
 #include <hibf/detail/layout/layout.hpp>   // for layout
 
-namespace hibf
+namespace seqan::hibf
 {
 
 void update_content_node_data(std::vector<layout::layout::user_bin> && layout_user_bins,
                               lemon::ListDigraph & ibf_graph,
                               lemon::ListDigraph::NodeMap<node_data> & node_map);
 
-} // namespace hibf
+} // namespace seqan::hibf

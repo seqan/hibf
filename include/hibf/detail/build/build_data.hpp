@@ -17,14 +17,14 @@
 #include <hibf/detail/build/node_data.hpp> // for node_data
 #include <hibf/detail/timer.hpp>           // for concurrent, timer
 
-namespace hibf
+namespace seqan::hibf
 {
 
 struct build_data
 {
     std::atomic<size_t> ibf_number{};
 
-    hibf::config const & config;
+    seqan::hibf::config const & config;
 
     lemon::ListDigraph ibf_graph{};
     lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
@@ -46,4 +46,4 @@ struct build_data
     }
 };
 
-} // namespace hibf
+} // namespace seqan::hibf

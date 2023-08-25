@@ -13,7 +13,7 @@ TEST(layout_test, printing_max_bins)
 {
     std::stringstream ss{};
 
-    hibf::layout::layout layout;
+    seqan::hibf::layout::layout layout;
 
     layout.max_bins.emplace_back(std::vector<size_t>{}, 0);
     layout.max_bins.emplace_back(std::vector<size_t>{2}, 2);
@@ -34,7 +34,7 @@ TEST(layout_test, printing_user_bins)
 {
     std::stringstream ss{};
 
-    hibf::layout::layout layout;
+    seqan::hibf::layout::layout layout;
 
     layout.user_bins.emplace_back(7, std::vector<size_t>{}, 1, 0);
     layout.user_bins.emplace_back(4, std::vector<size_t>{1}, 22, 0);
@@ -55,7 +55,7 @@ TEST(layout_test, write_to)
 {
     std::stringstream ss{};
 
-    hibf::layout::layout layout;
+    seqan::hibf::layout::layout layout;
 
     layout.top_level_max_bin_id = 111;
     layout.max_bins.emplace_back(std::vector<size_t>{0}, 0);
@@ -92,14 +92,14 @@ TEST(layout_test, read_from)
 5	1;2;3;4;22	1;1;1;1;21
 )layout_file"};
 
-    hibf::layout::layout layout;
+    seqan::hibf::layout::layout layout;
     layout.read_from(ss);
 
     EXPECT_EQ(layout.top_level_max_bin_id, 111);
-    EXPECT_EQ(layout.max_bins[0], (hibf::layout::layout::max_bin{{0}, 0}));
-    EXPECT_EQ(layout.max_bins[1], (hibf::layout::layout::max_bin{{2}, 2}));
-    EXPECT_EQ(layout.max_bins[2], (hibf::layout::layout::max_bin{{1, 2, 3, 4}, 22}));
-    EXPECT_EQ(layout.user_bins[0], (hibf::layout::layout::user_bin{7, std::vector<size_t>{}, 1, 0}));
-    EXPECT_EQ(layout.user_bins[1], (hibf::layout::layout::user_bin{4, std::vector<size_t>{1}, 22, 0}));
-    EXPECT_EQ(layout.user_bins[2], (hibf::layout::layout::user_bin{5, std::vector<size_t>{1, 2, 3, 4}, 21, 22}));
+    EXPECT_EQ(layout.max_bins[0], (seqan::hibf::layout::layout::max_bin{{0}, 0}));
+    EXPECT_EQ(layout.max_bins[1], (seqan::hibf::layout::layout::max_bin{{2}, 2}));
+    EXPECT_EQ(layout.max_bins[2], (seqan::hibf::layout::layout::max_bin{{1, 2, 3, 4}, 22}));
+    EXPECT_EQ(layout.user_bins[0], (seqan::hibf::layout::layout::user_bin{7, std::vector<size_t>{}, 1, 0}));
+    EXPECT_EQ(layout.user_bins[1], (seqan::hibf::layout::layout::user_bin{4, std::vector<size_t>{1}, 22, 0}));
+    EXPECT_EQ(layout.user_bins[2], (seqan::hibf::layout::layout::user_bin{5, std::vector<size_t>{1, 2, 3, 4}, 21, 22}));
 }

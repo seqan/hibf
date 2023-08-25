@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides [seqan::std::detail::non_propagating_cache](https://eel.is/c++draft/range.nonprop.cache).
+ * \brief Provides [seqan::stl::detail::non_propagating_cache](https://eel.is/c++draft/range.nonprop.cache).
  */
 
 // File might be included from multiple libraries.
@@ -16,7 +16,7 @@
 
 #include <optional>
 
-namespace seqan::std::detail
+namespace seqan::stl::detail
 {
 
 /*!\brief A helper that enables an input view to temporarily cache values as it is iterated over.
@@ -78,6 +78,6 @@ public:
     }
 };
 
-} // namespace seqan::std::detail
+} // namespace seqan::stl::detail
 
 #endif // SEQAN_STD_DETAIL_NON_PROPAGATING_CACHE

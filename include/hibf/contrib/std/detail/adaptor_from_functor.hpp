@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides seqan::std::detail::adaptor_from_functor
+ * \brief Provides seqan::stl::detail::adaptor_from_functor
  * \author Hannes Hauswedell <hannes.hauswedell AT fu-berlin.de>
  */
 
@@ -16,7 +16,7 @@
 
 #include "adaptor_base.hpp"
 
-namespace seqan::std::detail
+namespace seqan::stl::detail
 {
 
 // ============================================================================
@@ -70,6 +70,6 @@ public:
     //!\}
 };
 
-} // namespace seqan::std::detail
+} // namespace seqan::stl::detail
 
 #endif // SEQAN_STD_DETAIL_ADAPTOR_FROM_FUNCTOR

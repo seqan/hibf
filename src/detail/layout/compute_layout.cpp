@@ -15,7 +15,7 @@
 #include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 #include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 layout
@@ -24,7 +24,7 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     layout resulting_layout{};
 
     // The output streams facilitate writing the layout file in hierarchical structure.
-    // hibf::execute currently writes the filled buffers to the output file.
+    // seqan::hibf::execute currently writes the filled buffers to the output file.
     std::stringstream output_buffer;
     std::stringstream header_buffer;
 
@@ -36,7 +36,7 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
 #pragma omp parallel for schedule(static) num_threads(config.threads) private(kmers)
     for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
-        hibf::sketch::hyperloglog sketch(config.sketch_bits);
+        seqan::hibf::sketch::hyperloglog sketch(config.sketch_bits);
 
         kmers.clear();
         config.input_fn(i, std::inserter(kmers, kmers.begin()));
@@ -55,7 +55,7 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
                      .kmer_counts = std::addressof(kmer_counts),
                      .sketches = std::addressof(sketches)};
 
-    size_t const max_hibf_id = hibf::execute(config, store);
+    size_t const max_hibf_id = seqan::hibf::execute(config, store);
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
     return *store.hibf_layout; // return layout as string for now, containing the file
@@ -69,4 +69,4 @@ layout compute_layout(config const & config)
     return compute_layout(config, kmer_counts, sketches);
 }
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

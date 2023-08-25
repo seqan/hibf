@@ -35,7 +35,7 @@ TEST(string_view, range_eq_pass)
     std::vector<char> expect{'H', 'e', 'l', 'l', 'o'};
     std::string_view result{"Hello"};
 
-    auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+    auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
     EXPECT_TRUE(expect_result);
     EXPECT_RANGE_EQ(expect, result);
 }
@@ -52,7 +52,7 @@ TEST(string_view, range_eq_fail)
     std::vector<char> expect{'H', 'e', 'l', '\n', 'l', 'o'};
     std::string_view result{"Hello!"};
 
-    auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+    auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
     EXPECT_NONFATAL_FAILURE(EXPECT_RANGE_EQ(expect, result), error_message);
@@ -64,7 +64,7 @@ TEST(span, range_eq_pass)
     std::vector<int> source{-2, -1, 0, 1, 2, 3, 4, 5, 6};
     std::span result{source.begin() + 2, 5};
 
-    auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+    auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
     EXPECT_TRUE(expect_result);
     EXPECT_RANGE_EQ(expect, result);
 }
@@ -81,7 +81,7 @@ TEST(span, range_eq_fail)
     std::vector<int> source{-2, -1, 0, 1, 2, 3, 4, 5, 6};
     std::span result{source.begin() + 1, 7};
 
-    auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+    auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
 
     EXPECT_FALSE(expect_result);
     EXPECT_STREQ(error_message, expect_result.message());
@@ -144,7 +144,7 @@ TEST(input_range, range_eq_pass)
 
     {
         input_range result{};
-        auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+        auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
         EXPECT_TRUE(expect_result);
     }
 
@@ -166,7 +166,7 @@ TEST(input_range, range_eq_fail)
 
     {
         input_range result{};
-        auto && expect_result = hibf::test::expect_range_eq{}("expect", "result", expect, result);
+        auto && expect_result = seqan::hibf::test::expect_range_eq{}("expect", "result", expect, result);
         EXPECT_FALSE(expect_result);
         EXPECT_STREQ(error_message, expect_result.message());
     }

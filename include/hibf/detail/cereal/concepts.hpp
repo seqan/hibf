@@ -11,7 +11,7 @@
 
 #include <cereal/details/helpers.hpp> // for InputArchiveBase, OutputArchiveBase
 
-namespace hibf
+namespace seqan::hibf
 {
 
 template <typename t>
@@ -23,4 +23,4 @@ concept cereal_input_archive = std::is_base_of_v<cereal::detail::InputArchiveBas
 template <typename t>
 concept cereal_archive = cereal_output_archive<t> || cereal_input_archive<t>;
 
-} // namespace hibf
+} // namespace seqan::hibf

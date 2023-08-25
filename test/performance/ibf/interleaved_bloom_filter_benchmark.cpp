@@ -64,9 +64,9 @@ auto set_up(::benchmark::State const & state)
     std::vector<size_t> const bin_indices{generate(bins - 1)};
     std::vector<size_t> const hash_values{generate()};
 
-    hibf::interleaved_bloom_filter ibf{hibf::bin_count{bins},
-                                       hibf::bin_size{bits},
-                                       hibf::hash_function_count{hash_num}};
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{bins},
+                                              seqan::hibf::bin_size{bits},
+                                              seqan::hibf::hash_function_count{hash_num}};
 
     return std::make_tuple(bin_indices, hash_values, ibf);
 }
@@ -77,8 +77,8 @@ void emplace_benchmark(::benchmark::State & state)
 
     for (auto _ : state)
     {
-        for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
-            ibf.emplace(hash, hibf::bin_index{bin});
+        for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
+            ibf.emplace(hash, seqan::hibf::bin_index{bin});
     }
 
     state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(hash_values));
@@ -90,13 +90,13 @@ void clear_benchmark(::benchmark::State & state)
     (void)bin_indices;
     (void)hash_values;
 
-    std::vector<hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
-                                           | std::views::transform(
-                                                 [](size_t i)
-                                                 {
-                                                     return hibf::bin_index{i};
-                                                 })
-                                           | seqan::std::ranges::to<std::vector>();
+    std::vector<seqan::hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
+                                                  | std::views::transform(
+                                                        [](size_t i)
+                                                        {
+                                                            return seqan::hibf::bin_index{i};
+                                                        })
+                                                  | seqan::stl::ranges::to<std::vector>();
 
     for (auto _ : state)
     {
@@ -113,13 +113,13 @@ void clear_range_benchmark(::benchmark::State & state)
     (void)bin_indices;
     (void)hash_values;
 
-    std::vector<hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
-                                           | std::views::transform(
-                                                 [](size_t i)
-                                                 {
-                                                     return hibf::bin_index{i};
-                                                 })
-                                           | seqan::std::ranges::to<std::vector>();
+    std::vector<seqan::hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
+                                                  | std::views::transform(
+                                                        [](size_t i)
+                                                        {
+                                                            return seqan::hibf::bin_index{i};
+                                                        })
+                                                  | seqan::stl::ranges::to<std::vector>();
 
     for (auto _ : state)
     {
@@ -133,8 +133,8 @@ void bulk_contains_benchmark(::benchmark::State & state)
 {
     auto && [bin_indices, hash_values, ibf] = set_up(state);
 
-    for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
-        ibf.emplace(hash, hibf::bin_index{bin});
+    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
+        ibf.emplace(hash, seqan::hibf::bin_index{bin});
 
     auto agent = ibf.membership_agent();
     for (auto _ : state)
@@ -153,8 +153,8 @@ void bulk_count_benchmark(::benchmark::State & state)
 {
     auto && [bin_indices, hash_values, ibf] = set_up(state);
 
-    for (auto [hash, bin] : seqan::std::views::zip(hash_values, bin_indices))
-        ibf.emplace(hash, hibf::bin_index{bin});
+    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
+        ibf.emplace(hash, seqan::hibf::bin_index{bin});
 
     auto agent = ibf.counting_agent();
     for (auto _ : state)

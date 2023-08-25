@@ -11,7 +11,7 @@
  */
 
 /*!\defgroup search_dream_index DREAM Index
- * \brief Provides hibf::interleaved_bloom_filter.
+ * \brief Provides seqan::hibf::interleaved_bloom_filter.
  * \ingroup search
  * \see search
  */

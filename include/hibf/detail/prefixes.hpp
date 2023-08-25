@@ -4,7 +4,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::prefix
+namespace seqan::hibf::prefix
 {
 /* These prefixes are for writing the layout file
 
@@ -57,4 +57,4 @@ static_assert(layout_first_header_line.ends_with(layout_top_level));
 constexpr std::string_view layout_column_names{"#USER_BIN_IDX\tTECHNICAL_BIN_INDICES\tNUMBER_OF_TECHNICAL_BINS"};
 static_assert(layout_column_names.starts_with(layout_header));
 
-} // namespace hibf::prefix
+} // namespace seqan::hibf::prefix

@@ -7,7 +7,7 @@
 TEST(snippet_tmp_directory, tmp_directory_)
 {
     // create a directory folder
-    hibf::test::tmp_directory tmp{};
+    seqan::hibf::test::tmp_directory tmp{};
 
     // Some function that should creates temporary files and removes them again
     {

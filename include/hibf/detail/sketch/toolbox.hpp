@@ -10,7 +10,7 @@
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
-namespace hibf::sketch::toolbox
+namespace seqan::hibf::sketch::toolbox
 {
 
 //!\brief type for a node in the clustering tree when for the rearrangement
@@ -157,4 +157,4 @@ void trace(std::vector<clustering_node> const & clustering,
            size_t const first,
            size_t const id);
 
-} // namespace hibf::sketch::toolbox
+} // namespace seqan::hibf::sketch::toolbox

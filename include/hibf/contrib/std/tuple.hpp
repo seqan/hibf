@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides seqan::std::tuple.
+ * \brief Provides seqan::stl::tuple.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -17,19 +17,19 @@
 
 #ifdef __cpp_lib_tuple_like
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 using ::std::tuple;
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
 #else
 
 #    include "detail/exposition_only.hpp"
 #    include "pair.hpp"
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 template <class... Types>
@@ -891,9 +891,9 @@ public:
 template <class... UTypes>
 tuple(UTypes...) -> tuple<UTypes...>;
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
-namespace seqan::std::detail::tuple
+namespace seqan::stl::detail::tuple
 {
 
 template <typename query_t, typename... pack_t>
@@ -905,109 +905,109 @@ namespace std
 {
 
 template <typename... args>
-struct tuple_size<seqan::std::tuple<args...>> : public tuple_size<::std::tuple<args...>>
+struct tuple_size<seqan::stl::tuple<args...>> : public tuple_size<::std::tuple<args...>>
 {};
 
 template <size_t index, typename... args>
-struct tuple_element<index, seqan::std::tuple<args...>> : public tuple_element<index, ::std::tuple<args...>>
+struct tuple_element<index, seqan::stl::tuple<args...>> : public tuple_element<index, ::std::tuple<args...>>
 {};
 
 template <class... Ts, class... Us>
-    requires requires { typename seqan::std::tuple<::std::common_type_t<Ts, Us>...>; }
-struct common_type<seqan::std::tuple<Ts...>, seqan::std::tuple<Us...>>
+    requires requires { typename seqan::stl::tuple<::std::common_type_t<Ts, Us>...>; }
+struct common_type<seqan::stl::tuple<Ts...>, seqan::stl::tuple<Us...>>
 {
-    using type = seqan::std::tuple<::std::common_type_t<Ts, Us>...>;
+    using type = seqan::stl::tuple<::std::common_type_t<Ts, Us>...>;
 };
 
 template <class... Ts, class... Us>
-    requires requires { typename seqan::std::tuple<::std::common_type_t<Ts, Us>...>; }
-struct common_type<::std::tuple<Ts...>, seqan::std::tuple<Us...>>
+    requires requires { typename seqan::stl::tuple<::std::common_type_t<Ts, Us>...>; }
+struct common_type<::std::tuple<Ts...>, seqan::stl::tuple<Us...>>
 {
-    using type = seqan::std::tuple<::std::common_type_t<Ts, Us>...>;
+    using type = seqan::stl::tuple<::std::common_type_t<Ts, Us>...>;
 };
 
 template <class... Ts, class... Us>
-    requires requires { typename seqan::std::tuple<::std::common_type_t<Ts, Us>...>; }
-struct common_type<seqan::std::tuple<Ts...>, ::std::tuple<Us...>>
+    requires requires { typename seqan::stl::tuple<::std::common_type_t<Ts, Us>...>; }
+struct common_type<seqan::stl::tuple<Ts...>, ::std::tuple<Us...>>
 {
-    using type = seqan::std::tuple<::std::common_type_t<Ts, Us>...>;
+    using type = seqan::stl::tuple<::std::common_type_t<Ts, Us>...>;
 };
 
 template <class... Ts, class... Us, template <class> class TQual, template <class> class UQual>
-    requires requires { typename seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
-struct basic_common_reference<seqan::std::tuple<Ts...>, seqan::std::tuple<Us...>, TQual, UQual>
+    requires requires { typename seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
+struct basic_common_reference<seqan::stl::tuple<Ts...>, seqan::stl::tuple<Us...>, TQual, UQual>
 {
-    using type = seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    using type = seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
 
 template <class... Ts, class... Us, template <class> class TQual, template <class> class UQual>
-    requires requires { typename seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
-struct basic_common_reference<seqan::std::tuple<Ts...>, ::std::tuple<Us...>, TQual, UQual>
+    requires requires { typename seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
+struct basic_common_reference<seqan::stl::tuple<Ts...>, ::std::tuple<Us...>, TQual, UQual>
 {
-    using type = seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    using type = seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
 
 template <class... Ts, class... Us, template <class> class TQual, template <class> class UQual>
-    requires requires { typename seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
-struct basic_common_reference<::std::tuple<Ts...>, seqan::std::tuple<Us...>, TQual, UQual>
+    requires requires { typename seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>; }
+struct basic_common_reference<::std::tuple<Ts...>, seqan::stl::tuple<Us...>, TQual, UQual>
 {
-    using type = seqan::std::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
+    using type = seqan::stl::tuple<::std::common_reference_t<TQual<Ts>, UQual<Us>>...>;
 };
 
 template <::std::size_t i, typename... types>
-constexpr ::std::tuple_element_t<i, seqan::std::tuple<types...>> & get(seqan::std::tuple<types...> & t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::tuple<types...>> & get(seqan::stl::tuple<types...> & t) noexcept
     requires (i < sizeof...(types))
 {
     return ::std::get<i>(static_cast<::std::tuple<types...> &>(t));
 }
 
 template <::std::size_t i, typename... types>
-constexpr ::std::tuple_element_t<i, seqan::std::tuple<types...>> const &
-get(seqan::std::tuple<types...> const & t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::tuple<types...>> const &
+get(seqan::stl::tuple<types...> const & t) noexcept
     requires (i < sizeof...(types))
 {
     return ::std::get<i>(static_cast<::std::tuple<types...> const &>(t));
 }
 
 template <::std::size_t i, typename... types>
-constexpr ::std::tuple_element_t<i, seqan::std::tuple<types...>> && get(seqan::std::tuple<types...> && t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::tuple<types...>> && get(seqan::stl::tuple<types...> && t) noexcept
     requires (i < sizeof...(types))
 {
     return ::std::get<i>(static_cast<::std::tuple<types...> &&>(::std::move(t)));
 }
 
 template <::std::size_t i, typename... types>
-constexpr ::std::tuple_element_t<i, seqan::std::tuple<types...>> const &&
-get(seqan::std::tuple<types...> const && t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::tuple<types...>> const &&
+get(seqan::stl::tuple<types...> const && t) noexcept
     requires (i < sizeof...(types))
 {
     return ::std::get<i>(static_cast<::std::tuple<types...> const &&>(::std::move(t)));
 }
 
 template <typename type, typename... types>
-constexpr type & get(seqan::std::tuple<types...> & t) noexcept
-    requires (seqan::std::detail::tuple::count_in_pack<type, types...> == 1)
+constexpr type & get(seqan::stl::tuple<types...> & t) noexcept
+    requires (seqan::stl::detail::tuple::count_in_pack<type, types...> == 1)
 {
     return ::std::get<type>(static_cast<::std::tuple<types...> &>(t));
 }
 
 template <typename type, typename... types>
-constexpr type const & get(seqan::std::tuple<types...> const & t) noexcept
-    requires (seqan::std::detail::tuple::count_in_pack<type, types...> == 1)
+constexpr type const & get(seqan::stl::tuple<types...> const & t) noexcept
+    requires (seqan::stl::detail::tuple::count_in_pack<type, types...> == 1)
 {
     return ::std::get<type>(static_cast<::std::tuple<types...> const &>(t));
 }
 
 template <typename type, typename... types>
-constexpr type && get(seqan::std::tuple<types...> && t) noexcept
-    requires (seqan::std::detail::tuple::count_in_pack<type, types...> == 1)
+constexpr type && get(seqan::stl::tuple<types...> && t) noexcept
+    requires (seqan::stl::detail::tuple::count_in_pack<type, types...> == 1)
 {
     return ::std::get<type>(static_cast<::std::tuple<types...> &&>(::std::move(t)));
 }
 
 template <typename type, typename... types>
-constexpr type const && get(seqan::std::tuple<types...> const && t) noexcept
-    requires (seqan::std::detail::tuple::count_in_pack<type, types...> == 1)
+constexpr type const && get(seqan::stl::tuple<types...> const && t) noexcept
+    requires (seqan::stl::detail::tuple::count_in_pack<type, types...> == 1)
 {
     return ::std::get<type>(static_cast<::std::tuple<types...> const &&>(::std::move(t)));
 }

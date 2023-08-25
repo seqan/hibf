@@ -9,7 +9,7 @@
 #include <hibf/detail/data_store.hpp>   // for data_store
 #include <hibf/next_multiple_of_64.hpp> // for next_multiple_of_64
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
 /*!\brief Distributes x Technical Bins across y User Bins while minimizing the maximal Technical Bin size
@@ -140,4 +140,4 @@ public:
     size_t execute();
 };
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

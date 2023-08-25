@@ -20,7 +20,7 @@
 #include <hibf/test/sandboxed_path.hpp> // for sandboxed_path, operator/
 #include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 
 class temporary_snippet_file
@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    static inline hibf::test::tmp_directory const tmp_folder{};
+    static inline seqan::hibf::test::tmp_directory const tmp_folder{};
 };
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

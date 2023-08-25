@@ -14,7 +14,7 @@
 
 #include <hibf/platform.hpp>
 
-namespace hibf::test
+namespace seqan::hibf::test
 {
 
 inline namespace literals
@@ -34,4 +34,4 @@ static constexpr size_t operator""_GiB(unsigned long long int const number) noex
 
 } // namespace literals
 
-} // namespace hibf::test
+} // namespace seqan::hibf::test

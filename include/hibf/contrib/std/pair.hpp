@@ -6,7 +6,7 @@
 // -----------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Provides seqan::std::pair.
+ * \brief Provides seqan::stl::pair.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -17,16 +17,16 @@
 
 #ifdef __cpp_lib_tuple_like
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 using ::std::pair;
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
 #else
 
-namespace seqan::std
+namespace seqan::stl
 {
 
 template <class T1, class T2>
@@ -544,124 +544,124 @@ public:
 template <class T1, class T2>
 pair(T1, T2) -> pair<T1, T2>;
 
-} // namespace seqan::std
+} // namespace seqan::stl
 
 namespace std
 {
 
 template <class T1, class T2>
-struct tuple_size<seqan::std::pair<T1, T2>> : public tuple_size<::std::pair<T1, T2>>
+struct tuple_size<seqan::stl::pair<T1, T2>> : public tuple_size<::std::pair<T1, T2>>
 {};
 
 template <size_t index, class T1, class T2>
-struct tuple_element<index, seqan::std::pair<T1, T2>> : public tuple_element<index, ::std::pair<T1, T2>>
+struct tuple_element<index, seqan::stl::pair<T1, T2>> : public tuple_element<index, ::std::pair<T1, T2>>
 {};
 
 template <class T1, class T2, class U1, class U2>
-    requires requires { typename seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
-struct common_type<seqan::std::pair<T1, T2>, seqan::std::pair<U1, U2>>
+    requires requires { typename seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
+struct common_type<seqan::stl::pair<T1, T2>, seqan::stl::pair<U1, U2>>
 {
-    using type = seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
+    using type = seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
 };
 
 template <class T1, class T2, class U1, class U2>
-    requires requires { typename seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
-struct common_type<::std::pair<T1, T2>, seqan::std::pair<U1, U2>>
+    requires requires { typename seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
+struct common_type<::std::pair<T1, T2>, seqan::stl::pair<U1, U2>>
 {
-    using type = seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
+    using type = seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
 };
 
 template <class T1, class T2, class U1, class U2>
-    requires requires { typename seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
-struct common_type<seqan::std::pair<T1, T2>, ::std::pair<U1, U2>>
+    requires requires { typename seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>; }
+struct common_type<seqan::stl::pair<T1, T2>, ::std::pair<U1, U2>>
 {
-    using type = seqan::std::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
+    using type = seqan::stl::pair<::std::common_type_t<T1, U1>, ::std::common_type_t<T2, U2>>;
 };
 
 template <class T1, class T2, class U1, class U2, template <class> class TQual, template <class> class UQual>
     requires requires {
-                 typename seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+                 typename seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                            ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
              }
-struct basic_common_reference<seqan::std::pair<T1, T2>, seqan::std::pair<U1, U2>, TQual, UQual>
+struct basic_common_reference<seqan::stl::pair<T1, T2>, seqan::stl::pair<U1, U2>, TQual, UQual>
 {
-    using type = seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+    using type = seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                   ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
 };
 
 template <class T1, class T2, class U1, class U2, template <class> class TQual, template <class> class UQual>
     requires requires {
-                 typename seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+                 typename seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                            ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
              }
-struct basic_common_reference<::std::pair<T1, T2>, seqan::std::pair<U1, U2>, TQual, UQual>
+struct basic_common_reference<::std::pair<T1, T2>, seqan::stl::pair<U1, U2>, TQual, UQual>
 {
-    using type = seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+    using type = seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                   ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
 };
 
 template <class T1, class T2, class U1, class U2, template <class> class TQual, template <class> class UQual>
     requires requires {
-                 typename seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+                 typename seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                            ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
              }
-struct basic_common_reference<seqan::std::pair<T1, T2>, ::std::pair<U1, U2>, TQual, UQual>
+struct basic_common_reference<seqan::stl::pair<T1, T2>, ::std::pair<U1, U2>, TQual, UQual>
 {
-    using type = seqan::std::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
+    using type = seqan::stl::pair<::std::common_reference_t<TQual<T1>, UQual<U1>>,
                                   ::std::common_reference_t<TQual<T2>, UQual<U2>>>;
 };
 
 template <::std::size_t i, class T1, class T2>
-constexpr ::std::tuple_element_t<i, seqan::std::pair<T1, T2>> & get(seqan::std::pair<T1, T2> & t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::pair<T1, T2>> & get(seqan::stl::pair<T1, T2> & t) noexcept
     requires (i < 2)
 {
     return ::std::get<i>(static_cast<::std::pair<T1, T2> &>(t));
 }
 
 template <::std::size_t i, class T1, class T2>
-constexpr ::std::tuple_element_t<i, seqan::std::pair<T1, T2>> const & get(seqan::std::pair<T1, T2> const & t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::pair<T1, T2>> const & get(seqan::stl::pair<T1, T2> const & t) noexcept
     requires (i < 2)
 {
     return ::std::get<i>(static_cast<::std::pair<T1, T2> const &>(t));
 }
 
 template <::std::size_t i, class T1, class T2>
-constexpr ::std::tuple_element_t<i, seqan::std::pair<T1, T2>> && get(seqan::std::pair<T1, T2> && t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::pair<T1, T2>> && get(seqan::stl::pair<T1, T2> && t) noexcept
     requires (i < 2)
 {
     return ::std::get<i>(static_cast<::std::pair<T1, T2> &&>(::std::move(t)));
 }
 
 template <::std::size_t i, class T1, class T2>
-constexpr ::std::tuple_element_t<i, seqan::std::pair<T1, T2>> const && get(seqan::std::pair<T1, T2> const && t) noexcept
+constexpr ::std::tuple_element_t<i, seqan::stl::pair<T1, T2>> const && get(seqan::stl::pair<T1, T2> const && t) noexcept
     requires (i < 2)
 {
     return ::std::get<i>(static_cast<::std::pair<T1, T2> const &&>(::std::move(t)));
 }
 
 template <typename type, class T1, class T2>
-constexpr type & get(seqan::std::pair<T1, T2> & t) noexcept
+constexpr type & get(seqan::stl::pair<T1, T2> & t) noexcept
     requires (!::std::same_as<T1, T2>)
 {
     return ::std::get<type>(static_cast<::std::pair<T1, T2> &>(t));
 }
 
 template <typename type, class T1, class T2>
-constexpr type const & get(seqan::std::pair<T1, T2> const & t) noexcept
+constexpr type const & get(seqan::stl::pair<T1, T2> const & t) noexcept
     requires (!::std::same_as<T1, T2>)
 {
     return ::std::get<type>(static_cast<::std::pair<T1, T2> const &>(t));
 }
 
 template <typename type, class T1, class T2>
-constexpr type && get(seqan::std::pair<T1, T2> && t) noexcept
+constexpr type && get(seqan::stl::pair<T1, T2> && t) noexcept
     requires (!::std::same_as<T1, T2>)
 {
     return ::std::get<type>(static_cast<::std::pair<T1, T2> &&>(::std::move(t)));
 }
 
 template <typename type, class T1, class T2>
-constexpr type const && get(seqan::std::pair<T1, T2> const && t) noexcept
+constexpr type const && get(seqan::stl::pair<T1, T2> const && t) noexcept
     requires (!::std::same_as<T1, T2>)
 {
     return ::std::get<type>(static_cast<::std::pair<T1, T2> const &&>(::std::move(t)));

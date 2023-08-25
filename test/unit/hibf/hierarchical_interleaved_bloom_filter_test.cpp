@@ -21,16 +21,16 @@ TEST(hibf_test, test_specific_hash_values)
     // range of range of sequences
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
 
-    hibf::config config{.input_fn =
-                            [&](size_t const num, hibf::insert_iterator it)
-                        {
-                            for (auto const hash : hashes[num])
-                                it = hash;
-                        },
-                        .number_of_user_bins = 2,
-                        .disable_rearrangement = true};
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const num, seqan::hibf::insert_iterator it)
+                               {
+                                   for (auto const hash : hashes[num])
+                                       it = hash;
+                               },
+                               .number_of_user_bins = 2,
+                               .disable_rearrangement = true};
 
-    hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
 
     {
         std::vector<size_t> query{1, 2, 3, 4, 5};
@@ -47,7 +47,7 @@ TEST(hibf_test, build_from_layout)
     // range of range of sequences
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
 
-    auto input_fn = [&](size_t const num, hibf::insert_iterator it)
+    auto input_fn = [&](size_t const num, seqan::hibf::insert_iterator it)
     {
         for (auto const hash : hashes[num])
             it = hash;
@@ -76,7 +76,7 @@ TEST(hibf_test, build_from_layout)
                              "1\t0\t34\n"
                              "0\t34\t30\n"};
 
-    hibf::hierarchical_interleaved_bloom_filter hibf{input_fn, stream};
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_fn, stream};
 
     {
         std::vector<size_t> query{1, 2, 3, 4, 5};
@@ -99,34 +99,34 @@ TEST(hibf_test, build_from_layout)
 
 // TEST(hibf_seqan3_test, input_sequences_of_sequences)
 // {
-//     using namespace hibf::literals;
+//     using namespace seqan::hibf::literals;
 
-//     auto kmer_transformation = hibf::views::kmer_hash(hibf::ungapped{2u});
+//     auto kmer_transformation = seqan::hibf::views::kmer_hash(seqan::hibf::ungapped{2u});
 
 //     // range of range of sequences
-//     std::vector<std::vector<std::vector<hibf::dna4>>> seqs{{"AAAGGGGGGC"_dna4}, {"TTTTTT"_dna4}};
+//     std::vector<std::vector<std::vector<seqan::hibf::dna4>>> seqs{{"AAAGGGGGGC"_dna4}, {"TTTTTT"_dna4}};
 
-//     hibf::config config
+//     seqan::hibf::config config
 //     {
-//         .input = seqs | hibf::views::deep{kmer_transformation},
+//         .input = seqs | seqan::hibf::views::deep{kmer_transformation},
 //         .rearrange_user_bins = false
 //     };
 
-//     hibf::hierarchical_interleaved_bloom_filter hibf{config};
+//     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
 
 //     auto agent = hibf.membership_agent();
 
-//     std::vector<hibf::dna4> query{"AAGG"_dna4};
+//     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
 //     auto query_kmers = query | kmer_transformation;
 
 //     auto result = agent.bulk_contains(query_kmers, 1);
 
-//     hibf::debug_stream << result << std::endl;
+//     seqan::hibf::debug_stream << result << std::endl;
 // }
 
 // TEST(hibf_seqan3_test, input_files)
 // {
-//     hibf::test::tmp_directory tmp{};
+//     seqan::hibf::test::tmp_directory tmp{};
 //     std::filesystem::path f1{tmp.path() / "f1.fa"};
 //     std::filesystem::path f2{tmp.path() / "f2.fa"};
 
@@ -138,33 +138,33 @@ TEST(hibf_test, build_from_layout)
 //         out2 << ">seq1\nTTTTTT\n";
 //     }
 
-//     auto transform = hibf::views::kmer_hash(hibf::ungapped{2u});
+//     auto transform = seqan::hibf::views::kmer_hash(seqan::hibf::ungapped{2u});
 
 //     // range of range of sequences
 //     std::vector<std::string> filenames{f1.string(), f2.string()};
 //     auto file_range = filenames | std::views::transform([&transform](auto const & f)
 //     {
 //         auto record_transform = std::views::transform([&transform](auto && rec){ return rec.sequence() | transform; });
-//         return hibf::detail::all(hibf::sequence_file_input{f}) | record_transform;
+//         return seqan::hibf::detail::all(seqan::hibf::sequence_file_input{f}) | record_transform;
 //     });
 
-//     hibf::config config
+//     seqan::hibf::config config
 //     {
 //         .input = file_range,
 //         .rearrange_user_bins = false
 //     };
 
-//     hibf::hierarchical_interleaved_bloom_filter hibf{config};
+//     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
 
 //     auto agent = hibf.membership_agent();
 
-//     using namespace hibf::literals;
+//     using namespace seqan::hibf::literals;
 
-//     std::vector<hibf::dna4> query{"AAGG"_dna4};
+//     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
 
 //     auto result = agent.bulk_contains(query | transform, 1);
 
-//     hibf::debug_stream << result << std::endl; // prints [0] since query is found in user bin 0
+//     seqan::hibf::debug_stream << result << std::endl; // prints [0] since query is found in user bin 0
 // }
 
 // #endif // HIBF_HAS_SEQAN3

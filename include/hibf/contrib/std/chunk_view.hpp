@@ -7,7 +7,7 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Provides seqan::std::views::chunk.
+ * \brief Provides seqan::stl::views::chunk.
  */
 
 // File might be included from multiple libraries.
@@ -18,12 +18,12 @@
 
 #ifdef __cpp_lib_ranges_chunk
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
 using ::std::ranges::views::chunk;
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 
 #else
 
@@ -37,7 +37,7 @@ using ::std::ranges::views::chunk;
 #    include "detail/exposition_only.hpp"
 #    include "detail/non_propagating_cache.hpp"
 
-namespace seqan::std::detail::chunk
+namespace seqan::stl::detail::chunk
 {
 
 template <class I>
@@ -55,9 +55,9 @@ constexpr auto to_unsigned_like(T v) noexcept
     return static_cast<::std::make_unsigned_t<T>>(v);
 }
 
-} // namespace seqan::std::detail::chunk
+} // namespace seqan::stl::detail::chunk
 
-namespace seqan::std::ranges
+namespace seqan::stl::ranges
 {
 
 template <::std::ranges::view V>
@@ -74,7 +74,7 @@ SEQAN_STD_NESTED_VISIBILITY
     ::std::ranges::range_difference_t<V> n_;
     ::std::ranges::range_difference_t<V> remainder_ = 0;
 
-    seqan::std::detail::non_propagating_cache<::std::ranges::iterator_t<V>> current_;
+    seqan::stl::detail::non_propagating_cache<::std::ranges::iterator_t<V>> current_;
 
 private:
     class outer_iterator;
@@ -115,19 +115,19 @@ public:
     constexpr auto size()
         requires ::std::ranges::sized_range<V>
     {
-        return seqan::std::detail::chunk::to_unsigned_like(
-            seqan::std::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
+        return seqan::stl::detail::chunk::to_unsigned_like(
+            seqan::stl::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
     }
     constexpr auto size() const
         requires ::std::ranges::sized_range<V const>
     {
-        return seqan::std::detail::chunk::to_unsigned_like(
-            seqan::std::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
+        return seqan::stl::detail::chunk::to_unsigned_like(
+            seqan::stl::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
     }
 };
 
 template <class R>
-chunk_view(R &&, ::std::ranges::range_difference_t<R>) -> chunk_view<seqan::std::views::all_t<R>>;
+chunk_view(R &&, ::std::ranges::range_difference_t<R>) -> chunk_view<seqan::stl::views::all_t<R>>;
 
 template <::std::ranges::view V>
     requires ::std::ranges::input_range<V>
@@ -180,7 +180,7 @@ public:
         {
             return dist == 0 ? 0 : 1;
         }
-        return seqan::std::detail::chunk::div_ceil(dist - x.parent_->remainder_, x.parent_->n_) + 1;
+        return seqan::stl::detail::chunk::div_ceil(dist - x.parent_->remainder_, x.parent_->n_) + 1;
     }
     friend constexpr difference_type operator-(outer_iterator const & x, ::std::default_sentinel_t y)
         requires ::std::sized_sentinel_for<::std::ranges::sentinel_t<V>, ::std::ranges::iterator_t<V>>
@@ -214,7 +214,7 @@ public:
     constexpr auto size() const
         requires ::std::sized_sentinel_for<::std::ranges::sentinel_t<V>, ::std::ranges::iterator_t<V>>
     {
-        return seqan::std::detail::chunk::to_unsigned_like(
+        return seqan::stl::detail::chunk::to_unsigned_like(
             ::std::ranges::min(parent_->remainder_, ::std::ranges::end(parent_->base_) - *parent_->current_));
     }
 };
@@ -326,7 +326,7 @@ public:
     }
 
     constexpr auto begin()
-        requires (!seqan::std::detail::simple_view<V>)
+        requires (!seqan::stl::detail::simple_view<V>)
     {
         return iterator<false>{this, ::std::ranges::begin(base_)};
     }
@@ -338,7 +338,7 @@ public:
     }
 
     constexpr auto end()
-        requires (!seqan::std::detail::simple_view<V>)
+        requires (!seqan::stl::detail::simple_view<V>)
     {
         if constexpr (::std::ranges::common_range<V> && ::std::ranges::sized_range<V>)
         {
@@ -376,14 +376,14 @@ public:
     constexpr auto size()
         requires ::std::ranges::sized_range<V>
     {
-        return seqan::std::detail::chunk::to_unsigned_like(
-            seqan::std::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
+        return seqan::stl::detail::chunk::to_unsigned_like(
+            seqan::stl::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
     }
     constexpr auto size() const
         requires ::std::ranges::sized_range<V const>
     {
-        return seqan::std::detail::chunk::to_unsigned_like(
-            seqan::std::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
+        return seqan::stl::detail::chunk::to_unsigned_like(
+            seqan::stl::detail::chunk::div_ceil(::std::ranges::distance(base_), n_));
     }
 };
 
@@ -393,8 +393,8 @@ template <bool Const>
 class chunk_view<V>::iterator
 {
 private:
-    using Parent = seqan::std::detail::maybe_const<Const, chunk_view>;
-    using Base = seqan::std::detail::maybe_const<Const, V>;
+    using Parent = seqan::stl::detail::maybe_const<Const, chunk_view>;
+    using Base = seqan::stl::detail::maybe_const<Const, V>;
 
     ::std::ranges::iterator_t<Base> current_ = ::std::ranges::iterator_t<Base>{};
     ::std::ranges::sentinel_t<Base> end_ = ::std::ranges::sentinel_t<Base>{};
@@ -575,7 +575,7 @@ public:
     friend constexpr difference_type operator-(::std::default_sentinel_t y, iterator const & x)
         requires ::std::sized_sentinel_for<::std::ranges::sentinel_t<Base>, ::std::ranges::iterator_t<Base>>
     {
-        return seqan::std::detail::chunk::div_ceil(x.end_ - x.current_, x.n_);
+        return seqan::stl::detail::chunk::div_ceil(x.end_ - x.current_, x.n_);
     }
 
     friend constexpr difference_type operator-(iterator const & x, ::std::default_sentinel_t y)
@@ -590,24 +590,24 @@ struct chunk_fn
     template <typename Difference>
     constexpr auto operator()(Difference n) const
     {
-        return seqan::std::detail::adaptor_from_functor{*this, n};
+        return seqan::stl::detail::adaptor_from_functor{*this, n};
     }
 
-    template <seqan::std::ranges::viewable_range Range, typename Difference = ::std::ranges::range_difference_t<Range>>
+    template <seqan::stl::ranges::viewable_range Range, typename Difference = ::std::ranges::range_difference_t<Range>>
     constexpr auto operator()(Range && range, ::std::type_identity_t<Difference> n) const
     {
         return chunk_view{::std::forward<Range>(range), n};
     }
 };
 
-} // namespace seqan::std::ranges
+} // namespace seqan::stl::ranges
 
-namespace seqan::std::views
+namespace seqan::stl::views
 {
 
-inline constexpr auto chunk = seqan::std::ranges::chunk_fn{};
+inline constexpr auto chunk = seqan::stl::ranges::chunk_fn{};
 
-} // namespace seqan::std::views
+} // namespace seqan::stl::views
 
 #endif // ifdef __cpp_lib_ranges_chunk
 

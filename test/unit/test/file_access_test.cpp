@@ -74,7 +74,7 @@ struct file_access_test : public ::testing::Test
 TEST_F(file_access_test, file_read_access_granted)
 {
     auto path = create_file("hibf_test_permissions_file_read_access_granted");
-    EXPECT_TRUE(hibf::test::read_access(path));
+    EXPECT_TRUE(seqan::hibf::test::read_access(path));
     std::filesystem::remove(path);
 }
 
@@ -82,14 +82,14 @@ TEST_F(file_access_test, file_read_access_revoked)
 {
     auto path = create_file("hibf_test_permissions_file_read_access_revoked");
     remove_read_permission(path);
-    EXPECT_EQ(hibf::test::read_access(path), is_root());
+    EXPECT_EQ(seqan::hibf::test::read_access(path), is_root());
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, file_write_access_granted)
 {
     auto path = create_file("hibf_test_permissions_file_write_access_granted");
-    EXPECT_TRUE(hibf::test::write_access(path));
+    EXPECT_TRUE(seqan::hibf::test::write_access(path));
     std::filesystem::remove(path);
 }
 
@@ -97,14 +97,14 @@ TEST_F(file_access_test, file_write_access_revoked)
 {
     auto path = create_file("hibf_test_permissions_file_write_access_revoked");
     remove_write_permission(path);
-    EXPECT_EQ(hibf::test::write_access(path), is_root());
+    EXPECT_EQ(seqan::hibf::test::write_access(path), is_root());
     std::filesystem::remove(path);
 }
 
 TEST_F(file_access_test, directory_write_access_granted)
 {
     auto path = create_directory("hibf_test_permissions_directory_write_access_granted");
-    EXPECT_TRUE(hibf::test::write_access(path));
+    EXPECT_TRUE(seqan::hibf::test::write_access(path));
     std::filesystem::remove(path);
 }
 
@@ -112,6 +112,6 @@ TEST_F(file_access_test, directory_write_access_revoked)
 {
     auto path = create_directory("hibf_test_permissions_directory_write_access_revoked");
     remove_write_permission(path);
-    EXPECT_EQ(hibf::test::write_access(path), is_root());
+    EXPECT_EQ(seqan::hibf::test::write_access(path), is_root());
     std::filesystem::remove(path);
 }

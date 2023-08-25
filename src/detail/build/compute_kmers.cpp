@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Implements hibf::compute_kmers.
+ * \brief Implements seqan::hibf::compute_kmers.
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
@@ -21,7 +21,7 @@
 #include <hibf/detail/layout/layout.hpp>       // for layout
 #include <hibf/detail/timer.hpp>               // for concurrent, timer
 
-namespace hibf
+namespace seqan::hibf
 {
 
 void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
@@ -35,4 +35,4 @@ void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
     data.user_bin_io_timer += local_user_bin_io_timer;
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

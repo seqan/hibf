@@ -13,12 +13,12 @@
 #include <hibf/detail/layout/layout.hpp>
 #include <hibf/detail/prefixes.hpp>
 
-namespace hibf::layout
+namespace seqan::hibf::layout
 {
 
-hibf::layout::layout::user_bin parse_layout_line(std::string const & current_line)
+seqan::hibf::layout::layout::user_bin parse_layout_line(std::string const & current_line)
 {
-    hibf::layout::layout::user_bin result{};
+    seqan::hibf::layout::layout::user_bin result{};
 
     size_t tmp{}; // integer buffer when reading numbers
 
@@ -56,7 +56,7 @@ hibf::layout::layout::user_bin parse_layout_line(std::string const & current_lin
     return result;
 }
 
-void hibf::layout::layout::read_from(std::istream & stream)
+void seqan::hibf::layout::layout::read_from(std::istream & stream)
 {
     // parse header
     auto parse_bin_indices = [](std::string_view const & buffer)
@@ -125,7 +125,7 @@ void hibf::layout::layout::read_from(std::istream & stream)
         user_bins.emplace_back(parse_layout_line(line));
 }
 
-void hibf::layout::layout::write_to(std::ostream & stream) const
+void seqan::hibf::layout::layout::write_to(std::ostream & stream) const
 {
     // write layout header with max bin ids
     stream << prefix::layout_first_header_line << " " << prefix::layout_fullest_technical_bin_idx
@@ -141,4 +141,4 @@ void hibf::layout::layout::write_to(std::ostream & stream) const
         stream << user_bin << '\n';
 }
 
-} // namespace hibf::layout
+} // namespace seqan::hibf::layout

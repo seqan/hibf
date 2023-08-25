@@ -35,7 +35,7 @@
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
-namespace hibf
+namespace seqan::hibf
 {
 
 size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
@@ -172,7 +172,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
 void build_index(hierarchical_interleaved_bloom_filter & hibf,
                  config const & config,
-                 hibf::layout::layout & hibf_layout)
+                 seqan::hibf::layout::layout & hibf_layout)
 {
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
 
@@ -214,4 +214,4 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
     build_index(*this, configuration, hibf_layout);
 }
 
-} // namespace hibf
+} // namespace seqan::hibf

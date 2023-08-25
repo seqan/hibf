@@ -33,7 +33,7 @@ TEST(estimate_kmer_counts_test, small_example)
 
     uint8_t const kmer_size{19};
     size_t const b = 12;
-    hibf::sketch::hyperloglog sketch(b);
+    seqan::hibf::sketch::hyperloglog sketch(b);
 
     for (std::string_view seq : input_sequences)
     {
@@ -48,10 +48,10 @@ TEST(estimate_kmer_counts_test, small_example)
         }
     }
 
-    std::vector<hibf::sketch::hyperloglog> sketches{sketch, sketch};
+    std::vector<seqan::hibf::sketch::hyperloglog> sketches{sketch, sketch};
     std::vector<size_t> kmer_counts;
 
-    hibf::sketch::estimate_kmer_counts(sketches, kmer_counts);
+    seqan::hibf::sketch::estimate_kmer_counts(sketches, kmer_counts);
 
     ASSERT_EQ(kmer_counts.size(), 2);
     EXPECT_EQ(kmer_counts[0], 581);

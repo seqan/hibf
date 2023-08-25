@@ -5,10 +5,10 @@
 
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
-namespace hibf::sketch
+namespace seqan::hibf::sketch
 {
 
-inline void estimate_kmer_counts(std::vector<hibf::sketch::hyperloglog> const & sketches,
+inline void estimate_kmer_counts(std::vector<seqan::hibf::sketch::hyperloglog> const & sketches,
                                  std::vector<size_t> & kmer_counts)
 {
     kmer_counts.resize(sketches.size());
@@ -17,4 +17,4 @@ inline void estimate_kmer_counts(std::vector<hibf::sketch::hyperloglog> const & 
         kmer_counts[i] = sketches[i].estimate();
 }
 
-} // namespace hibf::sketch
+} // namespace seqan::hibf::sketch

@@ -6,7 +6,7 @@
 // --------------------------------------------------------------------------------------------------
 
 /*!\file
- * \brief Implements hibf::initialise_build_tree.
+ * \brief Implements seqan::hibf::initialise_build_tree.
  * \author Svenja Mehringer <svenja.mehringer AT fu-berlin.de>
  */
 
@@ -17,11 +17,11 @@
 #include <hibf/detail/build/node_data.hpp> // for node_data
 #include <hibf/detail/layout/layout.hpp>   // for layout
 
-namespace hibf
+namespace seqan::hibf
 {
 
 void initialise_build_tree(layout::layout & hibf_layout,
                            lemon::ListDigraph & ibf_graph,
                            lemon::ListDigraph::NodeMap<node_data> & node_map);
 
-} // namespace hibf
+} // namespace seqan::hibf
