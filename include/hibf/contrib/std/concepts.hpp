@@ -20,7 +20,7 @@
 namespace seqan::stl::ranges
 {
 
-using ::std::ranges::viewable_range;
+using std::ranges::viewable_range;
 
 }
 #else
@@ -29,13 +29,13 @@ namespace seqan::stl::ranges
 {
 
 template <class T>
-concept viewable_range = ::std::ranges::range<T>
-                      && ((::std::ranges::view<::std::remove_cvref_t<T>>
-                           && ::std::constructible_from<::std::remove_cvref_t<T>, T>)
-                          || (!::std::ranges::view<::std::remove_cvref_t<T>>
-                              && (::std::is_lvalue_reference_v<T>
-                                  || (::std::movable<::std::remove_reference_t<T>>
-                                      && !seqan::stl::detail::is_initializer_list<::std::remove_cvref_t<T>>))));
+concept viewable_range = std::ranges::range<T>
+                      && ((std::ranges::view<std::remove_cvref_t<T>>
+                           && std::constructible_from<std::remove_cvref_t<T>, T>)
+                          || (!std::ranges::view<std::remove_cvref_t<T>>
+                              && (std::is_lvalue_reference_v<T>
+                                  || (std::movable<std::remove_reference_t<T>>
+                                      && !seqan::stl::detail::is_initializer_list<std::remove_cvref_t<T>>))));
 
 } // namespace seqan::stl::ranges
 
