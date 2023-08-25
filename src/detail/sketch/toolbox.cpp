@@ -17,9 +17,7 @@
 namespace seqan::hibf::sketch::toolbox
 {
 
-void sort_by_cardinalities(std::vector<hyperloglog> const & sketches,
-                           std::vector<size_t> const & kmer_counts,
-                           std::vector<size_t> & positions)
+void sort_by_cardinalities(std::vector<size_t> const & kmer_counts, std::vector<size_t> & positions)
 {
     assert(positions.size() <= kmer_counts.size());
 
@@ -97,7 +95,7 @@ void rearrange_bins(std::vector<hyperloglog> const & sketches,
         if (last == positions.size() || kmer_counts[positions[first]] * max_ratio > kmer_counts[positions[last]])
         {
             // if this is not the first group, we want one bin overlap
-            cluster_bins(sketches, kmer_counts, positions, permutation, first, last, num_threads);
+            cluster_bins(sketches, positions, permutation, first, last, num_threads);
             first = last;
         }
         ++last;
@@ -114,7 +112,6 @@ void rearrange_bins(std::vector<hyperloglog> const & sketches,
 }
 
 void cluster_bins(std::vector<hyperloglog> const & sketches,
-                  std::vector<size_t> const & counts,
                   std::vector<size_t> & positions,
                   std::vector<size_t> & permutation,
                   size_t const first,

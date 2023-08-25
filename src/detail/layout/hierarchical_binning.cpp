@@ -30,7 +30,7 @@ size_t hierarchical_binning::execute()
 
     if (!data->user_bins_arranged)
     {
-        sketch::toolbox::sort_by_cardinalities(*data->sketches, *data->kmer_counts, data->positions);
+        sketch::toolbox::sort_by_cardinalities(*data->kmer_counts, data->positions);
 
         if (!config.disable_estimate_union && !config.disable_rearrangement)
             sketch::toolbox::rearrange_bins(*data->sketches,

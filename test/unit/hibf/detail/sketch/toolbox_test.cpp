@@ -68,7 +68,7 @@ struct toolbox_test : public ::testing::Test
 
 TEST_F(toolbox_test, sort_by_cardinalities)
 {
-    seqan::hibf::sketch::toolbox::sort_by_cardinalities(test_sketches, test_kmer_counts, test_positions);
+    seqan::hibf::sketch::toolbox::sort_by_cardinalities(test_kmer_counts, test_positions);
 
     // filenames do not change
     EXPECT_RANGE_EQ(test_filenames, (std::vector<std::string>{"small.fa", "small.fa", "small2.fa", "small2.fa"}));
@@ -264,7 +264,6 @@ TEST_F(toolbox_test, cluster_bins)
     { // whole range
         std::vector<size_t> permutation{};
         seqan::hibf::sketch::toolbox::cluster_bins(test_sketches,
-                                                   test_kmer_counts,
                                                    test_positions,
                                                    permutation,
                                                    0 /*interval start*/,
@@ -277,7 +276,6 @@ TEST_F(toolbox_test, cluster_bins)
     { // intervals
         std::vector<size_t> permutation{};
         seqan::hibf::sketch::toolbox::cluster_bins(test_sketches,
-                                                   test_kmer_counts,
                                                    test_positions,
                                                    permutation,
                                                    0 /*interval start*/,
@@ -285,7 +283,6 @@ TEST_F(toolbox_test, cluster_bins)
                                                    1 /*number of threads*/);
         EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{0}));
         seqan::hibf::sketch::toolbox::cluster_bins(test_sketches,
-                                                   test_kmer_counts,
                                                    test_positions,
                                                    permutation,
                                                    1 /*interval start*/,

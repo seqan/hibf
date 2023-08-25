@@ -49,9 +49,7 @@ struct entry
 using distance_matrix = std::vector<entry>;
 
 //!\brief Sorts filenames and cardinalities by looking only at the cardinalities.
-void sort_by_cardinalities(std::vector<hyperloglog> const & sketches,
-                           std::vector<size_t> const & counts,
-                           std::vector<size_t> & positions);
+void sort_by_cardinalities(std::vector<size_t> const & counts, std::vector<size_t> & positions);
 
 /*!\brief Estimate the cardinality of the union for a single user bin j with all prior ones j' < j.
  * \param[out] estimates output row
@@ -106,7 +104,6 @@ void rearrange_bins(std::vector<hyperloglog> const & sketches,
  */
 
 void cluster_bins(std::vector<hyperloglog> const & sketches,
-                  std::vector<size_t> const & counts,
                   std::vector<size_t> & positions,
                   std::vector<size_t> & permutation,
                   size_t const first,
