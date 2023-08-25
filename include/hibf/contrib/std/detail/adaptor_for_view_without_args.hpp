@@ -43,7 +43,7 @@ private:
     template <typename... arg_types>
     static auto impl(arg_types &&... args)
     {
-        return view_type{::std::forward<arg_types>(args)...};
+        return view_type{std::forward<arg_types>(args)...};
     }
 
 public:
