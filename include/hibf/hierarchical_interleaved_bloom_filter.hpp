@@ -161,7 +161,7 @@ private:
 
     //!\brief Helper for recursive membership querying.
     template <std::ranges::forward_range value_range_t>
-    void bulk_contains_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
     {
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
         auto & result = agent.bulk_count(values);
@@ -177,7 +177,7 @@ private:
             if (current_filename_index < 0) // merged bin
             {
                 if (sum >= threshold)
-                    bulk_contains_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                    membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
             else if (bin + 1u == result.size() ||                                                    // last bin
@@ -209,20 +209,42 @@ public:
     {}
     //!\}
 
-    //!\brief Stores the result of bulk_contains().
+    //!\brief Stores the result of membership_for().
     std::vector<int64_t> result_buffer;
 
     /*!\name Lookup
      * \{
      */
-    /*!\brief Determines set membership of given values, and returns the user bin indices of occurrences.
+    /*!\brief Determines set membership for all user bins contained in this index, based on `values` and the `threshold`.
      * \param[in] values The values to process; must model std::ranges::forward_range.
      * \param[in] threshold Report a user bin if there are at least this many hits.
+     * \returns A vector of user bin ids (index values) with successfull set membership query.
      *
      * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
      * \attention Sequential calls to this function invalidate the previously returned reference.
      *
      * \details
+     *
+     * Each value in `values` is queried against the index and all hits are accumulated. If the accumulated sum of hits
+     * reaches the threshold for a user bin, that user bin (its index value) is returned.
+     *
+     * ### Example
+     *
+     * Lets assume that the hibf index is build on 3 user bins (UB_A, UB_B, and UB_C) and the user bins contain the
+     * following hash values:
+     *
+     * * 0: UB_A = {4,5,6,11}
+     * * 1: UB_B = {4,5,11,12}
+     * * 2: UB_C = {4,5,6,7,9,10}
+     *
+     * Then the following query:
+     * ```cpp
+     *    auto agent = hibf.membership_agent();
+     *    auto result = agent.membership_for(std::vector<size_t>{4,5,6,7}, 3); // result = {0,2}
+     * ```
+     * would return a vector that contains the index values 0 and 2, indicating that UB_A (hits 4,5,6) and
+     * UB_C (hits 4,5,6,7) reached the threshold of `>= 3` hits. UB_B only counts 2 hits (hits 4,5) and is thus not
+     * contained in the list of user bins with a successful query.
      *
      * ### Thread safety
      *
@@ -230,7 +252,7 @@ public:
      * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
      */
     template <std::ranges::forward_range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values, size_t const threshold) & noexcept
+    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values, size_t const threshold) & noexcept
     {
         assert(hibf_ptr != nullptr);
 
@@ -240,18 +262,18 @@ public:
 
         result_buffer.clear();
 
-        bulk_contains_impl(values, 0, threshold);
+        membership_for_impl(values, 0, threshold);
 
         std::ranges::sort(result_buffer); // TODO: necessary?
 
         return result_buffer;
     }
 
-    // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
+    // `membership_for` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & bulk_contains(value_range_t && values,
-                                                             size_t const threshold) && noexcept = delete;
+    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
+                                                              size_t const threshold) && noexcept = delete;
     //!\}
 };
 

@@ -36,7 +36,7 @@ TEST(hibf_test, test_specific_hash_values)
         std::vector<size_t> query{1, 2, 3, 4, 5};
 
         auto agent = hibf.membership_agent();
-        auto result = agent.bulk_contains(query, 2);
+        auto result = agent.membership_for(query, 2);
 
         EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
     }
@@ -82,7 +82,7 @@ TEST(hibf_test, build_from_layout)
         std::vector<size_t> query{1, 2, 3, 4, 5};
 
         auto agent = hibf.membership_agent();
-        auto result = agent.bulk_contains(query, 2);
+        auto result = agent.membership_for(query, 2);
 
         EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
     }
@@ -119,7 +119,7 @@ TEST(hibf_test, build_from_layout)
 //     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
 //     auto query_kmers = query | kmer_transformation;
 
-//     auto result = agent.bulk_contains(query_kmers, 1);
+//     auto result = agent.membership_for(query_kmers, 1);
 
 //     seqan::hibf::debug_stream << result << std::endl;
 // }
@@ -162,7 +162,7 @@ TEST(hibf_test, build_from_layout)
 
 //     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
 
-//     auto result = agent.bulk_contains(query | transform, 1);
+//     auto result = agent.membership_for(query | transform, 1);
 
 //     seqan::hibf::debug_stream << result << std::endl; // prints [0] since query is found in user bin 0
 // }
