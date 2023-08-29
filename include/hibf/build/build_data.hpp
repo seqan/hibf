@@ -13,9 +13,9 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector
 
-#include <hibf/config.hpp>                 // for config
-#include <hibf/detail/build/node_data.hpp> // for node_data
-#include <hibf/detail/timer.hpp>           // for concurrent, timer
+#include <hibf/build/node_data.hpp> // for node_data
+#include <hibf/config.hpp>          // for config
+#include <hibf/detail/timer.hpp>    // for concurrent, timer
 
 namespace seqan::hibf
 {

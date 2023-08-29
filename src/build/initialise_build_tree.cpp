@@ -15,10 +15,10 @@
 
 #include <utility> // for move
 
-#include <hibf/detail/build/initialise_build_tree.hpp>    // for initialise_build_tree
-#include <hibf/detail/build/node_data.hpp>                // for node_data
-#include <hibf/detail/build/update_content_node_data.hpp> // for update_content_node_data
-#include <hibf/detail/build/update_header_node_data.hpp>  // for update_header_node_data
+#include <hibf/build/initialise_build_tree.hpp>    // for initialise_build_tree
+#include <hibf/build/node_data.hpp>                // for node_data
+#include <hibf/build/update_content_node_data.hpp> // for update_content_node_data
+#include <hibf/build/update_header_node_data.hpp>  // for update_header_node_data
 #include <hibf/layout/layout.hpp>                  // for layout
 
 namespace seqan::hibf

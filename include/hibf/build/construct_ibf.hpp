@@ -12,8 +12,8 @@
 #include <cinttypes> // for uint64_t
 #include <cstddef>   // for size_t
 
+#include <hibf/build/build_data.hpp>         // for build_data
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
-#include <hibf/detail/build/build_data.hpp>  // for build_data
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 
 namespace seqan::hibf

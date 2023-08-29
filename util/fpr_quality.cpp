@@ -8,9 +8,8 @@
 #include <iostream>
 #include <random>
 
+#include <hibf/build/bin_size_in_bits.hpp>
 #include <hibf/contrib/robin_hood.hpp>
-#include <hibf/detail/build/bin_size_in_bits.hpp>
-#include <hibf/layout/compute_fpr_correction.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 
 #include <sharg/parser.hpp>

@@ -21,8 +21,8 @@
 #include <utility>    // for move
 #include <vector>     // for vector
 
-#include <hibf/detail/build/node_data.hpp>               // for node_data
-#include <hibf/detail/build/update_header_node_data.hpp> // for update_header_node_data
+#include <hibf/build/node_data.hpp>               // for node_data
+#include <hibf/build/update_header_node_data.hpp> // for update_header_node_data
 #include <hibf/layout/layout.hpp>                 // for layout
 
 namespace seqan::hibf

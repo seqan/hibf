@@ -12,15 +12,15 @@
 #include <iterator>   // for inserter, counted_iterator
 #include <ranges>     // for all_t, operator==
 
+#include <hibf/build/build_data.hpp>                // for build_data
+#include <hibf/build/insert_into_ibf.hpp>           // for insert_into_ibf
 #include <hibf/config.hpp>                          // for config
 #include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
-#include <hibf/detail/build/build_data.hpp>         // for build_data
-#include <hibf/detail/build/insert_into_ibf.hpp>    // for insert_into_ibf
-#include <hibf/layout/layout.hpp>            // for layout
 #include <hibf/detail/timer.hpp>                    // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
+#include <hibf/layout/layout.hpp>                   // for layout
 
 namespace seqan::hibf
 {

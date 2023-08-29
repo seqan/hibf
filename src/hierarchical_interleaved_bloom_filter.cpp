@@ -18,19 +18,16 @@
 #include <utility>   // for move
 #include <vector>    // for vector
 
+#include <hibf/build/build_data.hpp>                      // for build_data
+#include <hibf/build/compute_kmers.hpp>                   // for compute_kmers
+#include <hibf/build/construct_ibf.hpp>                   // for construct_ibf
+#include <hibf/build/initialise_build_tree.hpp>           // for initialise_build_tree
+#include <hibf/build/insert_into_ibf.hpp>                 // for insert_into_ibf
+#include <hibf/build/node_data.hpp>                       // for node_data
+#include <hibf/build/update_parent_kmers.hpp>             // for update_parent_kmers
+#include <hibf/build/update_user_bins.hpp>                // for update_user_bins
 #include <hibf/config.hpp>                                // for config
 #include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
-#include <hibf/detail/build/build_data.hpp>               // for build_data
-#include <hibf/detail/build/compute_kmers.hpp>            // for compute_kmers
-#include <hibf/detail/build/construct_ibf.hpp>            // for construct_ibf
-#include <hibf/detail/build/initialise_build_tree.hpp>    // for initialise_build_tree
-#include <hibf/detail/build/insert_into_ibf.hpp>          // for insert_into_ibf
-#include <hibf/detail/build/node_data.hpp>                // for node_data
-#include <hibf/detail/build/update_parent_kmers.hpp>      // for update_parent_kmers
-#include <hibf/detail/build/update_user_bins.hpp>         // for update_user_bins
-#include <hibf/layout/compute_fpr_correction.hpp>  // for compute_fpr_correction
-#include <hibf/layout/compute_layout.hpp>          // for compute_layout
-#include <hibf/layout/layout.hpp>                  // for layout
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type

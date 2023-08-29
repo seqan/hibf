@@ -13,16 +13,16 @@
 #include <cstddef>   // for size_t
 #include <vector>    // for vector
 
-#include <hibf/config.hpp>                           // for config
-#include <hibf/contrib/robin_hood.hpp>               // for unordered_flat_set
-#include <hibf/detail/build/bin_size_in_bits.hpp>    // for bin_size_in_bits
-#include <hibf/detail/build/build_data.hpp>          // for build_data
-#include <hibf/detail/build/construct_ibf.hpp>       // for construct_ibf
-#include <hibf/detail/build/insert_into_ibf.hpp>     // for insert_into_ibf
-#include <hibf/detail/build/node_data.hpp>           // for node_data
-#include <hibf/detail/build/update_parent_kmers.hpp> // for update_parent_kmers
-#include <hibf/detail/timer.hpp>                     // for concurrent, timer
-#include <hibf/interleaved_bloom_filter.hpp>         // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
+#include <hibf/build/bin_size_in_bits.hpp>    // for bin_size_in_bits
+#include <hibf/build/build_data.hpp>          // for build_data
+#include <hibf/build/construct_ibf.hpp>       // for construct_ibf
+#include <hibf/build/insert_into_ibf.hpp>     // for insert_into_ibf
+#include <hibf/build/node_data.hpp>           // for node_data
+#include <hibf/build/update_parent_kmers.hpp> // for update_parent_kmers
+#include <hibf/config.hpp>                    // for config
+#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set
+#include <hibf/detail/timer.hpp>              // for concurrent, timer
+#include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
 
 namespace seqan::hibf
 {

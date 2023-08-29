@@ -10,11 +10,11 @@
 #include <cinttypes> // for uint64_t
 #include <cstddef>   // for size_t
 
+#include <hibf/build/build_data.hpp>         // for build_data
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
-#include <hibf/detail/build/build_data.hpp>  // for build_data
-#include <hibf/layout/layout.hpp>     // for layout
 #include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/layout/layout.hpp>            // for layout
 
 namespace seqan::hibf
 {
