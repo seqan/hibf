@@ -9,10 +9,10 @@
 #include <tuple>       // for tie, make_tuple
 #include <vector>      // for vector
 
-#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map
-#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
-#include <hibf/sketch/toolbox.hpp>     // for clustering_node, entry, precompute_union_estimates_for, cluste...
-#include <hibf/test/expect_range_eq.hpp>      // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/contrib/robin_hood.hpp>   // for unordered_flat_map
+#include <hibf/sketch/hyperloglog.hpp>   // for hyperloglog
+#include <hibf/sketch/toolbox.hpp>       // for clustering_node, entry, precompute_union_estimates_for, cluste...
+#include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
 
 // inherits from toolbox to test private members
 struct toolbox_test : public ::testing::Test

@@ -11,9 +11,9 @@
 #include <unordered_set> // for unordered_set
 #include <vector>        // for vector
 
-#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
-#include <hibf/test/sandboxed_path.hpp>       // for operator/, sandboxed_path
-#include <hibf/test/tmp_directory.hpp>        // for tmp_directory
+#include <hibf/sketch/hyperloglog.hpp>  // for hyperloglog
+#include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
+#include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
 TEST(hyperloglog, bit_widths)
 {
