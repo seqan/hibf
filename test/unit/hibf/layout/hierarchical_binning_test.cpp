@@ -3,8 +3,7 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector, allocator
 
-#include <hibf/config.hpp>                               // for config
-#include <hibf/detail/data_store.hpp>                    // for data_store
+#include <hibf/config.hpp>                        // for config
 #include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/layout/data_store.hpp>             // for data_store
 #include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning

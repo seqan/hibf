@@ -6,9 +6,8 @@
 #include <utility>    // for addressof
 #include <vector>     // for vector
 
-#include <hibf/config.hpp>                             // for config
-#include <hibf/contrib/robin_hood.hpp>                 // for unordered_flat_set
-#include <hibf/detail/data_store.hpp>                  // for data_store
+#include <hibf/config.hpp>                      // for config
+#include <hibf/contrib/robin_hood.hpp>          // for unordered_flat_set
 #include <hibf/layout/compute_layout.hpp>       // for compute_layout
 #include <hibf/layout/data_store.hpp>           // for data_store
 #include <hibf/layout/execute.hpp>              // for execute

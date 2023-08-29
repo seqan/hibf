@@ -9,8 +9,8 @@
 #include <utility>   // for pair, addressof
 #include <vector>    // for vector
 
-#include <hibf/config.hpp>                             // for config
-#include <hibf/detail/data_store.hpp>                  // for data_store
+#include <hibf/config.hpp>                      // for config
+#include <hibf/layout/data_store.hpp>           // for data_store
 #include <hibf/layout/hierarchical_binning.hpp> // for hierarchical_binning
 #include <hibf/layout/layout.hpp>               // for layout
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning

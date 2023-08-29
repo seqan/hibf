@@ -4,7 +4,7 @@
 #include <stdexcept> // for runtime_error
 #include <vector>    // for allocator, vector
 
-#include <hibf/detail/data_store.hpp>            // for data_store
+#include <hibf/layout/data_store.hpp>     // for data_store
 #include <hibf/layout/layout.hpp>         // for layout
 #include <hibf/layout/simple_binning.hpp> // for simple_binning
 #include <hibf/test/expect_range_eq.hpp>  // for expect_range_eq, EXPECT_RANGE_EQ

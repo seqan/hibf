@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t
 
 #include <hibf/config.hpp>            // for config
-#include <hibf/detail/data_store.hpp> // for data_store
+#include <hibf/layout/data_store.hpp> // for data_store
 
 namespace seqan::hibf
 {

@@ -7,7 +7,7 @@
 #include <vector>  // for vector
 
 #include <hibf/config.hpp>            // for config
-#include <hibf/detail/data_store.hpp> // for data_store
+#include <hibf/layout/data_store.hpp> // for data_store
 #include <hibf/platform.hpp>          // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace seqan::hibf::layout

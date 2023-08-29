@@ -5,8 +5,7 @@
 #include <stdexcept> // for invalid_argument
 #include <vector>    // for vector
 
-#include <hibf/config.hpp>                               // for config
-#include <hibf/detail/data_store.hpp>                    // for data_store
+#include <hibf/config.hpp>                        // for config
 #include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/layout/data_store.hpp>             // for data_store
 #include <hibf/layout/execute.hpp>                // for execute

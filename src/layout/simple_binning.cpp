@@ -4,7 +4,7 @@
 #include <limits>    // for numeric_limits
 #include <vector>    // for vector
 
-#include <hibf/detail/data_store.hpp>            // for data_store
+#include <hibf/layout/data_store.hpp>     // for data_store
 #include <hibf/layout/layout.hpp>         // for layout
 #include <hibf/layout/simple_binning.hpp> // for simple_binning
 
