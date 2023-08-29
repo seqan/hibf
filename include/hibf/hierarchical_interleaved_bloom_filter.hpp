@@ -17,8 +17,8 @@
 #include <utility>    // for addressof
 #include <vector>     // for vector
 
+#include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config
-#include <hibf/detail/cereal/concepts.hpp>   // for cereal_archive
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/user_bins_type.hpp>           // for user_bins_type
 

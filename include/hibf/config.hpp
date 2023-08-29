@@ -14,8 +14,8 @@
 #include <iosfwd>     // for ostream
 #include <iterator>   // for insert_iterator
 
+#include <hibf/cereal/path.hpp>        // IWYU pragma: keep
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
-#include <hibf/detail/cereal/path.hpp> // IWYU pragma: keep
 #include <hibf/platform.hpp>
 
 #include <cereal/access.hpp> // for access
