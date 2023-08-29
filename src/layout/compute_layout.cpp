@@ -58,7 +58,14 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     size_t const max_hibf_id = seqan::hibf::execute(config, store);
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
-    return *store.hibf_layout; // return layout as string for now, containing the file
+    // sort records ascending by the number of bin indices (corresponds to the IBF levels)
+    std::ranges::sort(store.hibf_layout->max_bins,
+                      [](auto const & r, auto const & l)
+                      {
+                          return r.previous_TB_indices.size() < l.previous_TB_indices.size();
+                      });
+
+    return *store.hibf_layout;
 }
 
 layout compute_layout(config const & config)

@@ -5,10 +5,6 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <lemon/bits/array_map.h> // for ArrayMap
-#include <lemon/core.h>           // for INVALID
-#include <lemon/list_graph.h>     // for ListDigraph
-
 #include <algorithm> // for shuffle
 #include <cinttypes> // for uint64_t, int64_t
 #include <cstddef>   // for size_t
@@ -21,9 +17,7 @@
 #include <hibf/build/build_data.hpp>                      // for build_data
 #include <hibf/build/compute_kmers.hpp>                   // for compute_kmers
 #include <hibf/build/construct_ibf.hpp>                   // for construct_ibf
-#include <hibf/build/initialise_build_tree.hpp>           // for initialise_build_tree
 #include <hibf/build/insert_into_ibf.hpp>                 // for insert_into_ibf
-#include <hibf/build/node_data.hpp>                       // for node_data
 #include <hibf/build/update_parent_kmers.hpp>             // for update_parent_kmers
 #include <hibf/build/update_user_bins.hpp>                // for update_user_bins
 #include <hibf/config.hpp>                                // for config
@@ -32,41 +26,38 @@
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
-#include <hibf/layout/layout.hpp>                         // for layout
-#include <hibf/user_bins_type.hpp>                        // for user_bins_type
+#include <hibf/layout/graph.hpp>
+#include <hibf/layout/layout.hpp>  // for layout
+#include <hibf/user_bins_type.hpp> // for user_bins_type
 
 namespace seqan::hibf
 {
 
 size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                           robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
-                          lemon::ListDigraph::Node const & current_node,
+                          layout::graph::node const & current_node,
                           build_data & data,
                           bool is_root)
 {
-    auto & current_node_data = data.node_map[current_node];
-
     size_t const ibf_pos{data.request_ibf_idx()};
 
-    std::vector<int64_t> ibf_positions(current_node_data.number_of_technical_bins, ibf_pos);
-    std::vector<int64_t> filename_indices(current_node_data.number_of_technical_bins, -1);
+    std::vector<int64_t> ibf_positions(current_node.number_of_technical_bins, ibf_pos);
+    std::vector<int64_t> filename_indices(current_node.number_of_technical_bins, -1);
     robin_hood::unordered_flat_set<uint64_t> kmers{};
 
     auto initialise_max_bin_kmers = [&]() -> size_t
     {
-        auto & node_data = data.node_map[current_node];
-
-        if (node_data.favourite_child != lemon::INVALID) // max bin is a merged bin
+        if (current_node.favourite_child_idx != -1) // max bin is a merged bin
         {
             // recursively initialize favourite child first
-            ibf_positions[node_data.max_bin_index] =
-                hierarchical_build(hibf, kmers, node_data.favourite_child, data, false);
+            ibf_positions[current_node.max_bin_index] =
+                hierarchical_build(hibf, kmers, current_node.children[current_node.favourite_child_idx], data, false);
             return 1;
         }
         else // max bin is not a merged bin
         {
             // we assume that the max record is at the beginning of the list of remaining records.
-            auto const & record = node_data.remaining_records[0];
+            auto const & record = current_node.remaining_records[0];
             compute_kmers(kmers, data, record);
             update_user_bins(filename_indices, record);
 
@@ -82,16 +73,12 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
     // parse all other children (merged bins) of the current ibf
     auto loop_over_children = [&]()
     {
-        auto & current_node_data = data.node_map[current_node];
-        std::vector<lemon::ListDigraph::Node> children{};
-
-        for (lemon::ListDigraph::OutArcIt arc_it(data.ibf_graph, current_node); arc_it != lemon::INVALID; ++arc_it)
-            children.emplace_back(data.ibf_graph.target(arc_it));
-
-        if (children.empty())
+        if (current_node.children.empty())
             return;
 
-        size_t const number_of_mutex = (data.node_map[current_node].number_of_technical_bins + 63) / 64;
+        std::vector<layout::graph::node> children = current_node.children; // copy for threads
+
+        size_t const number_of_mutex = (current_node.number_of_technical_bins + 63) / 64;
         std::vector<std::mutex> local_ibf_mutex(number_of_mutex);
 
         size_t number_of_threads{};
@@ -114,11 +101,11 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             auto & child = children[index];
 
-            if (child != current_node_data.favourite_child)
+            if (index != current_node.favourite_child_idx)
             {
                 robin_hood::unordered_flat_set<uint64_t> kmers{};
                 size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
-                auto parent_bin_index = data.node_map[child].parent_bin_index;
+                auto parent_bin_index = child.parent_bin_index;
                 {
                     size_t const mutex_id{parent_bin_index / 64};
                     std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
@@ -134,10 +121,10 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
     loop_over_children();
 
     // If max bin was a merged bin, process all remaining records, otherwise the first one has already been processed
-    size_t const start{(current_node_data.favourite_child != lemon::INVALID) ? 0u : 1u};
-    for (size_t i = start; i < current_node_data.remaining_records.size(); ++i)
+    size_t const start{(current_node.favourite_child_idx != -1) ? 0u : 1u};
+    for (size_t i = start; i < current_node.remaining_records.size(); ++i)
     {
-        auto const & record = current_node_data.remaining_records[i];
+        auto const & record = current_node.remaining_records[i];
 
         if (is_root && record.number_of_technical_bins == 1) // no splitting needed
         {
@@ -163,7 +150,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 }
 
 size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
-                          lemon::ListDigraph::Node const & root_node,
+                          layout::graph::node const & root_node,
                           build_data & data)
 {
     robin_hood::unordered_flat_set<uint64_t> root_kmers{};
@@ -181,12 +168,11 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
     hibf.next_ibf_id.resize(number_of_ibfs);
 
-    build_data data{.config = config};
+    build_data data{.config = config, .ibf_graph = {hibf_layout}};
 
-    initialise_build_tree(hibf_layout, data.ibf_graph, data.node_map);
-    lemon::ListDigraph::Node root_node = data.ibf_graph.nodeFromId(0); // root node = top-level IBF node
+    layout::graph::node const & root_node = data.ibf_graph.root;
 
-    size_t const t_max{data.node_map[root_node].number_of_technical_bins};
+    size_t const t_max{root_node.number_of_technical_bins};
     data.fpr_correction = layout::compute_fpr_correction(
         {.fpr = config.maximum_false_positive_rate, .hash_count = config.number_of_hash_functions, .t_max = t_max});
 

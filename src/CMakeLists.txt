@@ -6,15 +6,13 @@ set (HIBF_SOURCE_FILES
      layout/execute.cpp
      layout/compute_fpr_correction.cpp
      layout/compute_layout.cpp
+     layout/graph.cpp
      layout/hierarchical_binning.cpp
      sketch/toolbox.cpp
      sketch/hyperloglog.cpp
-     build/initialise_build_tree.cpp
      build/insert_into_ibf.cpp
      build/compute_kmers.cpp
-     build/update_header_node_data.cpp
-     build/construct_ibf.cpp
-     build/update_content_node_data.cpp)
+     build/construct_ibf.cpp)
 
 add_library (hibf STATIC ${HIBF_SOURCE_FILES})
 add_library (seqan::hibf ALIAS hibf)

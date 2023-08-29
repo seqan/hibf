@@ -7,15 +7,13 @@
 
 #pragma once
 
-#include <lemon/list_graph.h> // for ListDigraph
-
 #include <atomic>  // for atomic_fetch_add, atomic
 #include <cstddef> // for size_t
 #include <vector>  // for vector
 
-#include <hibf/build/node_data.hpp> // for node_data
-#include <hibf/config.hpp>          // for config
-#include <hibf/detail/timer.hpp>    // for concurrent, timer
+#include <hibf/config.hpp>       // for config
+#include <hibf/detail/timer.hpp> // for concurrent, timer
+#include <hibf/layout/graph.hpp> // for node_data
 
 namespace seqan::hibf
 {
@@ -26,8 +24,7 @@ struct build_data
 
     seqan::hibf::config const & config;
 
-    lemon::ListDigraph ibf_graph{};
-    lemon::ListDigraph::NodeMap<node_data> node_map{ibf_graph};
+    layout::graph ibf_graph{};
 
     std::vector<double> fpr_correction{};
 
