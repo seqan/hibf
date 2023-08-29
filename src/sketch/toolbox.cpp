@@ -10,9 +10,9 @@
 #include <utility>    // for swap, move
 #include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map, pair
-#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
-#include <hibf/detail/sketch/toolbox.hpp>     // for clustering_node, entry, neighbor, prio_queue, distance_matrix
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_map, pair
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/sketch/toolbox.hpp>     // for clustering_node, entry, neighbor, prio_queue, distance_matrix
 
 namespace seqan::hibf::sketch::toolbox
 {

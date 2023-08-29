@@ -13,7 +13,7 @@
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/contrib/xxhash/xxhash.h>       // for XXH_INLINE_XXH3_64bits, XXH3_64bits
-#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
 
 #include <x86/avx.h>  // for simde_mm256_add_ps, simde_mm256_set_ps, simde__m256i, simde_mm...
 #include <x86/avx2.h> // for simde_mm256_max_epu8

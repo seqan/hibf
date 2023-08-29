@@ -7,8 +7,8 @@ set (HIBF_SOURCE_FILES
      layout/compute_fpr_correction.cpp
      layout/compute_layout.cpp
      layout/hierarchical_binning.cpp
-     detail/sketch/toolbox.cpp
-     detail/sketch/hyperloglog.cpp
+     sketch/toolbox.cpp
+     sketch/hyperloglog.cpp
      build/initialise_build_tree.cpp
      build/insert_into_ibf.cpp
      build/compute_kmers.cpp

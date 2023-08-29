@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector
 
-#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::sketch
 {

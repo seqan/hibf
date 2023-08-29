@@ -9,7 +9,7 @@
 #include <vector>    // for vector
 
 #include <hibf/layout/layout.hpp>      // for layout
-#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf
 {

@@ -6,8 +6,8 @@
 #include <string_view> // for string_view
 #include <vector>      // for allocator, vector
 
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
-#include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
+#include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 
 TEST(estimate_kmer_counts_test, small_example)
 {

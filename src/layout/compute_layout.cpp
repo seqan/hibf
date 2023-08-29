@@ -13,8 +13,8 @@
 #include <hibf/layout/data_store.hpp>           // for data_store
 #include <hibf/layout/execute.hpp>              // for execute
 #include <hibf/layout/layout.hpp>               // for layout
-#include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
-#include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
+#include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 
 namespace seqan::hibf::layout
 {

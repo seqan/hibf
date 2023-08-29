@@ -7,8 +7,8 @@
 #include <queue>      // for priority_queue
 #include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_map
-#include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_map
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::sketch::toolbox
 {
