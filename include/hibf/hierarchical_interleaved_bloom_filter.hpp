@@ -252,7 +252,8 @@ public:
      * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
      */
     template <std::ranges::forward_range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values, size_t const threshold) & noexcept
+    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
+                                                              size_t const threshold) & noexcept
     {
         assert(hibf_ptr != nullptr);
 
