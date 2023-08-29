@@ -30,6 +30,9 @@
 #include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
+#include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
+#include <hibf/layout/compute_layout.hpp>                 // for compute_layout
+#include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace seqan::hibf

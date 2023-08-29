@@ -6,9 +6,10 @@
 #include <hibf/config.hpp>                               // for config
 #include <hibf/detail/data_store.hpp>                    // for data_store
 #include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/layout/data_store.hpp>             // for data_store
 #include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
 #include <hibf/layout/layout.hpp>                 // for layout
-#include <hibf/test/expect_range_eq.hpp>                 // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/test/expect_range_eq.hpp>          // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(hierarchical_binning_test, small_example)
 {
