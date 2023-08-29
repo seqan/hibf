@@ -28,9 +28,9 @@
 #include <hibf/detail/build/node_data.hpp>                // for node_data
 #include <hibf/detail/build/update_parent_kmers.hpp>      // for update_parent_kmers
 #include <hibf/detail/build/update_user_bins.hpp>         // for update_user_bins
-#include <hibf/detail/layout/compute_fpr_correction.hpp>  // for compute_fpr_correction
-#include <hibf/detail/layout/compute_layout.hpp>          // for compute_layout
-#include <hibf/detail/layout/layout.hpp>                  // for layout
+#include <hibf/layout/compute_fpr_correction.hpp>  // for compute_fpr_correction
+#include <hibf/layout/compute_layout.hpp>          // for compute_layout
+#include <hibf/layout/layout.hpp>                  // for layout
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type

@@ -3,8 +3,8 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector
 
-#include <hibf/config.hpp>                    // for config
-#include <hibf/detail/layout/layout.hpp>      // for layout
+#include <hibf/config.hpp>             // for config
+#include <hibf/layout/layout.hpp>      // for layout
 #include <hibf/detail/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::layout

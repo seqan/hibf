@@ -11,9 +11,9 @@
 
 #include <hibf/config.hpp>                             // for config
 #include <hibf/detail/data_store.hpp>                  // for data_store
-#include <hibf/detail/layout/hierarchical_binning.hpp> // for hierarchical_binning
-#include <hibf/detail/layout/layout.hpp>               // for layout
-#include <hibf/detail/layout/simple_binning.hpp>       // for simple_binning
+#include <hibf/layout/hierarchical_binning.hpp> // for hierarchical_binning
+#include <hibf/layout/layout.hpp>               // for layout
+#include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/detail/sketch/toolbox.hpp>              // for toolbox
 #include <hibf/next_multiple_of_64.hpp>                // for next_multiple_of_64
 #include <hibf/platform.hpp>                           // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY

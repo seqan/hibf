@@ -6,7 +6,7 @@
 #include <string_view> // for operator<<
 #include <vector>      // for vector
 
-#include <hibf/detail/layout/layout.hpp> // for layout, operator<<
+#include <hibf/layout/layout.hpp> // for layout, operator<<
 #include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(layout_test, printing_max_bins)

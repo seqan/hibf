@@ -18,7 +18,7 @@
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
 #include <hibf/detail/build/build_data.hpp>         // for build_data
 #include <hibf/detail/build/insert_into_ibf.hpp>    // for insert_into_ibf
-#include <hibf/detail/layout/layout.hpp>            // for layout
+#include <hibf/layout/layout.hpp>            // for layout
 #include <hibf/detail/timer.hpp>                    // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
 

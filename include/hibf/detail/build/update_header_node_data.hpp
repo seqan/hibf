@@ -17,7 +17,7 @@
 #include <vector> // for vector
 
 #include <hibf/detail/build/node_data.hpp> // for node_data
-#include <hibf/detail/layout/layout.hpp>   // for layout
+#include <hibf/layout/layout.hpp>   // for layout
 
 namespace seqan::hibf
 {

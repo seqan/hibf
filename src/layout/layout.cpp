@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include <hibf/config.hpp>
-#include <hibf/detail/layout/layout.hpp>
+#include <hibf/layout/layout.hpp>
 #include <hibf/detail/prefixes.hpp>
 
 namespace seqan::hibf::layout

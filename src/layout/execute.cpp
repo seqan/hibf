@@ -7,10 +7,11 @@
 
 #include <hibf/config.hpp>                               // for config
 #include <hibf/detail/data_store.hpp>                    // for data_store
-#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
-#include <hibf/detail/layout/execute.hpp>                // for execute
-#include <hibf/detail/layout/hierarchical_binning.hpp>   // for hierarchical_binning
-#include <hibf/next_multiple_of_64.hpp>                  // for next_multiple_of_64
+#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/layout/data_store.hpp>             // for data_store
+#include <hibf/layout/execute.hpp>                // for execute
+#include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
+#include <hibf/next_multiple_of_64.hpp>           // for next_multiple_of_64
 
 namespace seqan::hibf
 {

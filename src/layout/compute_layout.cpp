@@ -9,9 +9,10 @@
 #include <hibf/config.hpp>                             // for config
 #include <hibf/contrib/robin_hood.hpp>                 // for unordered_flat_set
 #include <hibf/detail/data_store.hpp>                  // for data_store
-#include <hibf/detail/layout/compute_layout.hpp>       // for compute_layout
-#include <hibf/detail/layout/execute.hpp>              // for execute
-#include <hibf/detail/layout/layout.hpp>               // for layout
+#include <hibf/layout/compute_layout.hpp>       // for compute_layout
+#include <hibf/layout/data_store.hpp>           // for data_store
+#include <hibf/layout/execute.hpp>              // for execute
+#include <hibf/layout/layout.hpp>               // for layout
 #include <hibf/detail/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 #include <hibf/detail/sketch/hyperloglog.hpp>          // for hyperloglog
 

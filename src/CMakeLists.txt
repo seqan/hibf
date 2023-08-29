@@ -1,12 +1,12 @@
 set (HIBF_SOURCE_FILES
      hierarchical_interleaved_bloom_filter.cpp
      config.cpp
-     detail/layout/simple_binning.cpp
-     detail/layout/layout.cpp
-     detail/layout/execute.cpp
-     detail/layout/compute_fpr_correction.cpp
-     detail/layout/compute_layout.cpp
-     detail/layout/hierarchical_binning.cpp
+     layout/simple_binning.cpp
+     layout/layout.cpp
+     layout/execute.cpp
+     layout/compute_fpr_correction.cpp
+     layout/compute_layout.cpp
+     layout/hierarchical_binning.cpp
      detail/sketch/toolbox.cpp
      detail/sketch/hyperloglog.cpp
      detail/build/initialise_build_tree.cpp

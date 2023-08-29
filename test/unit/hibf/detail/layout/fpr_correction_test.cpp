@@ -3,7 +3,7 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector, allocator
 
-#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 
 TEST(fp_correction_test, one_bin)
 {

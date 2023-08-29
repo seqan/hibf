@@ -5,8 +5,8 @@
 #include <vector>    // for allocator, vector
 
 #include <hibf/detail/data_store.hpp>            // for data_store
-#include <hibf/detail/layout/layout.hpp>         // for layout
-#include <hibf/detail/layout/simple_binning.hpp> // for simple_binning
+#include <hibf/layout/layout.hpp>         // for layout
+#include <hibf/layout/simple_binning.hpp> // for simple_binning
 #include <hibf/test/expect_range_eq.hpp>         // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(simple_binning_test, small_example)

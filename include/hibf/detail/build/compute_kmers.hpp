@@ -16,7 +16,7 @@
 
 #include <hibf/contrib/robin_hood.hpp>      // for unordered_flat_set
 #include <hibf/detail/build/build_data.hpp> // for build_data
-#include <hibf/detail/layout/layout.hpp>    // for layout
+#include <hibf/layout/layout.hpp>    // for layout
 
 namespace seqan::hibf
 {

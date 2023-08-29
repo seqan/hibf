@@ -3,8 +3,8 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector
 
-#include <hibf/detail/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
-#include <hibf/next_multiple_of_64.hpp>                  // for next_multiple_of_64
+#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <hibf/next_multiple_of_64.hpp>           // for next_multiple_of_64
 
 namespace seqan::hibf::layout
 {
