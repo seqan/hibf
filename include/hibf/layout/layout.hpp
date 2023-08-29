@@ -6,7 +6,7 @@
 #include <iosfwd>    // for ostream
 #include <vector>    // for vector, operator==
 
-#include <hibf/detail/prefixes.hpp> // for header, merged_bin
+#include <hibf/layout/prefixes.hpp> // for header, merged_bin
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::layout

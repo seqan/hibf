@@ -11,7 +11,7 @@
 
 #include <hibf/config.hpp>
 #include <hibf/layout/layout.hpp>
-#include <hibf/detail/prefixes.hpp>
+#include <hibf/layout/prefixes.hpp>
 
 namespace seqan::hibf::layout
 {
