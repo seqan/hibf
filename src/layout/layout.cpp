@@ -1,0 +1,144 @@
+// ---------------------------------------------------------------------------------------------------
+// Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
+// shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
+// ---------------------------------------------------------------------------------------------------
+
+#include <cassert>
+#include <charconv>
+#include <iostream>
+
+#include <hibf/config.hpp>
+#include <hibf/layout/layout.hpp>
+#include <hibf/layout/prefixes.hpp>
+
+namespace seqan::hibf::layout
+{
+
+seqan::hibf::layout::layout::user_bin parse_layout_line(std::string const & current_line)
+{
+    seqan::hibf::layout::layout::user_bin result{};
+
+    size_t tmp{}; // integer buffer when reading numbers
+
+    // initialize parsing
+    std::string_view const buffer{current_line};
+    auto const buffer_end{buffer.end()};
+    auto field_end = buffer.begin();
+    assert(field_end != buffer_end);
+
+    // read user bin index
+    field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
+    result.idx = tmp;
+    assert(field_end != buffer_end && *field_end == '\t');
+
+    do // read bin_indices
+    {
+        ++field_end; // skip tab or ;
+        assert(field_end != buffer_end && *field_end != '\t');
+        field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
+        result.previous_TB_indices.push_back(tmp);
+    }
+    while (field_end != buffer_end && *field_end != '\t');
+
+    result.storage_TB_id = result.previous_TB_indices.back();
+    result.previous_TB_indices.pop_back();
+
+    do // read number of technical bins
+    {
+        ++field_end; // skip tab or ;
+        field_end = std::from_chars(field_end, buffer_end, tmp).ptr;
+        result.number_of_technical_bins = tmp; // only the last number really counts
+    }
+    while (field_end != buffer_end && *field_end != '\t');
+
+    return result;
+}
+
+void seqan::hibf::layout::layout::read_from(std::istream & stream)
+{
+    // parse header
+    auto parse_bin_indices = [](std::string_view const & buffer)
+    {
+        std::vector<size_t> result;
+
+        auto buffer_start = &buffer[0];
+        auto const buffer_end = buffer_start + buffer.size();
+
+        size_t tmp{};
+
+        while (buffer_start < buffer_end)
+        {
+            buffer_start = std::from_chars(buffer_start, buffer_end, tmp).ptr;
+            ++buffer_start; // skip ;
+            result.push_back(tmp);
+        }
+
+        return result;
+    };
+
+    auto parse_first_bin = [](std::string_view const & buffer)
+    {
+        size_t tmp{};
+        std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
+        return tmp;
+    };
+
+    std::string line;
+
+    std::getline(stream, line); // get first line that is always the max bin index of the top level bin
+    assert(line.starts_with(prefix::layout_first_header_line));
+
+    // parse High Level max bin index
+    constexpr size_t fullest_tbx_prefix_size = prefix::layout_fullest_technical_bin_idx.size();
+    assert(line.substr(prefix::layout_top_level.size() + 2, fullest_tbx_prefix_size)
+           == prefix::layout_fullest_technical_bin_idx);
+    std::string_view const hibf_max_bin_str{line.begin() + prefix::layout_top_level.size() + 2
+                                                + fullest_tbx_prefix_size,
+                                            line.end()};
+    top_level_max_bin_id = parse_first_bin(hibf_max_bin_str);
+
+    // read and parse header records, in order to sort them before adding them to the graph
+    while (std::getline(stream, line) && line != prefix::layout_column_names)
+    {
+        assert(line.substr(1, prefix::layout_lower_level.size()) == prefix::layout_lower_level);
+
+        // parse header line
+        std::string_view const indices_str{
+            line.begin() + 1 /*#*/ + prefix::layout_lower_level.size() + 1 /*_*/,
+            std::find(line.begin() + prefix::layout_lower_level.size() + 2, line.end(), ' ')};
+
+        assert(line.substr(prefix::layout_lower_level.size() + indices_str.size() + 3, fullest_tbx_prefix_size)
+               == prefix::layout_fullest_technical_bin_idx);
+        std::string_view const max_id_str{line.begin() + prefix::layout_lower_level.size() + indices_str.size()
+                                              + fullest_tbx_prefix_size + 3,
+                                          line.end()};
+
+        max_bins.emplace_back(parse_bin_indices(indices_str), parse_first_bin(max_id_str));
+    }
+
+    assert(line == prefix::layout_column_names);
+
+    // parse the rest of the file
+    while (std::getline(stream, line))
+        user_bins.emplace_back(parse_layout_line(line));
+}
+
+void seqan::hibf::layout::layout::write_to(std::ostream & stream) const
+{
+    // write layout header with max bin ids
+    stream << prefix::layout_first_header_line << " " << prefix::layout_fullest_technical_bin_idx
+           << top_level_max_bin_id << '\n';
+    for (auto const & max_bin : max_bins)
+        stream << max_bin << '\n';
+
+    // write header line
+    stream << prefix::layout_column_names << '\n';
+
+    // write layout entries
+    for (auto const & user_bin : user_bins)
+        stream << user_bin << '\n';
+}
+
+} // namespace seqan::hibf::layout

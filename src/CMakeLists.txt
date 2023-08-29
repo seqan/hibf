@@ -1,20 +1,20 @@
 set (HIBF_SOURCE_FILES
      hierarchical_interleaved_bloom_filter.cpp
      config.cpp
-     detail/layout/simple_binning.cpp
-     detail/layout/layout.cpp
-     detail/layout/execute.cpp
-     detail/layout/compute_fpr_correction.cpp
-     detail/layout/compute_layout.cpp
-     detail/layout/hierarchical_binning.cpp
-     detail/sketch/toolbox.cpp
-     detail/sketch/hyperloglog.cpp
-     detail/build/initialise_build_tree.cpp
-     detail/build/insert_into_ibf.cpp
-     detail/build/compute_kmers.cpp
-     detail/build/update_header_node_data.cpp
-     detail/build/construct_ibf.cpp
-     detail/build/update_content_node_data.cpp)
+     layout/simple_binning.cpp
+     layout/layout.cpp
+     layout/execute.cpp
+     layout/compute_fpr_correction.cpp
+     layout/compute_layout.cpp
+     layout/hierarchical_binning.cpp
+     sketch/toolbox.cpp
+     sketch/hyperloglog.cpp
+     build/initialise_build_tree.cpp
+     build/insert_into_ibf.cpp
+     build/compute_kmers.cpp
+     build/update_header_node_data.cpp
+     build/construct_ibf.cpp
+     build/update_content_node_data.cpp)
 
 add_library (hibf STATIC ${HIBF_SOURCE_FILES})
 add_library (seqan::hibf ALIAS hibf)

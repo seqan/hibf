@@ -27,7 +27,7 @@
 #include <utility>     // for addressof
 #include <vector>      // for vector
 
-#include <hibf/detail/cereal/concepts.hpp> // for cereal_archive
+#include <hibf/cereal/concepts.hpp> // for cereal_archive
 
 #include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <sdsl/int_vector.hpp> // for bit_vector

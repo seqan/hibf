@@ -10,7 +10,7 @@
 #include <iostream>
 
 #include <hibf/config.hpp>
-#include <hibf/detail/prefixes.hpp>
+#include <hibf/layout/prefixes.hpp>
 
 #include <cereal/archives/json.hpp>
 
