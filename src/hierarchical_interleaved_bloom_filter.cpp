@@ -47,11 +47,15 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
     auto initialise_max_bin_kmers = [&]() -> size_t
     {
-        if (current_node.favourite_child_idx != -1) // max bin is a merged bin
+        if (current_node.favourite_child_idx.has_value()) // max bin is a merged bin
         {
             // recursively initialize favourite child first
             ibf_positions[current_node.max_bin_index] =
-                hierarchical_build(hibf, kmers, current_node.children[current_node.favourite_child_idx], data, false);
+                hierarchical_build(hibf,
+                                   kmers,
+                                   current_node.children[current_node.favourite_child_idx.value()],
+                                   data,
+                                   false);
             return 1;
         }
         else // max bin is not a merged bin
@@ -101,7 +105,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             auto & child = children[index];
 
-            if (index != current_node.favourite_child_idx)
+            if (index != current_node.favourite_child_idx.value_or(-1))
             {
                 robin_hood::unordered_flat_set<uint64_t> kmers{};
                 size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
@@ -121,7 +125,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
     loop_over_children();
 
     // If max bin was a merged bin, process all remaining records, otherwise the first one has already been processed
-    size_t const start{(current_node.favourite_child_idx != -1) ? 0u : 1u};
+    size_t const start{(current_node.favourite_child_idx.has_value()) ? 0u : 1u};
     for (size_t i = start; i < current_node.remaining_records.size(); ++i)
     {
         auto const & record = current_node.remaining_records[i];

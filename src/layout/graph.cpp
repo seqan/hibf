@@ -51,7 +51,7 @@ void update_header_node_data(std::vector<layout::layout::max_bin> const & header
             }
         }
 
-        seqan::hibf::layout::graph::node new_child{{}, bin_indices.back(), max_id, 0u, -1, {}};
+        seqan::hibf::layout::graph::node new_child{{}, bin_indices.back(), max_id, 0u, std::nullopt, {}};
         parent->children.push_back(new_child);
 
         if (parent->max_bin_index == bin_indices.back())
@@ -116,7 +116,7 @@ graph::graph(seqan::hibf::layout::layout const & hibf_layout)
     root.parent_bin_index = 0;
     root.max_bin_index = hibf_layout.top_level_max_bin_id;
     root.number_of_technical_bins = 0;
-    root.favourite_child_idx = -1; // not known yet
+    root.favourite_child_idx = std::nullopt; // not known yet
     root.remaining_records = {};
 
     update_header_node_data(hibf_layout.max_bins, *this);

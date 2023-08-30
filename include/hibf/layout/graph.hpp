@@ -12,6 +12,7 @@
 
 #pragma once
 
+#include <optional>
 #include <vector> // for vector, operator==
 
 #include <hibf/layout/layout.hpp>
@@ -43,7 +44,7 @@ struct graph
         size_t parent_bin_index{};
         size_t max_bin_index{};
         size_t number_of_technical_bins{};
-        int32_t favourite_child_idx{-1};
+        std::optional<uint32_t> favourite_child_idx{std::nullopt};
         std::vector<layout::layout::user_bin> remaining_records{}; // non-merged bins (either split or single)
 
         // Doesn't work, because the type is incomplete. To compare node, a comparison for the children member is needed.

@@ -49,7 +49,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(hibf_graph.root.parent_bin_index, 0);
     EXPECT_EQ(hibf_graph.root.max_bin_index, 0);
     EXPECT_EQ(hibf_graph.root.number_of_technical_bins, 5);
-    EXPECT_EQ(hibf_graph.root.favourite_child_idx, 0);
+    EXPECT_EQ(hibf_graph.root.favourite_child_idx.value(), 0);
     ASSERT_EQ(hibf_graph.root.remaining_records.size(), 2);
     EXPECT_EQ(hibf_graph.root.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{1, std::vector<size_t>{}, 1, 2}));
@@ -72,7 +72,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(root_child0.parent_bin_index, 0);
     EXPECT_EQ(root_child0.max_bin_index, 1);
     EXPECT_EQ(root_child0.number_of_technical_bins, 5);
-    EXPECT_EQ(root_child0.favourite_child_idx, 1);
+    EXPECT_EQ(root_child0.favourite_child_idx.value(), 1);
     ASSERT_EQ(root_child0.remaining_records.size(), 3);
     EXPECT_EQ(root_child0.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{7, std::vector<size_t>{0}, 1, 2}));
@@ -85,7 +85,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(root_child1.parent_bin_index, 1);
     EXPECT_EQ(root_child1.max_bin_index, 26);
     EXPECT_EQ(root_child1.number_of_technical_bins, 64);
-    EXPECT_EQ(root_child1.favourite_child_idx, -1);
+    EXPECT_EQ(root_child1.favourite_child_idx.has_value(), false);
     ASSERT_EQ(root_child1.remaining_records.size(), 3);
     EXPECT_EQ(root_child1.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{3, std::vector<size_t>{1}, 19, 26}));
@@ -98,7 +98,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_child0.parent_bin_index, 0);
     EXPECT_EQ(c0_child0.max_bin_index, 4);
     EXPECT_EQ(c0_child0.number_of_technical_bins, 5);
-    EXPECT_EQ(c0_child0.favourite_child_idx, -1);
+    EXPECT_EQ(c0_child0.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_child0.remaining_records.size(), 4);
     EXPECT_EQ(c0_child0.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{11, std::vector<size_t>{0, 0}, 1, 4}));
@@ -113,7 +113,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_child1.parent_bin_index, 1);
     EXPECT_EQ(c0_child1.max_bin_index, 34);
     EXPECT_EQ(c0_child1.number_of_technical_bins, 64);
-    EXPECT_EQ(c0_child1.favourite_child_idx, -1);
+    EXPECT_EQ(c0_child1.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_child1.remaining_records.size(), 3);
     EXPECT_EQ(c0_child1.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{9, std::vector<size_t>{0, 1}, 15, 34}));
@@ -126,7 +126,7 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_c0_child0.parent_bin_index, 0);
     EXPECT_EQ(c0_c0_child0.max_bin_index, 30);
     EXPECT_EQ(c0_c0_child0.number_of_technical_bins, 64);
-    EXPECT_EQ(c0_c0_child0.favourite_child_idx, -1);
+    EXPECT_EQ(c0_c0_child0.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_c0_child0.remaining_records.size(), 5);
     EXPECT_EQ(c0_c0_child0.remaining_records[0],
               (seqan::hibf::layout::layout::user_bin{16, std::vector<size_t>{0, 0, 0}, 11, 30}));
