@@ -15,7 +15,7 @@
 #include <hibf/detail/timer.hpp> // for concurrent, timer
 #include <hibf/layout/graph.hpp> // for node_data
 
-namespace seqan::hibf
+namespace seqan::hibf::build
 {
 
 struct build_data
@@ -40,4 +40,4 @@ struct build_data
     }
 };
 
-} // namespace seqan::hibf
+} // namespace seqan::hibf::build
