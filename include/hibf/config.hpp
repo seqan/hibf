@@ -47,7 +47,7 @@ struct config
     size_t threads{1u};
     //!\}
 
-    /*!\name Layout Configuration
+    /*!\name HIBF Layout Configuration
      * \{
      */
     //!\brief The number of bits the HyperLogLog sketch should use to distribute the values into bins.
@@ -73,16 +73,6 @@ struct config
     bool disable_rearrangement{false};
     //!\}
 
-    /*!\name Build Configuration
-     * \{
-     */
-    // Related to k-mers
-    bool disable_cutoffs{false};
-
-    // Related to IBF
-    // bool compressed{false};
-    //!\}
-
     void read_from(std::istream & stream);
     void write_to(std::ostream & stream) const;
 
@@ -106,8 +96,6 @@ private:
         archive(CEREAL_NVP(max_rearrangement_ratio));
         archive(CEREAL_NVP(disable_estimate_union));
         archive(CEREAL_NVP(disable_rearrangement));
-
-        archive(CEREAL_NVP(disable_cutoffs));
     }
 };
 

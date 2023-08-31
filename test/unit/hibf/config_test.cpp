@@ -24,7 +24,6 @@ TEST(config_test, write_to)
     configuration.max_rearrangement_ratio = 0.333;
     configuration.disable_estimate_union = true;
     configuration.disable_rearrangement = false;
-    configuration.disable_cutoffs = false;
 
     configuration.write_to(ss);
 
@@ -41,8 +40,7 @@ TEST(config_test, write_to)
                                     "@        \"alpha\": 1.0,\n"
                                     "@        \"max_rearrangement_ratio\": 0.333,\n"
                                     "@        \"disable_estimate_union\": true,\n"
-                                    "@        \"disable_rearrangement\": false,\n"
-                                    "@        \"disable_cutoffs\": false\n"
+                                    "@        \"disable_rearrangement\": false\n"
                                     "@    }\n"
                                     "@}\n"
                                     "@HIBF_CONFIG_END\n"};
@@ -65,8 +63,7 @@ TEST(config_test, read_from)
                          "@        \"alpha\": 1.0,\n"
                          "@        \"max_rearrangement_ratio\": 0.333,\n"
                          "@        \"disable_estimate_union\": true,\n"
-                         "@        \"disable_rearrangement\": false,\n"
-                         "@        \"disable_cutoffs\": false\n"
+                         "@        \"disable_rearrangement\": false\n"
                          "@    }\n"
                          "@}\n"
                          "@HIBF_CONFIG_END\n"};
@@ -84,7 +81,6 @@ TEST(config_test, read_from)
     EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
     EXPECT_EQ(configuration.disable_estimate_union, true);
     EXPECT_EQ(configuration.disable_rearrangement, false);
-    EXPECT_EQ(configuration.disable_cutoffs, false);
 }
 
 TEST(config_test, read_from_with_more_meta)
@@ -107,8 +103,7 @@ TEST(config_test, read_from_with_more_meta)
                          "@        \"alpha\": 1.0,\n"
                          "@        \"max_rearrangement_ratio\": 0.333,\n"
                          "@        \"disable_estimate_union\": true,\n"
-                         "@        \"disable_rearrangement\": false,\n"
-                         "@        \"disable_cutoffs\": false\n"
+                         "@        \"disable_rearrangement\": false\n"
                          "@    }\n"
                          "@}\n"
                          "@HIBF_CONFIG_END\n"};
@@ -126,5 +121,4 @@ TEST(config_test, read_from_with_more_meta)
     EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
     EXPECT_EQ(configuration.disable_estimate_union, true);
     EXPECT_EQ(configuration.disable_rearrangement, false);
-    EXPECT_EQ(configuration.disable_cutoffs, false);
 }
