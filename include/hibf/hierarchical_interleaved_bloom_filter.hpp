@@ -114,7 +114,8 @@ public:
      * or raptor-layout (https://github.com/seqan/raptor).
      */
     hierarchical_interleaved_bloom_filter(std::function<void(size_t const, insert_iterator &&)> input_fn,
-                                          std::istream & layout_stream);
+                                          std::istream & layout_stream,
+                                          size_t const threads = 1u);
     //!\}
 
     //!\brief The individual interleaved Bloom filters.
