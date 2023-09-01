@@ -89,6 +89,11 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         std::vector<size_t> indices(children.size());
         std::iota(indices.begin(), indices.end(), size_t{});
 
+        // We do not want to process the favourite child. It has already been processed prior.
+        // https://godbolt.org/z/6Yav7hrG1
+        if (current_node.favourite_child_idx.has_value())
+            std::erase(indices, current_node.favourite_child_idx.value());
+
         if (is_root)
         {
             // Shuffle indices: More likely to not block each other. Optimal: Interleave
@@ -105,19 +110,16 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             auto & child = children[index];
 
-            if (index != current_node.favourite_child_idx.value_or(-1))
+            robin_hood::unordered_flat_set<uint64_t> kmers{};
+            size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
+            auto parent_bin_index = child.parent_bin_index;
             {
-                robin_hood::unordered_flat_set<uint64_t> kmers{};
-                size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
-                auto parent_bin_index = child.parent_bin_index;
-                {
-                    size_t const mutex_id{parent_bin_index / 64};
-                    std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
-                    ibf_positions[parent_bin_index] = ibf_pos;
-                    insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
-                    if (!is_root)
-                        update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
-                }
+                size_t const mutex_id{parent_bin_index / 64};
+                std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
+                ibf_positions[parent_bin_index] = ibf_pos;
+                insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
+                if (!is_root)
+                    update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
             }
         }
     };
