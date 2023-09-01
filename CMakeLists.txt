@@ -5,7 +5,7 @@
 # shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
-cmake_minimum_required (VERSION 3.4)
+cmake_minimum_required (VERSION 3.5)
 
 include (cmake/version.cmake)
 
