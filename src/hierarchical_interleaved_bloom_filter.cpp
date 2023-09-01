@@ -193,7 +193,8 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
     std::function<void(size_t const, insert_iterator &&)> input_fn,
-    std::istream & layout_stream)
+    std::istream & layout_stream,
+    size_t const threads)
 {
     // read config and layout from file
     config configuration;
@@ -202,6 +203,7 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
     hibf_layout.read_from(layout_stream);
 
     configuration.input_fn = input_fn; // set input as it cannot be serialized.
+    configuration.threads = threads;   // set threads as it shouldn't use what was used to compute the layout.
 
     build_index(*this, configuration, hibf_layout);
 }
