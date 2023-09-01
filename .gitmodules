@@ -4,9 +4,6 @@
 [submodule "submodules/cereal"]
 	path = submodules/cereal
 	url = https://github.com/USCiLab/cereal.git
-[submodule "submodules/lemon"]
-	path = submodules/lemon
-	url = https://github.com/seqan/lemon
 [submodule "submodules/simde"]
 	path = submodules/simde
 	url = https://github.com/simd-everywhere/simde.git
