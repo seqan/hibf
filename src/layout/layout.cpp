@@ -5,13 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 // ---------------------------------------------------------------------------------------------------
 
-#include <cassert>
-#include <charconv>
-#include <iostream>
+#include <algorithm>   // for find
+#include <cassert>     // for assert
+#include <charconv>    // for from_chars, from_chars_result
+#include <cstddef>     // for size_t
+#include <iostream>    // for operator<<, char_traits, basic_ostream, basic_istream, istream, ostream
+#include <string>      // for basic_string, getline, string
+#include <string_view> // for operator<<, string_view, operator==, basic_string_view
+#include <vector>      // for vector
 
-#include <hibf/config.hpp>
-#include <hibf/layout/layout.hpp>
-#include <hibf/layout/prefixes.hpp>
+#include <hibf/layout/layout.hpp>   // for layout, operator<<
+#include <hibf/layout/prefixes.hpp> // for layout_lower_level, layout_column_names, layout_fullest_technical_bin_idx
 
 namespace seqan::hibf::layout
 {

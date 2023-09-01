@@ -7,11 +7,10 @@
 
 #pragma once
 
-#include <cinttypes>  // for uint16_t, uint64_t, uint8_t
+#include <cinttypes>  // for uint16_t, uint32_t, uint64_t, uint8_t
 #include <cstddef>    // for size_t
-#include <filesystem> // for path
 #include <functional> // for function
-#include <iosfwd>     // for ostream
+#include <iosfwd>     // for istream, ostream
 #include <iterator>   // for insert_iterator
 
 #include <hibf/cereal/path.hpp>        // IWYU pragma: keep

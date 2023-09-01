@@ -4,9 +4,9 @@
 #include <cstddef>   // for size_t
 #include <iomanip>   // for operator<<, setprecision, fixed
 #include <limits>    // for numeric_limits
-#include <ostream>   // for basic_ostream, stringstream
-#include <string>    // for char_traits, operator+, string, allocator
-#include <utility>   // for pair, addressof
+#include <sstream>   // for basic_ostream, basic_stringstream, stringstream
+#include <string>    // for allocator, char_traits, operator+, string
+#include <utility>   // for pair
 #include <vector>    // for vector
 
 #include <hibf/config.hpp>                      // for config
@@ -16,7 +16,7 @@
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/next_multiple_of_64.hpp>         // for next_multiple_of_64
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-#include <hibf/sketch/toolbox.hpp>              // for toolbox
+#include <hibf/sketch/toolbox.hpp>              // for precompute_initial_union_estimates, precompute_union_estimat...
 
 namespace seqan::hibf::layout
 {

@@ -5,14 +5,16 @@
 // shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 // ---------------------------------------------------------------------------------------------------
 
-#include <cassert>
-#include <charconv>
-#include <iostream>
+#include <cassert>     // for assert
+#include <sstream>     // for basic_istream, basic_ostream, operator<<, basic_stringstream, stringstream
+#include <string>      // for char_traits, getline, operator<<, string
+#include <string_view> // for operator<<, operator==, basic_string_view
 
-#include <hibf/config.hpp>
-#include <hibf/layout/prefixes.hpp>
+#include <hibf/config.hpp>          // for config
+#include <hibf/layout/prefixes.hpp> // for meta_header, meta_hibf_config_end, meta_hibf_config_start
 
-#include <cereal/archives/json.hpp>
+#include <cereal/archives/json.hpp> // for JSONInputArchive, JSONOutputArchive
+#include <cereal/cereal.hpp>        // for make_nvp, InputArchive, OutputArchive
 
 namespace seqan::hibf
 {

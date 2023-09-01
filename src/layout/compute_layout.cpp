@@ -1,8 +1,9 @@
+#include <algorithm>  // for __sort_fn, sort
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
-#include <functional> // for function
-#include <iosfwd>     // for stringstream
+#include <functional> // for identity, function
 #include <iterator>   // for inserter
+#include <sstream>    // for basic_stringstream, stringstream
 #include <utility>    // for addressof
 #include <vector>     // for vector
 

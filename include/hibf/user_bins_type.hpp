@@ -7,6 +7,7 @@
 
 #pragma once
 
+#include <algorithm> // for max
 #include <cinttypes> // for int64_t
 #include <cstddef>   // for size_t
 #include <string>    // for string

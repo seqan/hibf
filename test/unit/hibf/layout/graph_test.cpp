@@ -1,13 +1,11 @@
-#include <gtest/gtest.h> // for Test, TestInfo, EXPECT_EQ, Message, TEST, TestPartResult
+#include <gtest/gtest.h> // for Message, TestPartResult, EXPECT_EQ, Test, ASSERT_EQ, TestInfo, TEST
 
-#include <cstddef>     // for size_t
-#include <sstream>     // for operator<<, char_traits, basic_ostream, basic_stringstream, strings...
-#include <string>      // for allocator, string
-#include <string_view> // for operator<<
-#include <vector>      // for vector
+#include <cstddef>  // for size_t
+#include <optional> // for optional
+#include <vector>   // for vector, allocator
 
-#include <hibf/layout/graph.hpp>         // for layout, operator<<
-#include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/layout/graph.hpp>  // for graph
+#include <hibf/layout/layout.hpp> // for layout
 
 TEST(layout_test, printing_max_bins)
 {

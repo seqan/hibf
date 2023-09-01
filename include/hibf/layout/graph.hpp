@@ -12,10 +12,12 @@
 
 #pragma once
 
-#include <optional>
-#include <vector> // for vector, operator==
+#include <algorithm> // for copy
+#include <cstddef>   // for size_t
+#include <optional>  // for nullopt, optional
+#include <vector>    // for vector
 
-#include <hibf/layout/layout.hpp>
+#include <hibf/layout/layout.hpp> // for layout
 
 namespace seqan::hibf::layout
 {
