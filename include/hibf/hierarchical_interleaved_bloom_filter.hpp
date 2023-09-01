@@ -19,6 +19,7 @@
 
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config
+#include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/user_bins_type.hpp>           // for user_bins_type
 
@@ -151,6 +152,16 @@ public:
         archive(next_ibf_id);
         archive(user_bins);
     }
+
+    /*!\name Timer
+     * \brief Only contains values after the HIBF has been constructed.
+     * \{
+     */
+    timer<concurrent::yes> index_allocation_timer{};
+    timer<concurrent::yes> user_bin_io_timer{};
+    timer<concurrent::yes> merge_kmers_timer{};
+    timer<concurrent::yes> fill_ibf_timer{};
+    //!\}
     //!\endcond
 };
 

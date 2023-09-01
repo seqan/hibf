@@ -29,13 +29,10 @@ struct build_data
     std::vector<double> fpr_correction{};
 
     // Timers do not copy the stored duration upon copy construction/assignment
-    mutable timer<concurrent::yes> wall_clock_timer{};
-    mutable timer<concurrent::yes> bin_size_timer{};
     mutable timer<concurrent::yes> index_allocation_timer{};
     mutable timer<concurrent::yes> user_bin_io_timer{};
     mutable timer<concurrent::yes> merge_kmers_timer{};
     mutable timer<concurrent::yes> fill_ibf_timer{};
-    mutable timer<concurrent::yes> store_index_timer{};
 
     size_t request_ibf_idx()
     {

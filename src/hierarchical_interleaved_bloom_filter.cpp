@@ -183,6 +183,11 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
         {.fpr = config.maximum_false_positive_rate, .hash_count = config.number_of_hash_functions, .t_max = t_max});
 
     hierarchical_build(hibf, root_node, data);
+
+    hibf.index_allocation_timer = std::move(data.index_allocation_timer);
+    hibf.user_bin_io_timer = std::move(data.user_bin_io_timer);
+    hibf.merge_kmers_timer = std::move(data.merge_kmers_timer);
+    hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config const & configuration)
