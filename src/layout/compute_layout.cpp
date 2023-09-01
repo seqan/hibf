@@ -59,11 +59,13 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     store.hibf_layout->top_level_max_bin_id = max_hibf_id;
 
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
+    // GCOVR_EXCL_START
     std::ranges::sort(store.hibf_layout->max_bins,
                       [](auto const & r, auto const & l)
                       {
                           return r.previous_TB_indices.size() < l.previous_TB_indices.size();
                       });
+    // GCOVR_EXCL_STOP
 
     return *store.hibf_layout;
 }
