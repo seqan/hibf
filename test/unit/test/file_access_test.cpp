@@ -8,7 +8,7 @@
 #include <gtest/gtest.h> // for AssertionResult, TestInfo, Message, TEST_F, TestPartResult, EXPECT_EQ
 
 #include <filesystem> // for remove, path, temp_directory_path, permissions, perm_options, perms
-#include <iosfwd>     // for fstream, ios, ofstream
+#include <fstream>    // for basic_fstream, basic_ios, fstream, ios, basic_ofstream, ofstream
 #include <memory>     // for allocator
 
 #include <hibf/test/file_access.hpp> // for write_access, read_access

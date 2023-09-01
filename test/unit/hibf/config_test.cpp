@@ -1,10 +1,7 @@
-#include <gtest/gtest.h> // for Test, TestInfo, EXPECT_EQ, Message, TEST, TestPartResult
+#include <gtest/gtest.h> // for Test, EXPECT_EQ, Message, TestPartResult, TestInfo, TEST
 
-#include <cstddef>     // for size_t
-#include <sstream>     // for operator<<, char_traits, basic_ostream, basic_stringstream, strings...
-#include <string>      // for allocator, string
-#include <string_view> // for operator<<
-#include <vector>      // for vector
+#include <sstream> // for basic_stringstream, stringstream
+#include <string>  // for allocator, string
 
 #include <hibf/config.hpp> // for config
 

@@ -9,8 +9,8 @@
 
 #include <cstdlib>    // for setenv
 #include <filesystem> // for exists, path, operator/, equivalent, permissions, temp_directory_path
-#include <ostream>    // for operator<<, basic_ostream, ofstream, ios
-#include <string>     // for char_traits, allocator, string
+#include <fstream>    // for operator<<, basic_ofstream, basic_ostream, ofstream, basic_ios, ios
+#include <string>     // for allocator, char_traits, string
 #include <utility>    // for move
 
 #include <hibf/test/file_access.hpp>    // for write_access

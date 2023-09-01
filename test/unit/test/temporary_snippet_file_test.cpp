@@ -8,8 +8,9 @@
 #include <gtest/gtest.h> // for Test, AssertionResult, Message, TestInfo, TestPartResult
 
 #include <filesystem> // for current_path, operator/, path, exists
+#include <fstream>    // for char_traits, basic_ostream::operator<<, basic_ifstream, basi...
 #include <memory>     // for allocator
-#include <ostream>    // for basic_ostream::operator<<, basic_ostream, ifstream, stringst...
+#include <sstream>    // for basic_stringstream
 
 #include <hibf/test/temporary_snippet_file.hpp> // for temporary_snippet_file
 

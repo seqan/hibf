@@ -5,15 +5,16 @@
 // shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 // ---------------------------------------------------------------------------------------------------
 
-#include <algorithm>  // for max
-#include <cassert>    // for assert
-#include <cstddef>    // for size_t
-#include <functional> // for identity
-#include <ranges>     // for __prev_fn, prev
-#include <utility>    // for move
-#include <vector>     // for vector
+#include <algorithm> // for max, copy
+#include <cassert>   // for assert
+#include <cstddef>   // for size_t
+#include <optional>  // for nullopt, optional
+#include <ranges>    // for __prev_fn, prev
+#include <utility>   // for move
+#include <vector>    // for vector
 
-#include <hibf/layout/graph.hpp>
+#include <hibf/layout/graph.hpp>  // for graph
+#include <hibf/layout/layout.hpp> // for layout
 
 namespace seqan::hibf::layout
 {
