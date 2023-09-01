@@ -10,6 +10,7 @@
  * Modified a lot for a bugfix, improvements and functional changes (64 bit hashes)
  */
 
+#include <algorithm> // for copy
 #include <array>     // for array
 #include <cinttypes> // for uint64_t, uint8_t
 #include <cstddef>   // for size_t
