@@ -15,7 +15,7 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/graph.hpp>
 
-namespace seqan::hibf
+namespace seqan::hibf::build
 {
 
 seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
@@ -25,4 +25,4 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
                                                     build_data & data,
                                                     bool is_root);
 
-} // namespace seqan::hibf
+} // namespace seqan::hibf::build
