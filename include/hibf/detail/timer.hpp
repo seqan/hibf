@@ -104,4 +104,8 @@ private:
     rep_t ticks{};
 };
 
+// seqan::hibf::{serial,concurrent}_timer is easier to use than `seqan::hibf::timer<seqan::hibf::concurrent::{no,yes}.
+using serial_timer = timer<concurrent::no>;
+using concurrent_timer = timer<concurrent::yes>;
+
 } // namespace seqan::hibf
