@@ -50,23 +50,6 @@ struct layout
         size_t number_of_technical_bins{};         // 1 == single bin, >1 == split_bin
         size_t idx{};                              // The index of the user bin corresponding to the order in data
 
-        user_bin() = default;
-        user_bin(user_bin const &) = default;
-        user_bin(user_bin &&) = default;
-        user_bin & operator=(user_bin const &) = default;
-        user_bin & operator=(user_bin &&) = default;
-        ~user_bin() = default;
-
-        user_bin(size_t const idx_,
-                 std::vector<size_t> const & previous_TB_indices_,
-                 size_t const number_of_technical_bins_,
-                 size_t const storage_TB_id_) :
-            previous_TB_indices{previous_TB_indices_},
-            storage_TB_id{storage_TB_id_},
-            number_of_technical_bins{number_of_technical_bins_},
-            idx{idx_}
-        {}
-
         friend auto operator<=>(user_bin const &, user_bin const &) = default;
 
         // needs a template (instead of using std::ostream directly) to be able to only include <iosfwd>

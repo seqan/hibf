@@ -21,10 +21,10 @@ TEST(simple_binning_test, small_example)
     seqan::hibf::layout::simple_binning algo{data, 9};
     size_t max_bin = algo.execute();
 
-    std::vector<seqan::hibf::layout::layout::user_bin> expected{{3, {}, 1, 0},
-                                                                {2, {}, 1, 1},
-                                                                {1, {}, 2, 2},
-                                                                {0, {}, 5, 4}};
+    std::vector<seqan::hibf::layout::layout::user_bin> expected{{{}, 0, 1, 3},
+                                                                {{}, 1, 1, 2},
+                                                                {{}, 2, 2, 1},
+                                                                {{}, 4, 5, 0}};
 
     EXPECT_RANGE_EQ(hibf_layout.user_bins, expected);
     EXPECT_EQ(max_bin, 0u);
@@ -42,10 +42,10 @@ TEST(simple_binning_test, uniform_distribution)
     seqan::hibf::layout::simple_binning algo{data, 4u};
     size_t max_bin = algo.execute();
 
-    std::vector<seqan::hibf::layout::layout::user_bin> expected{{3, {}, 1, 0},
-                                                                {2, {}, 1, 1},
-                                                                {1, {}, 1, 2},
-                                                                {0, {}, 1, 3}};
+    std::vector<seqan::hibf::layout::layout::user_bin> expected{{{}, 0, 1, 3},
+                                                                {{}, 1, 1, 2},
+                                                                {{}, 2, 1, 1},
+                                                                {{}, 3, 1, 0}};
 
     EXPECT_RANGE_EQ(hibf_layout.user_bins, expected);
     EXPECT_EQ(max_bin, 0u);

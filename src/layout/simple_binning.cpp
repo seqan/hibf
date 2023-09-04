@@ -76,10 +76,10 @@ size_t simple_binning::execute()
         size_t const number_of_bins = (trace_i - next_i);
         size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
-        data->hibf_layout->user_bins.emplace_back(data->positions[trace_j],
-                                                  data->previous.bin_indices,
+        data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
+                                                  bin_id,
                                                   number_of_bins,
-                                                  bin_id);
+                                                  data->positions[trace_j]);
 
         if (kmer_count_per_bin > max_size)
         {
@@ -96,7 +96,7 @@ size_t simple_binning::execute()
     size_t const kmer_count = (*data->kmer_counts)[data->positions[0]];
     size_t const kmer_count_per_bin = (kmer_count + trace_i - 1) / trace_i;
 
-    data->hibf_layout->user_bins.emplace_back(data->positions[0], data->previous.bin_indices, trace_i, bin_id);
+    data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices, bin_id, trace_i, data->positions[0]);
 
     if (kmer_count_per_bin > max_size)
         max_id = bin_id;
