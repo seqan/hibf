@@ -20,26 +20,26 @@ TEST(layout_test, printing_max_bins)
     hibf_layout.max_bins.emplace_back(std::vector<size_t>{0, 1}, 34);
     hibf_layout.max_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 30);
     // isnert (previous_TB_indices, storage_TB_id, number_of_technical_bins, idx)
-    hibf_layout.user_bins.emplace_back(15, std::vector<size_t>{0, 0, 0}, 30, 0);
-    hibf_layout.user_bins.emplace_back(16, std::vector<size_t>{0, 0, 0}, 11, 30);
-    hibf_layout.user_bins.emplace_back(17, std::vector<size_t>{0, 0, 0}, 11, 41);
-    hibf_layout.user_bins.emplace_back(18, std::vector<size_t>{0, 0, 0}, 6, 52);
-    hibf_layout.user_bins.emplace_back(19, std::vector<size_t>{0, 0, 0}, 6, 58);
-    hibf_layout.user_bins.emplace_back(14, std::vector<size_t>{0, 0}, 1, 1);
-    hibf_layout.user_bins.emplace_back(13, std::vector<size_t>{0, 0}, 1, 2);
-    hibf_layout.user_bins.emplace_back(12, std::vector<size_t>{0, 0}, 1, 3);
-    hibf_layout.user_bins.emplace_back(11, std::vector<size_t>{0, 0}, 1, 4);
-    hibf_layout.user_bins.emplace_back(8, std::vector<size_t>{0, 1}, 34, 0);
-    hibf_layout.user_bins.emplace_back(9, std::vector<size_t>{0, 1}, 15, 34);
-    hibf_layout.user_bins.emplace_back(10, std::vector<size_t>{0, 1}, 15, 49);
-    hibf_layout.user_bins.emplace_back(7, std::vector<size_t>{0}, 1, 2);
-    hibf_layout.user_bins.emplace_back(6, std::vector<size_t>{0}, 1, 3);
-    hibf_layout.user_bins.emplace_back(5, std::vector<size_t>{0}, 1, 4);
-    hibf_layout.user_bins.emplace_back(2, std::vector<size_t>{1}, 26, 0);
-    hibf_layout.user_bins.emplace_back(3, std::vector<size_t>{1}, 19, 26);
-    hibf_layout.user_bins.emplace_back(4, std::vector<size_t>{1}, 19, 45);
-    hibf_layout.user_bins.emplace_back(1, std::vector<size_t>{}, 1, 2);
-    hibf_layout.user_bins.emplace_back(0, std::vector<size_t>{}, 2, 3);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 0, 30, 15);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 30, 11, 16);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 41, 11, 17);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 52, 6, 18);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0, 0}, 58, 6, 19);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0}, 1, 1, 14);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0}, 2, 1, 13);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0}, 3, 1, 12);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 0}, 4, 1, 11);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 1}, 0, 34, 8);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 1}, 34, 15, 9);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0, 1}, 49, 15, 10);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0}, 2, 1, 7);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0}, 3, 1, 6);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{0}, 4, 1, 5);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{1}, 0, 26, 2);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{1}, 26, 19, 3);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{1}, 45, 19, 4);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{}, 2, 1, 1);
+    hibf_layout.user_bins.emplace_back(std::vector<size_t>{}, 3, 2, 0);
 
     seqan::hibf::layout::graph hibf_graph{hibf_layout};
 
@@ -50,9 +50,9 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(hibf_graph.root.favourite_child_idx.value(), 0);
     ASSERT_EQ(hibf_graph.root.remaining_records.size(), 2);
     EXPECT_EQ(hibf_graph.root.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{1, std::vector<size_t>{}, 1, 2}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{}, 2, 1, 1}));
     EXPECT_EQ(hibf_graph.root.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{0, std::vector<size_t>{}, 2, 3}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{}, 3, 2, 0}));
 
     // tree structure:
     ASSERT_EQ(hibf_graph.root.children.size(), 2);
@@ -73,11 +73,11 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(root_child0.favourite_child_idx.value(), 1);
     ASSERT_EQ(root_child0.remaining_records.size(), 3);
     EXPECT_EQ(root_child0.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{7, std::vector<size_t>{0}, 1, 2}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0}, 2, 1, 7}));
     EXPECT_EQ(root_child0.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{6, std::vector<size_t>{0}, 1, 3}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0}, 3, 1, 6}));
     EXPECT_EQ(root_child0.remaining_records[2],
-              (seqan::hibf::layout::layout::user_bin{5, std::vector<size_t>{0}, 1, 4}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0}, 4, 1, 5}));
 
     // child 1 of root
     EXPECT_EQ(root_child1.parent_bin_index, 1);
@@ -86,11 +86,11 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(root_child1.favourite_child_idx.has_value(), false);
     ASSERT_EQ(root_child1.remaining_records.size(), 3);
     EXPECT_EQ(root_child1.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{3, std::vector<size_t>{1}, 19, 26}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1}, 26, 19, 3}));
     EXPECT_EQ(root_child1.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{2, std::vector<size_t>{1}, 26, 0}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1}, 0, 26, 2}));
     EXPECT_EQ(root_child1.remaining_records[2],
-              (seqan::hibf::layout::layout::user_bin{4, std::vector<size_t>{1}, 19, 45}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1}, 45, 19, 4}));
 
     // child 0 of child 0
     EXPECT_EQ(c0_child0.parent_bin_index, 0);
@@ -99,13 +99,13 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_child0.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_child0.remaining_records.size(), 4);
     EXPECT_EQ(c0_child0.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{11, std::vector<size_t>{0, 0}, 1, 4}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0}, 4, 1, 11}));
     EXPECT_EQ(c0_child0.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{14, std::vector<size_t>{0, 0}, 1, 1}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0}, 1, 1, 14}));
     EXPECT_EQ(c0_child0.remaining_records[2],
-              (seqan::hibf::layout::layout::user_bin{13, std::vector<size_t>{0, 0}, 1, 2}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0}, 2, 1, 13}));
     EXPECT_EQ(c0_child0.remaining_records[3],
-              (seqan::hibf::layout::layout::user_bin{12, std::vector<size_t>{0, 0}, 1, 3}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0}, 3, 1, 12}));
 
     // child 1 of child 0
     EXPECT_EQ(c0_child1.parent_bin_index, 1);
@@ -114,11 +114,11 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_child1.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_child1.remaining_records.size(), 3);
     EXPECT_EQ(c0_child1.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{9, std::vector<size_t>{0, 1}, 15, 34}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 1}, 34, 15, 9}));
     EXPECT_EQ(c0_child1.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{8, std::vector<size_t>{0, 1}, 34, 0}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 1}, 0, 34, 8}));
     EXPECT_EQ(c0_child1.remaining_records[2],
-              (seqan::hibf::layout::layout::user_bin{10, std::vector<size_t>{0, 1}, 15, 49}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 1}, 49, 15, 10}));
 
     // child 0 of child 0 of child 0
     EXPECT_EQ(c0_c0_child0.parent_bin_index, 0);
@@ -127,13 +127,13 @@ TEST(layout_test, printing_max_bins)
     EXPECT_EQ(c0_c0_child0.favourite_child_idx.has_value(), false);
     ASSERT_EQ(c0_c0_child0.remaining_records.size(), 5);
     EXPECT_EQ(c0_c0_child0.remaining_records[0],
-              (seqan::hibf::layout::layout::user_bin{16, std::vector<size_t>{0, 0, 0}, 11, 30}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0, 0}, 30, 11, 16}));
     EXPECT_EQ(c0_c0_child0.remaining_records[1],
-              (seqan::hibf::layout::layout::user_bin{15, std::vector<size_t>{0, 0, 0}, 30, 0}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0, 0}, 0, 30, 15}));
     EXPECT_EQ(c0_c0_child0.remaining_records[2],
-              (seqan::hibf::layout::layout::user_bin{17, std::vector<size_t>{0, 0, 0}, 11, 41}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0, 0}, 41, 11, 17}));
     EXPECT_EQ(c0_c0_child0.remaining_records[3],
-              (seqan::hibf::layout::layout::user_bin{18, std::vector<size_t>{0, 0, 0}, 6, 52}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0, 0}, 52, 6, 18}));
     EXPECT_EQ(c0_c0_child0.remaining_records[4],
-              (seqan::hibf::layout::layout::user_bin{19, std::vector<size_t>{0, 0, 0}, 6, 58}));
+              (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{0, 0, 0}, 58, 6, 19}));
 }

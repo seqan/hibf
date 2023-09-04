@@ -264,10 +264,10 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         {
             size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
 
-            data->hibf_layout->user_bins.emplace_back(data->positions[trace_j],
-                                                      data->previous.bin_indices,
+            data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
+                                                      bin_id,
                                                       number_of_bins,
-                                                      bin_id);
+                                                      data->positions[trace_j]);
 
             // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << kmer_count_per_bin << std::endl;
 
@@ -312,10 +312,10 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         size_t const number_of_tbs = trace_i + 1;
         size_t const average_bin_size = (kmer_count + number_of_tbs - 1) / number_of_tbs; // round up
 
-        data->hibf_layout->user_bins.emplace_back(data->positions[0],
-                                                  data->previous.bin_indices,
+        data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
+                                                  bin_id,
                                                   number_of_tbs,
-                                                  bin_id);
+                                                  data->positions[0]);
 
         update_max_id(high_level_max_id, high_level_max_size, bin_id, average_bin_size);
         // std::cout << "split " << trace_j << " into " << trace_i << ": " << kmer_count / number_of_tbs << std::endl;
