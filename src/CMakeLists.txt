@@ -3,7 +3,6 @@ set (HIBF_SOURCE_FILES
      config.cpp
      layout/simple_binning.cpp
      layout/layout.cpp
-     layout/execute.cpp
      layout/compute_fpr_correction.cpp
      layout/compute_layout.cpp
      layout/graph.cpp
