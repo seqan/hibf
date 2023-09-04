@@ -122,7 +122,7 @@ public:
      *   can be easily filtered in the down-stream analysis
      *
      * ## Validation
-     * \copybrief check_config_and_set_defaults
+     * \copybrief seqan::hibf::config::validate_and_set_defaults
      */
     hierarchical_interleaved_bloom_filter(config & configuration);
 

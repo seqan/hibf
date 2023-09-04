@@ -7,7 +7,6 @@
 
 #include <algorithm>  // for fill_n, max, shuffle
 #include <cinttypes>  // for uint64_t, int64_t
-#include <cmath>      // for ceil, sqrt
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <iostream>   // for char_traits, operator<<, basic_ostream, cerr
@@ -15,7 +14,6 @@
 #include <numeric>    // for iota
 #include <optional>   // for optional
 #include <random>     // for random_device, mt19937_64
-#include <stdexcept>  // for invalid_argument
 #include <utility>    // for move
 #include <vector>     // for vector, erase
 
@@ -34,7 +32,6 @@
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
-#include <hibf/next_multiple_of_64.hpp>                   // for next_multiple_of_64
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace seqan::hibf
@@ -201,55 +198,9 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
-/*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
- *
- * The following checks are performed and will throw an exception if the checks fail:
- * * seqan::hibf::config::number_of_user_bins must be greather than `0`.
- * * If seqan::hibf::config::tmax is `0`, seqan::hibf::config::number_of_user_bins must be smaller than `1ULL << 32`.
- *
- * The configuration might be modified before being passed to the HIBF construction algorithm:
- * * If seqan::hibf::config::disable_estimate_union is `true`, seqan::hibf::config::disable_rearrangement will be set
- *   to `true` . Without union estimation, no rearrangement can be done.
- * * If seqan::hibf::config::tmax is `0`, the default value of `std::ceil(std::sqrt(cfg.number_of_user_bins))` will be
- *   used.
- * * If seqan::hibf::config::tmax is **not** `0` but also not a multiple of 64, it is increased to the next multiple of
- *   64. E.g., the value `60` will be increased to `64`, and `1000` to `1024`.
- */
-void check_config_and_set_defaults(config & cfg)
-{
-    if (cfg.disable_estimate_union)
-        cfg.disable_rearrangement = true;
-
-    if (cfg.number_of_user_bins == 0u)
-        throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
-
-    if (cfg.tmax == 0) // no tmax was set by the user on the command line
-    {
-        // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
-        if (cfg.number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
-        {
-            throw std::invalid_argument{
-                "[HIBF CONFIG ERROR] Too many user bins to compute a default tmax. " // GCOVR_EXCL_LINE
-                "Please set a tmax manually."};                                      // GCOVR_EXCL_LINE
-        }
-        else
-        {
-            cfg.tmax =
-                seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(cfg.number_of_user_bins))));
-        }
-    }
-    else if (cfg.tmax % 64 != 0)
-    {
-        cfg.tmax = seqan::hibf::next_multiple_of_64(cfg.tmax);
-        std::cerr << "[HIBF CONFIG WARNING]: Your requested number of technical bins was not a multiple of 64. "
-                  << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
-                  << "anyway, so we increased your number of technical bins to " << cfg.tmax << ".\n";
-    }
-}
-
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration)
 {
-    check_config_and_set_defaults(configuration);
+    configuration.validate_and_set_defaults();
     auto layout = layout::compute_layout(configuration);
     build_index(*this, configuration, layout);
 }
