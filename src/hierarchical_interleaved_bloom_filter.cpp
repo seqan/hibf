@@ -201,6 +201,23 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
+/*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
+ *
+ * The following checks are performed and might throw an exception if the configuration doesn't pass validation:
+ * * If seqan::hibf::config::number_of_user_bins is `0` it is considered `not set` and an exception will be thrown
+ *   because this paprameter is required.
+ * * If seqan::hibf::config::tmax is `0` and seqan::hibf::config::number_of_user_bins is `>= 1ULL << 32` an exception
+ *   will be thrown because a default tmax cannot be computed.
+ *
+ * The configuration might be modified as follows before passed to the HIBF construction algorithm:
+ * * If seqan::hibf::config::disable_estimate_union is set to true but seqan::hibf::config::disable_rearrangement
+ *   is not, seqan::hibf::config::disable_rearrangement will be fordced to be true also. Without union estimations,
+ *   no rearrangement can be done.
+ * * If seqan::hibf::config::tmax is `0` it is considered `not set` and a default will be computed via
+ *   `static_cast<uint16_t>(std::ceil(std::sqrt(cfg.number_of_user_bins)))`.
+ * * If seqan::hibf::config::tmax is **not** `0` but also not a multiple of 64, it is increased to the next multiple of
+ *   64 to avoid uneccessary space consumption (e.g. value `60` will be increased to `64` or `1000` increased to `1024`).
+ */
 void check_config_and_set_defaults(config & cfg)
 {
     if (cfg.disable_estimate_union)

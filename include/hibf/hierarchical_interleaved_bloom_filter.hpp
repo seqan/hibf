@@ -106,9 +106,27 @@ public:
     operator=(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
     ~hierarchical_interleaved_bloom_filter() = default;            //!< Defaulted.
 
+    /*!\brief Constructs the HIBF from the given configuration.
+     * \details
+     *
+     * ## Configuration
+     * Required options:
+     * * `input_fn`
+     * * `number_of_user_bins`
+     *
+     * Options recommended to adapt to your setup:
+     * * `threads` - Choose number of threads depending on your hardware settings to speed up construction
+     * * `maximum_false_positive_rate` - How many false positive answers can you tolerate? A low FPR (e.g. 0.001) is
+     *   needed if you can tolerate a high RAM peak when using the HIBF but post-processing steps are heavy and FPs
+     *   should be avoided. A high FPR (e.g. `0.3`) can be chosed if you want a very small HIBF and false positive
+     *   can be easily filtered in the down-stream analysis
+     *
+     * ## Validation
+     * \copybrief check_config_and_set_defaults
+     */
     hierarchical_interleaved_bloom_filter(config & configuration);
 
-    /*!\brief [Advanced] Constructs the HIBF from a layout file (stream) and a given input function
+    /*!\brief [Advanced] Constructs the HIBF from a layout file (stream) and a given input function.
      * \details
      * This constructor makes it possible to construct an hibf from a given layout file instead of calculating the
      * layout based on the input function. A seqan::hibf::config object is not needed as it is assumed to be stored in the
