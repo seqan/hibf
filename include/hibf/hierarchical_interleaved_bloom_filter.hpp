@@ -106,7 +106,7 @@ public:
     operator=(hierarchical_interleaved_bloom_filter &&) = default; //!< Defaulted.
     ~hierarchical_interleaved_bloom_filter() = default;            //!< Defaulted.
 
-    hierarchical_interleaved_bloom_filter(config const & configuration);
+    hierarchical_interleaved_bloom_filter(config & configuration);
 
     /*!\brief [Advanced] Constructs the HIBF from a layout file (stream) and a given input function
      * \details

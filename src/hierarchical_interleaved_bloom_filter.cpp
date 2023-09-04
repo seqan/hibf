@@ -7,15 +7,15 @@
 
 #include <algorithm>  // for fill_n, max, shuffle
 #include <cinttypes>  // for uint64_t, int64_t
-#include <cmath>     // for ceil, sqrt
+#include <cmath>      // for ceil, sqrt
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iostream>  // for char_traits, operator<<, basic_ostream, cerr
+#include <iostream>   // for char_traits, operator<<, basic_ostream, cerr
 #include <mutex>      // for mutex, lock_guard
 #include <numeric>    // for iota
 #include <optional>   // for optional
 #include <random>     // for random_device, mt19937_64
-#include <stdexcept> // for invalid_argument
+#include <stdexcept>  // for invalid_argument
 #include <utility>    // for move
 #include <vector>     // for vector, erase
 
@@ -201,35 +201,44 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
-void check_config(config & configuration)
+void check_config_and_set_defaults(config & cfg)
 {
-    if (configuration.disable_estimate_union)
-        configuration.disable_rearrangement = true;
+    if (cfg.disable_estimate_union)
+        cfg.disable_rearrangement = true;
 
-    if (configuration.tmax == 0) // no tmax was set by the user on the command line
+    if (cfg.number_of_user_bins = 0)
+        throw std::invalid_argument{
+            "[HIBF CONFIG ERROR] You didn't set config::number_of_user_bins but it's required."};
+
+    if (cfg.tmax == 0) // no tmax was set by the user on the command line
     {
         // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
-        if (configuration.number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
-            throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
+        if (cfg.number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
+        {
+            throw std::invalid_argument{
+                "[HIBF CONFIG ERROR] Too many user-bins/samples to compute a default tmax. " // GCOVR_EXCL_LINE
+                "Please set a tmax manually."};                                              // GCOVR_EXCL_LINE
+        }
         else
-            configuration.tmax =
-                seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(configuration.number_of_user_bins))));
+        {
+            cfg.tmax =
+                seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(cfg.number_of_user_bins))));
+        }
     }
-    else if (configuration.tmax % 64 != 0)
+    else if (cfg.tmax % 64 != 0)
     {
-        configuration.tmax = seqan::hibf::next_multiple_of_64(configuration.tmax);
-        std::cerr << "[HIBF LAYOUT WARNING]: Your requested number of technical bins was not a multiple of 64. "
+        cfg.tmax = seqan::hibf::next_multiple_of_64(cfg.tmax);
+        std::cerr << "[HIBF CONFIG WARNING]: Your requested number of technical bins was not a multiple of 64. "
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
-                  << "anyway, so we increased your number of technical bins to " << configuration.tmax << ".\n";
+                  << "anyway, so we increased your number of technical bins to " << cfg.tmax << ".\n";
     }
 }
 
-hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config const & configuration)
+hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration)
 {
-    seqan::hibf::config config_copy{configuration};
-    check_config(config_copy);
-    auto layout = layout::compute_layout(config_copy);
-    build_index(*this, config_copy, layout);
+    check_config_and_set_defaults(configuration);
+    auto layout = layout::compute_layout(configuration);
+    build_index(*this, configuration, layout);
 }
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
