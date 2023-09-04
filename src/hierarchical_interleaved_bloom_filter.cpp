@@ -7,13 +7,15 @@
 
 #include <algorithm>  // for fill_n, max, shuffle
 #include <cinttypes>  // for uint64_t, int64_t
+#include <cmath>     // for ceil, sqrt
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iosfwd>     // for istream
+#include <iostream>  // for char_traits, operator<<, basic_ostream, cerr
 #include <mutex>      // for mutex, lock_guard
 #include <numeric>    // for iota
 #include <optional>   // for optional
 #include <random>     // for random_device, mt19937_64
+#include <stdexcept> // for invalid_argument
 #include <utility>    // for move
 #include <vector>     // for vector, erase
 
@@ -32,6 +34,7 @@
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/next_multiple_of_64.hpp>                   // for next_multiple_of_64
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace seqan::hibf
@@ -198,10 +201,35 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
+void check_config(config & configuration)
+{
+    if (configuration.disable_estimate_union)
+        configuration.disable_rearrangement = true;
+
+    if (configuration.tmax == 0) // no tmax was set by the user on the command line
+    {
+        // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
+        if (configuration.number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
+            throw std::invalid_argument{"Too many samples. Please set a tmax (see help via `-hh`)."}; // GCOVR_EXCL_LINE
+        else
+            configuration.tmax =
+                seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(configuration.number_of_user_bins))));
+    }
+    else if (configuration.tmax % 64 != 0)
+    {
+        configuration.tmax = seqan::hibf::next_multiple_of_64(configuration.tmax);
+        std::cerr << "[HIBF LAYOUT WARNING]: Your requested number of technical bins was not a multiple of 64. "
+                  << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
+                  << "anyway, so we increased your number of technical bins to " << configuration.tmax << ".\n";
+    }
+}
+
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config const & configuration)
 {
-    auto layout = layout::compute_layout(configuration);
-    build_index(*this, configuration, layout);
+    seqan::hibf::config config_copy{configuration};
+    check_config(config_copy);
+    auto layout = layout::compute_layout(config_copy);
+    build_index(*this, config_copy, layout);
 }
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
