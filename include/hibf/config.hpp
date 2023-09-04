@@ -75,6 +75,23 @@ struct config
     void read_from(std::istream & stream);
     void write_to(std::ostream & stream) const;
 
+    /*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
+     *
+     * The following checks are performed and will throw an exception if the checks fail:
+     * * seqan::hibf::config::number_of_user_bins must be greather than `0`.
+     * * If seqan::hibf::config::tmax is `0`, seqan::hibf::config::number_of_user_bins must be
+     *   smaller than `1ULL << 32`.
+     *
+     * The configuration might be modified before being passed to the HIBF construction algorithm:
+     * * If seqan::hibf::config::disable_estimate_union is `true`, seqan::hibf::config::disable_rearrangement will be
+     *   set to `true` . Without union estimation, no rearrangement can be done.
+     * * If seqan::hibf::config::tmax is `0`, the default value of `std::ceil(std::sqrt(cfg.number_of_user_bins))` will
+     *   be used.
+     * * If seqan::hibf::config::tmax is **not** `0` but also not a multiple of 64, it is increased to the next multiple
+     *   of 64. E.g., the value `60` will be increased to `64`, and `1000` to `1024`.
+     */
+    void validate_and_set_defaults();
+
 private:
     friend class cereal::access;
 

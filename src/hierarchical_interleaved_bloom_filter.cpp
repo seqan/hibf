@@ -9,7 +9,7 @@
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iosfwd>     // for istream
+#include <iostream>   // for char_traits, operator<<, basic_ostream, cerr
 #include <mutex>      // for mutex, lock_guard
 #include <numeric>    // for iota
 #include <optional>   // for optional
@@ -198,8 +198,9 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
 }
 
-hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config const & configuration)
+hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration)
 {
+    configuration.validate_and_set_defaults();
     auto layout = layout::compute_layout(configuration);
     build_index(*this, configuration, layout);
 }
