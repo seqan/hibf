@@ -203,29 +203,25 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
 
 /*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
  *
- * The following checks are performed and might throw an exception if the configuration doesn't pass validation:
- * * If seqan::hibf::config::number_of_user_bins is `0` it is considered `not set` and an exception will be thrown
- *   because this paprameter is required.
- * * If seqan::hibf::config::tmax is `0` and seqan::hibf::config::number_of_user_bins is `>= 1ULL << 32` an exception
- *   will be thrown because a default tmax cannot be computed.
+ * The following checks are performed and will throw an exception if the checks fail:
+ * * seqan::hibf::config::number_of_user_bins must be greather than `0`.
+ * * If seqan::hibf::config::tmax is `0`, seqan::hibf::config::number_of_user_bins must be smaller than `1ULL << 32`.
  *
- * The configuration might be modified as follows before passed to the HIBF construction algorithm:
- * * If seqan::hibf::config::disable_estimate_union is set to true but seqan::hibf::config::disable_rearrangement
- *   is not, seqan::hibf::config::disable_rearrangement will be fordced to be true also. Without union estimations,
- *   no rearrangement can be done.
- * * If seqan::hibf::config::tmax is `0` it is considered `not set` and a default will be computed via
- *   `static_cast<uint16_t>(std::ceil(std::sqrt(cfg.number_of_user_bins)))`.
+ * The configuration might be modified before being passed to the HIBF construction algorithm:
+ * * If seqan::hibf::config::disable_estimate_union is `true`, seqan::hibf::config::disable_rearrangement will be set
+ *   to `true` . Without union estimation, no rearrangement can be done.
+ * * If seqan::hibf::config::tmax is `0`, the default value of `std::ceil(std::sqrt(cfg.number_of_user_bins))` will be
+ *   used.
  * * If seqan::hibf::config::tmax is **not** `0` but also not a multiple of 64, it is increased to the next multiple of
- *   64 to avoid uneccessary space consumption (e.g. value `60` will be increased to `64` or `1000` increased to `1024`).
+ *   64. E.g., the value `60` will be increased to `64`, and `1000` to `1024`.
  */
 void check_config_and_set_defaults(config & cfg)
 {
     if (cfg.disable_estimate_union)
         cfg.disable_rearrangement = true;
 
-    if (cfg.number_of_user_bins = 0)
-        throw std::invalid_argument{
-            "[HIBF CONFIG ERROR] You didn't set config::number_of_user_bins but it's required."};
+    if (cfg.number_of_user_bins == 0u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
 
     if (cfg.tmax == 0) // no tmax was set by the user on the command line
     {
@@ -233,8 +229,8 @@ void check_config_and_set_defaults(config & cfg)
         if (cfg.number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
         {
             throw std::invalid_argument{
-                "[HIBF CONFIG ERROR] Too many user-bins/samples to compute a default tmax. " // GCOVR_EXCL_LINE
-                "Please set a tmax manually."};                                              // GCOVR_EXCL_LINE
+                "[HIBF CONFIG ERROR] Too many user bins to compute a default tmax. " // GCOVR_EXCL_LINE
+                "Please set a tmax manually."};                                      // GCOVR_EXCL_LINE
         }
         else
         {
