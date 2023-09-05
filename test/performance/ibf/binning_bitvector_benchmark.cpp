@@ -20,13 +20,13 @@ static void arguments(benchmark::internal::Benchmark * b)
     b->Args({1024, 64});   // First bit in second word set
     b->Args({1024, 512});  // First bit set halfway
 
-    // // 8,192 bits (8 KiB)
+    // 8,192 bits (8 KiB)
     b->Args({8192, 8192}); // No bit set
     b->Args({8192, 0});    // First bit set
     b->Args({8192, 64});   // First bit in second word set
     b->Args({8192, 4096}); // First bit set halfway
 
-    // // 1,048,576 bits (1 MiB)
+    // 1,048,576 bits (1 MiB)
     b->Args({1LL << 20, 1LL << 20}); // No bit set
     b->Args({1LL << 20, 0});         // First bit set
     b->Args({1LL << 20, 64});        // First bit in second word set
@@ -95,7 +95,7 @@ BENCHMARK_DEFINE_F(all_zero, std_ranges_all_of)(benchmark::State & state)
 bool no_early_termination(bitvector_t const & bitvector) noexcept
 {
     uint64_t const * const ptr = bitvector.raw_data().data();
-    size_t const number_of_words{bitvector.size() >> 6};
+    size_t const number_of_words{(bitvector.size() + 63u) >> 6};
     bool result{false};
 
     for (size_t i{}; i < number_of_words; ++i)
@@ -118,7 +118,7 @@ BENCHMARK_DEFINE_F(all_zero, ptr_no_early_termination)(benchmark::State & state)
 bool with_early_termination(bitvector_t const & bitvector) noexcept
 {
     uint64_t const * const ptr = bitvector.raw_data().data();
-    size_t const number_of_words{bitvector.size() >> 6};
+    size_t const number_of_words{(bitvector.size() + 63u) >> 6};
     bool result{false};
 
     for (size_t i{}; !result && i < number_of_words; ++i)
