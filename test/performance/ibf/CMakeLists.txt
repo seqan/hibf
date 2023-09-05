@@ -1,1 +1,2 @@
+hibf_benchmark (binning_bitvector_benchmark.cpp)
 hibf_benchmark (interleaved_bloom_filter_benchmark.cpp)
