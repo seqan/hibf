@@ -133,8 +133,7 @@ public:
      * layout. A layout file can be constructed manually or via chopper (https://github.com/seqan/chopper)
      * or raptor-layout (https://github.com/seqan/raptor).
      */
-    hierarchical_interleaved_bloom_filter(config & configuration,
-                                          layout::layout const & layout);
+    hierarchical_interleaved_bloom_filter(config & configuration, layout::layout const & layout);
     //!\}
 
     //!\brief The individual interleaved Bloom filters.
