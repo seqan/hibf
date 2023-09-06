@@ -22,6 +22,7 @@
 #include <hibf/config.hpp>                   // for config, insert_iterator
 #include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/layout/layout.hpp>            // for layout
 #include <hibf/user_bins_type.hpp>           // for user_bins_type
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
@@ -126,16 +127,14 @@ public:
      */
     hierarchical_interleaved_bloom_filter(config & configuration);
 
-    /*!\brief [Advanced] Constructs the HIBF from a layout file (stream) and a given input function.
+    /*!\brief [Advanced] Constructs the HIBF from a config and layout.
      * \details
-     * This constructor makes it possible to construct an hibf from a given layout file instead of calculating the
-     * layout based on the input function. A seqan::hibf::config object is not needed as it is assumed to be stored in the
-     * layout file. A layout file can be constructed manually or via chopper (https://github.com/seqan/chopper)
+     * This constructor makes it possible to avoid computing the layout on construction of an hibf by using a given
+     * layout. A layout file can be constructed manually or via chopper (https://github.com/seqan/chopper)
      * or raptor-layout (https://github.com/seqan/raptor).
      */
-    hierarchical_interleaved_bloom_filter(std::function<void(size_t const, insert_iterator &&)> input_fn,
-                                          std::istream & layout_stream,
-                                          size_t const threads = 1u);
+    hierarchical_interleaved_bloom_filter(config & configuration,
+                                          layout::layout const & layout);
     //!\}
 
     //!\brief The individual interleaved Bloom filters.
