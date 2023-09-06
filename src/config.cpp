@@ -74,7 +74,7 @@ void config::validate_and_set_defaults()
     if (tmax == 0) // no tmax was set by the user on the command line
     {
         // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
-        if (number_of_user_bins >= 1ULL << 32) // sqrt is bigger than uint16_t
+        if (number_of_user_bins > 4'286'582'784ULL) // https://godbolt.org/z/oPh18s7cM
         {
             throw std::invalid_argument{
                 "[HIBF CONFIG ERROR] Too many user bins to compute a default tmax. " // GCOVR_EXCL_LINE
@@ -84,6 +84,10 @@ void config::validate_and_set_defaults()
         {
             tmax = seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_of_user_bins))));
         }
+    }
+    else if (tmax > 65472u) // next_multiple_of_64 would return 65536, does not fit in uint16_t
+    {
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible tmax is 65472."};
     }
     else if (tmax % 64 != 0)
     {

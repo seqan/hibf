@@ -31,7 +31,7 @@ struct config
      * \{
      */
     //!\brief A lambda how to hash your input. TODO: Detailed docu needed!
-    std::function<void(size_t const, insert_iterator &&)> input_fn;
+    std::function<void(size_t const, insert_iterator &&)> input_fn{};
 
     //!\brief Number of user bins
     size_t number_of_user_bins{};
@@ -53,7 +53,7 @@ struct config
     uint8_t sketch_bits{12};
 
     //!\brief The maximum number of technical bins on each IBF in the HIBF.
-    uint16_t tmax{64};
+    uint16_t tmax{};
 
     /*\brief A scaling factor to influence the amount of merged bins produced by the algorithm.
      *
