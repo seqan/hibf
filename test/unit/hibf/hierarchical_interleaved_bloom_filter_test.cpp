@@ -75,7 +75,14 @@ TEST(hibf_test, build_from_layout)
                              "1\t0\t34\n"
                              "0\t34\t30\n"};
 
-    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{input_fn, stream};
+    seqan::hibf::config configuration{};
+    configuration.read_from(stream);
+    configuration.input_fn = input_fn;
+
+    seqan::hibf::layout::layout layout{};
+    layout.read_from(stream);
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{configuration, layout};
 
     {
         std::vector<size_t> query{1, 2, 3, 4, 5};

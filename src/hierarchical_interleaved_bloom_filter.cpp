@@ -31,7 +31,6 @@
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
-#include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace seqan::hibf
@@ -173,7 +172,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
 void build_index(hierarchical_interleaved_bloom_filter & hibf,
                  config const & config,
-                 seqan::hibf::layout::layout & hibf_layout)
+                 seqan::hibf::layout::layout const & hibf_layout)
 {
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
 
@@ -205,21 +204,12 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
     build_index(*this, configuration, layout);
 }
 
-hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(
-    std::function<void(size_t const, insert_iterator &&)> input_fn,
-    std::istream & layout_stream,
-    size_t const threads)
+// seqan::hibf::config, seqan::hibf::layout::layout
+hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration,
+                                                                             layout::layout const & layout)
 {
-    // read config and layout from file
-    config configuration;
-    layout::layout hibf_layout;
-    configuration.read_from(layout_stream);
-    hibf_layout.read_from(layout_stream);
-
-    configuration.input_fn = input_fn; // set input as it cannot be serialized.
-    configuration.threads = threads;   // set threads as it shouldn't use what was used to compute the layout.
-
-    build_index(*this, configuration, hibf_layout);
+    configuration.validate_and_set_defaults();
+    build_index(*this, configuration, layout);
 }
 
 } // namespace seqan::hibf
