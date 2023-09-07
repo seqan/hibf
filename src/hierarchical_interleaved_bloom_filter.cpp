@@ -30,7 +30,6 @@
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
-#include <hibf/user_bins_type.hpp>                        // for user_bins_type
 
 namespace seqan::hibf
 {
@@ -156,7 +155,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
     hibf.ibf_vector[ibf_pos] = std::move(ibf);
     hibf.next_ibf_id[ibf_pos] = std::move(ibf_positions);
-    hibf.user_bins.bin_indices_of_ibf(ibf_pos) = std::move(filename_indices);
+    hibf.ibf_bin_to_user_bin_id[ibf_pos] = std::move(filename_indices);
 
     return ibf_pos;
 }
@@ -176,8 +175,7 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     size_t const number_of_ibfs = hibf_layout.max_bins.size() + 1;
 
     hibf.ibf_vector.resize(number_of_ibfs);
-    hibf.user_bins.set_ibf_count(number_of_ibfs);
-    hibf.user_bins.set_user_bin_count(hibf_layout.user_bins.size());
+    hibf.ibf_bin_to_user_bin_id.resize(number_of_ibfs);
     hibf.next_ibf_id.resize(number_of_ibfs);
 
     build::build_data data{.config = config, .ibf_graph = {hibf_layout}};

@@ -22,7 +22,6 @@
 #include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>            // for layout
-#include <hibf/user_bins_type.hpp>           // for user_bins_type
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
@@ -147,8 +146,14 @@ public:
      */
     std::vector<std::vector<int64_t>> next_ibf_id;
 
-    //!\brief The underlying user bins.
-    user_bins_type user_bins;
+    /*!\brief Stores for each bin in each IBF of the HIBF the user bin ID.
+    * \details
+    * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_user_bin_id[i][b]`.
+    * If `-1` is returned, bin `b` is a merged bin, there is no single user bin, we need to look into the
+    * lower level IBF.
+    * Otherwise, the returned value `j` is the corresponding user bin ID.
+    */
+    std::vector<std::vector<int64_t>> ibf_bin_to_user_bin_id{};
 
     //!\brief Returns a membership_agent to be used for counting.
     membership_agent_type membership_agent() const;
@@ -166,7 +171,11 @@ public:
     {
         archive(ibf_vector);
         archive(next_ibf_id);
-        archive(user_bins);
+#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF.
+        std::vector<std::string> filenames{};
+        archive(filenames);
+#endif
+        archive(ibf_bin_to_user_bin_id);
     }
 
     /*!\name Timer
@@ -200,7 +209,7 @@ private:
         {
             sum += result[bin];
 
-            auto const current_filename_index = hibf_ptr->user_bins.filename_index(ibf_idx, bin);
+            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
             if (current_filename_index < 0) // merged bin
             {
@@ -208,8 +217,8 @@ private:
                     membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
-            else if (bin + 1u == result.size() ||                                                    // last bin
-                     current_filename_index != hibf_ptr->user_bins.filename_index(ibf_idx, bin + 1)) // end of split bin
+            else if (bin + 1u == result.size() ||                                                  // last bin
+                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
             {
                 if (sum >= threshold)
                     result_buffer.emplace_back(current_filename_index);
