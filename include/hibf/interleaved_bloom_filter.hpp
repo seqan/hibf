@@ -217,7 +217,7 @@ public:
                              seqan::hibf::bin_size size,
                              seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u});
 
-    interleaved_bloom_filter(config const & configuration);
+    interleaved_bloom_filter(config & configuration);
     //!\}
 
     /*!\name Modifiers
