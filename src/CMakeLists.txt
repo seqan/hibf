@@ -1,5 +1,6 @@
 set (HIBF_SOURCE_FILES
      hierarchical_interleaved_bloom_filter.cpp
+     interleaved_bloom_filter.cpp
      config.cpp
      layout/simple_binning.cpp
      layout/layout.cpp
