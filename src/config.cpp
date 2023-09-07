@@ -6,8 +6,8 @@
 // ---------------------------------------------------------------------------------------------------
 
 #include <cassert>     // for assert
-#include <cinttypes>   // for uint16_t
 #include <cmath>       // for ceil, sqrt
+#include <functional>  // for function
 #include <iostream>    // for basic_ostream, operator<<, basic_istream, stringstream, cerr, istream
 #include <sstream>     // for basic_stringstream
 #include <stdexcept>   // for invalid_argument

@@ -1,10 +1,13 @@
-#include <gtest/gtest.h> // for Message, TestPartResult, Test, EXPECT_EQ, AssertionResult, CaptureStderr, GetCapt...
+#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, Test, EXPECT_EQ, CaptureStderr, GetCapt...
 
-#include <sstream>   // for basic_stringstream, stringstream
-#include <stdexcept> // for invalid_argument
-#include <string>    // for allocator, string
+#include <cstddef>     // for size_t
+#include <functional>  // for function
+#include <sstream>     // for basic_stringstream, stringstream
+#include <stdexcept>   // for invalid_argument
+#include <string>      // for allocator, string
+#include <string_view> // for string_view
 
-#include <hibf/config.hpp> // for config
+#include <hibf/config.hpp> // for config, insert_iterator
 
 TEST(config_test, write_to)
 {
