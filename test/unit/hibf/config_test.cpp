@@ -1,7 +1,8 @@
-#include <gtest/gtest.h> // for Test, EXPECT_EQ, Message, TestPartResult, TestInfo, TEST
+#include <gtest/gtest.h> // for Message, TestPartResult, Test, EXPECT_EQ, AssertionResult, CaptureStderr, GetCapt...
 
-#include <sstream> // for basic_stringstream, stringstream
-#include <string>  // for allocator, string
+#include <sstream>   // for basic_stringstream, stringstream
+#include <stdexcept> // for invalid_argument
+#include <string>    // for allocator, string
 
 #include <hibf/config.hpp> // for config
 

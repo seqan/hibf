@@ -9,11 +9,12 @@
 
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <sstream>
-#include <vector> // for vector, allocator
+#include <sstream>    // for basic_stringstream, stringstream
+#include <vector>     // for vector, allocator
 
-#include <hibf/config.hpp>                                // for insert_iterator, config
+#include <hibf/config.hpp>                                // for config, insert_iterator
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(hibf_test, test_specific_hash_values)
