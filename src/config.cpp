@@ -5,10 +5,11 @@
 // shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 // ---------------------------------------------------------------------------------------------------
 
-#include <cassert> // for assert
-#include <cmath>
-#include <iostream>
-#include <sstream>     // for basic_istream, basic_ostream, operator<<, basic_stringstream, stringstream
+#include <cassert>     // for assert
+#include <cinttypes>   // for uint16_t
+#include <cmath>       // for ceil, sqrt
+#include <iostream>    // for basic_ostream, operator<<, basic_istream, stringstream, cerr, istream
+#include <sstream>     // for basic_stringstream
 #include <stdexcept>   // for invalid_argument
 #include <string>      // for char_traits, getline, operator<<, string
 #include <string_view> // for operator<<, operator==, basic_string_view

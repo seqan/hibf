@@ -12,14 +12,13 @@
 #include <cinttypes>  // for int64_t, uint16_t
 #include <concepts>   // for unsigned_integral
 #include <cstddef>    // for size_t
-#include <functional> // for identity, less, function
-#include <iosfwd>     // for istream
+#include <functional> // for identity, less
 #include <ranges>     // for forward_range, range, range_value_t
 #include <utility>    // for addressof
 #include <vector>     // for vector
 
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
-#include <hibf/config.hpp>                   // for config, insert_iterator
+#include <hibf/config.hpp>                   // for config
 #include <hibf/detail/timer.hpp>             // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>            // for layout
