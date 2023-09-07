@@ -123,6 +123,43 @@ TYPED_TEST(interleaved_bloom_filter_test, bulk_contains)
     }
 }
 
+TEST(interleaved_bloom_filter_single_test, construction_from_config)
+{
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {0u, 2u, 3u, 4u, 5u}};
+    size_t const number_of_ub{hashes.size()};
+
+    seqan::hibf::config ibf_config{.input_fn =
+                                       [&](size_t const num, seqan::hibf::insert_iterator it)
+                                   {
+                                       for (auto const hash : hashes[num])
+                                           it = hash;
+                                   },
+                                   .number_of_user_bins = number_of_ub};
+
+    seqan::hibf::interleaved_bloom_filter ibf{ibf_config};
+
+    {
+        auto agent = ibf.membership_agent();
+
+        std::vector<size_t> query{1, 2, 3, 4, 5};
+
+        // value 2 is in both user bins
+        std::vector<bool> expected_v2(number_of_ub);
+        expected_v2[0] = 1;
+        expected_v2[1] = 1;
+        // value 8 is only in user bin 0
+        std::vector<bool> expected_v8(number_of_ub);
+        expected_v8[0] = 1;
+        // value 0 is only in user bin 1
+        std::vector<bool> expected_v0(number_of_ub);
+        expected_v0[1] = 1;
+
+        EXPECT_RANGE_EQ(agent.bulk_contains(2), expected_v2);
+        EXPECT_RANGE_EQ(agent.bulk_contains(8), expected_v8);
+        EXPECT_RANGE_EQ(agent.bulk_contains(0), expected_v0);
+    }
+}
+
 TYPED_TEST(interleaved_bloom_filter_test, emplace)
 {
     // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.

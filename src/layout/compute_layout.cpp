@@ -35,7 +35,7 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     kmer_counts.resize(config.number_of_user_bins);
 
     robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(static) num_threads(config.threads) private(kmers)
+#pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers)
     for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
         seqan::hibf::sketch::hyperloglog sketch(config.sketch_bits);

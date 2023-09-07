@@ -28,6 +28,7 @@
 #include <vector>      // for vector
 
 #include <hibf/cereal/concepts.hpp> // for cereal_archive
+#include <hibf/config.hpp>
 
 #include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <sdsl/int_vector.hpp> // for bit_vector
@@ -214,24 +215,9 @@ public:
      */
     interleaved_bloom_filter(seqan::hibf::bin_count bins_,
                              seqan::hibf::bin_size size,
-                             seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u})
-    {
-        bins = bins_.value;
-        bin_size_ = size.value;
-        hash_funs = funs.value;
+                             seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u});
 
-        if (bins == 0)
-            throw std::logic_error{"The number of bins must be > 0."};
-        if (hash_funs == 0 || hash_funs > 5)
-            throw std::logic_error{"The number of hash functions must be > 0 and <= 5."};
-        if (bin_size_ == 0)
-            throw std::logic_error{"The size of a bin must be > 0."};
-
-        hash_shift = std::countl_zero(bin_size_);
-        bin_words = (bins + 63) >> 6;    // = ceil(bins/64)
-        technical_bins = bin_words << 6; // = bin_words * 64
-        data = sdsl::bit_vector(technical_bins * bin_size_);
-    }
+    interleaved_bloom_filter(config const & configuration);
     //!\}
 
     /*!\name Modifiers
