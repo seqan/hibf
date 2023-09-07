@@ -191,13 +191,18 @@ IGNORE_PREFIX          =
 GENERATE_HTML          = YES
 HTML_OUTPUT            = html
 HTML_FILE_EXTENSION    = .html
-HTML_HEADER            =
+HTML_HEADER            = ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/hibf_header.html
 HTML_FOOTER            = ${HIBF_DOXYGEN_OUTPUT_DIR}/hibf_footer.html
 HTML_STYLESHEET        =
-HTML_EXTRA_STYLESHEET  = ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/hibf.css \
-                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/hibf_dark.css
-HTML_EXTRA_FILES       = ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/api-stability.js
-HTML_COLORSTYLE        = AUTO_LIGHT
+HTML_EXTRA_STYLESHEET  = ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome.css \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/hibf.css
+HTML_EXTRA_FILES       = ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-darkmode-toggle.js \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-fragment-copy-button.js \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-paragraph-link.js \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-interactive-toc.js \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/doxygen-awesome/doxygen-awesome-tabs.js \
+                         ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/api-stability.js
+HTML_COLORSTYLE        = LIGHT
 HTML_COLORSTYLE_HUE    = 220
 HTML_COLORSTYLE_SAT    = 100
 HTML_COLORSTYLE_GAMMA  = 80
@@ -228,11 +233,11 @@ QHP_SECT_FILTER_ATTRS  =
 QHG_LOCATION           =
 GENERATE_ECLIPSEHELP   = NO
 ECLIPSE_DOC_ID         = org.doxygen.Project
-DISABLE_INDEX          = YES
+DISABLE_INDEX          = NO
 GENERATE_TREEVIEW      = YES
 FULL_SIDEBAR           = NO
 ENUM_VALUES_PER_LINE   = 4
-TREEVIEW_WIDTH         = 250
+TREEVIEW_WIDTH         = 265
 EXT_LINKS_IN_WINDOW    = YES
 OBFUSCATE_EMAILS       = YES
 HTML_FORMULA_FORMAT    = png
