@@ -109,7 +109,7 @@ void config::validate_and_set_defaults()
     if (max_rearrangement_ratio < 0.0 || max_rearrangement_ratio > 1.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0]."};
 
-    if (disable_estimate_union)
+    if (disable_estimate_union || max_rearrangement_ratio == 0.0)
         disable_rearrangement = true;
 }
 

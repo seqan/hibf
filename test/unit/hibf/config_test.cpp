@@ -273,4 +273,21 @@ TEST(config_test, validate_and_set_defaults)
         EXPECT_TRUE(configuration.disable_rearrangement);
         EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
     }
+
+    // Set disable_rearrangement if max_rearrangement_ratio is 0.0
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .max_rearrangement_ratio = 0.0};
+        EXPECT_EQ(configuration.max_rearrangement_ratio, 0.0);
+        EXPECT_FALSE(configuration.disable_estimate_union);
+        EXPECT_FALSE(configuration.disable_rearrangement);
+
+        testing::internal::CaptureStderr();
+        configuration.validate_and_set_defaults();
+        EXPECT_EQ(configuration.max_rearrangement_ratio, 0.0);
+        EXPECT_FALSE(configuration.disable_estimate_union);
+        EXPECT_TRUE(configuration.disable_rearrangement);
+        EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
+    }
 }
