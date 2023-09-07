@@ -5,17 +5,20 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <algorithm> // for shuffle
-#include <cinttypes> // for uint64_t, int64_t
-#include <cstddef>   // for size_t
-#include <mutex>     // for mutex, lock_guard
-#include <numeric>   // for iota
-#include <random>    // for random_device, mt19937_64
-#include <utility>   // for move
-#include <vector>    // for vector
+#include <algorithm>  // for clamp, max
+#include <bit>        // for bit_ceil, countl_zero
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <iterator>   // for inserter
+#include <stdexcept>  // for logic_error
 
-#include <hibf/build/bin_size_in_bits.hpp>
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
+#include <hibf/config.hpp>                   // for config
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_size, hash_function_count
+
+#include <sdsl/int_vector.hpp> // for bit_vector
 
 namespace seqan::hibf
 {

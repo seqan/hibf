@@ -7,15 +7,17 @@
 
 #include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, EXPECT_EQ, TYPED_TEST
 
-#include <algorithm> // for for_each
-#include <array>     // for array
-#include <cstddef>   // for size_t
-#include <ranges>    // for iota_view, operator==, _Iota, iota
-#include <stdexcept> // for logic_error, invalid_argument
-#include <vector>    // for vector, allocator
+#include <algorithm>  // for for_each
+#include <array>      // for array
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <ranges>     // for iota_view, operator==, _Iota, iota
+#include <stdexcept>  // for logic_error, invalid_argument
+#include <vector>     // for vector, allocator
 
+#include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
-#include <hibf/test/expect_range_eq.hpp>     // for EXPECT_RANGE_EQ, expect_range_eq
+#include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
 #include <sdsl/io.hpp> // for size_in_mega_bytes
 
