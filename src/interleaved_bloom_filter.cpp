@@ -41,8 +41,10 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     data = sdsl::bit_vector(technical_bins * bin_size_);
 }
 
-size_t max_bin_size(config const & configuration)
+size_t max_bin_size(config & configuration)
 {
+    configuration.validate_and_set_defaults();
+
     size_t max_size{};
     robin_hood::unordered_flat_set<uint64_t> kmers;
 #pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(kmers)
@@ -60,7 +62,8 @@ size_t max_bin_size(config const & configuration)
                                     .elements = max_size});
 }
 
-interleaved_bloom_filter::interleaved_bloom_filter(config const & configuration) :
+// config validation is done by max_bin_size
+interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
                              seqan::hibf::bin_size{max_bin_size(configuration)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions}}

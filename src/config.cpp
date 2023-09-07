@@ -66,29 +66,34 @@ void config::write_to(std::ostream & stream) const
 
 void config::validate_and_set_defaults()
 {
-    if (disable_estimate_union)
-        disable_rearrangement = true;
+    if (!input_fn)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::input_fn."};
 
     if (number_of_user_bins == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
 
+    if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
+
+    if (maximum_false_positive_rate < 0.0 || maximum_false_positive_rate > 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in [0.0,1.0]."};
+
+    if (threads == 0u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::threads must be greater than 0."};
+
+    // The following validations are not necessary when construction an interleaved_bloom_filter via config.
+    // However, they also shouldn't result in problems.
+
+    if (sketch_bits < 5u || sketch_bits > 32u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32]."};
+
     if (tmax == 0) // no tmax was set by the user on the command line
     {
-        // Set default as sqrt(#samples). Experiments showed that this is a reasonable default.
-        if (number_of_user_bins > 4'286'582'784ULL) // https://godbolt.org/z/oPh18s7cM
-        {
-            throw std::invalid_argument{
-                "[HIBF CONFIG ERROR] Too many user bins to compute a default tmax. " // GCOVR_EXCL_LINE
-                "Please set a tmax manually."};                                      // GCOVR_EXCL_LINE
-        }
-        else
-        {
-            tmax = seqan::hibf::next_multiple_of_64(static_cast<uint16_t>(std::ceil(std::sqrt(number_of_user_bins))));
-        }
+        tmax = seqan::hibf::next_multiple_of_64(std::ceil(std::sqrt(number_of_user_bins)));
     }
-    else if (tmax > 65472u) // next_multiple_of_64 would return 65536, does not fit in uint16_t
+    else if (tmax > 18'446'744'073'709'551'552ULL) // next_multiple_of_64 would not fit in size_t. Underflowed by user?
     {
-        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible tmax is 65472."};
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible tmax is 18446744073709551552."};
     }
     else if (tmax % 64 != 0)
     {
@@ -97,6 +102,15 @@ void config::validate_and_set_defaults()
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
                   << "anyway, so we increased your number of technical bins to " << tmax << ".\n";
     }
+
+    if (alpha < 0.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};
+
+    if (max_rearrangement_ratio < 0.0 || max_rearrangement_ratio > 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0]."};
+
+    if (disable_estimate_union || max_rearrangement_ratio == 0.0)
+        disable_rearrangement = true;
 }
 
 } // namespace seqan::hibf

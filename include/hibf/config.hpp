@@ -53,7 +53,7 @@ struct config
     uint8_t sketch_bits{12};
 
     //!\brief The maximum number of technical bins on each IBF in the HIBF.
-    uint16_t tmax{};
+    size_t tmax{};
 
     /*\brief A scaling factor to influence the amount of merged bins produced by the algorithm.
      *
@@ -77,18 +77,25 @@ struct config
 
     /*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
      *
-     * The following checks are performed and will throw an exception if the checks fail:
-     * * seqan::hibf::config::number_of_user_bins must be greather than `0`.
-     * * If seqan::hibf::config::tmax is `0`, seqan::hibf::config::number_of_user_bins must be
-     *   smaller than `1ULL << 32`.
+     * Required options:
+     *   * seqan::hibf::config::number_of_user_bins must be set to a value other than `0`.
+     *   * seqan::hibf::config::input_fn must be set.
      *
-     * The configuration might be modified before being passed to the HIBF construction algorithm:
-     * * If seqan::hibf::config::disable_estimate_union is `true`, seqan::hibf::config::disable_rearrangement will be
-     *   set to `true` . Without union estimation, no rearrangement can be done.
-     * * If seqan::hibf::config::tmax is `0`, the default value of `std::ceil(std::sqrt(cfg.number_of_user_bins))` will
-     *   be used.
-     * * If seqan::hibf::config::tmax is **not** `0` but also not a multiple of 64, it is increased to the next multiple
-     *   of 64. E.g., the value `60` will be increased to `64`, and `1000` to `1024`.
+     * Constrains:
+     *   * seqan::hibf::config::number_of_hash_functions must be in `[1,5]`.
+     *   * seqan::hibf::config::maximum_false_positive_rate must be in `[0.0,1.0]`.
+     *   * seqan::hibf::config::threads must be greater than `0`.
+     *   * seqan::hibf::config::sketch_bits must be in `[5,32]`.
+     *   * seqan::hibf::config::tmax must be at most `18446744073709551552`.
+     *   * seqan::hibf::config::alpha must be positive.
+     *   * seqan::hibf::config::max_rearrangement_ratio must be in `[0.0,1.0]`.
+     *
+     * Modifications:
+     *   * Enabling seqan::hibf::config::disable_estimate_union or setting seqan::hibf::config::max_rearrangement_ratio
+     *     to `0.0` also enables seqan::hibf::config::disable_rearrangement.
+     *   * Not setting seqan::hibf::config::tmax, or setting it to `0`, results in a default tmax
+     *     `std::ceil(std::sqrt(number_of_user_bins))` being used.
+     *   * seqan::hibf::config::tmax is increased to the next multiple of 64.
      */
     void validate_and_set_defaults();
 
