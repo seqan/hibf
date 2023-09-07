@@ -167,43 +167,21 @@ TEST(config_test, validate_and_set_defaults)
         EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
     }
 
-    // Cannot set default tmax
-    {
-        seqan::hibf::config configuration{.number_of_user_bins = 4'286'582'785ULL};
-        EXPECT_EQ(configuration.tmax, 0u);
-
-        try
-        {
-            configuration.validate_and_set_defaults();
-            FAIL();
-        }
-        catch (std::invalid_argument const & exception)
-        {
-            EXPECT_STREQ(
-                "[HIBF CONFIG ERROR] Too many user bins to compute a default tmax. Please set a tmax manually.",
-                exception.what());
-        }
-        catch (...)
-        {
-            FAIL();
-        }
-    }
-
     // Given tmax OK
     {
-        seqan::hibf::config configuration{.number_of_user_bins = 1u, .tmax = 65472u};
+        seqan::hibf::config configuration{.number_of_user_bins = 1u, .tmax = 18'446'744'073'709'551'552ULL};
 
         testing::internal::CaptureStderr();
         configuration.validate_and_set_defaults();
 
         EXPECT_EQ(configuration.number_of_user_bins, 1u);
-        EXPECT_EQ(configuration.tmax, 65472u);
+        EXPECT_EQ(configuration.tmax, 18'446'744'073'709'551'552ULL);
         EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
     }
 
     // Given tmax too big
     {
-        seqan::hibf::config configuration{.number_of_user_bins = 1u, .tmax = 65473u};
+        seqan::hibf::config configuration{.number_of_user_bins = 1u, .tmax = 18'446'744'073'709'551'553ULL};
 
         try
         {
@@ -212,7 +190,7 @@ TEST(config_test, validate_and_set_defaults)
         }
         catch (std::invalid_argument const & exception)
         {
-            EXPECT_STREQ("[HIBF CONFIG ERROR] The maximum possible tmax is 65472.", exception.what());
+            EXPECT_STREQ("[HIBF CONFIG ERROR] The maximum possible tmax is 18446744073709551552.", exception.what());
         }
         catch (...)
         {

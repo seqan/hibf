@@ -53,7 +53,7 @@ struct config
     uint8_t sketch_bits{12};
 
     //!\brief The maximum number of technical bins on each IBF in the HIBF.
-    uint16_t tmax{};
+    size_t tmax{};
 
     /*\brief A scaling factor to influence the amount of merged bins produced by the algorithm.
      *
