@@ -66,11 +66,26 @@ void config::write_to(std::ostream & stream) const
 
 void config::validate_and_set_defaults()
 {
-    if (disable_estimate_union)
-        disable_rearrangement = true;
+    if (!input_fn)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::input_fn."};
 
     if (number_of_user_bins == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
+
+    if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
+
+    if (maximum_false_positive_rate < 0.0 || maximum_false_positive_rate > 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in [0.0,1.0]."};
+
+    if (threads == 0u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::threads must be greater than 0."};
+
+    // The following validations are not necessary when construction an interleaved_bloom_filter via config.
+    // However, they also shouldn't result in problems.
+
+    if (sketch_bits < 5u || sketch_bits > 32u)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32]."};
 
     if (tmax == 0) // no tmax was set by the user on the command line
     {
@@ -87,6 +102,15 @@ void config::validate_and_set_defaults()
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
                   << "anyway, so we increased your number of technical bins to " << tmax << ".\n";
     }
+
+    if (alpha < 0.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};
+
+    if (max_rearrangement_ratio < 0.0 || max_rearrangement_ratio > 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0]."};
+
+    if (disable_estimate_union)
+        disable_rearrangement = true;
 }
 
 } // namespace seqan::hibf
