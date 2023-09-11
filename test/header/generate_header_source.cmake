@@ -57,6 +57,5 @@ if ("${HEADER_COMPONENT}" MATCHES "hibf")
           "class A{ int i{5}; };\n\n" #
           "template <typename t>\n" #
           "concept private_bug = requires(t a){a.i;};\n\n" #
-          "static_assert(!private_bug<A>, \"See https://github.com/seqan/hibf/issues/1317\");\n"
-    )
+          "static_assert(!private_bug<A>, \"See https://github.com/seqan/hibf/issues/1317\");\n")
 endif ()
