@@ -25,7 +25,10 @@ list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--keep=**hibf/version.hpp")
 list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--no_default_mappings")
 list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--mapping_file=${CMAKE_CURRENT_LIST_DIR}/mappings/iwyu.imp")
 
+set (INSTALL_HIBF OFF)
 add_subdirectory (../unit/ unit)
+add_subdirectory (../performance/ performance)
+add_subdirectory (../snippet/ snippet)
 
 # Make ./include/hibf and ./test/include SYSTEM header, such that they are included with -isystem
 # IWYU will always use quoted includes ("a.hpp") for -I includes, and angular includes (<a.hpp>) for -isystem includes
@@ -33,3 +36,5 @@ get_target_property (HIBF_INCLUDES hibf INCLUDE_DIRECTORIES)
 target_include_directories (hibf SYSTEM PUBLIC "${HIBF_INCLUDES}")
 get_target_property (HIBF_TEST_INCLUDES hibf_test INTERFACE_INCLUDE_DIRECTORIES)
 target_include_directories (hibf_test SYSTEM INTERFACE "${HIBF_TEST_INCLUDES}")
+get_target_property (HIBF_TEST_PERFORMANCE_INCLUDES hibf_test_performance INTERFACE_INCLUDE_DIRECTORIES)
+target_include_directories (hibf_test_performance SYSTEM INTERFACE "${HIBF_TEST_PERFORMANCE_INCLUDES}")
