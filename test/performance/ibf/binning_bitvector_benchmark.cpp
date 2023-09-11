@@ -5,9 +5,17 @@
 // shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h> // for State, DoNotOptimize, Benchmark, BENCHMARK_DEFINE_F, BENCHMARK_...
 
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <algorithm>  // for all_of, copy, __all_of_fn
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for identity
+#include <memory>     // for allocator
+
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+
+#include <sdsl/int_vector.hpp> // for operator-
 
 using bitvector_t = seqan::hibf::interleaved_bloom_filter::binning_bitvector;
 

@@ -1,8 +1,11 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, AssertionResult, TestInfo, EXPECT_TRUE, Message, TEST, TestPar...
 
-#include <fstream>
+#include <filesystem> // for remove
+#include <fstream>    // for char_traits, basic_ofstream, basic_ostream, operator<<, ofstream
+#include <memory>     // for allocator
 
-#include <hibf/test/tmp_directory.hpp>
+#include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
+#include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
 TEST(snippet_tmp_directory, tmp_directory_)
 {
