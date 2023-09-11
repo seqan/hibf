@@ -2,7 +2,7 @@
 // Copyright (c) 2006-2023, Knut Reinert & Freie Universität Berlin
 // Copyright (c) 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
+// shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 // ------------------------------------------------------------------------------------------------------------
 
 /*!\file
@@ -163,7 +163,7 @@
  * where gcc 4 is the standard compiler) don't support dual ABI. This has the effect that even community builds of gcc
  * are build with --disable-libstdcxx-dual-abi. Only building the compiler yourself would solve this problem.
  *
- * \see https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/issues/2244
+ * \see https://github.com/seqan/hibf/issues/2244
  * \see https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html
  */
 #ifndef HIBF_WORKAROUND_GCC_NO_CXX11_ABI
