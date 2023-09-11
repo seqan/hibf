@@ -5,14 +5,15 @@
 // shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <gtest/gtest.h> // for Test, TestInfo, Message, TEST, TestPartResult
+#include <gtest/gtest.h> // for Test, Message, TestInfo, TestPartResult, EXPECT_EQ
 
 #include <cstddef>    // for size_t
 #include <functional> // for function
+#include <ranges>     // for _Iota, iota, views
 #include <sstream>    // for basic_stringstream, stringstream
 #include <vector>     // for vector, allocator
 
-#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
