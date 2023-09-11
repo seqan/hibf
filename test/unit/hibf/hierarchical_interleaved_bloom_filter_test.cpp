@@ -17,7 +17,7 @@
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 
-TEST(hibf_test, test_specific_hash_values)
+TEST(hibf_test, small_example_with_direct_hashes)
 {
     // range of range of sequences
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
@@ -92,6 +92,120 @@ TEST(hibf_test, build_from_layout)
         auto result = agent.membership_for(query, 2);
 
         EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    }
+}
+
+TEST(hibf_test, three_level_hibf)
+{
+    // To ensure that there are 3 levels,
+    // we generate 4096 user bins, equal in size, with little overlap/similarity.
+    // Disable rearrangement as we are not testing the quality of the layout but just that an index with three level
+    // works as expected.
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const ub_id, seqan::hibf::insert_iterator it)
+                               {
+                                   // start every 80 position and take 100 values
+                                   // -> neighbouring user bins have an overlap of 20 hashes
+                                   size_t const start = ub_id * 16;
+                                   for (size_t i = start; i < start + 20; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 4096,
+                               .maximum_false_positive_rate = 0.001,
+                               .threads = 4,
+                               .tmax = 64,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = true};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+
+    {
+        // test a query within a single user bin and one in the overlap
+        for (size_t ub_id = 0; ub_id < 4096 - 1; ub_id = ub_id + 100)
+        {
+            size_t const start = ub_id * 16;
+            std::vector<size_t> overlap_query{start + 16, start + 17, start + 18, start + 19};
+            std::vector<size_t> unique_query{start + 5, start + 6, start + 7, start + 8};
+
+            auto agent = hibf.membership_agent();
+            auto overlap_result = agent.membership_for(overlap_query, 4); // t = 4, require all hashes to hit
+            auto unique_result = agent.membership_for(unique_query, 4);   // t = 4, require all hashes to hit
+
+            EXPECT_RANGE_EQ(overlap_result, (std::vector<size_t>{ub_id, ub_id + 1}));
+            EXPECT_RANGE_EQ(unique_result, (std::vector<size_t>{ub_id}));
+        }
+    }
+}
+
+TEST(hibf_test, unevenly_sized_and_unique_user_bins)
+{
+    // Simulate 500 user bins of exponentially increasing size
+    // No overlap between the user bins happens.
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const ub_id, seqan::hibf::insert_iterator it)
+                               {
+                                   size_t const start = std::pow(ub_id + 1, 2);
+                                   size_t const end = std::pow(ub_id + 2, 2) - 1;
+                                   for (size_t i = start; i < end; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 500,
+                               .maximum_false_positive_rate = 0.001,
+                               .threads = 4,
+                               .tmax = 64,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = true};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+
+    {
+        for (size_t ub_id = 5 /* don't test the tiny ones */; ub_id < 500 - 1; ub_id = ub_id + 20)
+        {
+            size_t const start = std::pow(ub_id + 1, 2);
+            std::vector<size_t> unique_query{start + 5, start + 6, start + 7, start + 8};
+
+            auto agent = hibf.membership_agent();
+            auto unique_result = agent.membership_for(unique_query, 4); // t = 4, require all hashes to hit
+
+            EXPECT_RANGE_EQ(unique_result, (std::vector<size_t>{ub_id}));
+        }
+    }
+}
+
+TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
+{
+    // Simulate 1000 user bins of roughly the same size with a lot of overlap/similarity
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const ub_id, seqan::hibf::insert_iterator it)
+                               {
+                                   // Each user bin is has an overlap of 30 to its former neighbour,
+                                   // 25 to its former-former neighbour, etc.. (similar to 6 neighbours in total)
+                                   size_t const start = ub_id * 5;
+                                   for (size_t i = start; i < start + 35; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 1000,
+                               .maximum_false_positive_rate = 0.001,
+                               .threads = 4,
+                               .tmax = 64,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = true};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+
+    {
+        for (size_t ub_id = 6; ub_id < 1000 - 6; ub_id = ub_id + 20)
+        {
+            size_t const start = ub_id * 5;
+            std::vector<size_t> similar_query{start, start + 1, start + 2, start + 3, start + 4};
+
+            auto agent = hibf.membership_agent();
+            auto similar_result = agent.membership_for(similar_query, 5); // t = 5, require all hashes to hit
+
+            std::vector<size_t> expected{ub_id - 6, ub_id - 5, ub_id - 4, ub_id - 3, ub_id - 2, ub_id - 1, ub_id};
+
+            EXPECT_RANGE_EQ(similar_result, expected);
+        }
     }
 }
 
