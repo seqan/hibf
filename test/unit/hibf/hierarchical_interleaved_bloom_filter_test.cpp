@@ -32,15 +32,12 @@ TEST(hibf_test, small_example_with_direct_hashes)
                                .disable_rearrangement = true};
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.membership_agent();
 
-    {
-        std::vector<size_t> query{1, 2, 3, 4, 5};
+    std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
 
-        auto agent = hibf.membership_agent();
-        auto result = agent.membership_for(query, 2);
-
-        EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
-    }
+    auto & result = agent.membership_for(query, 2u);
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
 }
 
 TEST(hibf_test, build_from_layout)
@@ -84,33 +81,29 @@ TEST(hibf_test, build_from_layout)
     layout.read_from(stream);
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{configuration, layout};
+    auto agent = hibf.membership_agent();
 
-    {
-        std::vector<size_t> query{1, 2, 3, 4, 5};
+    std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
 
-        auto agent = hibf.membership_agent();
-        auto result = agent.membership_for(query, 2);
-
-        EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
-    }
+    auto & result = agent.membership_for(query, 2u);
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
 }
 
 TEST(hibf_test, three_level_hibf)
 {
-    // To ensure that there are 3 levels,
-    // we generate 4096 user bins, equal in size, with little overlap/similarity.
+    // To ensure that there are 3 levels, we generate 4097 user bins, equal in size, with little overlap/similarity.
     // Disable rearrangement as we are not testing the quality of the layout but just that an index with three level
     // works as expected.
     seqan::hibf::config config{.input_fn =
                                    [&](size_t const ub_id, seqan::hibf::insert_iterator it)
                                {
-                                   // start every 80 position and take 100 values
-                                   // -> neighbouring user bins have an overlap of 20 hashes
+                                   // start every 16 positions and take 20 values
+                                   // -> neighbouring user bins have an overlap of 4 hashes
                                    size_t const start = ub_id * 16;
                                    for (size_t i = start; i < start + 20; ++i)
                                        it = i;
                                },
-                               .number_of_user_bins = 4096,
+                               .number_of_user_bins = 4097,
                                .maximum_false_positive_rate = 0.001,
                                .threads = 4,
                                .tmax = 64,
@@ -118,34 +111,43 @@ TEST(hibf_test, three_level_hibf)
                                .disable_rearrangement = true};
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.membership_agent();
 
+    // test a query within a single user bin and one in the overlap
+    for (size_t ub_id = 0u; ub_id < 4096u; ub_id += 100u)
     {
-        // test a query within a single user bin and one in the overlap
-        for (size_t ub_id = 0; ub_id < 4096 - 1; ub_id = ub_id + 100)
-        {
-            size_t const start = ub_id * 16;
-            std::vector<size_t> overlap_query{start + 16, start + 17, start + 18, start + 19};
-            std::vector<size_t> unique_query{start + 5, start + 6, start + 7, start + 8};
+        size_t const start = ub_id * 16u;
+        auto overlap_query = std::views::iota(start + 16u, start + 20u);
+        auto unique_query = std::views::iota(start + 5u, start + 9u);
 
-            auto agent = hibf.membership_agent();
-            auto overlap_result = agent.membership_for(overlap_query, 4); // t = 4, require all hashes to hit
-            auto unique_result = agent.membership_for(unique_query, 4);   // t = 4, require all hashes to hit
+        auto & overlap_result = agent.membership_for(overlap_query, 4u); // one overlapping user bin
+        EXPECT_EQ(overlap_result.size(), 2u);
+        EXPECT_EQ(overlap_result[0], ub_id);
+        EXPECT_EQ(overlap_result[1], ub_id + 1u);
 
-            EXPECT_RANGE_EQ(overlap_result, (std::vector<size_t>{ub_id, ub_id + 1}));
-            EXPECT_RANGE_EQ(unique_result, (std::vector<size_t>{ub_id}));
-        }
+        auto & unique_result = agent.membership_for(unique_query, 4u); // no overlapping user bin
+        EXPECT_EQ(unique_result.size(), 1u);
+        EXPECT_EQ(unique_result[0], ub_id);
     }
 }
 
 TEST(hibf_test, unevenly_sized_and_unique_user_bins)
 {
+    // std::pow(number, 2) does conversion do double and back to size_t.
+    // If used more often, consider porting pow with integer overloads from
+    // https://github.com/seqan/seqan3/blob/8b7d02cb8695369b7baeb4b3042ae7c864b67b8c/include/seqan3/utility/math.hpp
+    auto squared = [](size_t const number)
+    {
+        return number * number;
+    };
+
     // Simulate 500 user bins of exponentially increasing size
     // No overlap between the user bins happens.
     seqan::hibf::config config{.input_fn =
                                    [&](size_t const ub_id, seqan::hibf::insert_iterator it)
                                {
-                                   size_t const start = std::pow(ub_id + 1, 2);
-                                   size_t const end = std::pow(ub_id + 2, 2) - 1;
+                                   size_t const start = squared(ub_id + 1u);
+                                   size_t const end = squared(ub_id + 2u) - 1u;
                                    for (size_t i = start; i < end; ++i)
                                        it = i;
                                },
@@ -157,31 +159,30 @@ TEST(hibf_test, unevenly_sized_and_unique_user_bins)
                                .disable_rearrangement = true};
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.membership_agent();
 
+    for (size_t ub_id = 5u /* don't test the tiny ones */; ub_id < 499u; ub_id += 20u)
     {
-        for (size_t ub_id = 5 /* don't test the tiny ones */; ub_id < 500 - 1; ub_id = ub_id + 20)
-        {
-            size_t const start = std::pow(ub_id + 1, 2);
-            std::vector<size_t> unique_query{start + 5, start + 6, start + 7, start + 8};
+        size_t const start = squared(ub_id + 1u);
+        auto unique_query = std::views::iota(start + 5u, start + 9u);
 
-            auto agent = hibf.membership_agent();
-            auto unique_result = agent.membership_for(unique_query, 4); // t = 4, require all hashes to hit
-
-            EXPECT_RANGE_EQ(unique_result, (std::vector<size_t>{ub_id}));
-        }
+        auto & unique_result = agent.membership_for(unique_query, 4u);
+        EXPECT_EQ(unique_result.size(), 1u);
+        EXPECT_EQ(unique_result[0], ub_id);
     }
 }
 
 TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
 {
-    // Simulate 1000 user bins of roughly the same size with a lot of overlap/similarity
+    // Simulate 1000 user bins of roughly the same size with a lot of overlap/similarity.
     seqan::hibf::config config{.input_fn =
                                    [&](size_t const ub_id, seqan::hibf::insert_iterator it)
                                {
-                                   // Each user bin is has an overlap of 30 to its former neighbour,
-                                   // 25 to its former-former neighbour, etc.. (similar to 6 neighbours in total)
-                                   size_t const start = ub_id * 5;
-                                   for (size_t i = start; i < start + 35; ++i)
+                                   // Each user bin has an overlap of 30 with its predecessor,
+                                   // 25 with its second predecessor, etc.
+                                   // There are in total 6 other user bins that share at least 5 values.
+                                   size_t const start = ub_id * 5u;
+                                   for (size_t i = start; i < start + 35u; ++i)
                                        it = i;
                                },
                                .number_of_user_bins = 1000,
@@ -192,20 +193,15 @@ TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
                                .disable_rearrangement = true};
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.membership_agent();
 
+    for (size_t ub_id = 6u; ub_id < 994u; ub_id += 20u)
     {
-        for (size_t ub_id = 6; ub_id < 1000 - 6; ub_id = ub_id + 20)
-        {
-            size_t const start = ub_id * 5;
-            std::vector<size_t> similar_query{start, start + 1, start + 2, start + 3, start + 4};
+        size_t const start = ub_id * 5;
+        auto similar_query = std::views::iota(start, start + 5u);
 
-            auto agent = hibf.membership_agent();
-            auto similar_result = agent.membership_for(similar_query, 5); // t = 5, require all hashes to hit
-
-            std::vector<size_t> expected{ub_id - 6, ub_id - 5, ub_id - 4, ub_id - 3, ub_id - 2, ub_id - 1, ub_id};
-
-            EXPECT_RANGE_EQ(similar_result, expected);
-        }
+        auto & similar_result = agent.membership_for(similar_query, 5u); // t = 5 results in 6 similar user bins
+        EXPECT_RANGE_EQ(similar_result, (std::views::iota(ub_id - 6u, ub_id + 1u)));
     }
 }
 
