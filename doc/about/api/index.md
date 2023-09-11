@@ -113,8 +113,7 @@ are added by newer versions of a supported compiler.
 <small>¹ [This site](https://linuxlifecycle.com) provides a good overview of what the current release and its
 lifecycle is.</small><br>
 <small>² We consider CentOS 7 / RedHat Enterprise Linux (RHEL) 7 as being community-supported. That means issues and
-patches are welcome, but we do not actively test for those operating systems. See this related
-[issue](https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/issues/2244).</small>
+patches are welcome, but we do not actively test for those operating systems.</small>
 
 # Dependencies
 

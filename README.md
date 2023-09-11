@@ -23,14 +23,14 @@
     The picture, or alternative text, should link to `[2]`.
 -->
 
-[1]: https://img.shields.io/github/actions/workflow/status/seqan/Hierarchical_Interleaved_Bloomfilter/ci_linux.yml?branch=main&style=flat&logo=github&label=CI "Open GitHub actions page"
-[2]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/actions?query=branch%3Amain
-[3]: https://codecov.io/gh/seqan/Hierarchical_Interleaved_Bloomfilter/branch/main/graph/badge.svg?token=BH1FQiBBle "Open Codecov page"
-[4]: https://codecov.io/gh/seqan/Hierarchical_Interleaved_Bloomfilter
+[1]: https://img.shields.io/github/actions/workflow/status/seqan/hibf/ci_linux.yml?branch=main&style=flat&logo=github&label=CI "Open GitHub actions page"
+[2]: https://github.com/seqan/hibf/actions?query=branch%3Amain
+[3]: https://codecov.io/gh/seqan/hibf/branch/main/graph/badge.svg?token=BH1FQiBBle "Open Codecov page"
+[4]: https://codecov.io/gh/seqan/hibf
 [5]: https://img.shields.io/badge/license-BSD-green.svg "Open Copyright page"
-[6]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/blob/main/LICENSE.md
-[7]: https://img.shields.io/github/release/seqan/Hierarchical_Interleaved_Bloomfilter.svg "Get the latest release"
-[8]: https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter/releases/latest
+[6]: https://github.com/seqan/hibf/blob/main/LICENSE.md
+[7]: https://img.shields.io/github/release/seqan/hibf.svg "Get the latest release"
+[8]: https://github.com/seqan/hibf/releases/latest
 [9]: https://img.shields.io/badge/platform-linux%20%7C%20bsd%20%7C%20osx-informational.svg
 
 This library contains the HIBF and layout algorithm.
@@ -43,7 +43,7 @@ To use the HIBF lib in your app:
 include (FetchContent)
 FetchContent_Declare (
     hibf_fetch_content
-    GIT_REPOSITORY "https://github.com/seqan/Hierarchical_Interleaved_Bloomfilter"
+    GIT_REPOSITORY "https://github.com/seqan/hibf"
     GIT_TAG "main")
 option (INSTALL_HIBF "" OFF)
 FetchContent_MakeAvailable (hibf_fetch_content)
@@ -55,6 +55,6 @@ target_link_libraries (<your_app> PUBLIC seqan::hibf)
 
 ## Sponsorships
 
-[![Vercel](https://raw.githubusercontent.com/seqan/Hierarchical_Interleaved_Bloomfilter/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
+[![Vercel](https://raw.githubusercontent.com/seqan/hibf/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
 
 Vercel is kind enough to sponsor our documentation preview-builds within our pull requests. Check them out!
