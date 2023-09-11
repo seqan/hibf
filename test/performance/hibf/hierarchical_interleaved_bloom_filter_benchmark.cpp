@@ -5,12 +5,20 @@
 // shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
 // -----------------------------------------------------------------------------------------------------
 
-#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h> // for State, Benchmark, Counter, ClobberMemory, BENCHMARK
 
-#include <span>
+#include <algorithm>  // for copy, fill_n, __generate_fn, generate
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <random>     // for uniform_int_distribution, mt19937_64
+#include <ranges>     // for _Size, size
+#include <span>       // for span
+#include <stdexcept>  // for invalid_argument
+#include <tuple>      // for make_tuple
+#include <vector>     // for allocator, vector
 
-#include <hibf/config.hpp>
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
+#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
 inline benchmark::Counter hashes_per_second(size_t const count)
 {
