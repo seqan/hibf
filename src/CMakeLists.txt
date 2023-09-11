@@ -14,15 +14,17 @@ set (HIBF_SOURCE_FILES
      build/compute_kmers.cpp
      build/construct_ibf.cpp)
 
-add_library (hibf STATIC ${HIBF_SOURCE_FILES})
-add_library (seqan::hibf ALIAS hibf)
-target_compile_definitions (hibf PUBLIC ${HIBF_DEFINITIONS})
-target_compile_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
-target_link_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
-target_link_libraries (hibf PUBLIC "${HIBF_LIBRARIES}")
+if (NOT TARGET hibf)
+    add_library (hibf STATIC ${HIBF_SOURCE_FILES})
+    add_library (seqan::hibf ALIAS hibf)
+    target_compile_definitions (hibf PUBLIC ${HIBF_DEFINITIONS})
+    target_compile_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
+    target_link_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
+    target_link_libraries (hibf PUBLIC "${HIBF_LIBRARIES}")
 
-target_include_directories (
-    hibf PUBLIC "$<BUILD_INTERFACE:${HIBF_HEADER_PATH}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
-                "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hibf/submodules>")
+    target_include_directories (
+        hibf PUBLIC "$<BUILD_INTERFACE:${HIBF_HEADER_PATH}>" "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+                    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/hibf/submodules>")
 
-target_include_directories (hibf SYSTEM PUBLIC "$<BUILD_INTERFACE:${HIBF_DEPENDENCY_HEADER_PATHS}>")
+    target_include_directories (hibf SYSTEM PUBLIC "$<BUILD_INTERFACE:${HIBF_DEPENDENCY_HEADER_PATHS}>")
+endif ()
