@@ -38,6 +38,7 @@ TEST(hibf_test, small_example_with_direct_hashes)
     std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
 
     auto & result = agent.membership_for(query, 2u);
+    agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
 }
 
@@ -87,6 +88,7 @@ TEST(hibf_test, build_from_layout)
     std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
 
     auto & result = agent.membership_for(query, 2u);
+    agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
 }
 
@@ -122,6 +124,7 @@ TEST(hibf_test, three_level_hibf)
         auto unique_query = std::views::iota(start + 5u, start + 9u);
 
         auto & overlap_result = agent.membership_for(overlap_query, 4u); // one overlapping user bin
+        agent.sort_results();
         EXPECT_EQ(overlap_result.size(), 2u);
         EXPECT_EQ(overlap_result[0], ub_id);
         EXPECT_EQ(overlap_result[1], ub_id + 1u);
@@ -202,6 +205,7 @@ TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
         auto similar_query = std::views::iota(start, start + 5u);
 
         auto & similar_result = agent.membership_for(similar_query, 5u); // t = 5 results in 6 similar user bins
+        agent.sort_results();
         EXPECT_RANGE_EQ(similar_result, (std::views::iota(ub_id - 6u, ub_id + 1u)));
     }
 }

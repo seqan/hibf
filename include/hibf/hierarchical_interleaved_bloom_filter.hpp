@@ -229,8 +229,8 @@ private:
 
 public:
     /*!\name Constructors, destructor and assignment
-        * \{
-        */
+     * \{
+     */
     membership_agent_type() = default;                                         //!< Defaulted.
     membership_agent_type(membership_agent_type const &) = default;            //!< Defaulted.
     membership_agent_type & operator=(membership_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
@@ -248,6 +248,12 @@ public:
 
     //!\brief Stores the result of membership_for().
     std::vector<int64_t> result_buffer;
+
+    //!\brief Sorts the results.
+    void sort_results()
+    {
+        std::ranges::sort(result_buffer);
+    }
 
     /*!\name Lookup
      * \{
@@ -301,8 +307,6 @@ public:
         result_buffer.clear();
 
         membership_for_impl(values, 0, threshold);
-
-        std::ranges::sort(result_buffer); // TODO: necessary?
 
         return result_buffer;
     }
