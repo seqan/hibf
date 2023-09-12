@@ -541,7 +541,7 @@ struct zip_fn
 {
     template <seqan::stl::ranges::viewable_range... urng_ts>
         requires (sizeof...(urng_ts) == 0)
-    constexpr auto operator()(urng_ts &&... ranges) const
+    constexpr auto operator()(urng_ts &&...) const
     {
         return std::views::empty<seqan::stl::tuple<>>;
     }
