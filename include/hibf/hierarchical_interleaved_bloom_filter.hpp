@@ -198,7 +198,7 @@ private:
 
     //!\brief Helper for recursive membership querying.
     template <std::ranges::forward_range value_range_t>
-    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, uint16_t const threshold)
     {
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
         auto & result = agent.bulk_count(values);
@@ -229,8 +229,8 @@ private:
 
 public:
     /*!\name Constructors, destructor and assignment
-        * \{
-        */
+     * \{
+     */
     membership_agent_type() = default;                                         //!< Defaulted.
     membership_agent_type(membership_agent_type const &) = default;            //!< Defaulted.
     membership_agent_type & operator=(membership_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
@@ -248,6 +248,12 @@ public:
 
     //!\brief Stores the result of membership_for().
     std::vector<int64_t> result_buffer;
+
+    //!\brief Sorts the results.
+    void sort_results()
+    {
+        std::ranges::sort(result_buffer);
+    }
 
     /*!\name Lookup
      * \{
@@ -290,7 +296,7 @@ public:
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              size_t const threshold) & noexcept
+                                                              uint16_t const threshold) & noexcept
     {
         assert(hibf_ptr != nullptr);
 
@@ -302,8 +308,6 @@ public:
 
         membership_for_impl(values, 0, threshold);
 
-        std::ranges::sort(result_buffer); // TODO: necessary?
-
         return result_buffer;
     }
 
@@ -311,7 +315,7 @@ public:
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              size_t const threshold) && noexcept = delete;
+                                                              uint16_t const threshold) && noexcept = delete;
     //!\}
 };
 

@@ -72,15 +72,16 @@ int main()
 
     // query1 hits in user_bin_1 and user_bin_3, which have the IDs 0 and 2, respectively.
     for (int64_t hit_user_bin : result1)
-        std::cout << hit_user_bin << ' '; // 0 2
+        std::cout << hit_user_bin << ' '; // The results are not sorted: 2 0
     std::cout << '\n';
 
     // Another query. A query is simply a range of unsigned integer values, e.g., it does not have to be a vector.
     auto query2 = std::views::iota(0u, 15u); // 0,1,2,...,14
     auto & result2 = agent.membership_for(query2, 5u);
+    agent.sort_results(); // Sort the results.
 
     // query2 hits in user_bin_1 and user_bin_2, which have the IDs 0 and 1, respectively.
     for (int64_t hit_user_bin : result2)
-        std::cout << hit_user_bin << ' '; // 0 1
+        std::cout << hit_user_bin << ' '; // The results are sorted: 0 1
     std::cout << '\n';
 }
