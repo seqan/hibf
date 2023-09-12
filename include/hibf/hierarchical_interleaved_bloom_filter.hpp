@@ -198,7 +198,7 @@ private:
 
     //!\brief Helper for recursive membership querying.
     template <std::ranges::forward_range value_range_t>
-    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, uint16_t const threshold)
     {
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
         auto & result = agent.bulk_count(values);
@@ -290,7 +290,7 @@ public:
      */
     template <std::ranges::forward_range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              size_t const threshold) & noexcept
+                                                              uint16_t const threshold) & noexcept
     {
         assert(hibf_ptr != nullptr);
 
@@ -311,7 +311,7 @@ public:
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
     [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              size_t const threshold) && noexcept = delete;
+                                                              uint16_t const threshold) && noexcept = delete;
     //!\}
 };
 
