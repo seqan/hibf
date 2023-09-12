@@ -120,13 +120,31 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
+# Required: 128 bit unsigned integer extension
+# ----------------------------------------------------------------------------
+
+set (HIBF_128BIT_TEST_SOURCE
+     "#if !defined (__SIZEOF_INT128__)
+      #error NO128BITS
+      #endif
+      int main() {}")
+
+check_cxx_source_compiles ("${HIBF_128BIT_TEST_SOURCE}" HIBF_128BIT_SUPPORT)
+
+if (HIBF_128BIT_SUPPORT)
+    hibf_config_print ("128 bit support:            builtin")
+else ()
+    hibf_config_error ("HIBF requires 128 bit integers, but your compiler does not support it.")
+endif ()
+
+# ----------------------------------------------------------------------------
 # Required: OpenMP
 # ----------------------------------------------------------------------------
 
 check_cxx_compiler_flag ("-fopenmp" HIBF_HAS_OPENMP)
 if (HIBF_HAS_OPENMP)
     set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -fopenmp")
-    hibf_config_print ("OpenMP Support:             via -fopenmp")
+    hibf_config_print ("OpenMP support:             via -fopenmp")
 else ()
     hibf_config_error ("HIBF requires OpenMP, but your compiler does not support it.")
 endif ()
@@ -135,9 +153,9 @@ check_cxx_compiler_flag ("-fopenmp-simd" HIBF_HAS_OPENMP_SIMD)
 if (HIBF_HAS_OPENMP_SIMD)
     set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -fopenmp-simd")
     set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DSIMDE_ENABLE_OPENMP")
-    hibf_config_print ("SIMD-OpenMP Support:        via -fopenmp-simd")
+    hibf_config_print ("SIMD-OpenMP support:        via -fopenmp-simd")
 else ()
-    hibf_config_print ("SIMD-OpenMP Support:        not found")
+    hibf_config_print ("SIMD-OpenMP support:        not found")
 endif ()
 
 check_cxx_compiler_flag ("-Wno-psabi" HIBF_SUPPRESS_GCC4_ABI)

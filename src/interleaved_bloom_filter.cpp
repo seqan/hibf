@@ -85,4 +85,186 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     }
 }
 
+void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
+{
+    assert(bin.value < bins);
+    for (size_t i = 0; i < hash_funs; ++i)
+    {
+        size_t idx = hash_and_fit(value, hash_seeds[i]);
+        idx += bin.value;
+        assert(idx < data.size());
+        data[idx] = 1;
+    };
+}
+
+void interleaved_bloom_filter::clear(bin_index const bin) noexcept
+{
+    assert(bin.value < bins);
+    for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
+        data[idx] = 0;
+}
+
+void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bins_)
+{
+    size_t new_bins = new_bins_.value;
+
+    if (new_bins < bins)
+        throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
+
+    // Equivalent to ceil(new_bins / 64)
+    size_t new_bin_words = (new_bins + 63) >> 6;
+
+    bins = new_bins;
+
+    if (new_bin_words == bin_words) // No need for internal resize if bin_words does not change.
+        return;
+
+    size_t new_technical_bins = new_bin_words << 6;
+    size_t new_bits = bin_size_ * new_technical_bins;
+
+    size_t idx_{new_bits}, idx{data.size()};
+    size_t delta = new_technical_bins - technical_bins + 64;
+
+    data.resize(new_bits);
+
+    for (size_t i = idx_, j = idx; j > 0; i -= new_technical_bins, j -= technical_bins)
+    {
+        size_t stop = i - new_technical_bins;
+
+        for (size_t ii = i - delta, jj = j - 64; stop && ii >= stop; ii -= 64, jj -= 64)
+        {
+            uint64_t old = data.get_int(jj);
+            data.set_int(jj, 0);
+            data.set_int(ii, old);
+        }
+    }
+
+    bin_words = new_bin_words;
+    technical_bins = new_technical_bins;
+}
+
+#if HIBF_COMPILER_IS_GCC
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wattributes"
+#endif // HIBF_COMPILER_IS_GCC
+[[gnu::always_inline]] interleaved_bloom_filter::binning_bitvector const &
+interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const value) & noexcept
+{
+#if HIBF_COMPILER_IS_GCC
+#    pragma GCC diagnostic pop
+#endif // HIBF_COMPILER_IS_GCC
+    assert(ibf_ptr != nullptr);
+    assert(result_buffer.size() == ibf_ptr->bin_count());
+
+    // Needed for auto-vectorization of loop. ibf_ptr->bin_words could change bewtween loops.
+    size_t const bin_words = ibf_ptr->bin_words;
+    size_t const hash_funs = ibf_ptr->hash_funs;
+
+#ifndef NDEBUG
+    assert(bin_words != 0u);
+    assert(hash_funs != 0u);
+#else
+    // Removes case for bin_words == 0u. The same statment inside the switch-case wouldn't have that effect.
+    if (bin_words == 0u)
+        __builtin_unreachable();
+    if (hash_funs == 0u)
+        __builtin_unreachable();
+#endif
+
+    for (size_t i = 0; i < hash_funs; ++i)
+        bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) >> 6;
+
+    uint64_t * const raw = result_buffer.raw_data().data(); // TODO: std::assume_aligned<64> once memory-aligned
+    uint64_t const * const ibf_data = ibf_ptr->data.data(); // TODO: std::assume_aligned<64> once memory-aligned
+    std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words);
+
+    // https://godbolt.org/z/1nbhvqeGj
+    // Having the loop inside is faster.
+    // GCOVR_EXCL_START
+    switch (bin_words)
+    {
+    case 1u: // 1 AND (64 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+            raw[0] &= ibf_raw[0];
+        }
+        break;
+    case 2u: // 1 SSE4 instruction (128 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 2u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 3u: // 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 3u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 4u: // 1 AVX2 instruction (256 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 4u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 5u: // 1 AVX2 instruction (256 bit) + 1 AND (64 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 5u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 6u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 6u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 7u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 7u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    case 8u: // 1 AVX512 instruction (512 bit)
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < 8u; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+        break;
+    default: // Auto vectorize. Might create different versions.
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+#pragma omp simd
+            for (size_t batch = 0; batch < bin_words; ++batch)
+                raw[batch] &= ibf_raw[batch];
+        }
+    }
+    // GCOVR_EXCL_STOP
+
+    return result_buffer;
+}
+
 } // namespace seqan::hibf
