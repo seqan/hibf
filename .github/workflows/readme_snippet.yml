@@ -1,0 +1,47 @@
+name: Readme
+
+on:
+  push:
+    branches:
+      - 'main'
+  workflow_dispatch:
+
+concurrency:
+  group: readme-update-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  TZ: Europe/Berlin
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  readme-update:
+    name: Update
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
+
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
+      - name: Update README
+        uses: dineshsonachalam/markdown-autodocs@v1.0.7
+        with:
+          commit_author: seqan-actions[bot]
+          commit_user_email: seqan-actions@users.noreply.github.com
+          commit_message: "[MISC] Update README.md"
+          output_file_paths: '[./README.md]'
+          categories: '[code-block]'
