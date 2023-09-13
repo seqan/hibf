@@ -70,6 +70,29 @@ TEST(hyperloglog, add_and_estimate_small)
     EXPECT_NEAR(sketch.estimate(), 9.205826318, 0.0000001);
 }
 
+TEST(hyperloglog, clear)
+{
+    // Same as add_and_estimate_small
+    size_t const b = 4;
+
+    seqan::hibf::sketch::hyperloglog sketch(b);
+
+    sketch.add("bla", 3);
+    sketch.add("bli", 3);
+    sketch.add("blub", 4);
+    sketch.add("bloink", 6);
+    sketch.add("blubba", 6);
+    sketch.add("blumpf", 6);
+    sketch.add("blarkse", 7);
+    sketch.add("bladuzel", 8);
+
+    EXPECT_NEAR(sketch.estimate(), 9.205826318, 0.0000001);
+
+    // Actual clear test
+    sketch.clear();
+    EXPECT_EQ(sketch.estimate(), 0.0);
+}
+
 std::vector<std::string> const input_sequences{
     {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
      "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"

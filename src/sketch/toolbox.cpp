@@ -65,6 +65,7 @@ void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
         estimates[j] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD(sketches[positions[j]]));
 }
 
+#if 0 // Currently unused
 uint64_t estimate_interval(std::vector<hyperloglog> const & sketches, std::vector<size_t> const & positions)
 {
     assert(positions.size() <= sketches.size());
@@ -77,6 +78,7 @@ uint64_t estimate_interval(std::vector<hyperloglog> const & sketches, std::vecto
 
     return temp_hll.estimate();
 }
+#endif
 
 void rearrange_bins(std::vector<hyperloglog> const & sketches,
                     std::vector<size_t> const & kmer_counts,
@@ -367,7 +369,7 @@ void random_shuffle(distance_matrix & dist, robin_hood::unordered_flat_map<size_
 void prune(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids)
 {
     if (dist.empty())
-        return;
+        return; // GCVOR_EXCL_LINE
 
     // index of the first entry after the valid range
     size_t valid_range_end = 0;

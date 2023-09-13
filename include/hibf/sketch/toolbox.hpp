@@ -93,6 +93,7 @@ void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
                                         std::vector<size_t> const & counts,
                                         std::vector<size_t> const & positions);
 
+#if 0 // Currently unused
 /*!\brief Estimate the cardinality of the union for a single interval.
  * \ingroup hibf_sketch_toolbox
  * \param[in] sketches The hyperloglog sketches to be used for estimation.
@@ -100,6 +101,7 @@ void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
  * \returns The the cardinality of the union for the interval [start, end).
  */
 uint64_t estimate_interval(std::vector<hyperloglog> const & sketches, std::vector<size_t> const & positions);
+#endif
 
 /*!\brief Rearrange filenames, sketches and counts such that similar bins are close to each other
  * \ingroup hibf_sketch_toolbox

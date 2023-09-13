@@ -143,6 +143,9 @@ private:
                                                     *this,
                                                     std::make_error_code(std::errc::invalid_argument));
         }
+
+        // Should not be possible.
+        // GCOVR_EXCL_START
         // Checking that *this is an absolute path
         if (!is_absolute())
         {
@@ -151,6 +154,7 @@ private:
                                                     *this,
                                                     std::make_error_code(std::errc::invalid_argument));
         }
+        // GCOVR_EXCL_STOP
 
         auto rel_path = lexically_relative(sandbox_directory);
 

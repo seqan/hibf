@@ -24,6 +24,7 @@ namespace seqan::hibf::layout
 size_t hierarchical_binning::execute()
 {
     assert(data != nullptr);
+    assert(data->kmer_counts != nullptr);
     assert(data->positions.size() <= data->kmer_counts->size());
 
     static constexpr size_t max_size_t{std::numeric_limits<size_t>::max()};
@@ -33,11 +34,14 @@ size_t hierarchical_binning::execute()
         sketch::toolbox::sort_by_cardinalities(*data->kmer_counts, data->positions);
 
         if (!config.disable_estimate_union && !config.disable_rearrangement)
+        {
+            assert(data->sketches != nullptr);
             sketch::toolbox::rearrange_bins(*data->sketches,
                                             *data->kmer_counts,
                                             data->positions,
                                             config.max_rearrangement_ratio,
                                             config.threads);
+        }
 
         data->user_bins_arranged = true;
     }
@@ -323,14 +327,6 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
 
     return high_level_max_id;
 }
-
-std::string hierarchical_binning::to_string_with_precision(double const value) const
-{
-    // TODO std::to_chars after https://github.com/seqan/product_backlog/issues/396
-    std::stringstream stream;
-    stream << std::fixed << std::setprecision(2) << value;
-    return stream.str();
-};
 
 data_store hierarchical_binning::initialise_libf_data(size_t const trace_j) const
 {

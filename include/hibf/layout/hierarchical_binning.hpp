@@ -120,8 +120,6 @@ private:
     //!\brief Backtracks the trace matrix and writes the resulting binning into the output file.
     size_t backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace);
 
-    std::string to_string_with_precision(double const value) const;
-
     data_store initialise_libf_data(size_t const trace_j) const;
 
     void process_merged_bin(data_store & libf_data, size_t const bin_id) const;
