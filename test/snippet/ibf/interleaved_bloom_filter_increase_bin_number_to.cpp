@@ -1,6 +1,6 @@
 #include <hibf/interleaved_bloom_filter.hpp>
 
-void print(seqan::hibf::interleaved_bloom_filter::binning_bitvector const & vector)
+void print(seqan::hibf::binning_bitvector const & vector)
 {
     std::cout << '[';
 
