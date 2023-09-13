@@ -28,48 +28,58 @@
 namespace seqan::hibf
 {
 
-/*!\brief The HIBF binning directory. A data structure that efficiently answers set-membership queries for multiple
- *        bins.
- * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See
- *                           [seqan::hibf::data_layout](https://docs.seqan.de/seqan/3.0.3/group__submodule__dream__index.html#gae9cb143481c46a1774b3cdf5d9fdb518).
- * \see [seqan::hibf::interleaved_bloom_filter][1]
+/*!\brief The Hierarchical Interleaved Bloom Filter (HIBF) - Fast answers to set-membership queries for multiple bins.
  * \details
  *
  * This class improves the [seqan::hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
- * to establish a hierarchical structure. This structure can then be used to split or merge user bins and distribute
- * them over a variable number of technical bins. In the [seqan::hibf::interleaved_bloom_filter][1], the number of user bins
- * and technical bins is always the same. This causes performance degradation when there are many user bins or the user
- * bins are unevenly distributed.
+ * to establish a hierarchical structure. It is especially suited if you want to index are many samples/sets/user bins
+ * or if their sizes are unevenly distributed.
  *
- * # Terminology
+ * Publication reference: https://doi.org/10.1186/s13059-023-02971-4
  *
- * ## Technical Bin
- * A Technical Bin represents an actual bin in the binning directory. In the IBF, it stores its kmers in a single Bloom
- * Filter (which is interleaved with all the other BFs).
+ * ### Example
  *
- * ## User Bin
- * The user may impose a structure on his sequence data in the form of logical groups (e.g. species). When querying the
- * IBF, the user is interested in an answer that differentiates between these groups.
+ * \include test/snippets/hibf/hierarchical_interleaved_bloom_filter.cpp
  *
- * # Hierarchical Interleaved Bloom Filter (HIBF)
+ * ### Cite
  *
- * In constrast to the [seqan::hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical bins
- * , or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
- * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
- * to further distinguish between merged bins.
+ * *Mehringer, Svenja, et al. "Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries."
+ * Genome Biology 24.1 (2023): 1-25.*
  *
- * In this example, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single technical
- * bin, and another IBF was added for the merged bin.
- * \image html hibf.svg width=90%
+ * ## Constructing the HIBF
  *
- * The individual IBFs may have a different number of technical bins and differ in their sizes, allowing an efficient
- * distribution of the user bins.
+ * The HIBF is constructed by passing a seqan::hibf::config. There are two options required to be set:
+ * (1) seqan::hibf::config::input_fn and (2) seqan::hibf::config::number_of_user bins. For all other options
+ * we have set sensible defaults.
  *
- * ## Querying
- * To query the Hierarchical Interleaved Bloom Filter for values, call
- * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent() and use the returned
+ * Here are all options with their defaults:
+ *
+ * \input test/snippet/hibf/hibf_construction.cpp
+ *
+ * Please see the documentation of seqan::hibf::config for details on how to configure the HIBF construction.
+ *
+ * ## Membership Queries with the HIBF
+ *
+ * To allow efficient, thread-safe membership queries, you need to use the
  * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent.
- * In contrast to the [seqan::hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+ *
+ * \include test/snippets/hibf/hierarchical_interleaved_bloom_filter.cpp
+ *
+ * You retrieve an membership_agent by calling seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent().
+ *
+ * You can then pass a **range of hashes** and a **threshold**.
+ *
+ * ### Thresholding
+ *
+ * Given a number `x` of hashes to query and a threshold value `t`, a query will return all user bin ids for which at
+ * least `t` number of hashes have been found in the respective user bin in the HIBF index. In other words, the hit
+ * count must be equal or greater than `t` (`count >= t`).
+ *
+ * For all practical applications it is recommended to research sensible thresholds based on the data, the false
+ * positive rate, the length of the query and whether (canonical) k-mers, minimizers, syncmers,.. etc were used for
+ * hashing genomic content.
+ *
+ * ## Counting Queries with the HIBF
  *
  * To count the occurrences in each user bin of a range of values in the Hierarchical Interleaved Bloom Filter, call
  * seqan::hibf::hierarchical_interleaved_bloom_filter::counting_agent() and use
@@ -81,7 +91,36 @@ namespace seqan::hibf
  * calls to `const` member functions are safe from multiple threads (as long as no thread calls
  * a non-`const` member function at the same time).
  *
- * [1]: https://docs.seqan.de/seqan/3.0.3/classseqan3_1_1interleaved__bloom__filter.html
+ * # Details on the data structure
+ *
+ * The following gives some insights about the general design of the HIBF data structure. More details can be found
+ * in the publication: https://doi.org/10.1186/s13059-023-02971-4
+ *
+ * ## Terminology
+ *
+ * ### Technical Bin
+ * A Technical Bin represents an actual bin in the binning directory. In the IBF, it stores its kmers in a single Bloom
+ * Filter (which is interleaved with all the other BFs).
+ *
+ * ### User Bin
+ * The user may impose a structure on his sequence data in the form of logical groups (e.g. species). When querying the
+ * IBF, the user is interested in an answer that differentiates between these groups.
+ *
+ * ## Hierarchical Interleaved Bloom Filter (HIBF)
+ *
+ * In constrast to the [seqan::hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical
+ * bins, or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
+ * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
+ * to further distinguish between merged bins.
+ *
+ * In this example, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single technical
+ * bin, and another IBF was added for the merged bin.
+ * \image html hibf.svg width=90%
+ *
+ * The individual IBFs may have a different number of technical bins and differ in their sizes, allowing an efficient
+ * distribution of the user bins.
+ *
+ * \see [seqan::hibf::interleaved_bloom_filter][1]
  */
 class hierarchical_interleaved_bloom_filter
 {
