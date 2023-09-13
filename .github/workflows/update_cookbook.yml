@@ -1,4 +1,4 @@
-name: Readme
+name: Cookbook
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: readme-update-${{ github.ref }}
+  group: cookbook-update-${{ github.ref }}
   cancel-in-progress: true
 
 env:
@@ -18,7 +18,7 @@ defaults:
     shell: bash -Eexuo pipefail {0}
 
 jobs:
-  readme-update:
+  cookbook-update:
     name: Update
     runs-on: ubuntu-22.04
     timeout-minutes: 15
@@ -37,11 +37,13 @@ jobs:
           git_user_signingkey: true
           git_commit_gpgsign: true
 
-      - name: Update README
-        uses: dineshsonachalam/markdown-autodocs@v1.0.7
+      - name: Update Cookbook
+        run: ./test/scripts/add_snippets_to_cookbook.sh .
+
+      - name: Commit changes
+        uses: EndBug/add-and-commit@v9
         with:
-          commit_author: seqan-actions[bot]
-          commit_user_email: seqan-actions@users.noreply.github.com
-          commit_message: "[MISC] Update README.md"
-          output_file_paths: '[./README.md]'
-          categories: '[code-block]'
+          add: ./doc/cookbook/index.md
+          author_name: seqan-actions[bot]
+          author_email: seqan-actions@users.noreply.github.com
+          message: '[MISC] Update Cookbook'
