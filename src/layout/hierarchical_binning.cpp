@@ -14,7 +14,7 @@
 #include <hibf/layout/hierarchical_binning.hpp> // for hierarchical_binning
 #include <hibf/layout/layout.hpp>               // for layout
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
-#include <hibf/next_multiple_of_64.hpp>         // for next_multiple_of_64
+#include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 #include <hibf/sketch/toolbox.hpp>              // for precompute_initial_union_estimates, precompute_union_estimat...
 

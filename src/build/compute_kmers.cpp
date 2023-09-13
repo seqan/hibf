@@ -18,8 +18,8 @@
 #include <hibf/build/compute_kmers.hpp> // for compute_kmers
 #include <hibf/config.hpp>              // for config
 #include <hibf/contrib/robin_hood.hpp>  // for unordered_flat_set
-#include <hibf/detail/timer.hpp>        // for concurrent, timer
 #include <hibf/layout/layout.hpp>       // for layout
+#include <hibf/misc/timer.hpp>          // for concurrent, timer
 
 namespace seqan::hibf::build
 {

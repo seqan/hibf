@@ -23,13 +23,13 @@
 #include <hibf/build/update_user_bins.hpp>                // for update_user_bins
 #include <hibf/config.hpp>                                // for config
 #include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
-#include <hibf/detail/timer.hpp>                          // for timer
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/misc/timer.hpp>                            // for timer
 
 namespace seqan::hibf
 {
