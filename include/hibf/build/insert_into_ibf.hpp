@@ -19,13 +19,18 @@
 namespace seqan::hibf::build
 {
 
-// automatically does naive splitting if number_of_bins > 1
+/*!\brief Inserts values into an IBF.
+ * \ingroup hibf_build
+ * \details
+ * Automatically does naive splitting if number_of_bins > 1.
+ */
 void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan::hibf::interleaved_bloom_filter & ibf,
                      timer<concurrent::yes> & fill_ibf_timer);
 
+//!\overload
 void insert_into_ibf(build_data const & data,
                      layout::layout::user_bin const & record,
                      seqan::hibf::interleaved_bloom_filter & ibf);

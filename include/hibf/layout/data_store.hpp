@@ -14,10 +14,13 @@
 namespace seqan::hibf::layout
 {
 
+/*!\brief Contains information used for the layout.
+ * \ingroup hibf_layout
+ */
 struct data_store
 {
     /*!\brief Stores information of the previous level of a given IBF.
-     *
+     * \details
      * When computing a hierarchical layout, the `data_store` data structure is used with local copies for each IBF
      * within the hierarchical structure of the HIBF. To keep track of the hierarchy, the `previous_level` stores
      * information about the previous level (where the corresponding merged bin is located).
@@ -51,7 +54,7 @@ struct data_store
     //!\}
 
     /*!\name Local Storage one IBF in the HIBF.
-     *
+     * \details
      * These member variables change on each IBF of the HIBF s.t. the current IBF can be constructed from
      * the current subset of data. The same data is also used for the top level IBF that holds all the data.
      * \{

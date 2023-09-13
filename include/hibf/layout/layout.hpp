@@ -12,7 +12,9 @@
 namespace seqan::hibf::layout
 {
 
-// Currently, the layout is structured by user bin.
+/*!\brief The layout.
+ * \ingroup hibf_layout
+ */
 struct layout
 {
     struct max_bin

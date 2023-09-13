@@ -18,6 +18,9 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Contains information used for building.
+ * \ingroup hibf_build
+ */
 struct build_data
 {
     std::atomic<size_t> ibf_number{};

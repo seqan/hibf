@@ -22,96 +22,76 @@
 namespace seqan::hibf::sketch
 {
 
-/** @class hyperloglog
- *  @brief Implement of 'HyperLogLog' estimate cardinality algorithm
- *
- * Copied from Hideaki Ohno (https://github.com/hideo55/cpp-HyperLogLog) and adjusted/improved by Felix Droop
+/*!\brief HyperLogLog estimates.
+ * \ingroup hibf_sketch
+ * \details
+ * Copied from Hideaki Ohno and adjusted/improved by Felix Droop
+ * \see https://github.com/hideo55/cpp-HyperLogLog
  */
 class hyperloglog
 {
 public:
-    /**
-     * Constructor
-     *
-     * @param[in] b bit width (register size will be 2 to the b power).
+    /*!\brief Constructor
+     * \param[in] b bit width (register size will be 2 to the b power).
      *            This value must be in the range[4,30].Default value is 5.
      *
-     * @exception std::invalid_argument the argument b is out of range.
+     * \throws std::invalid_argument if the argument b is out of range.
      */
     hyperloglog(uint8_t b = 5);
 
-    /**
-     * Adds element to the estimator
-     *
-     * @param[in] str string to add
-     * @param[in] len length of string
+    /*!\brief Adds element to the estimator
+     * \param[in] str string to add
+     * \param[in] len length of string
      */
     void add(char const * str, uint64_t len);
 
-    /**
-     * Estimates cardinality value.
-     *
-     * @return Estimated cardinality value.
+    /*!\brief Estimates cardinality value.
+     * \returns Estimated cardinality value.
      */
     double estimate() const;
 
-    /**
-     * Merges the estimate from 'other' into this object
+    /*!\brief Merges the estimate from 'other' into this object.
+     * \param[in] other HyperLogLog instance to be merged
+     * \details
      * The number of registers in each must be the same.
-     *
-     * @param[in] other HyperLogLog instance to be merged
      */
     void merge(hyperloglog const & other);
 
-    /**
-     * Merges the estimate from 'other' into this object
+    /*!\brief Merges the estimate from 'other' into this object
+     * \param[in] other HyperLogLog instance to be merged
+     * \returns estimated cardinality of the new merged sketch.
+     * \details
      * The number of registers in each must be the same.
      * This function is implemented using SIMD instructions.
-     * WARNING: This function is undefined bevahior if this.b_ == 4
-     *
-     * @param[in] other HyperLogLog instance to be merged
-     *
-     * @return estimated cardinality of the new merged sketch
+     * \warning This function is undefined bevahior if this.b_ == 4
      */
     double merge_and_estimate_SIMD(hyperloglog const & other);
 
-    /**
-     * Clears all internal registers.
+    /*!\brief Clears all internal registers.
      */
     void clear();
 
-    /**
-     * Returns size of register.
-     *
-     * @return Register size
+    /*!\brief Returns size of register.
      */
     uint64_t registerSize() const
     {
         return m_;
     }
 
-    /**
-     * Exchanges the content of the instance
-     *
-     * @param[in,out] rhs Another HyperLogLog instance
+    /*!\brief Exchanges the content of the instance.
+     * \param[in,out] rhs Another HyperLogLog instance
      */
     void swap(hyperloglog & rhs);
 
-    /**
-     * Dump the current status to a stream
-     *
-     * @param[out] os The output stream where the data is saved
-     *
-     * @exception std::runtime_error When failed to dump.
+    /*!\brief Dumps the current status to a stream.
+     * \param[in,out] os The output stream where the data is saved to
+     * \throws std::runtime_error if dumping failed.
      */
     void dump(std::ostream & os) const;
 
-    /**
-     * Restore the status from a stream
-     *
-     * @param[in] is The input stream where the status is saved
-     *
-     * @exception std::runtime_error When failed to restore.
+    /*!\brief Restorse the status from a stream.
+     * \param[in] is The input stream where the status is saved
+     * \throws std::runtime_error if restoring failed.
      */
     void restore(std::istream & is);
 

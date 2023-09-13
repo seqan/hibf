@@ -9,6 +9,9 @@
 namespace seqan::hibf::sketch
 {
 
+/*!\brief Estimates k-mer counts via sketches.
+ * \ingroup hibf_sketch
+ */
 inline void estimate_kmer_counts(std::vector<seqan::hibf::sketch::hyperloglog> const & sketches,
                                  std::vector<size_t> & kmer_counts)
 {

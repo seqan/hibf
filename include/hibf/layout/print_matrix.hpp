@@ -7,7 +7,9 @@
 namespace seqan::hibf::layout
 {
 
-// helper function to print a matrix when debugging
+/*!\brief Helper function to print a matrix when debugging.
+ * \ingroup hibf_layout
+ */
 template <typename matrix_type, typename matrix_value_type>
 void print_matrix(matrix_type const & matrix,
                   size_t const row_bound,

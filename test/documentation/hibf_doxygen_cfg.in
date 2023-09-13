@@ -88,7 +88,7 @@ TIMESTAMP              = YES
 # Build related configuration options
 #---------------------------------------------------------------------------
 EXTRACT_ALL            = NO
-EXTRACT_PRIVATE        = YES
+EXTRACT_PRIVATE        = NO
 EXTRACT_PRIV_VIRTUAL   = NO
 EXTRACT_PACKAGE        = NO
 EXTRACT_STATIC         = NO
@@ -109,7 +109,7 @@ SHOW_INCLUDE_FILES     = YES
 SHOW_GROUPED_MEMB_INC  = NO
 FORCE_LOCAL_INCLUDES   = NO
 INLINE_INFO            = YES
-SORT_MEMBER_DOCS       = YES
+SORT_MEMBER_DOCS       = NO
 SORT_BRIEF_DOCS        = YES
 SORT_MEMBERS_CTORS_1ST = NO
 SORT_GROUP_NAMES       = NO
@@ -269,14 +269,14 @@ MAKEINDEX_CMD_NAME     = makeindex
 LATEX_MAKEINDEX_CMD    = makeindex
 COMPACT_LATEX          = NO
 PAPER_TYPE             = a4
-EXTRA_PACKAGES         = {amsfonts}
+EXTRA_PACKAGES         = {lstfiracode}
 LATEX_HEADER           =
 LATEX_FOOTER           =
 LATEX_EXTRA_STYLESHEET =
 LATEX_EXTRA_FILES      =
 PDF_HYPERLINKS         = YES
 USE_PDFLATEX           = YES
-LATEX_BATCHMODE        = NO
+LATEX_BATCHMODE        = YES
 LATEX_HIDE_INDICES     = NO
 LATEX_BIB_STYLE        = plain
 LATEX_EMOJI_DIRECTORY  =
@@ -355,9 +355,9 @@ HIDE_UNDOC_RELATIONS   = YES
 ## DOT SUPPORT
 HAVE_DOT               = ${HIBF_DOXYGEN_HAVE_DOT}
 DOT_NUM_THREADS        = ${HIBF_DOXYGEN_DOT_NUM_THREADS}
-DOT_COMMON_ATTR        = "fontname=Helvetica,fontsize=10"
-DOT_EDGE_ATTR          = "labelfontname=Helvetica,labelfontsize=10"
-DOT_NODE_ATTR          = "shape=box,height=0.2,width=0.4"
+DOT_COMMON_ATTR        =
+DOT_EDGE_ATTR          =
+DOT_NODE_ATTR          =
 DOT_FONTPATH           =
 CLASS_GRAPH            = YES
 COLLABORATION_GRAPH    = NO

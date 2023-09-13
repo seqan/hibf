@@ -22,12 +22,18 @@
 namespace seqan::hibf
 {
 
+/*!\brief Whether the timer is concurrent.
+ * \ingroup hibf_build
+ */
 enum class concurrent
 {
-    no,
-    yes
+    no, //!< Not concurrent.
+    yes //!< Concurrent.
 };
 
+/*!\brief Timer.
+ * \ingroup hibf_build
+ */
 template <concurrent concurrency>
 class timer
 {
@@ -104,8 +110,13 @@ private:
     rep_t ticks{};
 };
 
-// seqan::hibf::{serial,concurrent}_timer is easier to use than `seqan::hibf::timer<seqan::hibf::concurrent::{no,yes}.
+/*!\brief Alias for timer<concurrent::no>
+ * \ingroup hibf_build
+ */
 using serial_timer = timer<concurrent::no>;
+/*!\brief Alias for timer<concurrent::yes>
+ * \ingroup hibf_build
+ */
 using concurrent_timer = timer<concurrent::yes>;
 
 } // namespace seqan::hibf

@@ -7,15 +7,36 @@
 
 /*!\file
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
- * \brief Meta-header for the \link search_dream_index Search / DREAM Index submodule \endlink.
+ * \brief Meta-header.
  */
 
-/*!\defgroup search_dream_index DREAM Index
- * \brief Provides seqan::hibf::interleaved_bloom_filter.
- * \ingroup search
- * \see search
+/*!\defgroup ibf IBF
+ * \brief The Interleaved Bloom Filter.
  */
 
+/*!\defgroup hibf HIBF
+ * \brief The Hierarchical Interleaved Bloom Filter.
+ */
+
+/*!\defgroup hibf_sketch Sketching
+ * \brief Sketching.
+ * \ingroup hibf
+ */
+
+/*!\defgroup hibf_sketch_toolbox Toolbox
+ * \brief Sketching toolbox.
+ * \ingroup hibf_sketch
+ */
+
+/*!\defgroup hibf_layout Layout
+ * \brief The Layout.
+ * \ingroup hibf
+ */
+
+/*!\defgroup hibf_build Build
+ * \brief Building.
+ * \ingroup hibf
+ */
 #pragma once
 
 #include <hibf/interleaved_bloom_filter.hpp>
