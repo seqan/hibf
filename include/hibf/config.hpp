@@ -27,14 +27,32 @@ using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint
 
 /*!\brief The configuration used to build an (H)IBF
  *
+ * # The (H)IBF config
+ *
  * The configuration can be used to construct an HIBF or IBF.
  *
  * When constructing an IBF, only the members `General Configuration` are considered, layout parameters from
  * the section `HIBF Layout Configuration` are ignored.
  *
- * \note If an option is marked [REQUIRED], an error will be thrown on (H)IBF
- *       construction if it is not set. An option is marked RECOMMENDED_TO_ADAPT if we give a sensible default
- *       but still recommend from experience that it is worth thinking about adjusting it to your data.
+ * Here is the list of all configs options:
+ *
+ * | Type    |  Option Name                                     | Default | Note                   |
+ * |:--------|:-------------------------------------------------|:-------:|:-----------------------|
+ * | General | seqan::hibf::config::input_fn                    | -       | [REQUIRED]             |
+ * | General | seqan::hibf::config::number_of_user_bins         | -       | [REQUIRED]             |
+ * | General | seqan::hibf::config::number_of_hash_functions    | 2       |                        |
+ * | General | seqan::hibf::config::maximum_false_positive_rate | 0.05    | [RECOMMENDED_TO_ADAPT] |
+ * | General | seqan::hibf::config::threads                     | 1       | [RECOMMENDED_TO_ADAPT] |
+ * | Layout  | seqan::hibf::config::sketch_bits                 | 12      |                        |
+ * | Layout  | seqan::hibf::config::tmax                        | 0       | 0 indicates unset      |
+ * | Layout  | seqan::hibf::config::max_rearrangement_ratio     | 0.5     |                        |
+ * | Layout  | seqan::hibf::config::alpha                       | 1.2     |                        |
+ * | Layout  | seqan::hibf::config::disable_estimate_union      | false   |                        |
+ * | Layout  | seqan::hibf::config::disable_rearrangement       | false   |                        |
+ *
+ * As a copy and paste source, here are all config options with their defaults:
+ *
+ * \include test/snippet/hibf/hibf_construction.cpp
  *
  * ## The HIBF takes too long to construct?
  *
@@ -50,54 +68,6 @@ using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint
  * * seqan::hibf::config::threads
  * * seqan::hibf::config::number_of_hash_functions
  * * seqan::hibf::config::maximum_false_positive_rate
- *
- * ## General Configuration
- *
- * ### seqan::hibf::config::input_fn [REQUIRED]
- *
- * \copydetails seqan::hibf::config::input_fn
- *
- * ### seqan::hibf::config::number_of_user_bins [REQURIED]
- *
- * \copydetails seqan::hibf::config::number_of_user_bins
- *
- * ### seqan::hibf::config::number_of_hash_functions
- *
- * \copydetails seqan::hibf::config::number_of_hash_functions
- *
- * ### seqan::hibf::config::maximum_false_positive_rate [RECOMMENDED_TO_ADAPT]
- *
- * \copydetails seqan::hibf::config::maximum_false_positive_rate
- *
- * ### seqan::hibf::config::threads [RECOMMENDED_TO_ADAPT]
- *
- * \copydetails seqan::hibf::config::threads
- *
- * ## HIBF Layout Configuration
- *
- * ### seqan::hibf::config::sketch_bits
- *
- * \copydetails seqan::hibf::config::sketch_bits
- *
- * ### seqan::hibf::config::tmax
- *
- * \copydetails seqan::hibf::config::tmax
- *
- * ### seqan::hibf::config::max_rearrangement_ratio
- *
- * \copydetails seqan::hibf::config::max_rearrangement_ratio
- *
- * ### seqan::hibf::config::alpha
- *
- * \copydetails seqan::hibf::config::alpha
- *
- * ### seqan::hibf::config::disable_estimate_union
- *
- * \copydetails seqan::hibf::config::disable_estimate_union
- *
- * ### seqan::hibf::config::disable_rearrangement
- *
- * \copydetails seqan::hibf::config::disable_rearrangement
  *
  */
 struct config
