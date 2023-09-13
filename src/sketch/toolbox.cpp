@@ -369,7 +369,7 @@ void random_shuffle(distance_matrix & dist, robin_hood::unordered_flat_map<size_
 void prune(distance_matrix & dist, robin_hood::unordered_flat_map<size_t, size_t> & remaining_ids)
 {
     if (dist.empty())
-        return; // GCVOR_EXCL_LINE
+        return; // GCOVR_EXCL_LINE
 
     // index of the first entry after the valid range
     size_t valid_range_end = 0;
