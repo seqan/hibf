@@ -5,7 +5,6 @@
 # shipped with this file and also available at: https://github.com/seqan/hibf/blob/main/LICENSE.md
 # ------------------------------------------------------------------------------------------------------------
 
-# Minimum cmake version
 cmake_minimum_required (VERSION 3.7)
 
 include (../../cmake/version.cmake)
@@ -31,17 +30,43 @@ endif ()
 set (HIBF_DOXYGEN_INPUT_DIR "${CMAKE_SOURCE_DIR}")
 
 include (hibf-doxygen.cmake)
-
 include (hibf-doxygen-layout.cmake)
 
+# Add documentation
+message (STATUS "Configuring docs.")
+
+set (HIBF_DOXYGEN_OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}")
+set (HIBF_DOXYGEN_EXCLUDE_SYMBOLS "")
+set (HIBF_DOXYGEN_PREDEFINED_NDEBUG "")
+
+configure_file (${HIBF_DOXYFILE_IN} ${HIBF_DOXYGEN_OUTPUT_DIR}/Doxyfile)
+configure_file (${HIBF_FOOTER_HTML_IN} ${HIBF_DOXYGEN_OUTPUT_DIR}/hibf_footer.html)
+configure_file (${HIBF_LAYOUT_IN} ${HIBF_DOXYGEN_OUTPUT_DIR}/DoxygenLayout.xml)
+
+add_custom_target (docs ALL
+                   COMMAND ${DOXYGEN_EXECUTABLE}
+                   WORKING_DIRECTORY ${HIBF_DOXYGEN_OUTPUT_DIR}
+                   BYPRODUCTS html/
+                   DEPENDS download-cppreference-doxygen-web-tag
+                   COMMENT "Generating developer API documentation with Doxygen"
+                   VERBATIM)
+
+# Install docs documentation in ./install_docs folder
+# cmake --install . --prefix install_docs --component docs
+install (DIRECTORY "${HIBF_DOXYGEN_OUTPUT_DIR}/html"
+         DESTINATION "${CMAKE_INSTALL_DOCDIR}"
+         COMPONENT docs
+         EXCLUDE_FROM_ALL
+         PATTERN "*.md5" EXCLUDE
+         PATTERN "*.map" EXCLUDE
+         PATTERN "formula.repository" EXCLUDE)
+
+### Tests
 enable_testing ()
 
-if (HIBF_USER_DOC)
-    add_subdirectory (doc_usr)
-endif ()
-
-if (HIBF_DEV_DOC)
-    add_subdirectory (doc_dev)
-endif ()
+message (STATUS "Adding docs test.")
+add_test (NAME docs_no_warnings_test
+          COMMAND bash -c "${HIBF_TEST_DOXYGEN_FAIL_ON_WARNINGS}"
+          WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
 
 include (hibf-doxygen-package.cmake)

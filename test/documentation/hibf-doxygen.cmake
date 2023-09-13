@@ -22,15 +22,6 @@ else ()
     set (HIBF_DOXYGEN_HAVE_DOT "YES")
 endif ()
 
-### Use mathjax instead of latex to render formulas.
-find_package (LATEX QUIET)
-
-if (${LATEX_FOUND})
-    set (HIBF_DOXYGEN_USE_MATHJAX "NO")
-else ()
-    set (HIBF_DOXYGEN_USE_MATHJAX "YES")
-endif ()
-
 ### Number of threads to use for dot. Doxygen's default is 0 (all threads).
 set (HIBF_DOXYGEN_DOT_NUM_THREADS "0")
 
@@ -41,12 +32,9 @@ set (HIBF_FOOTER_HTML_IN ${HIBF_DOXYGEN_INPUT_DIR}/hibf_footer.html.in)
 # DoxygenLayout.xml.in is created by hibf-doxygen-layout.cmake
 set (HIBF_LAYOUT_IN ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in)
 
-option (HIBF_USER_DOC "Create build target and test for user documentation." ON)
-option (HIBF_DEV_DOC "Create build target and test for developer documentation." ON)
 option (HIBF_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
 
 if (HIBF_VERCEL_PREVIEW_DOC)
-    set (HIBF_DOXYGEN_USE_MATHJAX "YES")
     set (HIBF_DOXYGEN_DOT_NUM_THREADS "2")
     set (HIBF_DOXYFILE_OPTION_POWERED_BY_VERCEL
          "HTML_EXTRA_FILES       += ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")

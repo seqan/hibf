@@ -51,19 +51,14 @@ function (replace_in_doxygen_layout doc_path doxygen_layout_tag)
         string (REGEX MATCH "^# \(.*\) {#\(.*\)}" DUMMY ${DOC_HEADER_LINE})
         set (doc_title ${CMAKE_MATCH_1})
         set (doc_ref_name ${CMAKE_MATCH_2})
-        set (visibility "yes")
-        if ("${doc_ref_name}" IN_LIST ARGS_HIDE_FROM_USER)
-            set (visibility "\${HIBF_SHOW_DEV_DOCS}")
-        endif ()
         string (APPEND
                 DOXYGEN_LAYOUT_DOC_PAGES
-                "      <tab type=\"user\" visible=\"${visibility}\" title=\"${doc_title}\" url=\"\\\\ref ${doc_ref_name}\" intro=\"\"/>\n"
+                "      <tab type=\"user\" visible=\"yes\" title=\"${doc_title}\" url=\"\\\\ref ${doc_ref_name}\" intro=\"\"/>\n"
         )
 
         unset (doc_howto_filepath)
         unset (doc_title)
         unset (doc_ref_name)
-        unset (visibility)
     endforeach ()
 
     # Replace header line and appended list of doc entries with header line

@@ -21,8 +21,5 @@ cmake3 --build . --target download-cppreference-doxygen-web-tag 1>/dev/null
 ctest3 -j 2 --output-on-failure .
 
 # Install documentation.
-mkdir -p "${EXPORT_DIR}/usr/" "${EXPORT_DIR}/dev/"
-DESTDIR="${EXPORT_DIR}/usr/" cmake3 -DCOMPONENT=doc -P cmake_install.cmake 1>/dev/null
-DESTDIR="${EXPORT_DIR}/dev/" cmake3 -DCOMPONENT=doc-dev -P cmake_install.cmake 1>/dev/null
-cp "${SOURCE_DIR}/test/documentation/.vercel/index.html" "${EXPORT_DIR}/index.html"
-cp "${SOURCE_DIR}/test/documentation/.vercel/vercel.css" "${EXPORT_DIR}/vercel.css"
+mkdir -p "${EXPORT_DIR}"
+DESTDIR="${EXPORT_DIR}" cmake3 -DCOMPONENT=docs -P cmake_install.cmake 1>/dev/null
