@@ -13,6 +13,7 @@ namespace seqan::hibf::layout
 {
 
 /*!\brief Distributes x Technical Bins across y User Bins while minimizing the maximal Technical Bin size
+ * \ingroup hibf_layout
  *
  * # Terminology
  *

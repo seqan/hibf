@@ -22,7 +22,9 @@
 namespace seqan::hibf::layout
 {
 
-// Currently, the layout is structured by user bin.
+/*!\brief Contains the layout graph structure.
+ * \ingroup hibf_layout
+ */
 struct graph
 {
 

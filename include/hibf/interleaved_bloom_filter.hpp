@@ -35,36 +35,44 @@
 
 namespace seqan::hibf
 {
-//!\brief A strong type that represents the number of bins for the seqan::hibf::interleaved_bloom_filter.
-//!\ingroup search_dream_index
+/*!\brief A strong type that represents the number of bins for the seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ * \qualifier strong
+ */
 struct bin_count
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the number of bits for each bin in the seqan::hibf::interleaved_bloom_filter.
-//!\ingroup search_dream_index
+/*!\brief A strong type that represents the number of bits for each bin in the seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ * \qualifier strong
+ */
 struct bin_size
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the number of hash functions for the seqan::hibf::interleaved_bloom_filter.
-//!\ingroup search_dream_index
+/*!\brief A strong type that represents the number of hash functions for the seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ * \qualifier strong
+ */
 struct hash_function_count
 {
     size_t value;
 };
 
-//!\brief A strong type that represents the bin index for the seqan::hibf::interleaved_bloom_filter.
-//!\ingroup search_dream_index
+/*!\brief A strong type that represents the bin index for the seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ * \qualifier strong
+ */
 struct bin_index
 {
     size_t value;
 };
 
 /*!\brief The IBF binning directory. A data structure that efficiently answers set-membership queries for multiple bins.
- * \ingroup search_dream_index
+ * \ingroup ibf
  * \tparam data_layout_mode_ Indicates whether the underlying data type is compressed. See seqan::hibf::data_layout.
  * \implements seqan::hibf::cerealisable
  *
@@ -217,6 +225,7 @@ public:
                              seqan::hibf::bin_size size,
                              seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u});
 
+    //!\brief Construct from seqan::hibf::config.
     interleaved_bloom_filter(config & configuration);
     //!\}
 
@@ -814,7 +823,7 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
 
 /*!\brief A data structure that behaves like a std::vector and can be used to consolidate the results of multiple calls
  *        to seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
- * \ingroup search_dream_index
+ * \ingroup ibf
  * \tparam value_t The type of the count. Must model std::integral.
  *
  * \details

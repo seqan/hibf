@@ -26,6 +26,7 @@ namespace seqan::hibf
 using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
 
 /*!\brief The configuration used to build an (H)IBF
+ * \ingroup hibf
  *
  * # The (H)IBF config
  *

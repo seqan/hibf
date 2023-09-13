@@ -29,6 +29,7 @@ namespace seqan::hibf
 {
 
 /*!\brief The Hierarchical Interleaved Bloom Filter (HIBF) - Fast answers to set-membership queries for multiple bins.
+ * \ingroup hibf
  * \details
  *
  * This class improves the [seqan::hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows

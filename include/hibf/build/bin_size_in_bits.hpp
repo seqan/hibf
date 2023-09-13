@@ -20,6 +20,10 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Contains parameters for bin_size_in_bits.
+ * \ingroup hibf_build
+ * \qualifier strong
+ */
 struct bin_size_parameters
 {
     double fpr{};
@@ -27,6 +31,9 @@ struct bin_size_parameters
     size_t elements{};
 };
 
+/*!\brief Computes the bin size.
+ * \ingroup hibf_build
+ */
 inline size_t bin_size_in_bits(bin_size_parameters const & params)
 {
     double const numerator{-static_cast<double>(params.elements * params.hash_count)};

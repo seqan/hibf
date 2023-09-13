@@ -8,6 +8,10 @@
 namespace seqan::hibf::layout
 {
 
+/*!\brief Contains parameters for compute_fpr_correction.
+ * \ingroup hibf_layout
+ * \qualifier strong
+ */
 struct fpr_correction_parameters
 {
     double fpr{};
@@ -16,6 +20,7 @@ struct fpr_correction_parameters
 };
 
 /*!\brief Precompute f_h factors that adjust the split bin size to prevent FPR inflation due to multiple testing.
+ * \ingroup hibf_layout
  * \sa https://godbolt.org/z/zTj1v9W94
  */
 std::vector<double> compute_fpr_correction(fpr_correction_parameters const & params);

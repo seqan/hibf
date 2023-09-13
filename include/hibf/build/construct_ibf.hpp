@@ -18,6 +18,9 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Constructs an IBF of the HIBF.
+ * \ingroup hibf_build
+ */
 seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                                                     robin_hood::unordered_flat_set<uint64_t> & kmers,
                                                     size_t const number_of_bins,

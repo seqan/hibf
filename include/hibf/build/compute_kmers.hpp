@@ -21,6 +21,9 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Computes kmers.
+ * \ingroup hibf_build
+ */
 void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
                    build_data const & data,
                    layout::layout::user_bin const & record);

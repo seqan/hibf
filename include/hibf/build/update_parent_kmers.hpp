@@ -20,6 +20,9 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Updates stored values of the parent IBF.
+ * \ingroup hibf_build
+ */
 inline void update_parent_kmers(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                                 robin_hood::unordered_flat_set<uint64_t> const & kmers,
                                 timer<concurrent::yes> & merge_kmers_timer)

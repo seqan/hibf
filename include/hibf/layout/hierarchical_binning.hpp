@@ -13,6 +13,9 @@
 namespace seqan::hibf::layout
 {
 
+/*!\brief Hierarchical binning algorithm.
+ * \ingroup hibf_layout
+ */
 class hierarchical_binning
 {
 private:

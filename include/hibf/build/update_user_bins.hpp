@@ -16,6 +16,9 @@
 namespace seqan::hibf::build
 {
 
+/*!\brief Updates user bins stored in HIBF.
+ * \ingroup hibf_build
+ */
 inline void update_user_bins(std::vector<int64_t> & filename_indices, layout::layout::user_bin const & record)
 {
     std::fill_n(filename_indices.begin() + record.storage_TB_id, record.number_of_technical_bins, record.idx);
