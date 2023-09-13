@@ -7,5 +7,5 @@ int main()
         it = 42; // assign something that is convertible to uint64_t
     };
 
-    seqan::hibf::config{.input_fn = my_input, .number_of_user_bins = 12};
+    seqan::hibf::config config{.input_fn = my_input, .number_of_user_bins = 12};
 }
