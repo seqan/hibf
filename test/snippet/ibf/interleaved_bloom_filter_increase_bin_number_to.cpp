@@ -1,4 +1,7 @@
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <cstddef>  // for size_t
+#include <iostream> // for operator<<, basic_ostream, cout, char_traits
+
+#include <hibf/interleaved_bloom_filter.hpp> // for binning_bitvector, interleaved_bloom_filter, bin_index, bin_count
 
 void print(seqan::hibf::binning_bitvector const & vector)
 {

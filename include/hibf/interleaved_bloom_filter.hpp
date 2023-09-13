@@ -14,21 +14,20 @@
 
 #include <algorithm>   // for fill
 #include <array>       // for array
-#include <bit>         // for countl_zero, countr_zero
+#include <bit>         // for countr_zero
 #include <cassert>     // for assert
 #include <cinttypes>   // for uint64_t, uint16_t
 #include <concepts>    // for integral, same_as, unsigned_integral
-#include <cstring>     // for size_t, memcpy
+#include <cstring>     // for size_t
 #include <functional>  // for plus
 #include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
-#include <stdexcept>   // for logic_error, invalid_argument
 #include <tuple>       // for tie, operator==, tuple
 #include <type_traits> // for remove_cvref_t
 #include <utility>     // for addressof
 #include <vector>      // for vector
 
 #include <hibf/cereal/concepts.hpp> // for cereal_archive
-#include <hibf/config.hpp>
+#include <hibf/config.hpp>          // for config
 
 #include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <sdsl/int_vector.hpp> // for bit_vector

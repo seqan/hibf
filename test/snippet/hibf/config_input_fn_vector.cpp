@@ -1,6 +1,9 @@
-#include <vector>
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <vector>     // for vector
 
-#include <hibf/config.hpp>
+#include <hibf/config.hpp> // for config, insert_iterator
 
 struct dna
 {

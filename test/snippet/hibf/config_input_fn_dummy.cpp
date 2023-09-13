@@ -1,4 +1,7 @@
-#include <hibf/config.hpp>
+#include <cstddef>    // for size_t
+#include <functional> // for function
+
+#include <hibf/config.hpp> // for config, insert_iterator
 
 int main()
 {

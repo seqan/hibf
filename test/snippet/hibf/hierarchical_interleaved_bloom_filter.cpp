@@ -1,4 +1,10 @@
-#include <hibf/config.hpp>                                // for insert_iterator, config
+#include <cinttypes>  // for int64_t
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <iostream>   // for operator<<, basic_ostream, cout, char_traits
+#include <vector>     // for vector
+
+#include <hibf/config.hpp>                                // for config, insert_iterator
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
 void print(std::vector<int64_t> const & vector)

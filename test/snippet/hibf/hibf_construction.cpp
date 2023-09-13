@@ -1,4 +1,8 @@
-#include <hibf/config.hpp>                                // for insert_iterator, config
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <vector>     // for vector
+
+#include <hibf/config.hpp>                                // for config, insert_iterator
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
 int main()
