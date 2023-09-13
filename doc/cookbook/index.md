@@ -17,5 +17,21 @@ The following lists all snippets that appear in our documentation.
 Search for keywords with `Strg + F`.
 
 <!-- ALL SNIPPETS START -->
+\include test/snippet/hibf/config_input_fn_dummy.cpp
+\include test/snippet/hibf/config_input_fn_file.cpp
+\include test/snippet/hibf/config_input_fn_vector.cpp
+\include test/snippet/hibf/config_number_of_user_bins.cpp
+\include test/snippet/hibf/hibf_construction.cpp
+\include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
+\include test/snippet/ibf/counting_agent.cpp
+\include test/snippet/ibf/counting_agent_construction.cpp
+\include test/snippet/ibf/counting_vector.cpp
+\include test/snippet/ibf/interleaved_bloom_filter_clear.cpp
+\include test/snippet/ibf/interleaved_bloom_filter_constructor.cpp
+\include test/snippet/ibf/interleaved_bloom_filter_emplace.cpp
+\include test/snippet/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
+\include test/snippet/ibf/membership_agent_bulk_contains.cpp
+\include test/snippet/ibf/membership_agent_construction.cpp
+\include test/snippet/readme.cpp
 \include test/snippet/snippet_main.cpp
 \include test/snippet/test/tmp_directory.cpp
