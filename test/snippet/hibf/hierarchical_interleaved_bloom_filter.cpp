@@ -1,6 +1,20 @@
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
+void print(std::vector<int64_t> const & vector)
+{
+    std::cout << '[';
+
+    if (!vector.empty())
+    {
+        for (size_t i = 0u; i < vector.size() - 1u; ++i)
+            std::cout << vector[i] << ',';
+        std::cout << vector.back();
+    }
+
+    std::cout << "]\n";
+}
+
 int main()
 {
     // 2 user bins:
@@ -23,6 +37,10 @@ int main()
     std::vector<size_t> query2{8u, 9u, 10u};
 
     auto agent = hibf.membership_agent();             // you need an agent for efficient queries
-    auto & result = agent.membership_for(query, 2u);  // result = [0, 1]; both user bins have hashes 1,2,3
-    auto & result2 = agent.membership_for(query, 2u); // result2 = [0]; only user bin 0 has hashes 8,9,10
+    auto & result = agent.membership_for(query, 2u);  // both user bins have hashes 1,2,3
+    print(result);                                    // [1,0]
+    agent.sort_results();                             // Results can also be sorted
+    print(result);                                    // [0,1]
+    auto & result2 = agent.membership_for(query, 2u); // only user bin 0 has hashes 8,9,10
+    print(result2);                                   // [0]
 }
