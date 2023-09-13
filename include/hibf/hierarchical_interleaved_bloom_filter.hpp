@@ -39,7 +39,7 @@ namespace seqan::hibf
  *
  * ### Example
  *
- * \include test/snippets/hibf/hierarchical_interleaved_bloom_filter.cpp
+ * \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
  *
  * ### Cite
  *
@@ -54,7 +54,7 @@ namespace seqan::hibf
  *
  * Here are all options with their defaults:
  *
- * \input test/snippet/hibf/hibf_construction.cpp
+ * \include test/snippet/hibf/hibf_construction.cpp
  *
  * Please see the documentation of seqan::hibf::config for details on how to configure the HIBF construction.
  *
@@ -63,7 +63,7 @@ namespace seqan::hibf
  * To allow efficient, thread-safe membership queries, you need to use the
  * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent.
  *
- * \include test/snippets/hibf/hierarchical_interleaved_bloom_filter.cpp
+ * \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
  *
  * You retrieve an membership_agent by calling seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent().
  *
