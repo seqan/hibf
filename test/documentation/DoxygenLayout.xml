@@ -23,7 +23,7 @@
       <tab type="user" visible="yes" title="Contributing" url="\ref about_contributing" intro=""/>
     </tab>
     <tab type="topics" visible="yes" title="API Reference" intro=""/>
-    <tab type="usergroup" visible="${HIBF_SHOW_DEV_DOCS}" title="API Reference (details)" intro="">
+    <tab type="usergroup" visible="yes" title="API Reference (details)" intro="">
     <tab type="modules" visible="no" title="" intro="">
       <tab type="modulelist" visible="yes" title="" intro=""/>
       <tab type="modulemembers" visible="yes" title="" intro=""/>
