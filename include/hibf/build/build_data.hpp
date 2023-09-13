@@ -12,8 +12,8 @@
 #include <vector>  // for vector
 
 #include <hibf/config.hpp>       // for config
-#include <hibf/detail/timer.hpp> // for concurrent, timer
 #include <hibf/layout/graph.hpp> // for node_data
+#include <hibf/misc/timer.hpp>   // for concurrent, timer
 
 namespace seqan::hibf::build
 {

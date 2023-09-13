@@ -147,7 +147,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wattributes"
 #endif // HIBF_COMPILER_IS_GCC
-[[gnu::always_inline]] interleaved_bloom_filter::binning_bitvector const &
+[[gnu::always_inline]] binning_bitvector const &
 interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const value) & noexcept
 {
 #if HIBF_COMPILER_IS_GCC

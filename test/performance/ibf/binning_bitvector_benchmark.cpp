@@ -17,7 +17,7 @@
 
 #include <sdsl/int_vector.hpp> // for operator-
 
-using bitvector_t = seqan::hibf::interleaved_bloom_filter::binning_bitvector;
+using bitvector_t = seqan::hibf::binning_bitvector;
 
 static void arguments(benchmark::internal::Benchmark * b)
 {

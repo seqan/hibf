@@ -192,7 +192,6 @@ public:
     class membership_agent_type; // documented upon definition below
     template <std::integral value_t>
     class counting_agent_type; // documented upon definition below
-    class binning_bitvector;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -460,8 +459,10 @@ public:
     //!\endcond
 };
 
-//!\brief A bitvector representing the result of a call to `bulk_contains` of the seqan::hibf::interleaved_bloom_filter.
-class interleaved_bloom_filter::binning_bitvector
+/*!\brief A bitvector representing the result of a call to `bulk_contains` of the seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ */
+class binning_bitvector
 {
 private:
     //!\brief The underlying datatype to use.
@@ -587,11 +588,8 @@ public:
 class interleaved_bloom_filter::membership_agent_type
 {
 private:
-    //!\brief The type of the augmented seqan::hibf::interleaved_bloom_filter.
-    using ibf_t = interleaved_bloom_filter;
-
     //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
-    ibf_t const * ibf_ptr{nullptr};
+    interleaved_bloom_filter const * ibf_ptr{nullptr};
 
     //!\brief Stores access positions of augmented seqan::hibf::interleaved_bloom_filter.
     std::array<size_t, 5> bloom_filter_indices;
@@ -611,7 +609,9 @@ public:
      * \private
      * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
-    explicit membership_agent_type(ibf_t const & ibf) : ibf_ptr(std::addressof(ibf)), result_buffer(ibf.bin_count())
+    explicit membership_agent_type(interleaved_bloom_filter const & ibf) :
+        ibf_ptr(std::addressof(ibf)),
+        result_buffer(ibf.bin_count())
     {}
     //!\}
 
@@ -664,7 +664,7 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
  * based on the k-mer counts.
  *
  * The seqan::hibf::counting_vector offers an easy way to add up the individual
- * seqan::hibf::interleaved_bloom_filter::binning_bitvector by offering an `+=` operator.
+ * seqan::hibf::binning_bitvector by offering an `+=` operator.
  *
  * The `value_t` template parameter should be chosen in a way that no overflow occurs if all calls to `bulk_contains`
  * return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina reads, whereas
@@ -695,8 +695,8 @@ public:
     using base_t::base_t;
     //!\}
 
-    /*!\brief Bin-wise adds the bits of a seqan::hibf::interleaved_bloom_filter::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+    /*!\brief Bin-wise adds the bits of a seqan::hibf::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      *
      * \details
@@ -705,7 +705,7 @@ public:
      *
      * \include test/snippet/ibf/counting_vector.cpp
      */
-    counting_vector & operator+=(interleaved_bloom_filter::binning_bitvector const & binning_bitvector)
+    counting_vector & operator+=(binning_bitvector const & binning_bitvector)
     {
         for_each_set_bin(binning_bitvector,
                          [this](size_t const bin)
@@ -715,12 +715,11 @@ public:
         return *this;
     }
 
-    /*!\brief Bin-wise subtracts the bits of a
-     *        seqan::hibf::interleaved_bloom_filter::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+    /*!\brief Bin-wise subtracts the bits of a seqan::hibf::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      */
-    counting_vector & operator-=(interleaved_bloom_filter::binning_bitvector const & binning_bitvector)
+    counting_vector & operator-=(binning_bitvector const & binning_bitvector)
     {
         for_each_set_bin(binning_bitvector,
                          [this](size_t const bin)
@@ -772,10 +771,9 @@ public:
     }
 
 private:
-    //!\brief Enumerates all bins of a seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+    //!\brief Enumerates all bins of a seqan::hibf::binning_bitvector.
     template <typename on_bin_fn_t>
-    void for_each_set_bin(interleaved_bloom_filter::binning_bitvector const & binning_bitvector,
-                          on_bin_fn_t && on_bin_fn)
+    void for_each_set_bin(binning_bitvector const & binning_bitvector, on_bin_fn_t && on_bin_fn)
     {
         assert(this->size() >= binning_bitvector.size()); // The counting vector may be bigger than what we need.
         size_t const words = (binning_bitvector.size() + 63u) >> 6;
@@ -820,11 +818,8 @@ template <std::integral value_t>
 class interleaved_bloom_filter::counting_agent_type
 {
 private:
-    //!\brief The type of the augmented seqan::hibf::interleaved_bloom_filter.
-    using ibf_t = interleaved_bloom_filter;
-
     //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
-    ibf_t const * ibf_ptr{nullptr};
+    interleaved_bloom_filter const * ibf_ptr{nullptr};
 
     //!\brief Store a seqan::hibf::interleaved_bloom_filter::membership_agent to call `bulk_contains`.
     membership_agent_type membership_agent;
@@ -844,7 +839,7 @@ public:
      * \private
      * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
-    explicit counting_agent_type(ibf_t const & ibf) :
+    explicit counting_agent_type(interleaved_bloom_filter const & ibf) :
         ibf_ptr(std::addressof(ibf)),
         membership_agent(ibf),
         result_buffer(ibf.bin_count())

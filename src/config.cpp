@@ -14,9 +14,9 @@
 #include <string>      // for char_traits, getline, operator<<, string
 #include <string_view> // for operator<<, operator==, basic_string_view
 
-#include <hibf/config.hpp>              // for config
-#include <hibf/layout/prefixes.hpp>     // for meta_header, meta_hibf_config_end, meta_hibf_config_start
-#include <hibf/next_multiple_of_64.hpp> // for next_multiple_of_64
+#include <hibf/config.hpp>                   // for config
+#include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start
+#include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
 
 #include <cereal/archives/json.hpp> // for JSONInputArchive, JSONOutputArchive
 #include <cereal/cereal.hpp>        // for make_nvp, InputArchive, OutputArchive

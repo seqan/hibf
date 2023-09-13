@@ -17,9 +17,9 @@
 #include <hibf/build/update_parent_kmers.hpp> // for update_parent_kmers
 #include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set
-#include <hibf/detail/timer.hpp>              // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
 #include <hibf/layout/graph.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent, timer
 
 namespace seqan::hibf::build
 {

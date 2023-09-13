@@ -18,9 +18,9 @@
 #include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
-#include <hibf/detail/timer.hpp>                    // for concurrent, timer
 #include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
 #include <hibf/layout/layout.hpp>                   // for layout
+#include <hibf/misc/timer.hpp>                      // for concurrent, timer
 
 namespace seqan::hibf::build
 {
