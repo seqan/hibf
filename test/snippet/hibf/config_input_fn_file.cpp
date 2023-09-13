@@ -1,14 +1,18 @@
-#include <fstream>
-#include <string>
-#include <vector>
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <fstream>    // for basic_ifstream, ifstream
+#include <functional> // for function
+#include <string>     // for getline, string
+#include <vector>     // for vector
 
-#include <hibf/test/temporary_snippet_file.hpp>
+#include <hibf/test/temporary_snippet_file.hpp> // for temporary_snippet_file
 
 seqan::hibf::test::temporary_snippet_file file1{"file1.fa", "ACGT"};
 seqan::hibf::test::temporary_snippet_file file2{"file2.fa", "ACGT"};
 
 //![main]
-#include <hibf/config.hpp>
+#include <hibf/config.hpp> // for config, insert_iterator
 
 int main()
 {

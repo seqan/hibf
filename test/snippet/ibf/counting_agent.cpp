@@ -1,4 +1,12 @@
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <algorithm> // for copy
+#include <cinttypes> // for uint16_t, uint8_t
+#include <concepts>  // for same_as
+#include <cstddef>   // for size_t
+#include <iostream>  // for operator<<, basic_ostream, cout, char_traits
+#include <ranges>    // for iota_view, operator==, _Iota, iota, views
+#include <vector>    // for vector
+
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, count...
 
 template <typename counter_t>
     requires (std::same_as<counter_t, uint16_t> || std::same_as<counter_t, uint8_t>)

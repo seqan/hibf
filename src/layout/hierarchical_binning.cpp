@@ -2,10 +2,8 @@
 #include <cassert>   // for assert
 #include <cmath>     // for log, ceil
 #include <cstddef>   // for size_t
-#include <iomanip>   // for operator<<, setprecision, fixed
 #include <limits>    // for numeric_limits
-#include <sstream>   // for basic_ostream, basic_stringstream, stringstream
-#include <string>    // for allocator, char_traits, operator+, string
+#include <string>    // for allocator, operator+, string
 #include <utility>   // for pair
 #include <vector>    // for vector
 

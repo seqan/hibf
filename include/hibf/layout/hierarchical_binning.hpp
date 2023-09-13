@@ -2,7 +2,6 @@
 
 #include <cassert> // for assert
 #include <cstddef> // for size_t
-#include <string>  // for string
 #include <utility> // for addressof, pair
 #include <vector>  // for vector
 
