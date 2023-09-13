@@ -34,19 +34,26 @@ public:
     ~temporary_snippet_file() = default;
 
     template <typename... content_t>
-    temporary_snippet_file(std::string_view const & file_name, content_t &&... content)
+    temporary_snippet_file(std::string_view const & file_name, content_t &&... content) :
+        path_{tmp_folder.path() / file_name}
     {
         std::filesystem::current_path(tmp_folder.path());
 
         if constexpr (sizeof...(content_t) > 0)
         {
-            std::ofstream file{tmp_folder.path() / file_name};
+            std::ofstream file{path_};
             (file << ... << std::forward<content_t>(content));
         }
     }
 
+    std::filesystem::path path() const
+    {
+        return path_;
+    }
+
 private:
     static inline seqan::hibf::test::tmp_directory const tmp_folder{};
+    std::filesystem::path path_{};
 };
 
 } // namespace seqan::hibf::test
