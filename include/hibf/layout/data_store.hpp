@@ -67,7 +67,7 @@ struct data_store
         ps.resize(this->kmer_counts->size());
         std::iota(ps.begin(), ps.end(), 0);
         return ps;
-    }();
+    }(); // GCOVR_EXCL_LINE
 
     //!\brief The false positive correction based on fp_rate, num_hash_functions and requested_max_tb.
     std::vector<double> fpr_correction{};

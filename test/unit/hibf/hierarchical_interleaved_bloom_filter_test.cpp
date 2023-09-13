@@ -29,8 +29,7 @@ TEST(hibf_test, small_example_with_direct_hashes)
                                    for (auto const hash : hashes[num])
                                        it = hash;
                                },
-                               .number_of_user_bins = 2,
-                               .disable_rearrangement = true};
+                               .number_of_user_bins = 2};
 
     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
     auto agent = hibf.membership_agent();
