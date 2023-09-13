@@ -20,8 +20,8 @@ int main()
                                .threads = 1,                        // recommended to adapt
                                .sketch_bits = 12,
                                .tmax = 0, // triggers default copmutation
-                               .max_rearrangement_ratio = 0.5,
                                .alpha = 1.2,
+                               .max_rearrangement_ratio = 0.5,
                                .disable_estimate_union = false,
                                .disable_rearrangement = false};
 
