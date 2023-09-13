@@ -31,6 +31,6 @@ int main()
         }
     };
 
-    seqan::hibf::config{.input_fn = my_input};
+    seqan::hibf::config config{.input_fn = my_input};
 }
 //![main]
