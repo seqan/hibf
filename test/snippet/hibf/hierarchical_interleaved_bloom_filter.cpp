@@ -24,5 +24,5 @@ int main()
 
     auto agent = hibf.membership_agent();            // you need an agent for efficient queries
     auto & result = agent.membership_for(query, 2u); // result = [0, 1]; both user bins have hashes 1,2,3
-    result = agent.membership_for(query, 2u);        // result = [0]; only user bin 0 has hashes 8,9,10
+    auto & result2 = agent.membership_for(query, 2u);        // result2 = [0]; only user bin 0 has hashes 8,9,10
 }
