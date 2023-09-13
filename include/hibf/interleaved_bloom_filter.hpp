@@ -176,18 +176,14 @@ private:
      * \sa https://probablydance.com/2018/06/16/
      * \sa https://lemire.me/blog/2016/06/27
      */
-    inline constexpr size_t hash_and_fit(size_t h, size_t const seed) const
+    [[gnu::always_inline]] inline constexpr size_t hash_and_fit(size_t h, size_t const seed) const
     {
         h *= seed;
         assert(hash_shift < 64);
         h ^= h >> hash_shift;         // XOR and shift higher bits into lower bits
         h *= 11400714819323198485ULL; // = 2^64 / golden_ration, to expand h to 64 bit range
-                                      // Use fastrange (integer modulo without division) if possible.
-#ifdef __SIZEOF_INT128__
+        // Use fastrange (integer modulo without division).
         h = static_cast<uint64_t>((static_cast<__uint128_t>(h) * static_cast<__uint128_t>(bin_size_)) >> 64);
-#else
-        h %= bin_size_;
-#endif
         h *= technical_bins;
         return h;
     }
@@ -244,17 +240,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_emplace.cpp
      */
-    void emplace(size_t const value, bin_index const bin) noexcept
-    {
-        assert(bin.value < bins);
-        for (size_t i = 0; i < hash_funs; ++i)
-        {
-            size_t idx = hash_and_fit(value, hash_seeds[i]);
-            idx += bin.value;
-            assert(idx < data.size());
-            data[idx] = 1;
-        };
-    }
+    void emplace(size_t const value, bin_index const bin) noexcept;
 
     /*!\brief Clears a specific bin.
      * \param[in] bin The bin index to clear.
@@ -267,12 +253,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_clear.cpp
      */
-    void clear(bin_index const bin) noexcept
-    {
-        assert(bin.value < bins);
-        for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
-            data[idx] = 0;
-    }
+    void clear(bin_index const bin) noexcept;
 
     /*!\brief Clears a range of bins.
      * \tparam rng_t The type of the range. Must model std::ranges::forward_range and the reference type must be
@@ -326,44 +307,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
-    void increase_bin_number_to(bin_count const new_bins_)
-    {
-        size_t new_bins = new_bins_.value;
-
-        if (new_bins < bins)
-            throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
-
-        // Equivalent to ceil(new_bins / 64)
-        size_t new_bin_words = (new_bins + 63) >> 6;
-
-        bins = new_bins;
-
-        if (new_bin_words == bin_words) // No need for internal resize if bin_words does not change.
-            return;
-
-        size_t new_technical_bins = new_bin_words << 6;
-        size_t new_bits = bin_size_ * new_technical_bins;
-
-        size_t idx_{new_bits}, idx{data.size()};
-        size_t delta = new_technical_bins - technical_bins + 64;
-
-        data.resize(new_bits);
-
-        for (size_t i = idx_, j = idx; j > 0; i -= new_technical_bins, j -= technical_bins)
-        {
-            size_t stop = i - new_technical_bins;
-
-            for (size_t ii = i - delta, jj = j - 64; stop && ii >= stop; ii -= 64, jj -= 64)
-            {
-                uint64_t old = data.get_int(jj);
-                data.set_int(jj, 0);
-                data.set_int(ii, old);
-            }
-        }
-
-        bin_words = new_bin_words;
-        technical_bins = new_technical_bins;
-    }
+    void increase_bin_number_to(bin_count const new_bins_);
     //!\}
 
     /*!\name Lookup
@@ -694,121 +638,7 @@ public:
      * Concurrent invocations of this function are not thread safe, please create a
      * seqan::hibf::interleaved_bloom_filter::membership_agent_type for each thread.
      */
-    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept
-    {
-        assert(ibf_ptr != nullptr);
-        assert(result_buffer.size() == ibf_ptr->bin_count());
-
-        // Needed for auto-vectorization of loop. ibf_ptr->bin_words could change bewtween loops.
-        size_t const bin_words = ibf_ptr->bin_words;
-        size_t const hash_funs = ibf_ptr->hash_funs;
-
-#ifndef NDEBUG
-        assert(bin_words != 0u);
-        assert(hash_funs != 0u);
-#else
-        // Removes case for bin_words == 0u. The same statment inside the switch-case wouldn't have that effect.
-        if (bin_words == 0u)
-            __builtin_unreachable();
-        if (hash_funs == 0u)
-            __builtin_unreachable();
-#endif
-
-        for (size_t i = 0; i < hash_funs; ++i)
-            bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) >> 6;
-
-        uint64_t * const raw = result_buffer.raw_data().data(); // TODO: std::assume_aligned<64> once memory-aligned
-        uint64_t const * const ibf_data = ibf_ptr->data.data(); // TODO: std::assume_aligned<64> once memory-aligned
-        std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words);
-
-        // https://godbolt.org/z/1nbhvqeGj
-        // Having the loop inside is faster.
-        // GCOVR_EXCL_START
-        switch (bin_words)
-        {
-        case 1u: // 1 AND (64 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-                raw[0] &= ibf_raw[0];
-            }
-            break;
-        case 2u: // 1 SSE4 instruction (128 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 2u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 3u: // 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 3u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 4u: // 1 AVX2 instruction (256 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 4u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 5u: // 1 AVX2 instruction (256 bit) + 1 AND (64 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 5u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 6u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 6u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 7u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 7u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        case 8u: // 1 AVX512 instruction (512 bit)
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < 8u; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-            break;
-        default: // Auto vectorize. Might create different versions.
-            for (size_t i = 1; i < hash_funs; ++i)
-            {
-                uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-                for (size_t batch = 0; batch < bin_words; ++batch)
-                    raw[batch] &= ibf_raw[batch];
-            }
-        }
-        // GCOVR_EXCL_STOP
-
-        return result_buffer;
-    }
+    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept;
 
     // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
@@ -834,7 +664,7 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
  * based on the k-mer counts.
  *
  * The seqan::hibf::counting_vector offers an easy way to add up the individual
- * seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector by offering an `+=` operator.
+ * seqan::hibf::interleaved_bloom_filter::binning_bitvector by offering an `+=` operator.
  *
  * The `value_t` template parameter should be chosen in a way that no overflow occurs if all calls to `bulk_contains`
  * return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina reads, whereas
@@ -851,11 +681,6 @@ private:
     //!\brief The base type.
     using base_t = std::vector<value_t>;
 
-    //!\brief Is binning_bitvector_t a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector?
-    template <typename binning_bitvector_t>
-    static constexpr bool is_binning_bitvector =
-        std::same_as<binning_bitvector_t, interleaved_bloom_filter::binning_bitvector>;
-
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -870,10 +695,8 @@ public:
     using base_t::base_t;
     //!\}
 
-    /*!\brief Bin-wise adds the bits of a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \tparam binning_bitvector_t The type of the right-hand side.
-     *         Must be seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+    /*!\brief Bin-wise adds the bits of a seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      *
      * \details
@@ -882,9 +705,7 @@ public:
      *
      * \include test/snippet/ibf/counting_vector.cpp
      */
-    template <typename binning_bitvector_t>
-        requires is_binning_bitvector<binning_bitvector_t>
-    counting_vector & operator+=(binning_bitvector_t const & binning_bitvector)
+    counting_vector & operator+=(interleaved_bloom_filter::binning_bitvector const & binning_bitvector)
     {
         for_each_set_bin(binning_bitvector,
                          [this](size_t const bin)
@@ -895,15 +716,11 @@ public:
     }
 
     /*!\brief Bin-wise subtracts the bits of a
-     *        seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \tparam binning_bitvector_t The type of the right-hand side.
-     *         Must be seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
+     *        seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+     * \param binning_bitvector The seqan::hibf::interleaved_bloom_filter::binning_bitvector.
      * \attention The counting_vector must be at least as big as `binning_bitvector`.
      */
-    template <typename binning_bitvector_t>
-        requires is_binning_bitvector<binning_bitvector_t>
-    counting_vector & operator-=(binning_bitvector_t const & binning_bitvector)
+    counting_vector & operator-=(interleaved_bloom_filter::binning_bitvector const & binning_bitvector)
     {
         for_each_set_bin(binning_bitvector,
                          [this](size_t const bin)
@@ -955,14 +772,17 @@ public:
     }
 
 private:
-    //!\brief Enumerates all bins of a seqan::hibf::interleaved_bloom_filter::membership_agent_type::binning_bitvector.
-    template <typename binning_bitvector_t, typename on_bin_fn_t>
-    void for_each_set_bin(binning_bitvector_t && binning_bitvector, on_bin_fn_t && on_bin_fn)
+    //!\brief Enumerates all bins of a seqan::hibf::interleaved_bloom_filter::binning_bitvector.
+    template <typename on_bin_fn_t>
+    void for_each_set_bin(interleaved_bloom_filter::binning_bitvector const & binning_bitvector,
+                          on_bin_fn_t && on_bin_fn)
     {
         assert(this->size() >= binning_bitvector.size()); // The counting vector may be bigger than what we need.
+        size_t const words = (binning_bitvector.size() + 63u) >> 6;
+        uint64_t const * const bitvector_raw = binning_bitvector.raw_data().data();
 
         // Jump to the next 1 and return the number of places jumped in the bit_sequence
-        auto jump_to_next_1bit = [](size_t & x)
+        auto jump_to_next_1bit = [](uint64_t & x)
         {
             auto const zeros = std::countr_zero(x);
             x >>= zeros; // skip number of zeros
@@ -970,13 +790,13 @@ private:
         };
 
         // Each iteration can handle 64 bits
-        for (size_t bit_pos = 0; bit_pos < binning_bitvector.size(); bit_pos += 64)
+        for (size_t batch = 0; batch < words; ++batch)
         {
             // get 64 bits starting at position `bit_pos`
-            size_t bit_sequence = binning_bitvector.raw_data().get_int(bit_pos);
+            uint64_t bit_sequence = bitvector_raw[batch];
 
             // process each relative bin inside the bit_sequence
-            for (size_t bin = bit_pos; bit_sequence != 0u; ++bin, bit_sequence >>= 1)
+            for (size_t bin = batch << 6; bit_sequence != 0u; ++bin, bit_sequence >>= 1)
             {
                 // Jump to the next 1 and
                 bin += jump_to_next_1bit(bit_sequence);
