@@ -45,7 +45,7 @@ using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint
  * | General | seqan::hibf::config::threads                     | 1       | [RECOMMENDED_TO_ADAPT] |
  * | Layout  | seqan::hibf::config::sketch_bits                 | 12      |                        |
  * | Layout  | seqan::hibf::config::tmax                        | 0       | 0 indicates unset      |
- * | Layout  | seqan::hibf::config::max_rearrangement_ratio     |         |                        |
+ * | Layout  | seqan::hibf::config::max_rearrangement_ratio     | 0.5     |                        |
  * | Layout  | seqan::hibf::config::alpha                       | 1.2     |                        |
  * | Layout  | seqan::hibf::config::disable_estimate_union      | false   |                        |
  * | Layout  | seqan::hibf::config::disable_rearrangement       | false   |                        |
