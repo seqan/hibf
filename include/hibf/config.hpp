@@ -52,7 +52,7 @@ using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint
  *
  * As a copy and paste source, here are all config options with their defaults:
  *
- * \include test/snippet/hibf_construction.cpp
+ * \include test/snippet/hibf/hibf_construction.cpp
  *
  * ## The HIBF takes too long to construct?
  *
