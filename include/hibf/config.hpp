@@ -201,7 +201,7 @@ struct config
      */
     size_t tmax{};
 
-    /*\brief A scaling factor to influence the amount of merged bins produced by the layout algorithm.
+    /*!\brief A scaling factor to influence the amount of merged bins produced by the layout algorithm.
      *
      * The layout algorithm optimizes the space consumption of the resulting HIBF, but currently has no means of
      * optimizing the runtime for querying such an HIBF. In general, the ratio of merged bins and split bins influences
