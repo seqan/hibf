@@ -13,11 +13,11 @@ int main()
             it = hash;
     };
 
-    seqan::hibf::config config{.input_fn = my_input,                 // required
-                               .number_of_user_bins = 2,             // required
+    seqan::hibf::config config{.input_fn = my_input,     // required
+                               .number_of_user_bins = 2, // required
                                .number_of_hash_functions = 2,
-                               .maximum_false_positive_rate = 0.05,  // recommended to adapt
-                               .threads = 1,                         // recommended to adapt
+                               .maximum_false_positive_rate = 0.05, // recommended to adapt
+                               .threads = 1,                        // recommended to adapt
                                .sketch_bits = 12,
                                .tmax = 0, // triggers default copmutation
                                .max_rearrangement_ratio = 0.5,

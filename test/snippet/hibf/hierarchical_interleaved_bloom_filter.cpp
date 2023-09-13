@@ -22,7 +22,7 @@ int main()
     std::vector<size_t> query{1u, 2u, 3u};
     std::vector<size_t> query2{8u, 9u, 10u};
 
-    auto agent = hibf.membership_agent(); // you need an agent for efficient queries
+    auto agent = hibf.membership_agent();            // you need an agent for efficient queries
     auto & result = agent.membership_for(query, 2u); // result = [0, 1]; both user bins have hashes 1,2,3
     auto & result = agent.membership_for(query, 2u); // result = [0]; only user bin 0 has hashes 8,9,10
 }
