@@ -2,20 +2,7 @@
 #include <iostream> // for operator<<, basic_ostream, cout, char_traits
 
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, binning_bitvector, bin_index, bin_count
-
-void print(seqan::hibf::binning_bitvector const & vector)
-{
-    std::cout << '[';
-
-    if (vector.size() != 0u)
-    {
-        for (size_t i = 0u; i < vector.size() - 1u; ++i)
-            std::cout << vector[i] << ',';
-        std::cout << vector[vector.size() - 1u];
-    }
-
-    std::cout << "]\n";
-}
+#include <hibf/misc/print.hpp>
 
 int main()
 {
@@ -29,7 +16,7 @@ int main()
     // Capture the result by reference to avoid copies.
     auto agent = ibf.membership_agent();
     auto & result = agent.bulk_contains(712);
-    print(result); // [0,0,0,1,0,0,0,0,0,0,0,0]
+    seqan::hibf::print(result); // [0,0,0,1,0,0,0,0,0,0,0,0]
 
     // Calling `increase_bin_number_to` invalidates the agent.
     ibf.increase_bin_number_to(seqan::hibf::bin_count{60u});

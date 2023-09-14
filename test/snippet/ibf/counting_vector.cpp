@@ -4,20 +4,7 @@
 #include <vector>    // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, interleaved_bloom_filter, bin_index, bin_count
-
-void print(seqan::hibf::counting_vector<uint16_t> const & vector)
-{
-    std::cout << '[';
-
-    if (!vector.empty())
-    {
-        for (size_t i = 0u; i < vector.size() - 1u; ++i)
-            std::cout << vector[i] << ',';
-        std::cout << vector.back();
-    }
-
-    std::cout << "]\n";
-}
+#include <hibf/misc/print.hpp>
 
 int main()
 {
@@ -34,14 +21,14 @@ int main()
     auto agent = ibf.membership_agent();
 
     counts += agent.bulk_contains(712); // `counts` contains the number of occurrences of 712 in each bin.
-    print(counts);                      // prints [0,0,0,1,0,0,0,0,0,0,0,0]
+    seqan::hibf::print(counts);         // prints [0,0,0,1,0,0,0,0,0,0,0,0]
 
     counts += agent.bulk_contains(237); // `counts` contains the number of occurrences of 712 and 237 in each bin.
-    print(counts);                      // prints [0,0,0,1,0,0,0,0,0,1,0,0]
+    seqan::hibf::print(counts);         // prints [0,0,0,1,0,0,0,0,0,1,0,0]
 
     counts += agent.bulk_contains(126); // `counts` contains the number of occurrences of 712, 237 and 126 in each bin.
-    print(counts);                      // prints [1,0,0,2,0,0,0,0,0,2,0,0]
+    seqan::hibf::print(counts);         // prints [1,0,0,2,0,0,0,0,0,2,0,0]
 
-    counts += counts; // multiple counts can also be added together
-    print(counts);    // prints [2,0,0,4,0,0,0,0,0,4,0,0]
+    counts += counts;           // multiple counts can also be added together
+    seqan::hibf::print(counts); // prints [2,0,0,4,0,0,0,0,0,4,0,0]
 }

@@ -7,22 +7,7 @@
 #include <vector>    // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, count...
-
-template <typename counter_t>
-    requires (std::same_as<counter_t, uint16_t> || std::same_as<counter_t, uint8_t>)
-void print(seqan::hibf::counting_vector<counter_t> const & vector)
-{
-    std::cout << '[';
-
-    if (!vector.empty())
-    {
-        for (size_t i = 0u; i < vector.size() - 1u; ++i)
-            std::cout << static_cast<uint16_t>(vector[i]) << ',';
-        std::cout << static_cast<uint16_t>(vector.back());
-    }
-
-    std::cout << "]\n";
-}
+#include <hibf/misc/print.hpp>
 
 int main()
 {
@@ -50,16 +35,16 @@ int main()
 
     // Count all values of sequence1 for all bins
     auto & result = agent.bulk_count(sequence1); // Bind by `&` to avoid copies!
-    print(result);                               // [20,0,0,0,10,0,0,0]
+    seqan::hibf::print(result);                  // [20,0,0,0,10,0,0,0]
 
     // Search for specific values
     std::vector<size_t> const values{92, 1238, 812, 81273};
-    print(agent.bulk_count(values));                      // [0,0,0,0,0,0,0,0]
-    print(agent.bulk_count(std::views::iota(0u, 1024u))); // [20,0,0,0,20,0,0,10]
+    seqan::hibf::print(agent.bulk_count(values));                      // [0,0,0,0,0,0,0,0]
+    seqan::hibf::print(agent.bulk_count(std::views::iota(0u, 1024u))); // [20,0,0,0,20,0,0,10]
 
     // The default counters are 16 bit unsigned integer.
     // An optional template parameter can be used to specify the counter type
     auto agent2 = ibf.counting_agent<uint8_t>();
     // The returned counts are now 8 bit unsigned integers.
-    print(agent2.bulk_count(sequence1)); // [20,0,0,0,10,0,0,0]
+    seqan::hibf::print(agent2.bulk_count(sequence1)); // [20,0,0,0,10,0,0,0]
 }

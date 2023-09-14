@@ -8,6 +8,7 @@ set (HIBF_SOURCE_FILES
      layout/compute_layout.cpp
      layout/graph.cpp
      layout/hierarchical_binning.cpp
+     misc/print.cpp
      sketch/toolbox.cpp
      sketch/hyperloglog.cpp
      build/insert_into_ibf.cpp
