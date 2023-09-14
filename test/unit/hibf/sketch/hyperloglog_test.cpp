@@ -45,21 +45,21 @@ TEST(hyperloglog, add_and_estimate_small)
     seqan::hibf::sketch::hyperloglog sketch(b); // m = 1 << b
 
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
-    sketch.add("bla", 3);
+    sketch.add("bla");
     // XXH3_64bits hash -> first 4 bits: 1011, rank: 2
-    sketch.add("bli", 3);
+    sketch.add("bli");
     // XXH3_64bits hash -> first 4 bits: 0100, rank: 2
-    sketch.add("blub", 4);
+    sketch.add("blub");
     // XXH3_64bits hash -> first 4 bits: 1110, rank: 1
-    sketch.add("bloink", 6);
+    sketch.add("bloink");
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
-    sketch.add("blubba", 6);
+    sketch.add("blubba");
     // XXH3_64bits hash -> first 4 bits: 1101, rank: 1
-    sketch.add("blumpf", 6);
+    sketch.add("blumpf");
     // XXH3_64bits hash -> first 4 bits: 1001, rank: 2
-    sketch.add("blarkse", 7);
+    sketch.add("blarkse");
     // XXH3_64bits hash -> first 4 bits: 1000, rank: 2
-    sketch.add("bladuzel", 8);
+    sketch.add("bladuzel");
 
     // estimate = alpha * m  * m  / sum(2^(-M_[j]))
     //          = 0.673 * 16 * 16 / (89/8) = 15,48...
@@ -77,14 +77,14 @@ TEST(hyperloglog, clear)
 
     seqan::hibf::sketch::hyperloglog sketch(b);
 
-    sketch.add("bla", 3);
-    sketch.add("bli", 3);
-    sketch.add("blub", 4);
-    sketch.add("bloink", 6);
-    sketch.add("blubba", 6);
-    sketch.add("blumpf", 6);
-    sketch.add("blarkse", 7);
-    sketch.add("bladuzel", 8);
+    sketch.add("bla");
+    sketch.add("bli");
+    sketch.add("blub");
+    sketch.add("bloink");
+    sketch.add("blubba");
+    sketch.add("blumpf");
+    sketch.add("blarkse");
+    sketch.add("bladuzel");
 
     EXPECT_NEAR(sketch.estimate(), 9.205826318, 0.0000001);
 
@@ -115,25 +115,20 @@ std::vector<std::string> const input_sequences{
 
 TEST(hyperloglog, add_and_estimate_large)
 {
-    size_t const k = 16;
+    size_t const kmer_size = 16;
 
     size_t const b = 4; // m = 1 << b
     seqan::hibf::sketch::hyperloglog sketch(b);
 
-    std::unordered_set<std::string> control;
+    std::unordered_set<std::string_view> control;
 
     // put every sequence in this file into the sketch
-    for (std::string_view seq : input_sequences)
+    for (std::string_view const seq : input_sequences)
     {
-        // we have to go C-style here for the HyperLogLog Interface
-        char const * c_seq_it = seq.begin();
-        char const * end = c_seq_it + seq.size();
-
-        while (c_seq_it + k <= end)
+        for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
         {
-            control.insert(std::string(c_seq_it, k));
-            sketch.add(c_seq_it, k);
-            ++c_seq_it;
+            control.insert(seq.substr(pos, kmer_size));
+            sketch.add(seq.substr(pos, kmer_size));
         }
     }
 
@@ -149,21 +144,21 @@ TEST(hyperloglog, add_and_estimate_small_SIMD)
     seqan::hibf::sketch::hyperloglog sketch(b);
 
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
-    sketch.add("bla", 3);
+    sketch.add("bla");
     // XXH3_64bits hash -> first 4 bits: 1011, rank: 2
-    sketch.add("bli", 3);
+    sketch.add("bli");
     // XXH3_64bits hash -> first 4 bits: 0100, rank: 2
-    sketch.add("blub", 4);
+    sketch.add("blub");
     // XXH3_64bits hash -> first 4 bits: 1110, rank: 1
-    sketch.add("bloink", 6);
+    sketch.add("bloink");
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
-    sketch.add("blubba", 6);
+    sketch.add("blubba");
     // XXH3_64bits hash -> first 4 bits: 1101, rank: 1
-    sketch.add("blumpf", 6);
+    sketch.add("blumpf");
     // XXH3_64bits hash -> first 4 bits: 1001, rank: 2
-    sketch.add("blarkse", 7);
+    sketch.add("blarkse");
     // XXH3_64bits hash -> first 4 bits: 1000, rank: 2
-    sketch.add("bladuzel", 8);
+    sketch.add("bladuzel");
 
     seqan::hibf::sketch::hyperloglog other{sketch};
 
@@ -172,7 +167,7 @@ TEST(hyperloglog, add_and_estimate_small_SIMD)
 
 TEST(hyperloglog, merge_and_merge_SIMD)
 {
-    size_t const k = 16;
+    size_t const kmer_size = 16;
 
     size_t const b = 5; // m = 1 << b
     seqan::hibf::sketch::hyperloglog full_sketch(b);
@@ -183,19 +178,14 @@ TEST(hyperloglog, merge_and_merge_SIMD)
 
     // put every sequence in this file into the full_sketch
     // and add a disjointed sketch for every sequence to partial_sketches
-    for (std::string_view seq : input_sequences)
+    for (std::string_view const seq : input_sequences)
     {
         partial_sketches.emplace_back(b);
 
-        // we have to go C-style here for the HyperLogLog Interface
-        char const * c_seq_it = seq.begin();
-        char const * end = c_seq_it + seq.size();
-
-        while (c_seq_it + k <= end)
+        for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
         {
-            partial_sketches.back().add(c_seq_it, k);
-            full_sketch.add(c_seq_it, k);
-            ++c_seq_it;
+            partial_sketches.back().add(seq.substr(pos, kmer_size));
+            full_sketch.add(seq.substr(pos, kmer_size));
         }
     }
 
@@ -249,25 +239,16 @@ TEST(hyperloglog, fail_restore_bit_width)
 
 TEST(hyperloglog, dump_and_restore)
 {
-    size_t const k = 16;
+    size_t const kmer_size = 16;
 
     size_t const b = 4; // m = 1 << b
     seqan::hibf::sketch::hyperloglog dump_sketch(b);
     seqan::hibf::sketch::hyperloglog restore_sketch(b);
 
     // put every sequence in this file into the dump_sketch
-    for (std::string_view seq : input_sequences)
-    {
-        // we have to go C-style here for the HyperLogLog Interface
-        char const * c_seq_it = seq.begin();
-        char const * end = c_seq_it + seq.size();
-
-        while (c_seq_it + k <= end)
-        {
-            dump_sketch.add(c_seq_it, k);
-            ++c_seq_it;
-        }
-    }
+    for (std::string_view const seq : input_sequences)
+        for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
+            dump_sketch.add(seq.substr(pos, kmer_size));
 
     // create temp file
     seqan::hibf::test::tmp_directory tmp_dir{};
@@ -283,4 +264,17 @@ TEST(hyperloglog, dump_and_restore)
 
     // now dump_sketch and restore_sketch should be equal
     EXPECT_EQ(dump_sketch.estimate(), restore_sketch.estimate());
+}
+
+TEST(hyperloglog, add_integer)
+{
+    uint64_t const value{87123921398671ULL};
+
+    seqan::hibf::sketch::hyperloglog sketch_as_sv{};
+    sketch_as_sv.add(std::string_view{reinterpret_cast<char const *>(&value), sizeof(uint64_t)});
+
+    seqan::hibf::sketch::hyperloglog sketch_as_int{};
+    sketch_as_int.add(value);
+
+    EXPECT_EQ(sketch_as_sv.estimate(), sketch_as_int.estimate());
 }

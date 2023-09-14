@@ -51,9 +51,20 @@ hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
     mask_ = (1 << b) - 1;
 }
 
-void hyperloglog::add(char const * str, uint64_t len)
+void hyperloglog::add(std::string_view const sv)
 {
-    uint64_t const hash = XXH3_64bits(str, len);
+    uint64_t const hash = XXH3_64bits(sv.data(), sv.size());
+    // the first b_ bits are used to distribute the leading zero counts along M_
+    uint64_t const index = hash >> (64 - b_);
+    // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.
+    // Otherwise the count for hash = 0 would be 64
+    uint8_t const rank = std::countl_zero((hash << b_) | mask_) + 1;
+    M_[index] = std::max(rank, M_[index]);
+}
+
+void hyperloglog::add(uint64_t const value)
+{
+    uint64_t const hash = XXH3_64bits(&value, sizeof(uint64_t));
     // the first b_ bits are used to distribute the leading zero counts along M_
     uint64_t const index = hash >> (64 - b_);
     // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.

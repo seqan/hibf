@@ -22,7 +22,7 @@ struct toolbox_test : public ::testing::Test
     std::vector<size_t> test_positions{0, 1, 2, 3};
     std::vector<seqan::hibf::sketch::hyperloglog> test_sketches = [this]()
     {
-        std::vector<seqan::hibf::sketch::hyperloglog> result(test_kmer_counts.size());
+        seqan::hibf::sketch::hyperloglog sketch{};
 
         std::vector<std::string> const small_input{
             {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
@@ -44,25 +44,14 @@ struct toolbox_test : public ::testing::Test
              "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
              "G"}};
 
-        for (std::string_view seq : small_input)
-        {
-            // we have to go C-style here for the HyperLogLog Interface
-            char const * c_seq_it = seq.begin();
-            char const * end = c_seq_it + seq.size();
+        size_t const kmer_size{21u};
 
-            while (c_seq_it + 21 <= end)
-            {
-                result[0].add(c_seq_it, 21);
-                ++c_seq_it;
-            }
-        }
-
-        result[1] = result[0];
-        result[2] = result[0];
-        result[3] = result[0];
+        for (std::string_view const seq : small_input)
+            for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
+                sketch.add(seq.substr(pos, kmer_size));
 
         // seqan::hibf::sketch::toolbox::read_hll_files_into(data(""), test_filenames, result);
-        return result;
+        return std::vector<seqan::hibf::sketch::hyperloglog>(test_kmer_counts.size(), sketch);
     }();
 };
 
