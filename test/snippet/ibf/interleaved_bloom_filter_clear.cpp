@@ -5,20 +5,7 @@
 #include <vector>    // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, counting_vector, interleaved_bloom_filter, bin_count
-
-void print(seqan::hibf::counting_vector<uint16_t> const & vector)
-{
-    std::cout << '[';
-
-    if (!vector.empty())
-    {
-        for (size_t i = 0u; i < vector.size() - 1u; ++i)
-            std::cout << vector[i] << ',';
-        std::cout << vector.back();
-    }
-
-    std::cout << "]\n";
-}
+#include <hibf/misc/print.hpp>
 
 int main()
 {
@@ -45,20 +32,20 @@ int main()
     auto agent = ibf.counting_agent();
 
     // Count all values of sequence1 for all bins
-    print(agent.bulk_count(sequence1)); // [20,0,0,0,10,0,0,0]
+    seqan::hibf::print(agent.bulk_count(sequence1)); // [20,0,0,0,10,0,0,0]
 
     // Clear bin 0
     ibf.clear(seqan::hibf::bin_index{0u});
 
     // After clearing, no values are found in bin 0
-    print(agent.bulk_count(sequence1)); // [0,0,0,0,10,0,0,0]
+    seqan::hibf::print(agent.bulk_count(sequence1)); // [0,0,0,0,10,0,0,0]
 
     // Search for specific values
-    print(agent.bulk_count(std::views::iota(0u, 1024u))); // [0,0,0,0,20,0,0,10]
+    seqan::hibf::print(agent.bulk_count(std::views::iota(0u, 1024u))); // [0,0,0,0,20,0,0,10]
 
     // Clear bin 4 and 7
     ibf.clear(std::vector{seqan::hibf::bin_index{4u}, seqan::hibf::bin_index{7u}});
 
     // After clearing, nothing is found
-    print(agent.bulk_count(std::views::iota(0u, 1024u))); // [0,0,0,0,0,0,0,0]
+    seqan::hibf::print(agent.bulk_count(std::views::iota(0u, 1024u))); // [0,0,0,0,0,0,0,0]
 }

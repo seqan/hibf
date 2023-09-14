@@ -1,0 +1,31 @@
+#pragma once
+
+#include <iosfwd>
+
+#include <hibf/interleaved_bloom_filter.hpp>
+
+namespace seqan::hibf
+{
+
+// Why a function object and not free `functions void print(...)` ?
+// Disables ADL and requires fully qualified name outside the seqan::hibf namespace.
+// With a free function, both seqan::hibf::print and print (found via ADL) would work.
+// Print is a common name and a free function might cause clashes.
+// A free function for `std::vector<int64_t>` might also cause problems.
+struct print_t
+{
+    void operator()(seqan::hibf::binning_bitvector const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<uint8_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<uint16_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<uint32_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<uint64_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<int8_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<int16_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<int32_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::counting_vector<int64_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(std::vector<int64_t> const & vector, std::ostream & stream = std::cout) const;
+};
+
+static inline constexpr auto print = print_t{};
+
+} // namespace seqan::hibf
