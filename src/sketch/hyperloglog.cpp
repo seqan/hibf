@@ -30,9 +30,6 @@ hyperloglog::hyperloglog(uint8_t const b) : m_{1ULL << b}, b_{b}, M_(m_, 0u)
 
     switch (m_)
     {
-    case 16:
-        alpha = 0.673;
-        break;
     case 32:
         alpha = 0.697;
         break;
@@ -224,7 +221,7 @@ void hyperloglog::dump(std::ostream & os) const
     os.flush();
     if (os.fail())
     {
-        throw std::runtime_error("Failed to dump a HyperLogLog sketch to a file.");
+        throw std::runtime_error("[HyperLogLog] Failed to dump a HyperLogLog sketch to a file.");
     }
 }
 
@@ -234,18 +231,18 @@ void hyperloglog::restore(std::istream & is)
     {
         uint8_t b{};
         is.read((char *)&b, sizeof(b));
-        hyperloglog tempHLL(b);
+        hyperloglog tempHLL{b}; // Constructor might throw std::invalid_argument
         is.read((char *)&(tempHLL.M_[0]), sizeof(M_[0]) * tempHLL.m_);
         if (is.fail())
         {
-            throw std::runtime_error("Failed to restore a HyperLogLog sketch from a file.");
+            throw std::runtime_error("[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: I/O error.");
         }
         swap(tempHLL);
     }
     catch (std::invalid_argument const & err)
     {
-        // turn the invalid argument error to a runtime error, because it is dependent on the file contents here
-        throw std::runtime_error("Failed to restore a HyperLogLog sketch from a file.");
+        throw std::runtime_error(
+            "[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: Invalid bit_width.");
     }
 }
 

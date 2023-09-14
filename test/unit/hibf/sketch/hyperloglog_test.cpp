@@ -60,7 +60,8 @@ TEST(hyperloglog, add_and_estimate_small)
     sketch.add("bladuzel");
 
     // estimate = alpha * m  * m  / sum(2^(-M_[j]))
-    //          = 0.673 * 32 * 32 / (89/8) = 61.94...
+    //          = 0.697 * 32 * 32 / (89/8)
+    //          = 0.697 * 32 * 32 / 11.125 = 64.155...
 
     // this still is in the range of small value corrections (< 2.5 * 32 = 80)
     // m * ln(m / #zeros) = 32 * ln(32/25) = 7.899522493... (with calculator)
@@ -197,7 +198,20 @@ TEST(hyperloglog, fail_dump)
     seqan::hibf::sketch::hyperloglog sketch{};
     std::ofstream ostrm{"hibf_non_existent_outputfile"};
     ostrm.close();
-    EXPECT_THROW(sketch.dump(ostrm), std::runtime_error);
+
+    try
+    {
+        sketch.dump(ostrm);
+        FAIL();
+    }
+    catch (std::runtime_error const & exception)
+    {
+        EXPECT_STREQ(exception.what(), "[HyperLogLog] Failed to dump a HyperLogLog sketch to a file.");
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(hyperloglog, fail_restore)
@@ -205,13 +219,26 @@ TEST(hyperloglog, fail_restore)
     seqan::hibf::test::tmp_directory tmp_dir{};
     std::filesystem::path file_name{tmp_dir.path() / "sketch.hll"};
     {
-        uint8_t b{4u};
+        uint8_t b{5u};
         std::ofstream ostrm{file_name};
         ostrm.write((char *)&b, sizeof(b));
     }
     seqan::hibf::sketch::hyperloglog sketch{};
     std::ifstream istrm{file_name};
-    EXPECT_THROW(sketch.restore(istrm), std::runtime_error);
+
+    try
+    {
+        sketch.restore(istrm);
+        FAIL();
+    }
+    catch (std::runtime_error const & exception)
+    {
+        EXPECT_STREQ(exception.what(), "[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: I/O error.");
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(hyperloglog, fail_restore_bit_width)
@@ -219,13 +246,27 @@ TEST(hyperloglog, fail_restore_bit_width)
     seqan::hibf::test::tmp_directory tmp_dir{};
     std::filesystem::path file_name{tmp_dir.path() / "wrong.hll"};
     {
-        uint8_t b{3u};
+        uint8_t b{4u};
         std::ofstream ostrm{file_name};
         ostrm.write((char *)&b, sizeof(b));
     }
     seqan::hibf::sketch::hyperloglog sketch{};
     std::ifstream istrm{file_name};
-    EXPECT_THROW(sketch.restore(istrm), std::runtime_error);
+
+    try
+    {
+        sketch.restore(istrm);
+        FAIL();
+    }
+    catch (std::runtime_error const & exception)
+    {
+        EXPECT_STREQ(exception.what(),
+                     "[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: Invalid bit_width.");
+    }
+    catch (...)
+    {
+        FAIL();
+    }
 }
 
 TEST(hyperloglog, dump_and_restore)
