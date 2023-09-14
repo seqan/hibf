@@ -32,20 +32,21 @@ namespace seqan::hibf
  * \ingroup hibf
  * \details
  *
- * This class improves the [seqan::hibf::interleaved_bloom_filter][1] by adding additional bookkeeping that allows
- * to establish a hierarchical structure. It is especially suited if you want to index are many samples/sets/user bins
+ * This class improves the seqan::hibf::interleaved_bloom_filter by adding additional bookkeeping that allows
+ * to establish a hierarchical structure. It is especially suited if you want to index many samples/sets/user bins
  * or if their sizes are unevenly distributed.
  *
  * Publication reference: https://doi.org/10.1186/s13059-023-02971-4
- *
- * ### Example
- *
- * \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
  *
  * ### Cite
  *
  * *Mehringer, Svenja, et al. "Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries."
  * Genome Biology 24.1 (2023): 1-25.*
+ *
+ * ### Example
+ *
+ * \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
+ *
  *
  * ## Constructing the HIBF
  *
@@ -109,19 +110,20 @@ namespace seqan::hibf
  *
  * ## Hierarchical Interleaved Bloom Filter (HIBF)
  *
- * In constrast to the [seqan::hibf::interleaved_bloom_filter][1], the user bins may be split across multiple technical
+ * In constrast to the seqan::hibf::interleaved_bloom_filter, the user bins may be split across multiple technical
  * bins, or multiple user bins may be merged into one technical bin. When merging multiple user bins, the HIBF stores
  * another IBF that is built over the user bins constituting the merged bin. This lower-level IBF can then be used
  * to further distinguish between merged bins.
  *
  * In this example, user bin 1 was split into two technical bins. Bins 3, 4, and 5 were merged into a single technical
  * bin, and another IBF was added for the merged bin.
- * \image html hibf.svg width=90%
+ * \image html hibf.svg width=50%
  *
  * The individual IBFs may have a different number of technical bins and differ in their sizes, allowing an efficient
  * distribution of the user bins.
  *
- * \see [seqan::hibf::interleaved_bloom_filter][1]
+ * \see seqan::hibf::interleaved_bloom_filter
+ * \see Official paper: https://doi.org/10.1186/s13059-023-02971-4
  */
 class hierarchical_interleaved_bloom_filter
 {
@@ -129,7 +131,7 @@ public:
     /*!\brief Manages membership queries for the seqan::hibf::hierarchical_interleaved_bloom_filter.
     * \see seqan::hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
-    * In contrast to the [seqan::hibf::interleaved_bloom_filter][1], the result will consist of indices of user bins.
+    * In contrast to the seqan::hibf::interleaved_bloom_filter, the result will consist of indices of user bins.
     */
     class membership_agent_type;
 
@@ -148,7 +150,14 @@ public:
     /*!\brief Constructs the HIBF from the given configuration.
      * \details
      *
-     * ## Configuration
+     * Here are all options with their defaults:
+     *
+     * \include test/snippet/hibf/hibf_construction.cpp
+     *
+     * Please see the documentation of seqan::hibf::config for details on how to configure the HIBF construction.
+     *
+     * ## Notes on Configuration
+     *
      * Required options:
      * * `input_fn`
      * * `number_of_user_bins`
@@ -160,8 +169,10 @@ public:
      *   should be avoided. A high FPR (e.g. `0.3`) can be chosed if you want a very small HIBF and false positive
      *   can be easily filtered in the down-stream analysis
      *
-     * ## Validation
+     * ## Config Validation
      * \copybrief seqan::hibf::config::validate_and_set_defaults
+     *
+     * See seqan::hibf::config::validate_and_set_defaults.
      */
     hierarchical_interleaved_bloom_filter(config & configuration);
 

@@ -70,6 +70,11 @@ using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint
  * * seqan::hibf::config::number_of_hash_functions
  * * seqan::hibf::config::maximum_false_positive_rate
  *
+ * ## Validation
+ *
+ * \copybrief seqan::hibf::config::validate_and_set_defaults
+ *
+ * See seqan::hibf::config::validate_and_set_defaults
  */
 struct config
 {
