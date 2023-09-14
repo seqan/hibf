@@ -7,7 +7,6 @@
 #include <cstddef>   // for size_t
 #include <iostream>  // for istream, ostream
 #include <stdexcept> // for runtime_error, invalid_argument
-#include <string>    // for operator+, to_string
 #include <utility>   // for swap
 #include <vector>    // for vector
 
@@ -21,10 +20,10 @@
 namespace seqan::hibf::sketch
 {
 
-hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
+hyperloglog::hyperloglog(uint8_t const b) : m_{1ULL << b}, b_{b}, M_(m_, 0u)
 {
-    if (b < 4 || 32 < b)
-        throw std::invalid_argument("bit width must be in the range [4,32] and it is " + std::to_string(b));
+    if (b_ < 5u || b_ > 32u)
+        throw std::invalid_argument("[HyperLogLog] bit width must be in the range [5,32].");
 
     M_.shrink_to_fit();
     double alpha;
@@ -48,7 +47,7 @@ hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
     alphaMM_ = alpha * m_ * m_;
     alphaMM_float_ = static_cast<float>(alphaMM_);
     // 64 bits where the last b are ones and the rest zeroes
-    mask_ = (1 << b) - 1;
+    mask_ = (1ULL << b_) - 1u;
 }
 
 void hyperloglog::add(std::string_view const sv)

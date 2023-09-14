@@ -17,10 +17,10 @@
 
 TEST(hyperloglog, bit_widths)
 {
-    for (uint8_t i : std::views::iota(0u, 4u))
+    for (uint8_t i : std::views::iota(0u, 5u))
         EXPECT_THROW(seqan::hibf::sketch::hyperloglog{i}, std::invalid_argument);
 
-    EXPECT_NO_THROW(seqan::hibf::sketch::hyperloglog{4u});
+    EXPECT_NO_THROW(seqan::hibf::sketch::hyperloglog{5u});
 }
 
 TEST(hyperloglog, initialization)
@@ -40,9 +40,7 @@ TEST(hyperloglog, initialization)
 
 TEST(hyperloglog, add_and_estimate_small)
 {
-    size_t const b = 4;
-
-    seqan::hibf::sketch::hyperloglog sketch(b); // m = 1 << b
+    seqan::hibf::sketch::hyperloglog sketch{};
 
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
     sketch.add("bla");
@@ -62,20 +60,18 @@ TEST(hyperloglog, add_and_estimate_small)
     sketch.add("bladuzel");
 
     // estimate = alpha * m  * m  / sum(2^(-M_[j]))
-    //          = 0.673 * 16 * 16 / (89/8) = 15,48...
+    //          = 0.673 * 32 * 32 / (89/8) = 61.94...
 
-    // this still is in the range of small value corrections (< 2.5 * 16)
-    // m * log(m / #zeros) = 16 * log(16/9) = 9.205826318 (with calculator)
+    // this still is in the range of small value corrections (< 2.5 * 32 = 80)
+    // m * ln(m / #zeros) = 32 * ln(32/25) = 7.899522493... (with calculator)
 
-    EXPECT_NEAR(sketch.estimate(), 9.205826318, 0.0000001);
+    EXPECT_NEAR(sketch.estimate(), 7.899522493, 0.0000001);
 }
 
 TEST(hyperloglog, clear)
 {
     // Same as add_and_estimate_small
-    size_t const b = 4;
-
-    seqan::hibf::sketch::hyperloglog sketch(b);
+    seqan::hibf::sketch::hyperloglog sketch{};
 
     sketch.add("bla");
     sketch.add("bli");
@@ -86,7 +82,7 @@ TEST(hyperloglog, clear)
     sketch.add("blarkse");
     sketch.add("bladuzel");
 
-    EXPECT_NEAR(sketch.estimate(), 9.205826318, 0.0000001);
+    EXPECT_NEAR(sketch.estimate(), 7.899522493, 0.0000001);
 
     // Actual clear test
     sketch.clear();
@@ -115,10 +111,8 @@ std::vector<std::string> const input_sequences{
 
 TEST(hyperloglog, add_and_estimate_large)
 {
-    size_t const kmer_size = 16;
-
-    size_t const b = 4; // m = 1 << b
-    seqan::hibf::sketch::hyperloglog sketch(b);
+    size_t const kmer_size{16u};
+    seqan::hibf::sketch::hyperloglog sketch{};
 
     std::unordered_set<std::string_view> control;
 
@@ -139,9 +133,7 @@ TEST(hyperloglog, add_and_estimate_large)
 
 TEST(hyperloglog, add_and_estimate_small_SIMD)
 {
-    size_t const b = 5; // m = 1 << b
-
-    seqan::hibf::sketch::hyperloglog sketch(b);
+    seqan::hibf::sketch::hyperloglog sketch{};
 
     // XXH3_64bits hash -> first 4 bits: 0000, rank: 3
     sketch.add("bla");
@@ -167,12 +159,11 @@ TEST(hyperloglog, add_and_estimate_small_SIMD)
 
 TEST(hyperloglog, merge_and_merge_SIMD)
 {
-    size_t const kmer_size = 16;
+    size_t const kmer_size{16u};
 
-    size_t const b = 5; // m = 1 << b
-    seqan::hibf::sketch::hyperloglog full_sketch(b);
-    seqan::hibf::sketch::hyperloglog merge_sketch(b);
-    seqan::hibf::sketch::hyperloglog merge_SIMD_sketch(b);
+    seqan::hibf::sketch::hyperloglog full_sketch{};
+    seqan::hibf::sketch::hyperloglog merge_sketch{};
+    seqan::hibf::sketch::hyperloglog merge_SIMD_sketch{};
 
     std::vector<seqan::hibf::sketch::hyperloglog> partial_sketches;
 
@@ -180,7 +171,7 @@ TEST(hyperloglog, merge_and_merge_SIMD)
     // and add a disjointed sketch for every sequence to partial_sketches
     for (std::string_view const seq : input_sequences)
     {
-        partial_sketches.emplace_back(b);
+        partial_sketches.emplace_back();
 
         for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
         {
@@ -203,7 +194,7 @@ TEST(hyperloglog, merge_and_merge_SIMD)
 
 TEST(hyperloglog, fail_dump)
 {
-    seqan::hibf::sketch::hyperloglog sketch{4};
+    seqan::hibf::sketch::hyperloglog sketch{};
     std::ofstream ostrm{"hibf_non_existent_outputfile"};
     ostrm.close();
     EXPECT_THROW(sketch.dump(ostrm), std::runtime_error);
@@ -239,11 +230,10 @@ TEST(hyperloglog, fail_restore_bit_width)
 
 TEST(hyperloglog, dump_and_restore)
 {
-    size_t const kmer_size = 16;
+    size_t const kmer_size{16u};
 
-    size_t const b = 4; // m = 1 << b
-    seqan::hibf::sketch::hyperloglog dump_sketch(b);
-    seqan::hibf::sketch::hyperloglog restore_sketch(b);
+    seqan::hibf::sketch::hyperloglog dump_sketch{};
+    seqan::hibf::sketch::hyperloglog restore_sketch{};
 
     // put every sequence in this file into the dump_sketch
     for (std::string_view const seq : input_sequences)

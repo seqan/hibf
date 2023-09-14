@@ -33,11 +33,11 @@ class hyperloglog
 public:
     /*!\brief Constructor
      * \param[in] b bit width (register size will be 2 to the b power).
-     *            This value must be in the range[4,30].Default value is 5.
+     *            This value must be in the range [5,32]. Default value is 5.
      *
      * \throws std::invalid_argument if the argument b is out of range.
      */
-    hyperloglog(uint8_t b = 5);
+    hyperloglog(uint8_t const b = 5u);
 
     // Note: `add(...)` calls `XXH3_64bits(const void* input, size_t length)`.
     // XXH3 is written in C; the API has type erasure (void *).
