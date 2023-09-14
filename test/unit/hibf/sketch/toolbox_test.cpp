@@ -291,3 +291,10 @@ TEST_F(toolbox_test, cluster_bins)
         EXPECT_RANGE_EQ(permutation, (std::vector<size_t>{0, 1, 2}));
     }
 }
+
+TEST_F(toolbox_test, rearrange_bins)
+{
+    seqan::hibf::sketch::toolbox::rearrange_bins(test_sketches, test_kmer_counts, test_positions, 0.9, 1);
+
+    EXPECT_RANGE_EQ(test_positions, (std::vector<size_t>{3, 2, 0, 1}));
+}
