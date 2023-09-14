@@ -34,7 +34,10 @@ set (HIBF_LAYOUT_IN ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in)
 
 option (HIBF_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
 
+set (HIBF_DOXYGEN_EXTERNAL_SEARCH "NO")
+
 if (HIBF_VERCEL_PREVIEW_DOC)
+    set (HIBF_DOXYGEN_EXTERNAL_SEARCH "YES")
     set (HIBF_DOXYGEN_DOT_NUM_THREADS "2")
     set (HIBF_DOXYFILE_OPTION_POWERED_BY_VERCEL
          "HTML_EXTRA_FILES       += ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
