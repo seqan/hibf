@@ -593,6 +593,9 @@ private:
     //!\brief Stores access positions of augmented seqan::hibf::interleaved_bloom_filter.
     std::array<size_t, 5> bloom_filter_indices;
 
+    //!\brief Stores the result of bulk_contains().
+    binning_bitvector result_buffer;
+
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -613,9 +616,6 @@ public:
         result_buffer(ibf.bin_count())
     {}
     //!\}
-
-    //!\brief Stores the result of bulk_contains().
-    binning_bitvector result_buffer;
 
     /*!\name Lookup
      * \{
@@ -823,6 +823,9 @@ private:
     //!\brief Store a seqan::hibf::interleaved_bloom_filter::membership_agent to call `bulk_contains`.
     membership_agent_type membership_agent;
 
+    //!\brief Stores the result of bulk_count().
+    counting_vector<value_t> result_buffer;
+
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -844,9 +847,6 @@ public:
         result_buffer(ibf.bin_count())
     {}
     //!\}
-
-    //!\brief Stores the result of bulk_count().
-    counting_vector<value_t> result_buffer;
 
     /*!\name Counting
      * \{

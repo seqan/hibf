@@ -278,6 +278,9 @@ private:
         }
     }
 
+    //!\brief Stores the result of membership_for().
+    std::vector<int64_t> result_buffer;
+
 public:
     /*!\name Constructors, destructor and assignment
      * \{
@@ -296,9 +299,6 @@ public:
     explicit membership_agent_type(hierarchical_interleaved_bloom_filter const & hibf) : hibf_ptr(std::addressof(hibf))
     {}
     //!\}
-
-    //!\brief Stores the result of membership_for().
-    std::vector<int64_t> result_buffer;
 
     //!\brief Sorts the results.
     void sort_results()
