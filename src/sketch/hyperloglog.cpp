@@ -7,7 +7,6 @@
 #include <cstddef>   // for size_t
 #include <iostream>  // for istream, ostream
 #include <stdexcept> // for runtime_error, invalid_argument
-#include <string>    // for operator+, to_string
 #include <utility>   // for swap
 #include <vector>    // for vector
 
@@ -21,19 +20,16 @@
 namespace seqan::hibf::sketch
 {
 
-hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
+hyperloglog::hyperloglog(uint8_t const b) : m_{1ULL << b}, b_{b}, M_(m_, 0u)
 {
-    if (b < 4 || 32 < b)
-        throw std::invalid_argument("bit width must be in the range [4,32] and it is " + std::to_string(b));
+    if (b_ < 5u || b_ > 32u)
+        throw std::invalid_argument("[HyperLogLog] bit width must be in the range [5,32].");
 
     M_.shrink_to_fit();
     double alpha;
 
     switch (m_)
     {
-    case 16:
-        alpha = 0.673;
-        break;
     case 32:
         alpha = 0.697;
         break;
@@ -48,12 +44,23 @@ hyperloglog::hyperloglog(uint8_t b) : m_(1 << b), b_(b), M_(m_, 0)
     alphaMM_ = alpha * m_ * m_;
     alphaMM_float_ = static_cast<float>(alphaMM_);
     // 64 bits where the last b are ones and the rest zeroes
-    mask_ = (1 << b) - 1;
+    mask_ = (1ULL << b_) - 1u;
 }
 
-void hyperloglog::add(char const * str, uint64_t len)
+void hyperloglog::add(std::string_view const sv)
 {
-    uint64_t const hash = XXH3_64bits(str, len);
+    uint64_t const hash = XXH3_64bits(sv.data(), sv.size());
+    // the first b_ bits are used to distribute the leading zero counts along M_
+    uint64_t const index = hash >> (64 - b_);
+    // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.
+    // Otherwise the count for hash = 0 would be 64
+    uint8_t const rank = std::countl_zero((hash << b_) | mask_) + 1;
+    M_[index] = std::max(rank, M_[index]);
+}
+
+void hyperloglog::add(uint64_t const value)
+{
+    uint64_t const hash = XXH3_64bits(&value, sizeof(uint64_t));
     // the first b_ bits are used to distribute the leading zero counts along M_
     uint64_t const index = hash >> (64 - b_);
     // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.
@@ -214,7 +221,7 @@ void hyperloglog::dump(std::ostream & os) const
     os.flush();
     if (os.fail())
     {
-        throw std::runtime_error("Failed to dump a HyperLogLog sketch to a file.");
+        throw std::runtime_error("[HyperLogLog] Failed to dump a HyperLogLog sketch to a file.");
     }
 }
 
@@ -224,18 +231,18 @@ void hyperloglog::restore(std::istream & is)
     {
         uint8_t b{};
         is.read((char *)&b, sizeof(b));
-        hyperloglog tempHLL(b);
+        hyperloglog tempHLL{b}; // Constructor might throw std::invalid_argument
         is.read((char *)&(tempHLL.M_[0]), sizeof(M_[0]) * tempHLL.m_);
         if (is.fail())
         {
-            throw std::runtime_error("Failed to restore a HyperLogLog sketch from a file.");
+            throw std::runtime_error("[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: I/O error.");
         }
         swap(tempHLL);
     }
     catch (std::invalid_argument const & err)
     {
-        // turn the invalid argument error to a runtime error, because it is dependent on the file contents here
-        throw std::runtime_error("Failed to restore a HyperLogLog sketch from a file.");
+        throw std::runtime_error(
+            "[HyperLogLog] Failed to restore a HyperLogLog sketch from a file: Invalid bit_width.");
     }
 }
 

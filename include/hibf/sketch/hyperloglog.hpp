@@ -33,17 +33,30 @@ class hyperloglog
 public:
     /*!\brief Constructor
      * \param[in] b bit width (register size will be 2 to the b power).
-     *            This value must be in the range[4,30].Default value is 5.
+     *            This value must be in the range [5,32]. Default value is 5.
      *
      * \throws std::invalid_argument if the argument b is out of range.
      */
-    hyperloglog(uint8_t b = 5);
+    hyperloglog(uint8_t const b = 5u);
 
-    /*!\brief Adds element to the estimator
-     * \param[in] str string to add
-     * \param[in] len length of string
+    // Note: `add(...)` calls `XXH3_64bits(const void* input, size_t length)`.
+    // XXH3 is written in C; the API has type erasure (void *).
+    // We only need `add(...)` for uint64_t (sketching), and string_view (unit tests).
+    // If we ever need a type erased overload, consider `std::span<std::byte>`.
+    // It can be constructed from any value `x`:
+    // `std::span<std::byte> my_span{reinterpret_cast<std::byte *>(x), sizeof(x)}`
+    // See also https://en.cppreference.com/w/cpp/types/byte
+    // `std::span<void>` is not valid.
+
+    /*!\brief Adds a string_view to the estimator.
+     * \param[in] sv string_view to add
      */
-    void add(char const * str, uint64_t len);
+    void add(std::string_view const sv);
+
+    /*!\brief Adds an unsigned 64-bit integer to the estimator.
+     * \param[in] value unsigned integer to add
+     */
+    void add(uint64_t const value);
 
     /*!\brief Estimates cardinality value.
      * \returns Estimated cardinality value.
@@ -104,12 +117,12 @@ private:
         return arr;
     }();
 
-    uint64_t mask_{};                                                                  ///< mask for the rank bits
-    double alphaMM_{};                                                                 ///< alpha * m^2
-    float alphaMM_float_{};                                                            ///< alpha * m^2
-    uint64_t m_{};                                                                     ///< register size
-    uint8_t b_{};                                                                      ///< register bit width
-    std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 256u>> M_{}; ///< registers
+    uint64_t mask_{};                                                                 //!< mask for the rank bits
+    double alphaMM_{};                                                                //!< alpha * m^2
+    float alphaMM_float_{};                                                           //!< alpha * m^2
+    uint64_t m_{};                                                                    //!< register size
+    uint8_t b_{};                                                                     //!< register bit width
+    std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 32u>> M_{}; //!< registers
 };
 
 } // namespace seqan::hibf::sketch

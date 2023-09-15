@@ -44,7 +44,7 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
         config.input_fn(i, std::inserter(kmers, kmers.begin()));
 
         for (auto k_hash : kmers)
-            sketch.add(reinterpret_cast<char *>(&k_hash), sizeof(k_hash));
+            sketch.add(k_hash);
 
         // #pragma omp critical
         sketches[i] = sketch;

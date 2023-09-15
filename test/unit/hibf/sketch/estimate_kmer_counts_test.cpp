@@ -35,18 +35,9 @@ TEST(estimate_kmer_counts_test, small_example)
     size_t const b = 12;
     seqan::hibf::sketch::hyperloglog sketch(b);
 
-    for (std::string_view seq : input_sequences)
-    {
-        // we have to go C-style here for the HyperLogLog Interface
-        char const * c_seq_it = seq.begin();
-        char const * end = c_seq_it + seq.size();
-
-        while (c_seq_it + kmer_size <= end)
-        {
-            sketch.add(c_seq_it, kmer_size);
-            ++c_seq_it;
-        }
-    }
+    for (std::string_view const seq : input_sequences)
+        for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
+            sketch.add(seq.substr(pos, kmer_size));
 
     std::vector<seqan::hibf::sketch::hyperloglog> sketches{sketch, sketch};
     std::vector<size_t> kmer_counts;
