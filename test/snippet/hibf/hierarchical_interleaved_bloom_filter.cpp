@@ -1,12 +1,10 @@
-#include <cinttypes>  // for int64_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iostream>   // for operator<<, basic_ostream, cout, char_traits
 #include <vector>     // for vector
 
 #include <hibf/config.hpp>                                // for config, insert_iterator
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
-#include <hibf/misc/print.hpp>
+#include <hibf/misc/print.hpp>                            // for print, print_t
 
 int main()
 {

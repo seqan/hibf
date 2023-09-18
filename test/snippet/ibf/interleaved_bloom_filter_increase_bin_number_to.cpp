@@ -1,8 +1,5 @@
-#include <cstddef>  // for size_t
-#include <iostream> // for operator<<, basic_ostream, cout, char_traits
-
-#include <hibf/interleaved_bloom_filter.hpp> // for binning_bitvector, interleaved_bloom_filter, bin_index, bin_count
-#include <hibf/misc/print.hpp>
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size
+#include <hibf/misc/print.hpp>               // for print, print_t
 
 int main()
 {

@@ -1,11 +1,8 @@
-#include <cinttypes> // for uint16_t
-#include <cstddef>   // for size_t
-#include <iostream>  // for operator<<, basic_ostream, cout, char_traits
-#include <ranges>    // for iota_view, operator==, _Iota, iota, views
-#include <vector>    // for vector
+#include <ranges> // for iota_view, operator==, _Iota, iota, views
+#include <vector> // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, counting_vector, interleaved_bloom_filter, bin_count
-#include <hibf/misc/print.hpp>
+#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
+#include <hibf/misc/print.hpp>               // for print, print_t
 
 int main()
 {

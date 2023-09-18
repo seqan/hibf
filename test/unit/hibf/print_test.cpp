@@ -1,6 +1,13 @@
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for EXPECT_EQ, GetCapturedStderr, GetCapturedStdout, Message, TestP...
 
-#include <hibf/misc/print.hpp>
+#include <cinttypes> // for int64_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint64_t
+#include <concepts>  // for same_as, unsigned_integral
+#include <iostream>  // for cerr
+#include <ranges>    // for range_value_t
+#include <vector>    // for allocator, vector
+
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
+#include <hibf/misc/print.hpp>               // for print
 
 template <typename t>
 using print_test = ::testing::Test;
