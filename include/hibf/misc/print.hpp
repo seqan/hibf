@@ -1,8 +1,10 @@
 #pragma once
 
-#include <iosfwd>
+#include <cinttypes> // for int64_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint64_t
+#include <iostream>  // for cout, ostream
+#include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
 
 namespace seqan::hibf
 {

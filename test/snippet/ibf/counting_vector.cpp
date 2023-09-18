@@ -1,10 +1,7 @@
 #include <cinttypes> // for uint16_t
-#include <cstddef>   // for size_t
-#include <iostream>  // for operator<<, basic_ostream, cout, char_traits
-#include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, interleaved_bloom_filter, bin_index, bin_count
-#include <hibf/misc/print.hpp>
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, counting_vector, bin_count
+#include <hibf/misc/print.hpp>               // for print, print_t
 
 int main()
 {

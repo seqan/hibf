@@ -1,14 +1,15 @@
-#include <algorithm> // for fill, max
-#include <array>     // for array
-#include <bit>       // for countl_zero
-#include <cassert>   // for assert
-#include <cinttypes> // for uint8_t, uint64_t, uint32_t
-#include <cmath>     // for log
-#include <cstddef>   // for size_t
-#include <iostream>  // for istream, ostream
-#include <stdexcept> // for runtime_error, invalid_argument
-#include <utility>   // for swap
-#include <vector>    // for vector
+#include <algorithm>   // for max, fill
+#include <array>       // for array
+#include <bit>         // for countl_zero
+#include <cassert>     // for assert
+#include <cinttypes>   // for uint8_t, uint64_t, uint32_t
+#include <cmath>       // for log
+#include <cstddef>     // for size_t
+#include <iostream>    // for basic_ostream, basic_istream, basic_istream::read, basic_ostre...
+#include <stdexcept>   // for runtime_error, invalid_argument
+#include <string_view> // for string_view
+#include <utility>     // for swap
+#include <vector>      // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/contrib/xxhash/xxhash.h>       // for XXH_INLINE_XXH3_64bits, XXH3_64bits

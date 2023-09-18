@@ -5,9 +5,14 @@
 // shipped with this file and also available at: https://github.com/seqan/raptor/blob/main/LICENSE.md
 // --------------------------------------------------------------------------------------------------
 
-#include <iostream>
+#include <cinttypes> // for uint16_t, int16_t, int64_t, int8_t, uint8_t, int32_t, uint32_t
+#include <cstddef>   // for size_t
+#include <iostream>  // for basic_ostream::operator<<, ostream, operator<<, basic_ostream
+#include <ranges>    // for range_value_t, empty
+#include <vector>    // for vector
 
-#include <hibf/misc/print.hpp>
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
+#include <hibf/misc/print.hpp>               // for print_t
 
 namespace seqan::hibf
 {
