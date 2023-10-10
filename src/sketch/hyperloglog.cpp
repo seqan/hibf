@@ -61,6 +61,8 @@ void hyperloglog::add(std::string_view const sv)
 
 void hyperloglog::add(uint64_t const value)
 {
+    // chopper hibf_statistics, gcc13 + lto: overzealous optimization results in wrong results
+    asm volatile("" : : "r,m"(value) : "memory");
     uint64_t const hash = XXH3_64bits(&value, sizeof(uint64_t));
     // the first b_ bits are used to distribute the leading zero counts along M_
     uint64_t const index = hash >> (64 - b_);
