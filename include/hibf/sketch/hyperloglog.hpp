@@ -54,10 +54,14 @@ public:
      */
     void add(std::string_view const sv);
 
+    // Note: Sometimes, LTO optimizes the function body away. In particular, when value is in a register.
+    // Using const & is more or less the same as using `asm inline("" : : "m"(value));`, but it can still optimize
+    // for memory addresses and registers when inlining, whereas the asm will always create a memory address.
+
     /*!\brief Adds an unsigned 64-bit integer to the estimator.
      * \param[in] value unsigned integer to add
      */
-    void add(uint64_t const value);
+    void add(uint64_t const & value);
 
     /*!\brief Estimates cardinality value.
      * \returns Estimated cardinality value.
