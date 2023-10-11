@@ -44,7 +44,7 @@ void precompute_union_estimates_for(std::vector<uint64_t> & estimates,
     estimates[j] = counts[positions[j]];
 
     for (int64_t j_prime = j - 1; j_prime >= 0; --j_prime)
-        estimates[j_prime] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD(sketches[positions[j_prime]]));
+        estimates[j_prime] = static_cast<uint64_t>(temp_hll.merge_and_estimate(sketches[positions[j_prime]]));
 }
 
 void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
@@ -62,7 +62,7 @@ void precompute_initial_union_estimates(std::vector<uint64_t> & estimates,
     estimates[0] = counts[positions[0]];
 
     for (size_t j = 1; j < positions.size(); ++j)
-        estimates[j] = static_cast<uint64_t>(temp_hll.merge_and_estimate_SIMD(sketches[positions[j]]));
+        estimates[j] = static_cast<uint64_t>(temp_hll.merge_and_estimate(sketches[positions[j]]));
 }
 
 #if 0 // Currently unused
@@ -215,7 +215,7 @@ void cluster_bins(std::vector<hyperloglog> const & sketches,
                 {
                     // this must be a copy, because merging changes the hll sketch
                     hyperloglog temp_hll = clustering[i].hll;
-                    double const estimate_ij = temp_hll.merge_and_estimate_SIMD(clustering[j].hll);
+                    double const estimate_ij = temp_hll.merge_and_estimate(clustering[j].hll);
                     // Jaccard distance estimate
                     double const distance = 2 - (estimates[i] + estimates[j]) / estimate_ij;
                     dist[i].pq.push({j + first, distance});
@@ -274,8 +274,7 @@ void cluster_bins(std::vector<hyperloglog> const & sketches,
 
                 // merge the two nodes with minimal distance together insert the new node into the clustering
                 clustering.push_back({min_id, neighbor_id, std::move(clustering[min_id - first].hll)});
-                estimates.emplace_back(
-                    clustering.back().hll.merge_and_estimate_SIMD(clustering[neighbor_id - first].hll));
+                estimates.emplace_back(clustering.back().hll.merge_and_estimate(clustering[neighbor_id - first].hll));
 
                 // remove old ids
                 remaining_ids.erase(min_id);
@@ -309,9 +308,9 @@ void cluster_bins(std::vector<hyperloglog> const & sketches,
                 if (other_id == new_id || !remaining_ids.contains(other_id))
                     continue;
 
-                // this must be a copy, because merge_and_estimate_SIMD() changes the hll
+                // this must be a copy, because merge_and_estimate() changes the hll
                 hyperloglog temp_hll = new_hll;
-                double const estimate_ij = temp_hll.merge_and_estimate_SIMD(clustering[other_id - first].hll);
+                double const estimate_ij = temp_hll.merge_and_estimate(clustering[other_id - first].hll);
                 // Jaccard distance estimate
                 double const distance = 2 - (estimates[other_id - first] + estimates.back()) / estimate_ij;
                 dist[i].pq.push({new_id, distance});

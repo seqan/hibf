@@ -1,14 +1,20 @@
-#pragma once
+// -----------------------------------------------------------------------------------------------------
+// Copyright (c) 2006-2022, Knut Reinert & Freie Universität Berlin
+// Copyright (c) 2016-2022, Knut Reinert & MPI für molekulare Genetik
+// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
+// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
+// -----------------------------------------------------------------------------------------------------
 
-/**
- * @file hyperloglog.hpp
- * @brief HyperLogLog cardinality estimator
- * @date Created 2013/3/20, Adjusted 2021/01
- * @author Hideaki Ohno
- *
- * Copied from Hideaki Ohno (https://github.com/hideo55/cpp-HyperLogLog) and adjusted/improved by Felix Droop
- * Modified a lot for a bugfix, improvements and functional changes (64 bit hashes)
+// Copyright (c) 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>
+// MIT License: https://github.com/hideo55/cpp-HyperLogLog#license
+
+/*!\file
+ * \author Felix Droop <felix.droop AT fu-berlin.de>
+ * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
+ * \brief Provides seqan::hibf::sketch::hyperloglog.
  */
+
+#pragma once
 
 #include <algorithm>   // for copy
 #include <array>       // for array
@@ -26,22 +32,33 @@ namespace seqan::hibf::sketch
 /*!\brief HyperLogLog estimates.
  * \ingroup hibf_sketch
  * \details
- * Copied from Hideaki Ohno and adjusted/improved by Felix Droop
+ * Original work by Hideaki Ohno. Major changes have been applied for bugfixes, 64-bit support, improvements, etc.
  * \see https://github.com/hideo55/cpp-HyperLogLog
  */
 class hyperloglog
 {
 public:
-    /*!\brief Constructor
-     * \param[in] b bit width (register size will be 2 to the b power).
-     *            This value must be in the range [5,32]. Default value is 5.
-     *
-     * \throws std::invalid_argument if the argument b is out of range.
+    /*!\name Constructors, destructor and assignment
+     * \{
      */
-    hyperloglog(uint8_t const b = 5u);
+    /*!\brief Default constructor.
+     * \param[in] bits The bit width in [5,32].
+     *
+     * Allocates 2^`bits` bytes of memory.
+     *
+     * \throws std::invalid_argument if bits is not in [5,32].
+     */
+    hyperloglog(uint8_t const bits = 5u);
+    hyperloglog(hyperloglog const &) = default;             //!< Defaulted.
+    hyperloglog & operator=(hyperloglog const &) = default; //!< Defaulted.
+    hyperloglog(hyperloglog &&) = default;                  //!< Defaulted.
+    hyperloglog & operator=(hyperloglog &&) = default;      //!< Defaulted.
+    ~hyperloglog() = default;                               //!< Defaulted.
 
-    /*!\brief Adds an unsigned 64-bit integer to the estimator.
-     * \param[in] value unsigned integer to add
+    //!\}
+
+    /*!\brief Adds a value.
+     * \param[in] value The value to add.
      */
     void add(uint64_t const value);
 
@@ -50,66 +67,70 @@ public:
      */
     double estimate() const;
 
-    /*!\brief Merges the estimate from 'other' into this object.
-     * \param[in] other HyperLogLog instance to be merged
+    /*!\brief Merges another hyperloglog into this object.
+     * \param[in] other The hyperloglog to be merged.
      * \details
-     * The number of registers in each must be the same.
+     * This has the same effect as adding all values that were added to `other`.
+     * \warning
+     * Merging a hyperloglog with differing `bits` is undefined behaviour. In debug mode, this is an assertion instead.
      */
     void merge(hyperloglog const & other);
 
-    /*!\brief Merges the estimate from 'other' into this object
-     * \param[in] other HyperLogLog instance to be merged
-     * \returns estimated cardinality of the new merged sketch.
+    /*!\brief Merges another hyperloglog and returns the new estimate.
+     * \param[in] other The hyperloglog to be merged.
+     * \returns Estimated cardinality value.
      * \details
-     * The number of registers in each must be the same.
-     * This function is implemented using SIMD instructions.
-     * \warning This function is undefined bevahior if this.b_ == 4
+     * \warning
+     * Merging a hyperloglog with differing `bits` is undefined behaviour. In debug mode, this is an assertion instead.
      */
-    double merge_and_estimate_SIMD(hyperloglog const & other);
+    double merge_and_estimate(hyperloglog const & other);
 
-    /*!\brief Clears all internal registers.
+    /*!\brief Clears added values.
+     * The size is unaffected.
      */
-    void clear();
+    void reset();
 
-    /*!\brief Returns size of register.
+    /*!\brief Returns size of the internal data.
+     * \returns Size in bytes.
+     * The returned value is equivalent to 2^`bits`.
      */
-    uint64_t registerSize() const
+    uint64_t data_size() const
     {
-        return m_;
+        return size;
     }
 
-    /*!\brief Exchanges the content of the instance.
-     * \param[in,out] rhs Another HyperLogLog instance
+    /*!\brief Write the hyperloglog to a stream.
+     * \param[in,out] os The output stream to write to.
+     * \throws std::runtime_error if storing failed.
      */
-    void swap(hyperloglog & rhs);
+    void store(std::ostream & os) const;
 
-    /*!\brief Dumps the current status to a stream.
-     * \param[in,out] os The output stream where the data is saved to
-     * \throws std::runtime_error if dumping failed.
+    /*!\brief Loads the hyperloglog from a stream.
+     * \param[in] is The input stream where to read from.
+     * \throws std::runtime_error if reading failed.
      */
-    void dump(std::ostream & os) const;
-
-    /*!\brief Restorse the status from a stream.
-     * \param[in] is The input stream where the status is saved
-     * \throws std::runtime_error if restoring failed.
-     */
-    void restore(std::istream & is);
+    void load(std::istream & is);
 
 private:
-    static constexpr std::array<float, 61> exp2_rcp = []() constexpr
+    //!\brief Used for estimation. Part of estimate E in the HyperLogLog publication.
+    static constexpr std::array<float, 61> expectation_values = []() constexpr
     {
-        std::array<float, 61> arr{};
+        std::array<float, 61> result{};
         for (size_t i = 0; i < 61; ++i)
-            arr[i] = 1.0f / static_cast<float>(1ULL << i);
-        return arr;
+            result[i] = 1.0f / (1ULL << i);
+        return result;
     }();
 
-    uint64_t mask_{};                                                                 //!< mask for the rank bits
-    double alphaMM_{};                                                                //!< alpha * m^2
-    float alphaMM_float_{};                                                           //!< alpha * m^2
-    uint64_t m_{};                                                                    //!< register size
-    uint8_t b_{};                                                                     //!< register bit width
-    std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 32u>> M_{}; //!< registers
+    //!\brief The bit width. Also called precision, b, and p in other publications.
+    uint8_t bits{};
+    //!\brief Equivalent to 2^bits. Called m in original publication.
+    uint64_t size{};
+    //!\brief Mask used in add().
+    uint64_t rank_mask{};
+    //!\brief Equivalent to alpha * m^2.
+    double normalization_factor{};
+    //!\brief Internal data. Also called register in publications.
+    std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 32u>> data{};
 };
 
 } // namespace seqan::hibf::sketch
