@@ -246,6 +246,8 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         size_t next_i = trace[trace_i][trace_j].first;
         size_t next_j = trace[trace_i][trace_j].second;
 
+        sketch::hyperloglog sketch =
+            config.disable_estimate_union ? sketch::hyperloglog{} : (*data->sketches)[data->positions[trace_j]];
         size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
         size_t number_of_bins = (trace_i - next_i);
 
@@ -257,7 +259,10 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
             --trace_j;
             while (trace_j != next_j)
             {
-                kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
+                if (!config.disable_estimate_union)
+                    sketch.merge((*data->sketches)[data->positions[trace_j]]);
+                else
+                    kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
                 libf_data.positions.push_back(data->positions[trace_j]);
                 // std::cout << "," << trace_j;
                 --trace_j;
@@ -266,6 +271,9 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
             trace_j = next_j; // unneccessary?
 
             process_merged_bin(libf_data, bin_id);
+
+            if (!config.disable_estimate_union)
+                kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
 
             update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
             // std::cout << "]: " << kmer_count << std::endl;
@@ -294,6 +302,8 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     assert(trace_i == 0 || trace_j == 0);
     if (trace_i == 0u && trace_j > 0u) // the last UBs get merged into the remaining TB
     {
+        sketch::hyperloglog sketch =
+            config.disable_estimate_union ? sketch::hyperloglog{} : (*data->sketches)[data->positions[trace_j]];
         size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
         auto libf_data = initialise_libf_data(trace_j);
 
@@ -301,13 +311,19 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         while (trace_j > 0)
         {
             --trace_j;
-            kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
+            if (!config.disable_estimate_union)
+                sketch.merge((*data->sketches)[data->positions[trace_j]]);
+            else
+                kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
             libf_data.positions.push_back(data->positions[trace_j]);
             // std::cout << "," << trace_j;
         }
         assert(trace_j == 0);
 
         process_merged_bin(libf_data, bin_id);
+
+        if (!config.disable_estimate_union)
+            kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
 
         update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
 
