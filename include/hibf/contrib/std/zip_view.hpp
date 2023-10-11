@@ -16,7 +16,8 @@
 
 #include <ranges>
 
-#ifdef __cpp_lib_ranges_zip
+// https://godbolt.org/z/YW7e785sd
+#if defined __cpp_lib_ranges_zip && !defined(__clang__)
 
 namespace seqan::stl::views
 {
