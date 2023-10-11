@@ -12,7 +12,6 @@
 #include <vector>      // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/contrib/xxhash/xxhash.h>       // for XXH_INLINE_XXH3_64bits, XXH3_64bits
 #include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
 
 #include <x86/avx.h>  // for simde_mm256_add_ps, simde_mm256_set_ps, simde__m256i, simde_mm...
@@ -48,20 +47,18 @@ hyperloglog::hyperloglog(uint8_t const b) : m_{1ULL << b}, b_{b}, M_(m_, 0u)
     mask_ = (1ULL << b_) - 1u;
 }
 
-void hyperloglog::add(std::string_view const sv)
+// See https://github.com/wangyi-fudan/wyhash
+// Simpler than murmur3: https://godbolt.org/z/bz7fd4aYz
+[[nodiscard]] inline uint64_t wyhash(uint64_t const value) noexcept
 {
-    uint64_t const hash = XXH3_64bits(sv.data(), sv.size());
-    // the first b_ bits are used to distribute the leading zero counts along M_
-    uint64_t const index = hash >> (64 - b_);
-    // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.
-    // Otherwise the count for hash = 0 would be 64
-    uint8_t const rank = std::countl_zero((hash << b_) | mask_) + 1;
-    M_[index] = std::max(rank, M_[index]);
+    __uint128_t result = value;
+    result *= 0x9E3779B97F4A7C15ULL;
+    return static_cast<uint64_t>(result) ^ static_cast<uint64_t>(result >> 64);
 }
 
-void hyperloglog::add(uint64_t const & value)
+void hyperloglog::add(uint64_t const value)
 {
-    uint64_t const hash = XXH3_64bits(&value, sizeof(uint64_t));
+    uint64_t const hash = wyhash(value);
     // the first b_ bits are used to distribute the leading zero counts along M_
     uint64_t const index = hash >> (64 - b_);
     // the bitwise-or with mask_ assures that we get at most 64 - b_ as value.

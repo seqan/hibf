@@ -248,22 +248,6 @@ else ()
 endif ()
 
 # ----------------------------------------------------------------------------
-# xxHash dependency
-# ----------------------------------------------------------------------------
-find_path (HIBF_XXHASH_DIR
-           NAMES xxhash.h
-           HINTS "${HIBF_HEADER_PATH}/hibf/contrib/xxhash")
-
-if (HIBF_XXHASH_DIR)
-    hibf_config_print ("Required dependency:        xxHash found")
-    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DXXH_INLINE_ALL")
-else ()
-    hibf_config_error ("Required dependency:        xxHash not found")
-endif ()
-
-unset (HIBF_XXHASH_DIR)
-
-# ----------------------------------------------------------------------------
 # robin-hood dependency
 # ----------------------------------------------------------------------------
 find_path (HIBF_ROBIN_HOOD_DIR
