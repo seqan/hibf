@@ -2,6 +2,7 @@
 
 #include <cinttypes>   // for uint8_t
 #include <cstddef>     // for size_t
+#include <random>      // for uniform_int_distribution, mt19937_64
 #include <string>      // for basic_string, string
 #include <string_view> // for string_view
 #include <vector>      // for allocator, vector
@@ -11,33 +12,13 @@
 
 TEST(estimate_kmer_counts_test, small_example)
 {
-    std::vector<std::string> const input_sequences{
-        {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-         "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-         "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-         "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-         "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
-        {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-         "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-         "ATATCGATCGAGCGAGGCAGGCAGCGATCGAGCGAGCGCATGCAGCGACTAGCTACGACAGCTACTATCAGCAGCGAGCG"
-         "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-         "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-         "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
-        {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-         "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-         "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-         "ATCGATCACGATCAGCGAGCGATATCTTATCGTAGGCATCGAGCATCGAGGAGCGATCTATCTATCTATCATCTATCTAT"
-         "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-         "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
-         "G"}};
+    seqan::hibf::sketch::hyperloglog sketch(12);
 
-    uint8_t const kmer_size{19};
-    size_t const b = 12;
-    seqan::hibf::sketch::hyperloglog sketch(b);
+    std::uniform_int_distribution<uint64_t> distribution{};
+    std::mt19937_64 engine{0u};
 
-    for (std::string_view const seq : input_sequences)
-        for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
-            sketch.add(seq.substr(pos, kmer_size));
+    for (size_t i = 0; i < 1500; ++i)
+        sketch.add(distribution(engine));
 
     std::vector<seqan::hibf::sketch::hyperloglog> sketches{sketch, sketch};
     std::vector<size_t> kmer_counts;
@@ -45,6 +26,6 @@ TEST(estimate_kmer_counts_test, small_example)
     seqan::hibf::sketch::estimate_kmer_counts(sketches, kmer_counts);
 
     ASSERT_EQ(kmer_counts.size(), 2);
-    EXPECT_EQ(kmer_counts[0], 581);
-    EXPECT_EQ(kmer_counts[1], 581);
+    EXPECT_EQ(kmer_counts[0], 1498);
+    EXPECT_EQ(kmer_counts[1], 1498);
 }

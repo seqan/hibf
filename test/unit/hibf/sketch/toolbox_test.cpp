@@ -4,6 +4,7 @@
 #include <cstddef>     // for size_t
 #include <functional>  // for greater
 #include <limits>      // for numeric_limits
+#include <random>      // for uniform_int_distribution, mt19937_64
 #include <string>      // for allocator, basic_string, string
 #include <string_view> // for string_view
 #include <tuple>       // for tie, make_tuple
@@ -24,33 +25,12 @@ struct toolbox_test : public ::testing::Test
     {
         seqan::hibf::sketch::hyperloglog sketch{};
 
-        std::vector<std::string> const small_input{
-            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
-            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-             "ATATCGATCGAGCGAGGCAGGCAGCGATCGAGCGAGCGCATGCAGCGACTAGCTACGACAGCTACTATCAGCAGCGAGCG"
-             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"},
-            {"ACGATCGACTAGGAGCGATTACGACTGACTACATCTAGCTAGCTAGAGATTCTTCAGAGCTTAGCGATCTCGAGCTATCG"
-             "AGCTATTTCAGACCTACACTATCTAGCTTATTCACAAATATTATAACGGCATACGTCTAGTGCTCATCGTGATCTAGCGA"
-             "GCTAGCGATCTGATTCACGAGCGTACGTGACGTACGTATCGTACTACGTATCGTACTACATGCATCGATCGACGTAGCTA"
-             "ATCGATCACGATCAGCGAGCGATATCTTATCGTAGGCATCGAGCATCGAGGAGCGATCTATCTATCTATCATCTATCTAT"
-             "TCAGCGTAGCGTACGAGTCAGCTGACTGACGTCGTAGCATCGTACGTAGCGTAGCGATCGAGTCACTTATCGTAGCTAGT"
-             "CGACTAGCGTACGTAGTCAGCTATTATGACGAGGCGACTTAGCGACTACGAGCTAGCGAGGAGGCGAGGCGAGCGGACTG"
-             "G"}};
+        std::uniform_int_distribution<uint64_t> distribution{};
+        std::mt19937_64 engine{0u};
 
-        size_t const kmer_size{21u};
+        for (size_t i = 0; i < 1500; ++i)
+            sketch.add(distribution(engine));
 
-        for (std::string_view const seq : small_input)
-            for (size_t pos = 0; pos + kmer_size <= seq.size(); ++pos) // substr is [pos, pos + len)
-                sketch.add(seq.substr(pos, kmer_size));
-
-        // seqan::hibf::sketch::toolbox::read_hll_files_into(data(""), test_filenames, result);
         return std::vector<seqan::hibf::sketch::hyperloglog>(test_kmer_counts.size(), sketch);
     }();
 };
@@ -82,21 +62,21 @@ TEST_F(toolbox_test, precompute_union_estimates_for)
                                                                  test_kmer_counts,
                                                                  test_positions,
                                                                  1);
-    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 600, 0, 0}));
+    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{1635, 600, 0, 0}));
 
     seqan::hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
                                                                  test_sketches,
                                                                  test_kmer_counts,
                                                                  test_positions,
                                                                  2);
-    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 658, 700, 0}));
+    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{1635, 1635, 700, 0}));
 
     seqan::hibf::sketch::toolbox::precompute_union_estimates_for(estimates,
                                                                  test_sketches,
                                                                  test_kmer_counts,
                                                                  test_positions,
                                                                  3);
-    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{658, 658, 658, 800}));
+    EXPECT_RANGE_EQ(estimates, (std::vector<uint64_t>{1635, 1635, 1635, 800}));
 }
 
 TEST_F(toolbox_test, random_shuffle)
