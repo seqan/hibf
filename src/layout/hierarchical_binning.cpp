@@ -131,6 +131,14 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
     assert(data != nullptr);
 
     // we must iterate column wise
+    // j iterates over the user bins
+    // i iterates over the technical bins
+    // matrix:
+    //    i\j  UB0 UB1 UB2 UB3
+    //        ---------------------------
+    //    TB0 |
+    //    TB1 |
+    //    TB2 |
     for (size_t j = 1; j < num_user_bins; ++j)
     {
         size_t const current_weight = (*data->kmer_counts)[data->positions[j]];
