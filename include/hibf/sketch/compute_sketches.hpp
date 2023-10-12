@@ -16,7 +16,8 @@ namespace seqan::hibf::sketch
  * \param[in,out] sketches The vector that will store the sketches.
  * \returns layout
  */
-void
-compute_sketches(config const & config, std::vector<size_t> & kmer_counts, std::vector<sketch::hyperloglog> & sketches);
+void compute_sketches(config const & config,
+                      std::vector<size_t> & kmer_counts,
+                      std::vector<sketch::hyperloglog> & sketches);
 
 } // namespace seqan::hibf::sketch

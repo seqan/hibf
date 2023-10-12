@@ -29,8 +29,8 @@
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
-#include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
 #include <hibf/misc/timer.hpp>                            // for timer
+#include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
 
 namespace seqan::hibf
 {

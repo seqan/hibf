@@ -20,8 +20,9 @@
 namespace seqan::hibf::layout
 {
 
-layout
-compute_layout(config const & config, std::vector<size_t> const & kmer_counts, std::vector<sketch::hyperloglog> const & sketches)
+layout compute_layout(config const & config,
+                      std::vector<size_t> const & kmer_counts,
+                      std::vector<sketch::hyperloglog> const & sketches)
 {
     layout resulting_layout{};
 

@@ -7,15 +7,16 @@
 #include <utility>    // for addressof
 #include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>            // for unordered_flat_set
-#include <hibf/sketch/compute_sketches.hpp>       // for compute_sketches
-#include <hibf/sketch/estimate_kmer_counts.hpp>   // for estimate_kmer_counts
+#include <hibf/contrib/robin_hood.hpp>          // for unordered_flat_set
+#include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
+#include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 
 namespace seqan::hibf::sketch
 {
 
-void
-compute_sketches(config const & config, std::vector<size_t> & kmer_counts, std::vector<sketch::hyperloglog> & sketches)
+void compute_sketches(config const & config,
+                      std::vector<size_t> & kmer_counts,
+                      std::vector<sketch::hyperloglog> & sketches)
 {
     // compute sketches
     sketches.resize(config.number_of_user_bins);
@@ -40,4 +41,4 @@ compute_sketches(config const & config, std::vector<size_t> & kmer_counts, std::
     sketch::estimate_kmer_counts(sketches, kmer_counts);
 }
 
-} // namespace seqan::hibf::sketches
+} // namespace seqan::hibf::sketch
