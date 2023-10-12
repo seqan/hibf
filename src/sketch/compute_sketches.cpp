@@ -29,7 +29,7 @@ void compute_sketches(config const & config,
         seqan::hibf::sketch::hyperloglog sketch(config.sketch_bits);
 
         kmers.clear();
-        config.input_fn(i, std::inserter(kmers, kmers.begin()));
+        config.input_fn(i, insert_iterator{kmers});
 
         for (auto k_hash : kmers)
             sketch.add(k_hash);

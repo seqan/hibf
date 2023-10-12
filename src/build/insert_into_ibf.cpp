@@ -54,11 +54,11 @@ void insert_into_ibf(build_data const & data,
                      seqan::hibf::interleaved_bloom_filter & ibf)
 {
     auto const bin_index = seqan::hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
-    robin_hood::unordered_flat_set<uint64_t> values;
+    std::vector<uint64_t> values;
 
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.config.input_fn(record.idx, std::inserter(values, values.begin()));
+    data.config.input_fn(record.idx, insert_iterator{values});
     local_user_bin_io_timer.stop();
     data.user_bin_io_timer += local_user_bin_io_timer;
 
