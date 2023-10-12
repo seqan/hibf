@@ -29,6 +29,7 @@
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
 #include <hibf/misc/timer.hpp>                            // for timer
 
 namespace seqan::hibf
@@ -197,7 +198,12 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration)
 {
     configuration.validate_and_set_defaults();
-    auto layout = layout::compute_layout(configuration);
+
+    std::vector<size_t> kmer_counts{};
+    std::vector<sketch::hyperloglog> sketches{};
+    sketch::compute_sketches(configuration, kmer_counts, sketches);
+
+    auto layout = layout::compute_layout(configuration, kmer_counts, sketches);
     build_index(*this, configuration, layout);
 }
 
