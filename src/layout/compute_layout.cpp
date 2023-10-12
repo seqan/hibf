@@ -20,8 +20,9 @@
 namespace seqan::hibf::layout
 {
 
-layout
-compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::vector<sketch::hyperloglog> & sketches)
+layout compute_layout(config const & config,
+                      std::vector<size_t> const & kmer_counts,
+                      std::vector<sketch::hyperloglog> const & sketches)
 {
     layout resulting_layout{};
 
@@ -29,28 +30,6 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     // seqan::hibf::execute currently writes the filled buffers to the output file.
     std::stringstream output_buffer;
     std::stringstream header_buffer;
-
-    // compute sketches
-    sketches.resize(config.number_of_user_bins);
-    kmer_counts.resize(config.number_of_user_bins);
-
-    robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers)
-    for (size_t i = 0; i < config.number_of_user_bins; ++i)
-    {
-        seqan::hibf::sketch::hyperloglog sketch(config.sketch_bits);
-
-        kmers.clear();
-        config.input_fn(i, std::inserter(kmers, kmers.begin()));
-
-        for (auto k_hash : kmers)
-            sketch.add(k_hash);
-
-        // #pragma omp critical
-        sketches[i] = sketch;
-    }
-
-    sketch::estimate_kmer_counts(sketches, kmer_counts);
 
     data_store store{.false_positive_rate = config.maximum_false_positive_rate,
                      .hibf_layout = &resulting_layout,
@@ -72,14 +51,6 @@ compute_layout(config const & config, std::vector<size_t> & kmer_counts, std::ve
     // GCOVR_EXCL_STOP
 
     return *store.hibf_layout;
-}
-
-layout compute_layout(config const & config)
-{
-    std::vector<size_t> kmer_counts{};
-    std::vector<sketch::hyperloglog> sketches{};
-
-    return compute_layout(config, kmer_counts, sketches);
 }
 
 } // namespace seqan::hibf::layout
