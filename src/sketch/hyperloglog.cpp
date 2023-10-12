@@ -89,8 +89,8 @@ void hyperloglog::merge(hyperloglog const & other)
 {
     assert(size == other.size);
 
-    simde__m256i * const it = reinterpret_cast<simde__m256i * const>(data.data());
-    simde__m256i const * const other_it = reinterpret_cast<simde__m256i const * const>(other.data.data());
+    simde__m256i * const it = reinterpret_cast<simde__m256i *>(data.data());
+    simde__m256i const * const other_it = reinterpret_cast<simde__m256i const *>(other.data.data());
 
     // We can do 256 bits = 32 bytes at once.
     // We store `uint8_t`, so `size` is the size in bytes.
@@ -116,10 +116,10 @@ void hyperloglog::store(std::ostream & os) const
 {
     assert(data.size() == size);
 
-    char const * const bits_ptr = reinterpret_cast<char const * const>(std::addressof(bits));
+    char const * const bits_ptr = reinterpret_cast<char const *>(std::addressof(bits));
     os.write(bits_ptr, sizeof(bits));
 
-    char const * const data_ptr = reinterpret_cast<char const * const>(data.data());
+    char const * const data_ptr = reinterpret_cast<char const *>(data.data());
     os.write(data_ptr, sizeof(data[0]) * size);
 
     os.flush();
@@ -134,12 +134,12 @@ void hyperloglog::load(std::istream & is)
     try
     {
         uint8_t restore_bits{};
-        char * const bits_ptr = reinterpret_cast<char * const>(std::addressof(restore_bits));
+        char * const bits_ptr = reinterpret_cast<char *>(std::addressof(restore_bits));
         is.read(bits_ptr, sizeof(restore_bits));
 
         hyperloglog restore_hll{restore_bits}; // Constructor might throw std::invalid_argument
 
-        char * const data_ptr = reinterpret_cast<char * const>(restore_hll.data.data());
+        char * const data_ptr = reinterpret_cast<char *>(restore_hll.data.data());
         is.read(data_ptr, sizeof(data[0]) * restore_hll.size);
 
         if (is.fail())
