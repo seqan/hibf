@@ -36,7 +36,6 @@ list (APPEND CMAKE_MODULE_PATH "${HIBF_TEST_CMAKE_MODULE_DIR}")
 # libraries which are in common for **all** hibf tests
 if (NOT TARGET hibf::test)
     add_library (hibf_test INTERFACE)
-    target_compile_options (hibf_test INTERFACE "-pedantic" "-Wall" "-Wextra" "-Werror")
 
     # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
@@ -94,3 +93,4 @@ include (hibf_add_subdirectories)
 
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
+target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
