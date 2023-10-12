@@ -40,28 +40,10 @@ public:
      */
     hyperloglog(uint8_t const b = 5u);
 
-    // Note: `add(...)` calls `XXH3_64bits(const void* input, size_t length)`.
-    // XXH3 is written in C; the API has type erasure (void *).
-    // We only need `add(...)` for uint64_t (sketching), and string_view (unit tests).
-    // If we ever need a type erased overload, consider `std::span<std::byte>`.
-    // It can be constructed from any value `x`:
-    // `std::span<std::byte> my_span{reinterpret_cast<std::byte *>(x), sizeof(x)}`
-    // See also https://en.cppreference.com/w/cpp/types/byte
-    // `std::span<void>` is not valid.
-
-    /*!\brief Adds a string_view to the estimator.
-     * \param[in] sv string_view to add
-     */
-    void add(std::string_view const sv);
-
-    // Note: Sometimes, LTO optimizes the function body away. In particular, when value is in a register.
-    // Using const & is more or less the same as using `asm inline("" : : "m"(value));`, but it can still optimize
-    // for memory addresses and registers when inlining, whereas the asm will always create a memory address.
-
     /*!\brief Adds an unsigned 64-bit integer to the estimator.
      * \param[in] value unsigned integer to add
      */
-    void add(uint64_t const & value);
+    void add(uint64_t const value);
 
     /*!\brief Estimates cardinality value.
      * \returns Estimated cardinality value.
