@@ -145,11 +145,11 @@
 //  Workarounds
 // ============================================================================
 
-/*!\brief Workaround bogus memcpy errors in GCC 12.1 and 12.2. (Wrestrict and Wstringop-overflow)
+/*!\brief Workaround bogus memcpy errors in GCC 12. (Wrestrict and Wstringop-overflow)
  * \see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105545
  */
 #ifndef HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
-#    if HIBF_COMPILER_IS_GCC && (__GNUC__ == 12 && __GNUC_MINOR__ < 3)
+#    if HIBF_COMPILER_IS_GCC && (__GNUC__ == 12)
 #        define HIBF_WORKAROUND_GCC_BOGUS_MEMCPY 1
 #    else
 #        define HIBF_WORKAROUND_GCC_BOGUS_MEMCPY 0
