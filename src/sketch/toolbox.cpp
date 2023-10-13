@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-License-Identifier: BSD-3-Clause
+
 #include <algorithm>  // for max, fill_n, sort
 #include <cassert>    // for assert
 #include <cinttypes>  // for uint64_t, int64_t

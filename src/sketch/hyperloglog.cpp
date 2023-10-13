@@ -1,3 +1,8 @@
+// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>
+// SPDX-License-Identifier: BSD-3-Clause AND MIT
+
 #include <algorithm>   // for max, fill
 #include <array>       // for array
 #include <bit>         // for countl_zero
