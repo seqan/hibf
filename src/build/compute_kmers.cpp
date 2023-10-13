@@ -30,7 +30,7 @@ void compute_kmers(robin_hood::unordered_flat_set<uint64_t> & kmers,
 {
     timer<concurrent::no> local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
-    data.config.input_fn(record.idx, std::inserter(kmers, kmers.begin()));
+    data.config.input_fn(record.idx, insert_iterator{kmers});
     local_user_bin_io_timer.stop();
     data.user_bin_io_timer += local_user_bin_io_timer;
 }

@@ -7,14 +7,12 @@
 
 #pragma once
 
-#include <cinttypes>  // for uint16_t, uint32_t, uint64_t, uint8_t
+#include <cinttypes>  // for uint32_t, uint8_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <iosfwd>     // for istream, ostream
-#include <iterator>   // for insert_iterator
 
-#include <hibf/cereal/path.hpp>        // IWYU pragma: keep
-#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
+#include <hibf/misc/insert_iterator.hpp> // for insert_iterator
 #include <hibf/platform.hpp>
 
 #include <cereal/access.hpp> // for access
@@ -22,8 +20,6 @@
 
 namespace seqan::hibf
 {
-
-using insert_iterator = std::insert_iterator<robin_hood::unordered_flat_set<uint64_t>>;
 
 /*!\brief The configuration used to build an (H)IBF
  * \ingroup hibf

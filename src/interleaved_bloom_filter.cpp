@@ -57,7 +57,7 @@ size_t max_bin_size(config & configuration)
     for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
     {
         kmers.clear();
-        configuration.input_fn(i, std::inserter(kmers, kmers.begin()));
+        configuration.input_fn(i, insert_iterator{kmers});
 
 #pragma omp critical
         max_size = std::max(max_size, kmers.size());
@@ -81,7 +81,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
     {
         kmers.clear();
-        configuration.input_fn(i, std::inserter(kmers, kmers.begin()));
+        configuration.input_fn(i, insert_iterator{kmers});
 
         for (uint64_t const hash : kmers)
             emplace(hash, seqan::hibf::bin_index{i});
