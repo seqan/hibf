@@ -18,6 +18,7 @@
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 #include <hibf/sketch/toolbox.hpp>              // for precompute_initial_union_estimates, precompute_union_estimat...
 
 namespace seqan::hibf::layout

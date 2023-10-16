@@ -6,12 +6,13 @@
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iterator>   // for inserter, counted_iterator
+#include <iterator>   // for counted_iterator
 #include <ranges>     // for all_t, operator==
+#include <vector>     // for vector
 
 #include <hibf/build/build_data.hpp>                // for build_data
 #include <hibf/build/insert_into_ibf.hpp>           // for insert_into_ibf
-#include <hibf/config.hpp>                          // for config
+#include <hibf/config.hpp>                          // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|

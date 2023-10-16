@@ -9,11 +9,10 @@
 #include <cinttypes>  // for uint64_t
 #include <cstring>    // for size_t, memcpy
 #include <functional> // for function
-#include <iterator>   // for inserter
 #include <stdexcept>  // for logic_error, invalid_argument
 
 #include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
-#include <hibf/config.hpp>                   // for config
+#include <hibf/config.hpp>                   // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
