@@ -127,6 +127,12 @@ private:
                               size_t & high_level_max_size,
                               bool is_first_row = false);
 
+    void backtrack_split_bin(size_t trace_j,
+                             size_t const number_of_bins,
+                             size_t const bin_id,
+                             size_t & high_level_max_id,
+                             size_t & high_level_max_size);
+
     //!\brief Backtracks the trace matrix and writes the resulting binning into the output file.
     size_t backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace);
 
