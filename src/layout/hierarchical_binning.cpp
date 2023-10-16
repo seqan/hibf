@@ -90,6 +90,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     assert(data != nullptr);
 
     // initialize first column
+    // this is equivalent to split the first user bin into an increasing number of technical bins
     double const ub_cardinality = static_cast<double>((*data->kmer_counts)[data->positions[0]]);
     for (size_t i = 0; i < num_technical_bins; ++i)
     {
@@ -99,6 +100,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     }
 
     // initialize first row
+    // this is equivalent to merging increasing number of user bins into the first technical bin
     size_t sum = (*data->kmer_counts)[data->positions[0]];
     if (!config.disable_estimate_union)
     {
@@ -136,8 +138,8 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
     assert(data != nullptr);
 
     // we must iterate column wise
-    // j iterates over the user bins
     // i iterates over the technical bins
+    // j iterates over the user bins
     // matrix:
     //    i\j  UB0 UB1 UB2 UB3
     //        ---------------------------
@@ -162,6 +164,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
             size_t full_minimum{std::numeric_limits<size_t>::max()};
 
             // check vertical cells
+            // this is equivalent of trying to split the current user bin j into (i - i_prime) technical bins
             for (size_t i_prime = 0; i_prime < i; ++i_prime)
             {
                 // score: The current maximum technical bin size for the high-level IBF (score for the matrix M)
@@ -188,6 +191,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
             //                      << std::endl;
 
             // check horizontal cells
+            // this is equivalent of merging user bins {j_prime + 1, j} into technical bin i
             size_t j_prime{j - 1};
             size_t weight{current_weight};
 
