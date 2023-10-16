@@ -64,6 +64,10 @@ A quick overview on how to use the HIBF lib:
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme.cpp) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme.cpp -->
 ```cpp
+// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-License-Identifier: CC0-1.0
+
 #include <algorithm>  // for copy
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
