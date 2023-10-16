@@ -2,24 +2,25 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, TestInfo, Message, TestPartResult, TEST, EXPECT_EQ, EXPE...
+#include <gtest/gtest.h> // for Test, Message, TestInfo, TestPartResult, TEST, EXPECT_EQ
 
-#include <cinttypes>   // for uint8_t
-#include <cstddef>     // for size_t
-#include <filesystem>  // for path
-#include <fstream>     // for ofstream, ifstream, basic_ostream::write, ios
-#include <random>      // for uniform_int_distribution, mt19937_64
-#include <ranges>      // for iota_view, operator==, _Iota, iota
-#include <stdexcept>   // for runtime_error, invalid_argument
-#include <string>      // for allocator, basic_string, hash, string, char_traits, operator==
-#include <string_view> // for string_view
-#include <vector>      // for vector
+#include <algorithm>  // for __generate_fn, generate
+#include <cinttypes>  // for uint64_t, uint8_t
+#include <cstddef>    // for size_t
+#include <filesystem> // for path
+#include <fstream>    // for basic_ofstream, basic_ifstream, ofstream, ifstream, basi...
+#include <random>     // for uniform_int_distribution, mt19937_64
+#include <ranges>     // for iterator_t, all_t, iota_view, operator==, _Iota, iota
+#include <stdexcept>  // for runtime_error, invalid_argument
+#include <string>     // for allocator, basic_string, char_traits
+#include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>     // for unordered_flat_set
-#include <hibf/contrib/std/chunk_view.hpp> // for chunk_view, operator==, chunk, chunk_fn
-#include <hibf/sketch/hyperloglog.hpp>     // for hyperloglog
-#include <hibf/test/sandboxed_path.hpp>    // for operator/, sandboxed_path
-#include <hibf/test/tmp_directory.hpp>     // for tmp_directory
+#include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
+#include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
+#include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
+#include <hibf/sketch/hyperloglog.hpp>              // for hyperloglog
+#include <hibf/test/sandboxed_path.hpp>             // for operator/, sandboxed_path
+#include <hibf/test/tmp_directory.hpp>              // for tmp_directory
 
 TEST(hyperloglog, bit_widths)
 {

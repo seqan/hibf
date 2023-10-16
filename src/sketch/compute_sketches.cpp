@@ -2,18 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>  // for __sort_fn, sort
+#include <algorithm>  // for max, fill_n
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
-#include <functional> // for identity, function
-#include <iterator>   // for inserter
-#include <sstream>    // for basic_stringstream, stringstream
-#include <utility>    // for addressof
+#include <functional> // for function
 #include <vector>     // for vector
 
+#include <hibf/config.hpp>                      // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>          // for unordered_flat_set
 #include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
 #include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 
 namespace seqan::hibf::sketch
 {

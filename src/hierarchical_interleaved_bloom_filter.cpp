@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for fill_n, max, shuffle
+#include <algorithm> // for max, fill_n, shuffle
 #include <cinttypes> // for uint64_t, int64_t
 #include <cstddef>   // for size_t
 #include <mutex>     // for mutex, lock_guard
@@ -28,6 +28,7 @@
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/misc/timer.hpp>                            // for timer
 #include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>                    // for hyperloglog
 
 namespace seqan::hibf
 {

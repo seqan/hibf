@@ -11,13 +11,12 @@
 
 #pragma once
 
-#include <algorithm>   // for copy
-#include <array>       // for array
-#include <cinttypes>   // for uint64_t, uint8_t
-#include <cstddef>     // for size_t
-#include <iosfwd>      // for istream, ostream
-#include <string_view> // for string_view
-#include <vector>      // for vector
+#include <algorithm> // for copy
+#include <array>     // for array
+#include <cinttypes> // for uint64_t, uint8_t
+#include <cstddef>   // for size_t
+#include <iosfwd>    // for istream, ostream
+#include <vector>    // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 

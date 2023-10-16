@@ -3,22 +3,18 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>  // for __sort_fn, sort
-#include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
-#include <functional> // for identity, function
-#include <iterator>   // for inserter
+#include <functional> // for identity
 #include <sstream>    // for basic_stringstream, stringstream
 #include <utility>    // for addressof
 #include <vector>     // for vector
 
 #include <hibf/config.hpp>                        // for config
-#include <hibf/contrib/robin_hood.hpp>            // for unordered_flat_set
 #include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
 #include <hibf/layout/compute_layout.hpp>         // for compute_layout
 #include <hibf/layout/data_store.hpp>             // for data_store
 #include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
 #include <hibf/layout/layout.hpp>                 // for layout
-#include <hibf/sketch/estimate_kmer_counts.hpp>   // for estimate_kmer_counts
 #include <hibf/sketch/hyperloglog.hpp>            // for hyperloglog
 
 namespace seqan::hibf::layout
