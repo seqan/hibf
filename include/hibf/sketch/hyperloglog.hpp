@@ -1,12 +1,7 @@
-// -----------------------------------------------------------------------------------------------------
-// Copyright (c) 2006-2022, Knut Reinert & Freie Universität Berlin
-// Copyright (c) 2016-2022, Knut Reinert & MPI für molekulare Genetik
-// This file may be used, modified and/or redistributed under the terms of the 3-clause BSD-License
-// shipped with this file and also available at: https://github.com/seqan/seqan3/blob/master/LICENSE.md
-// -----------------------------------------------------------------------------------------------------
-
-// Copyright (c) 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>
-// MIT License: https://github.com/hideo55/cpp-HyperLogLog#license
+// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>
+// SPDX-License-Identifier: BSD-3-Clause AND MIT
 
 /*!\file
  * \author Felix Droop <felix.droop AT fu-berlin.de>

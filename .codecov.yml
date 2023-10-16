@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
 # See https://docs.codecov.io/docs/codecovyml-reference
 codecov:
   token: 8e007bb5-3379-42a3-933a-8e3a0dad27ef

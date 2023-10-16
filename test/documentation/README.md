@@ -1,3 +1,9 @@
+<!--
+SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+SPDX-License-Identifier: BSD-3-Clause
+-->
+
 # hibf documentation
 
 Currently, we can only build the documentation on *nix systems.
@@ -55,7 +61,7 @@ Prerequisites: building the documentation
 Our installation uses GNU standard installation directories provided by cmake
 [GNUInstallDirs](https://cmake.org/cmake/help/v3.19/module/GNUInstallDirs.html#module:GNUInstallDirs).
 
-That means the html documentation will be installed to `<DESTDIR>/<INSTALL_PREFIX>/<INSTALL_DOCDIR>/html/` where 
+That means the html documentation will be installed to `<DESTDIR>/<INSTALL_PREFIX>/<INSTALL_DOCDIR>/html/` where
 `<INSTALL_PREFIX>` is typically `usr/local` and `<INSTALL_DOCDIR>` is `share/doc/hibf`.
 
 That means our html documentation will be installed to `<DESTDIR>/usr/local/share/doc/hibf/html`.
