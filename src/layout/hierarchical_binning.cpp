@@ -276,17 +276,18 @@ void hierarchical_binning::backtrack_split_bin(size_t trace_j,
                                                size_t & high_level_max_id,
                                                size_t & high_level_max_size)
 {
-    size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
-    size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
+    size_t cardinality = (*data->kmer_counts)[data->positions[trace_j]];
+    size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
+    size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
                                               bin_id,
                                               number_of_bins,
                                               data->positions[trace_j]);
 
-    // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << kmer_count_per_bin << std::endl;
+    // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << cardinality_per_bin << std::endl;
 
-    update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count_per_bin);
+    update_max_id(high_level_max_id, high_level_max_size, bin_id, cardinality_per_bin);
 }
 
 size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace)
