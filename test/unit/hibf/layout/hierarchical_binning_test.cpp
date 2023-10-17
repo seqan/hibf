@@ -61,7 +61,7 @@ TEST(hierarchical_binning_test, another_example)
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
 
-    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0, 0}, 56}, {{0}, 0}};
+    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0, 0}, 56}, {{0}, 1}};
 
     std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{0, 0}, 0, 42, 6},
                                                                           {{0, 0}, 42, 14, 5},
