@@ -78,8 +78,7 @@ size_t simple_binning::execute()
         size_t next_i = trace[trace_i][trace_j];
         size_t const number_of_bins = (trace_i - next_i);
         size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
-        size_t const corrected_cardinality =
-                    static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
+        size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
         size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
         data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
@@ -100,8 +99,7 @@ size_t simple_binning::execute()
     }
     ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins
     size_t const cardinality = (*data->kmer_counts)[data->positions[0]];
-    size_t const corrected_cardinality =
-                static_cast<size_t>(cardinality * data->fpr_correction[trace_i]);
+    size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[trace_i]);
     size_t const cardinality_per_bin = (corrected_cardinality + trace_i - 1) / trace_i;
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices, bin_id, trace_i, data->positions[0]);
