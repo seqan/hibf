@@ -235,6 +235,60 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
     }
 }
 
+void hierarchical_binning::backtrack_merged_bin(size_t trace_j,
+                                                size_t const next_j,
+                                                size_t const bin_id,
+                                                size_t & high_level_max_id,
+                                                size_t & high_level_max_size,
+                                                bool is_first_row)
+{
+    size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
+    sketch::hyperloglog sketch =
+        config.disable_estimate_union ? sketch::hyperloglog{} : (*data->sketches)[data->positions[trace_j]];
+    auto libf_data = initialise_libf_data(trace_j);
+
+    // std::cout << "merged [" << trace_j;
+    trace_j -= !is_first_row;
+    while (trace_j != next_j)
+    {
+        trace_j -= is_first_row;
+        if (!config.disable_estimate_union)
+            sketch.merge((*data->sketches)[data->positions[trace_j]]);
+        else
+            kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
+        libf_data.positions.push_back(data->positions[trace_j]);
+        // std::cout << "," << trace_j;
+        trace_j -= !is_first_row;
+    }
+
+    process_merged_bin(libf_data, bin_id);
+
+    if (!config.disable_estimate_union)
+        kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
+
+    update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
+    // std::cout << "]: " << kmer_count << std::endl;
+}
+
+void hierarchical_binning::backtrack_split_bin(size_t trace_j,
+                                               size_t const number_of_bins,
+                                               size_t const bin_id,
+                                               size_t & high_level_max_id,
+                                               size_t & high_level_max_size)
+{
+    size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
+    size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
+
+    data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
+                                              bin_id,
+                                              number_of_bins,
+                                              data->positions[trace_j]);
+
+    // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << kmer_count_per_bin << std::endl;
+
+    update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count_per_bin);
+}
+
 size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace)
 {
     assert(data != nullptr);
@@ -255,50 +309,18 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         size_t next_i = trace[trace_i][trace_j].first;
         size_t next_j = trace[trace_i][trace_j].second;
 
-        sketch::hyperloglog sketch =
-            config.disable_estimate_union ? sketch::hyperloglog{} : (*data->sketches)[data->positions[trace_j]];
-        size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
         size_t number_of_bins = (trace_i - next_i);
 
         if (number_of_bins == 1 && next_j != trace_j - 1u) // merged bin
         {
-            auto libf_data = initialise_libf_data(trace_j);
+            backtrack_merged_bin(trace_j, next_j, bin_id, high_level_max_id, high_level_max_size);
 
-            // std::cout << "merged [" << trace_j;
-            --trace_j;
-            while (trace_j != next_j)
-            {
-                if (!config.disable_estimate_union)
-                    sketch.merge((*data->sketches)[data->positions[trace_j]]);
-                else
-                    kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
-                libf_data.positions.push_back(data->positions[trace_j]);
-                // std::cout << "," << trace_j;
-                --trace_j;
-            }
             trace_i = next_i;
-            trace_j = next_j; // unneccessary?
-
-            process_merged_bin(libf_data, bin_id);
-
-            if (!config.disable_estimate_union)
-                kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
-
-            update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
-            // std::cout << "]: " << kmer_count << std::endl;
+            trace_j = next_j;
         }
         else // split bin
         {
-            size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
-
-            data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
-                                                      bin_id,
-                                                      number_of_bins,
-                                                      data->positions[trace_j]);
-
-            // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << kmer_count_per_bin << std::endl;
-
-            update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count_per_bin);
+            backtrack_split_bin(trace_j, number_of_bins, bin_id, high_level_max_id, high_level_max_size);
 
             trace_i = trace[trace_i][trace_j].first;
             --trace_j;
@@ -311,49 +333,13 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     assert(trace_i == 0 || trace_j == 0);
     if (trace_i == 0u && trace_j > 0u) // the last UBs get merged into the remaining TB
     {
-        sketch::hyperloglog sketch =
-            config.disable_estimate_union ? sketch::hyperloglog{} : (*data->sketches)[data->positions[trace_j]];
-        size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
-        auto libf_data = initialise_libf_data(trace_j);
-
-        // std::cout << "merged [" << trace_j;
-        while (trace_j > 0)
-        {
-            --trace_j;
-            if (!config.disable_estimate_union)
-                sketch.merge((*data->sketches)[data->positions[trace_j]]);
-            else
-                kmer_count += (*data->kmer_counts)[data->positions[trace_j]];
-            libf_data.positions.push_back(data->positions[trace_j]);
-            // std::cout << "," << trace_j;
-        }
-        assert(trace_j == 0);
-
-        process_merged_bin(libf_data, bin_id);
-
-        if (!config.disable_estimate_union)
-            kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
-
-        update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
-
-        // std::cout << "]: " << kmer_count << std::endl;
-        // std::cout << "\t I am now at " << trace_i << "," << trace_j << std::endl;
+        // we are in the first row, merging the remaining UBs into the last TB (TB-0)
+        backtrack_merged_bin(trace_j, 0, bin_id, high_level_max_id, high_level_max_size, true);
     }
     else if (trace_j == 0u) // the last UB is split into the remaining TBs
     {
-        // we only arrive here if the first user bin (UB-0) wasn't merged with some before so it is safe to assume
-        // that the bin was split (even if only into 1 bin).
-        size_t const kmer_count = (*data->kmer_counts)[data->positions[0]];
-        size_t const number_of_tbs = trace_i + 1;
-        size_t const average_bin_size = (kmer_count + number_of_tbs - 1) / number_of_tbs; // round up
-
-        data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
-                                                  bin_id,
-                                                  number_of_tbs,
-                                                  data->positions[0]);
-
-        update_max_id(high_level_max_id, high_level_max_size, bin_id, average_bin_size);
-        // std::cout << "split " << trace_j << " into " << trace_i << ": " << kmer_count / number_of_tbs << std::endl;
+        // we are in the first column, splitting the last UB (UB-0) into the remaining TBs (even if only into 1 bin).
+        backtrack_split_bin(trace_j, trace_i + 1, bin_id, high_level_max_id, high_level_max_size);
     }
 
     return high_level_max_id;
