@@ -76,19 +76,20 @@ size_t simple_binning::execute()
     while (trace_j > 0)
     {
         size_t next_i = trace[trace_i][trace_j];
-        size_t const kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
         size_t const number_of_bins = (trace_i - next_i);
-        size_t const kmer_count_per_bin = (kmer_count + number_of_bins - 1) / number_of_bins; // round up
+        size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
+        size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
+        size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
         data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
                                                   bin_id,
                                                   number_of_bins,
                                                   data->positions[trace_j]);
 
-        if (kmer_count_per_bin > max_size)
+        if (cardinality_per_bin > max_size)
         {
             max_id = bin_id;
-            max_size = kmer_count_per_bin;
+            max_size = cardinality_per_bin;
         }
 
         bin_id += number_of_bins;
@@ -97,12 +98,13 @@ size_t simple_binning::execute()
         --trace_j;
     }
     ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins
-    size_t const kmer_count = (*data->kmer_counts)[data->positions[0]];
-    size_t const kmer_count_per_bin = (kmer_count + trace_i - 1) / trace_i;
+    size_t const cardinality = (*data->kmer_counts)[data->positions[0]];
+    size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[trace_i]);
+    size_t const cardinality_per_bin = (corrected_cardinality + trace_i - 1) / trace_i;
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices, bin_id, trace_i, data->positions[0]);
 
-    if (kmer_count_per_bin > max_size)
+    if (cardinality_per_bin > max_size)
         max_id = bin_id;
 
     return max_id;
