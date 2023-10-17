@@ -56,6 +56,7 @@ TEST(hibf_test, build_from_layout)
                              "@        \"number_of_user_bins\": 2,\n"
                              "@        \"number_of_hash_functions\": 2,\n"
                              "@        \"maximum_false_positive_rate\": 0.05,\n"
+                             "@        \"relaxed_fpr\": 0.3,\n"
                              "@        \"threads\": 1,\n"
                              "@        \"sketch_bits\": 12,\n"
                              "@        \"tmax\": 64,\n"

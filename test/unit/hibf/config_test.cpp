@@ -39,6 +39,7 @@ TEST(config_test, write_to)
                                     "@        \"number_of_user_bins\": 123456789,\n"
                                     "@        \"number_of_hash_functions\": 4,\n"
                                     "@        \"maximum_false_positive_rate\": 0.0001,\n"
+                                    "@        \"relaxed_fpr\": 0.3,\n"
                                     "@        \"threads\": 31,\n"
                                     "@        \"sketch_bits\": 8,\n"
                                     "@        \"tmax\": 128,\n"
@@ -62,6 +63,7 @@ TEST(config_test, read_from)
                          "@        \"number_of_user_bins\": 123456789,\n"
                          "@        \"number_of_hash_functions\": 4,\n"
                          "@        \"maximum_false_positive_rate\": 0.0001,\n"
+                         "@        \"relaxed_fpr\": 0.3,\n"
                          "@        \"threads\": 31,\n"
                          "@        \"sketch_bits\": 8,\n"
                          "@        \"tmax\": 128,\n"
@@ -79,6 +81,7 @@ TEST(config_test, read_from)
     EXPECT_EQ(configuration.number_of_user_bins, 123456789);
     EXPECT_EQ(configuration.number_of_hash_functions, 4);
     EXPECT_EQ(configuration.maximum_false_positive_rate, 0.0001);
+    EXPECT_EQ(configuration.relaxed_fpr, 0.3);
     EXPECT_EQ(configuration.threads, 31);
     EXPECT_EQ(configuration.sketch_bits, 8);
     EXPECT_EQ(configuration.tmax, 128);
@@ -102,6 +105,7 @@ TEST(config_test, read_from_with_more_meta)
                          "@        \"number_of_user_bins\": 123456789,\n"
                          "@        \"number_of_hash_functions\": 4,\n"
                          "@        \"maximum_false_positive_rate\": 0.0001,\n"
+                         "@        \"relaxed_fpr\": 0.3,\n"
                          "@        \"threads\": 31,\n"
                          "@        \"sketch_bits\": 8,\n"
                          "@        \"tmax\": 128,\n"
@@ -119,6 +123,7 @@ TEST(config_test, read_from_with_more_meta)
     EXPECT_EQ(configuration.number_of_user_bins, 123456789);
     EXPECT_EQ(configuration.number_of_hash_functions, 4);
     EXPECT_EQ(configuration.maximum_false_positive_rate, 0.0001);
+    EXPECT_EQ(configuration.relaxed_fpr, 0.3);
     EXPECT_EQ(configuration.threads, 31);
     EXPECT_EQ(configuration.sketch_bits, 8);
     EXPECT_EQ(configuration.tmax, 128);
@@ -184,6 +189,30 @@ TEST(config_test, validate_and_set_defaults)
         configuration.maximum_false_positive_rate = 1.0;
         check_error_message(configuration,
                             "[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in (0.0,1.0).");
+    }
+
+    // relaxed_fpr must be in (0.0,1.0)
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .relaxed_fpr = -0.1};
+        check_error_message(configuration,
+                            "[HIBF CONFIG ERROR] config::relaxed_fpr must be in [0.0,1.0].");
+
+        configuration.relaxed_fpr = 1.1;
+        check_error_message(configuration,
+                            "[HIBF CONFIG ERROR] config::relaxed_fpr must be in [0.0,1.0].");
+    }
+
+    // relaxed_fpr must equal to or greater than maximum_false_positive_rate
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .maximum_false_positive_rate = 0.3,
+                                          .relaxed_fpr = 0.2};
+        check_error_message(configuration,
+                            "[HIBF CONFIG ERROR] config::relaxed_fpr must be "
+                            "greater than or equal to config::maximum_false_positive_rate.");
     }
 
     // threads cannot be 0

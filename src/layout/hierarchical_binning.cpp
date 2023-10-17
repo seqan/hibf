@@ -238,8 +238,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
 void hierarchical_binning::backtrack_merged_bin(size_t trace_j,
                                                 size_t const next_j,
                                                 size_t const bin_id,
-                                                size_t & high_level_max_id,
-                                                size_t & high_level_max_size,
+                                                maximum_bin_tracker & max_tracker,
                                                 bool is_first_row)
 {
     size_t kmer_count = (*data->kmer_counts)[data->positions[trace_j]];
@@ -266,30 +265,33 @@ void hierarchical_binning::backtrack_merged_bin(size_t trace_j,
     if (!config.disable_estimate_union)
         kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
 
-    update_max_id(high_level_max_id, high_level_max_size, bin_id, kmer_count);
+    max_tracker.update_max(bin_id, kmer_count);
     // std::cout << "]: " << kmer_count << std::endl;
 }
 
 void hierarchical_binning::backtrack_split_bin(size_t trace_j,
                                                size_t const number_of_bins,
                                                size_t const bin_id,
-                                               size_t & high_level_max_id,
-                                               size_t & high_level_max_size)
+                                               maximum_bin_tracker & max_tracker)
 {
     assert(number_of_bins > 0u);
-    size_t cardinality = (*data->kmer_counts)[data->positions[trace_j]];
-    size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
-    // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
-    size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
+    // update layout
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
                                               bin_id,
                                               number_of_bins,
                                               data->positions[trace_j]);
 
-    // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << cardinality_per_bin << std::endl;
+    // update max bin
+    size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
+    size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
+    // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
+    size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
-    update_max_id(high_level_max_id, high_level_max_size, bin_id, cardinality_per_bin);
+    max_tracker.update_max(bin_id, cardinality_per_bin);
+    max_tracker.update_split_max(bin_id, cardinality_per_bin);
+
+    // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << cardinality_per_bin << std::endl;
 }
 
 size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace)
@@ -301,9 +303,8 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     size_t trace_j = num_user_bins - 1;
 
     // while backtracking, keep trach of the following variables
-    size_t high_level_max_id{};   // the id of the technical bin with maximal size
-    size_t high_level_max_size{}; // the maximum technical bin size seen so far
-    size_t bin_id{};              // the current bin that is processed, we start naming the bins here!
+    maximum_bin_tracker max_tracker{};
+    size_t bin_id{}; // the current bin that is processed, we start naming the bins here!
 
     // process the trace starting at the bottom right call until you arrive at the first row or column
     while (trace_j > 0u && trace_i > 0u)
@@ -316,14 +317,14 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
 
         if (number_of_bins == 1 && next_j != trace_j - 1u) // merged bin
         {
-            backtrack_merged_bin(trace_j, next_j, bin_id, high_level_max_id, high_level_max_size);
+            backtrack_merged_bin(trace_j, next_j, bin_id, max_tracker);
 
             trace_i = next_i;
             trace_j = next_j;
         }
         else // split bin
         {
-            backtrack_split_bin(trace_j, number_of_bins, bin_id, high_level_max_id, high_level_max_size);
+            backtrack_split_bin(trace_j, number_of_bins, bin_id, max_tracker);
 
             trace_i = trace[trace_i][trace_j].first;
             --trace_j;
@@ -337,15 +338,15 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     if (trace_i == 0u && trace_j > 0u) // the last UBs get merged into the remaining TB
     {
         // we are in the first row, merging the remaining UBs into the last TB (TB-0)
-        backtrack_merged_bin(trace_j, 0, bin_id, high_level_max_id, high_level_max_size, true);
+        backtrack_merged_bin(trace_j, 0, bin_id, max_tracker, true);
     }
     else if (trace_j == 0u) // the last UB is split into the remaining TBs
     {
         // we are in the first column, splitting the last UB (UB-0) into the remaining TBs (even if only into 1 bin).
-        backtrack_split_bin(trace_j, trace_i + 1, bin_id, high_level_max_id, high_level_max_size);
+        backtrack_split_bin(trace_j, trace_i + 1, bin_id, max_tracker);
     }
 
-    return high_level_max_id;
+    return max_tracker.choose_max_bin(config);
 }
 
 data_store hierarchical_binning::initialise_libf_data(size_t const trace_j) const
@@ -401,18 +402,6 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     {
         // use simple binning to distribute remaining UBs
         return simple_binning{libf_data, 0}.execute(); // return id of maximum technical bin
-    }
-}
-
-void hierarchical_binning::update_max_id(size_t & max_id,
-                                         size_t & max_size,
-                                         size_t const new_id,
-                                         size_t const new_size) const
-{
-    if (new_size > max_size)
-    {
-        max_id = new_id;
-        max_size = new_size;
     }
 }
 

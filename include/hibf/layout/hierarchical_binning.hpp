@@ -9,9 +9,10 @@
 #include <utility> // for addressof, pair
 #include <vector>  // for vector
 
-#include <hibf/config.hpp>            // for config
-#include <hibf/layout/data_store.hpp> // for data_store
-#include <hibf/platform.hpp>          // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/build/bin_size_in_bits.hpp> // for bin_size_in_bits
+#include <hibf/config.hpp>                 // for config
+#include <hibf/layout/data_store.hpp>      // for data_store
+#include <hibf/platform.hpp>               // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace seqan::hibf::layout
 {
@@ -31,6 +32,69 @@ private:
     size_t num_user_bins{};
     //!\brief The number of technical bins requested by the user.
     size_t num_technical_bins{};
+
+    //!\brief Simplifies passing the parameters needed for tracking the maximum technical bin.
+    struct maximum_bin_tracker
+    {
+        size_t max_id{};         //!< The ID of the technical bin with maximal size.
+        size_t max_size{};       //!< The maximum technical bin size seen so far.
+        size_t max_split_id{};   //!< The ID of the split bin with maximal size (if any).
+        size_t max_split_size{}; //!< The maximum split bin size seen so far.
+
+        void update_max(size_t const new_id, size_t const new_size)
+        {
+            if (new_size > max_size)
+            {
+                max_id = new_id;
+                max_size = new_size;
+            }
+        }
+
+        //!\brief Split cardinality `new_size` must already account for fpr-correction.
+        void update_split_max(size_t const new_id, size_t const new_size)
+        {
+            if (new_size > max_split_size)
+            {
+                max_split_id = new_id;
+                max_split_size = new_size;
+            }
+        }
+
+        /*!\brief Decides which bin is reported as the maximum bin.
+         *\param config The HIBF configuration.
+         *\return The chosen max bin id.
+         *
+         * As a HIBF feature, the merged bin FPR can differ from the overall maximum FPR. Merged bins in an HIBF layout
+         * will always be followed by one or more lower-level IBFs that will have split bins or single bins (split = 1)
+         * to recover the original user bins.
+         *
+         * We need to make sure, though, that downsizing merged bins does not affect split bins.
+         * Therefore, we check if choosing a merged bin as the max bin violates the minimum_bits needed for split bins.
+         * If so, we can report the largest split bin as the max bin as it will choose the correct size and downsize
+         * larger merged bins only a little.
+         */
+        size_t choose_max_bin(seqan::hibf::config const & config)
+        {
+            if (max_id == max_split_id) // Overall max bin is a split bin.
+                return max_id;
+
+            // the minimum size of the TBs of this IBF to ensure the maximum_false_positive_rate for split bins
+            size_t const minimum_bits{build::bin_size_in_bits({.fpr = config.maximum_false_positive_rate,
+                                                               .hash_count = config.number_of_hash_functions,
+                                                               .elements = max_split_size})};
+
+            // the potential size of the TBs of this IBF given the allowed merged bin FPR
+            size_t const merged_bits{build::bin_size_in_bits({.fpr = config.relaxed_fpr,
+                                                              .hash_count = config.number_of_hash_functions,
+                                                              .elements = max_size})};
+
+            // If split and merged bits are the same, we prefer merged bins. Better for build parallelisation.
+            if ((minimum_bits > merged_bits))
+                return max_split_id;
+
+            return max_id;
+        }
+    };
 
 public:
     hierarchical_binning() = default;                                        //!< Defaulted.
@@ -123,15 +187,13 @@ private:
     void backtrack_merged_bin(size_t trace_j,
                               size_t const next_j,
                               size_t const bin_id,
-                              size_t & high_level_max_id,
-                              size_t & high_level_max_size,
+                              maximum_bin_tracker & max_tracker,
                               bool is_first_row = false);
 
     void backtrack_split_bin(size_t trace_j,
                              size_t const number_of_bins,
                              size_t const bin_id,
-                             size_t & high_level_max_id,
-                             size_t & high_level_max_size);
+                             maximum_bin_tracker & max_tracker);
 
     //!\brief Backtracks the trace matrix and writes the resulting binning into the output file.
     size_t backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace);
@@ -143,8 +205,6 @@ private:
     void update_libf_data(data_store & libf_data, size_t const bin_id) const;
 
     size_t add_lower_level(data_store & libf_data) const;
-
-    void update_max_id(size_t & max_id, size_t & max_size, size_t const new_id, size_t const new_size) const;
 };
 
 } // namespace seqan::hibf::layout
