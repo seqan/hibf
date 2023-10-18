@@ -5,6 +5,11 @@
 cmake_minimum_required (VERSION 3.10...3.22)
 project (hibf_util CXX)
 
+# https://cmake.org/cmake/help/latest/policy/CMP0135.html
+if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    cmake_policy (SET CMP0135 NEW)
+endif ()
+
 # Dependency: seqan::hibf
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
@@ -19,5 +24,5 @@ FetchContent_Populate (sharg)
 list (APPEND CMAKE_PREFIX_PATH "${sharg_SOURCE_DIR}/build_system")
 find_package (sharg 1.0 REQUIRED)
 
-add_executable (fpr_quality fpr_quality.cpp)
-target_link_libraries (fpr_quality seqan::hibf sharg::sharg)
+add_executable (fpr_correction_check fpr_correction_check.cpp)
+target_link_libraries (fpr_correction_check seqan::hibf sharg::sharg)
