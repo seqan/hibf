@@ -38,8 +38,8 @@ endmacro ()
 set (HIBF_SUBMODULES_DIR
      "${HIBF_SOURCE_DIR}"
      CACHE STRING "Directory containing submodules.")
-file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde/simde
-      ${HIBF_SUBMODULES_DIR}/simde/simde)
+file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde
+      ${HIBF_SUBMODULES_DIR}/simde)
 foreach (submodule ${submodules})
     if (IS_DIRECTORY ${submodule})
         hibf_config_print ("  …adding submodule include: ${submodule}")

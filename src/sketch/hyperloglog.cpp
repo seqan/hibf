@@ -19,8 +19,8 @@
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
 
-#include <x86/avx.h>  // for simde__m256i
-#include <x86/avx2.h> // for simde_mm256_max_epu8
+#include <simde/x86/avx.h>  // for simde__m256i
+#include <simde/x86/avx2.h> // for simde_mm256_max_epu8
 
 namespace seqan::hibf::sketch
 {
