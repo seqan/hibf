@@ -180,7 +180,7 @@ void multiple_tb(config const & cfg, size_t const bin_size)
 
 int main(int argc, char ** argv)
 {
-    sharg::parser parser{"fpr_quality", argc, argv, sharg::update_notifications::off};
+    sharg::parser parser{"fpr_correction_check", argc, argv, sharg::update_notifications::off};
     parser.info.author = "Enrico Seiler";
     parser.info.short_copyright = "BSD 3-Clause License";
     parser.info.short_description = "Inserts a given amount of k-mers into an IBF and queries all possible k-mers. "
