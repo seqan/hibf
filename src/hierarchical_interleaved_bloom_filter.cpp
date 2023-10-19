@@ -187,10 +187,12 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
 
     hierarchical_build(hibf, root_node, data);
 
+    // NOLINTBEGIN(performance-move-const-arg)
     hibf.index_allocation_timer = std::move(data.index_allocation_timer);
     hibf.user_bin_io_timer = std::move(data.user_bin_io_timer);
     hibf.merge_kmers_timer = std::move(data.merge_kmers_timer);
     hibf.fill_ibf_timer = std::move(data.fill_ibf_timer);
+    // NOLINTEND(performance-move-const-arg)
 }
 
 hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(config & configuration)

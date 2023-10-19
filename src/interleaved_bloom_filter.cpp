@@ -70,6 +70,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
                              seqan::hibf::bin_size{max_bin_size(configuration)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions}}
 {
+    // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
     robin_hood::unordered_flat_set<uint64_t> kmers;
 

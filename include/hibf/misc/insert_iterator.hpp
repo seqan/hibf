@@ -49,12 +49,12 @@ public:
         if (is_set)
         {
             assert(set != nullptr);
-            set->emplace(std::move(value));
+            set->emplace(value);
         }
         else
         {
             assert(vec != nullptr);
-            vec->emplace_back(std::move(value));
+            vec->emplace_back(value);
         }
         return *this;
     }

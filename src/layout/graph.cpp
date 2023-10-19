@@ -64,7 +64,7 @@ void update_content_node_data(std::vector<layout::layout::user_bin> const & layo
     // -------------------------------------------------------------------------
     for (size_t user_bin = 0; user_bin < layout_user_bins.size(); ++user_bin)
     {
-        auto & record = layout_user_bins[user_bin]; // Not const because std::move(const&) will copy, not move
+        auto const & record = layout_user_bins[user_bin];
 
         // go down the tree until you find the matching parent
         seqan::hibf::layout::graph::node * current_node = &ibf_graph.root; // start at root
@@ -101,9 +101,9 @@ void update_content_node_data(std::vector<layout::layout::user_bin> const & layo
         current_node->number_of_technical_bins = std::max(current_node->number_of_technical_bins, bin + num_tbs);
 
         if (record.storage_TB_id == current_node->max_bin_index)
-            current_node->remaining_records.insert(current_node->remaining_records.begin(), std::move(record));
+            current_node->remaining_records.insert(current_node->remaining_records.begin(), record);
         else
-            current_node->remaining_records.emplace_back(std::move(record));
+            current_node->remaining_records.emplace_back(record);
     }
 }
 

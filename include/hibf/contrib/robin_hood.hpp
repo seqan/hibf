@@ -30,6 +30,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// NOLINTBEGIN(performance-noexcept-swap)
 #ifndef ROBIN_HOOD_H_INCLUDED
 #define ROBIN_HOOD_H_INCLUDED
 
@@ -2543,3 +2544,4 @@ using unordered_set = detail::Table<sizeof(Key) <= sizeof(size_t) * 6 &&
 
 #endif
 
+// NOLINTEND(performance-noexcept-swap)
