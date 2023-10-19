@@ -18,6 +18,8 @@ namespace seqan::hibf::layout
 size_t simple_binning::execute()
 {
     assert(data != nullptr);
+    assert(num_technical_bins > 0u);
+    assert(num_user_bins > 0u);
 
     std::vector<std::vector<size_t>> matrix(num_technical_bins); // rows
     for (auto & v : matrix)
@@ -100,6 +102,7 @@ size_t simple_binning::execute()
     ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins
     size_t const cardinality = (*data->kmer_counts)[data->positions[0]];
     size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[trace_i]);
+    // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
     size_t const cardinality_per_bin = (corrected_cardinality + trace_i - 1) / trace_i;
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices, bin_id, trace_i, data->positions[0]);

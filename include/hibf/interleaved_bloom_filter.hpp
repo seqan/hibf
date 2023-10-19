@@ -192,12 +192,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    interleaved_bloom_filter() = default;                                             //!< Defaulted.
-    interleaved_bloom_filter(interleaved_bloom_filter const &) = default;             //!< Defaulted.
-    interleaved_bloom_filter & operator=(interleaved_bloom_filter const &) = default; //!< Defaulted.
-    interleaved_bloom_filter(interleaved_bloom_filter &&) = default;                  //!< Defaulted.
-    interleaved_bloom_filter & operator=(interleaved_bloom_filter &&) = default;      //!< Defaulted.
-    ~interleaved_bloom_filter() = default;                                            //!< Defaulted.
+    interleaved_bloom_filter() = default;                                                 //!< Defaulted.
+    interleaved_bloom_filter(interleaved_bloom_filter const &) = default;                 //!< Defaulted.
+    interleaved_bloom_filter & operator=(interleaved_bloom_filter const &) = default;     //!< Defaulted.
+    interleaved_bloom_filter(interleaved_bloom_filter &&) noexcept = default;             //!< Defaulted.
+    interleaved_bloom_filter & operator=(interleaved_bloom_filter &&) noexcept = default; //!< Defaulted.
+    ~interleaved_bloom_filter() = default;                                                //!< Defaulted.
 
     /*!\brief Construct an uncompressed Interleaved Bloom Filter.
      * \param bins_ The number of bins.
@@ -472,12 +472,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    binning_bitvector() = default;                                      //!< Defaulted.
-    binning_bitvector(binning_bitvector const &) = default;             //!< Defaulted.
-    binning_bitvector & operator=(binning_bitvector const &) = default; //!< Defaulted.
-    binning_bitvector(binning_bitvector &&) = default;                  //!< Defaulted.
-    binning_bitvector & operator=(binning_bitvector &&) = default;      //!< Defaulted.
-    ~binning_bitvector() = default;                                     //!< Defaulted.
+    binning_bitvector() = default;                                          //!< Defaulted.
+    binning_bitvector(binning_bitvector const &) = default;                 //!< Defaulted.
+    binning_bitvector & operator=(binning_bitvector const &) = default;     //!< Defaulted.
+    binning_bitvector(binning_bitvector &&) noexcept = default;             //!< Defaulted.
+    binning_bitvector & operator=(binning_bitvector &&) noexcept = default; //!< Defaulted.
+    ~binning_bitvector() = default;                                         //!< Defaulted.
 
     //!\brief Construct with given size.
     explicit binning_bitvector(size_t const size) : data(size)
@@ -597,12 +597,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    membership_agent_type() = default;                                          //!< Defaulted.
-    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
-    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
-    ~membership_agent_type() = default;                                         //!< Defaulted.
+    membership_agent_type() = default;                                              //!< Defaulted.
+    membership_agent_type(membership_agent_type const &) = default;                 //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type const &) = default;     //!< Defaulted.
+    membership_agent_type(membership_agent_type &&) noexcept = default;             //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type &&) noexcept = default; //!< Defaulted.
+    ~membership_agent_type() = default;                                             //!< Defaulted.
 
     /*!\brief Construct a membership_agent_type from a seqan::hibf::interleaved_bloom_filter.
      * \private
@@ -827,12 +827,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    counting_agent_type() = default;                                        //!< Defaulted.
-    counting_agent_type(counting_agent_type const &) = default;             //!< Defaulted.
-    counting_agent_type & operator=(counting_agent_type const &) = default; //!< Defaulted.
-    counting_agent_type(counting_agent_type &&) = default;                  //!< Defaulted.
-    counting_agent_type & operator=(counting_agent_type &&) = default;      //!< Defaulted.
-    ~counting_agent_type() = default;                                       //!< Defaulted.
+    counting_agent_type() = default;                                            //!< Defaulted.
+    counting_agent_type(counting_agent_type const &) = default;                 //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type const &) = default;     //!< Defaulted.
+    counting_agent_type(counting_agent_type &&) noexcept = default;             //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type &&) noexcept = default; //!< Defaulted.
+    ~counting_agent_type() = default;                                           //!< Defaulted.
 
     /*!\brief Construct a counting_agent_type for an existing seqan::hibf::interleaved_bloom_filter.
      * \private

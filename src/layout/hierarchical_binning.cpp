@@ -276,8 +276,10 @@ void hierarchical_binning::backtrack_split_bin(size_t trace_j,
                                                size_t & high_level_max_id,
                                                size_t & high_level_max_size)
 {
+    assert(number_of_bins > 0u);
     size_t cardinality = (*data->kmer_counts)[data->positions[trace_j]];
     size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
+    // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
     size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
