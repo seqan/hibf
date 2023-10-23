@@ -182,8 +182,9 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     layout::graph::node const & root_node = data.ibf_graph.root;
 
     size_t const t_max{root_node.number_of_technical_bins};
-    data.fpr_correction = layout::compute_fpr_correction(
-        {.fpr = config.maximum_false_positive_rate, .hash_count = config.number_of_hash_functions, .t_max = t_max});
+    data.fpr_correction = layout::compute_fpr_correction({.fpr = config.maximum_fpr, //
+                                                          .hash_count = config.number_of_hash_functions,
+                                                          .t_max = t_max});
 
     hierarchical_build(hibf, root_node, data);
 

@@ -59,7 +59,7 @@ auto set_up(::benchmark::State const & state)
     seqan::hibf::config config{.input_fn = distribute_hashes_across_ub,
                                .number_of_user_bins = num_ub,
                                .number_of_hash_functions = hash_num,
-                               .maximum_false_positive_rate = fpr,
+                               .maximum_fpr = fpr,
                                .threads = 4u, // Only applies to layout and build
                                .disable_estimate_union = true};
 

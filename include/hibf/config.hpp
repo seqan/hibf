@@ -30,20 +30,20 @@ namespace seqan::hibf
  *
  * Here is the list of all configs options:
  *
- * | Type    |  Option Name                                                | Default | Note                   |
- * |:--------|:------------------------------------------------------------|:-------:|:-----------------------|
- * | General | seqan::hibf::config::input_fn                               | -       | [REQUIRED]             |
- * | General | seqan::hibf::config::number_of_user_bins                    | -       | [REQUIRED]             |
- * | General | seqan::hibf::config::number_of_hash_functions               | 2       |                        |
- * | General | seqan::hibf::config::maximum_false_positive_rate            | 0.05    | [RECOMMENDED_TO_ADAPT] |
- * | General | seqan::hibf::config::relaxed_fpr | 0.3     |                        |
- * | General | seqan::hibf::config::threads                                | 1       | [RECOMMENDED_TO_ADAPT] |
- * | Layout  | seqan::hibf::config::sketch_bits                            | 12      |                        |
- * | Layout  | seqan::hibf::config::tmax                                   | 0       | 0 indicates unset      |
- * | Layout  | seqan::hibf::config::max_rearrangement_ratio                | 0.5     |                        |
- * | Layout  | seqan::hibf::config::alpha                                  | 1.2     |                        |
- * | Layout  | seqan::hibf::config::disable_estimate_union                 | false   |                        |
- * | Layout  | seqan::hibf::config::disable_rearrangement                  | false   |                        |
+ * | Type    |  Option Name                                  | Default | Note                   |
+ * |:--------|:----------------------------------------------|:-------:|:-----------------------|
+ * | General | seqan::hibf::config::input_fn                 | -       | [REQUIRED]             |
+ * | General | seqan::hibf::config::number_of_user_bins      | -       | [REQUIRED]             |
+ * | General | seqan::hibf::config::number_of_hash_functions | 2       |                        |
+ * | General | seqan::hibf::config::maximum_fpr              | 0.05    | [RECOMMENDED_TO_ADAPT] |
+ * | General | seqan::hibf::config::relaxed_fpr              | 0.3     |                        |
+ * | General | seqan::hibf::config::threads                  | 1       | [RECOMMENDED_TO_ADAPT] |
+ * | Layout  | seqan::hibf::config::sketch_bits              | 12      |                        |
+ * | Layout  | seqan::hibf::config::tmax                     | 0       | 0 indicates unset      |
+ * | Layout  | seqan::hibf::config::max_rearrangement_ratio  | 0.5     |                        |
+ * | Layout  | seqan::hibf::config::alpha                    | 1.2     |                        |
+ * | Layout  | seqan::hibf::config::disable_estimate_union   | false   |                        |
+ * | Layout  | seqan::hibf::config::disable_rearrangement    | false   |                        |
  *
  * As a copy and paste source, here are all config options with their defaults:
  *
@@ -62,7 +62,7 @@ namespace seqan::hibf
  * Check the documentation of the following options that influence the memory consumption:
  * * seqan::hibf::config::threads
  * * seqan::hibf::config::number_of_hash_functions
- * * seqan::hibf::config::maximum_false_positive_rate
+ * * seqan::hibf::config::maximum_fpr
  *
  * ## Validation
  *
@@ -134,7 +134,7 @@ struct config
     /*!\brief The desired maximum false positive rate of the underlying Bloom Filters. [RECOMMENDED_TO_ADAPT]
      *
      * We ensure that when querying a single hash value in the (H)IBF, the probability of getting a false positive answer
-     * will not exceed the value set for seqan::hibf::config::maximum_false_positive_rate.
+     * will not exceed the value set for seqan::hibf::config::maximum_fpr.
      * The internal Bloom Filters will be configured accordingly. Individual Bloom Filters might have a different
      * but always lower false positive rate (FPR).
      *
@@ -147,30 +147,30 @@ struct config
      *
      * \sa [Bloom Filter Calculator](https://hur.st/bloomfilter/).
      */
-    double maximum_false_positive_rate{0.05};
+    double maximum_fpr{0.05};
 
     /*!\brief Allow a higher FPR in non-accuracy-critical parts of the HIBF structure.
      *
-     * Some parts in the hierarchical structure are not critical to ensure the seqan::hibf::config::maximum_false_positive_rate.
-     * These can be allowed to have a higher FPR to reduce the overall space consumption taking into account a small
-     * decrease in runtime performance.
+     * Some parts in the hierarchical structure are not critical to ensure the seqan::hibf::config::maximum_fpr.
+     * These can be allowed to have a higher FPR to reduce the overall space consumption, while only minimally
+     * affecting the runtime performance.
      *
-     * Value must be in range [0,1].
-     * Value must be equal to or larger than seqan::hibf::config::maximum_false_positive_rate.
+     * Value must be in range (0.0,1.0).
+     * Value must be equal to or larger than seqan::hibf::config::maximum_fpr.
      * Recommendation: default value (0.3)
      *
      * ### Technical details
-     * 
+     *
      * Merged bins in an HIBF layout will always be followed by one or more lower-level IBFs that will have split bins
      * or single bins (split = 1) to recover the original user bins. Thus, the FPR of merged bins does not determine the
-     * seqan::hibf::config::maximum_false_positive_rate, but is independent. Choosing a higher FPR for merged bins can
+     * seqan::hibf::config::maximum_fpr, but is independent. Choosing a higher FPR for merged bins can
      * lower the memory requirement but increases the runtime. Experiments show that the decrease in memory is
      * significant, while the runtime suffers only slightly. The accuracy of the results is not affected by this
      * parameter.
      *
      * Note: For each IBF there is a limit to how high the FPR of merged bins can be. Specifically, the FPR for merged
      * bins can never decrease the IBF size more than what is needed to ensure the
-     * seqan::hibf::config::maximum_false_positive_rate for split bins. This means that, at some point, choosing even
+     * seqan::hibf::config::maximum_fpr for split bins. This means that, at some point, choosing even
      * higher values for this parameter will have no effect anymore.
      *
      * \sa [Bloom Filter Calculator](https://hur.st/bloomfilter/).
@@ -293,10 +293,10 @@ struct config
      *
      * Constrains:
      *   * seqan::hibf::config::number_of_hash_functions must be in `[1,5]`.
-     *   * seqan::hibf::config::maximum_false_positive_rate must be in `(0.0,1.0)`.
-     *   * seqan::hibf::config::relaxed_fpr must be in `[0.0,1.0]`.
+     *   * seqan::hibf::config::maximum_fpr must be in `(0.0,1.0)`.
+     *   * seqan::hibf::config::relaxed_fpr must be in `(0.0,1.0)`.
      *   * seqan::hibf::config::relaxed_fpr must be equal to or larger than
-     *     seqan::hibf::config::maximum_false_positive_rate.
+     *     seqan::hibf::config::maximum_fpr.
      *   * seqan::hibf::config::threads must be greater than `0`.
      *   * seqan::hibf::config::sketch_bits must be in `[5,32]`.
      *   * seqan::hibf::config::tmax must be at most `18446744073709551552`.
@@ -323,7 +323,7 @@ private:
 
         archive(CEREAL_NVP(number_of_user_bins));
         archive(CEREAL_NVP(number_of_hash_functions));
-        archive(CEREAL_NVP(maximum_false_positive_rate));
+        archive(CEREAL_NVP(maximum_fpr));
         archive(CEREAL_NVP(relaxed_fpr));
         archive(CEREAL_NVP(threads));
 

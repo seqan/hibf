@@ -55,7 +55,7 @@ TEST(hibf_test, build_from_layout)
                              "@        \"version\": 1,\n"
                              "@        \"number_of_user_bins\": 2,\n"
                              "@        \"number_of_hash_functions\": 2,\n"
-                             "@        \"maximum_false_positive_rate\": 0.05,\n"
+                             "@        \"maximum_fpr\": 0.05,\n"
                              "@        \"relaxed_fpr\": 0.3,\n"
                              "@        \"threads\": 1,\n"
                              "@        \"sketch_bits\": 12,\n"
@@ -104,7 +104,7 @@ TEST(hibf_test, three_level_hibf)
                                        it = i;
                                },
                                .number_of_user_bins = 4097,
-                               .maximum_false_positive_rate = 0.001,
+                               .maximum_fpr = 0.001,
                                .threads = 4,
                                .tmax = 64,
                                .disable_estimate_union = true,
@@ -153,7 +153,7 @@ TEST(hibf_test, unevenly_sized_and_unique_user_bins)
                                        it = i;
                                },
                                .number_of_user_bins = 500,
-                               .maximum_false_positive_rate = 0.001,
+                               .maximum_fpr = 0.001,
                                .threads = 4,
                                .tmax = 64,
                                .disable_estimate_union = true,
@@ -187,7 +187,7 @@ TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
                                        it = i;
                                },
                                .number_of_user_bins = 1000,
-                               .maximum_false_positive_rate = 0.001,
+                               .maximum_fpr = 0.001,
                                .threads = 4,
                                .tmax = 64,
                                .disable_estimate_union = true,

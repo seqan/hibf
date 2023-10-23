@@ -31,11 +31,11 @@ layout compute_layout(config const & config,
     std::stringstream output_buffer;
     std::stringstream header_buffer;
 
-    data_store store{.false_positive_rate = config.maximum_false_positive_rate,
+    data_store store{.false_positive_rate = config.maximum_fpr,
                      .hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),
                      .sketches = std::addressof(sketches)};
-    store.fpr_correction = compute_fpr_correction({.fpr = config.maximum_false_positive_rate,
+    store.fpr_correction = compute_fpr_correction({.fpr = config.maximum_fpr, //
                                                    .hash_count = config.number_of_hash_functions,
                                                    .t_max = config.tmax});
 

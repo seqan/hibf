@@ -32,8 +32,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
     assert(!max_bin_is_merged || number_of_bins == 1u); // merged max bin implies (=>) number of bins == 1
 
     size_t const kmers_per_bin{(kmers.size() + number_of_bins - 1u) / number_of_bins}; // Integer ceil
-    double const fpr = max_bin_is_merged ? data.config.relaxed_fpr
-                                         : data.config.maximum_false_positive_rate;
+    double const fpr = max_bin_is_merged ? data.config.relaxed_fpr : data.config.maximum_fpr;
 
     size_t const bin_bits{bin_size_in_bits({.fpr = fpr, //
                                             .hash_count = data.config.number_of_hash_functions,

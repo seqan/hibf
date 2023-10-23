@@ -78,13 +78,14 @@ private:
             if (max_id == max_split_id) // Overall max bin is a split bin.
                 return max_id;
 
-            // the minimum size of the TBs of this IBF to ensure the maximum_false_positive_rate for split bins
-            size_t const minimum_bits{build::bin_size_in_bits({.fpr = config.maximum_false_positive_rate,
+            // Split cardinality `max_split_size` already accounts for fpr correction.
+            // The minimum size of the TBs of this IBF to ensure the maximum_false_positive_rate for split bins.
+            size_t const minimum_bits{build::bin_size_in_bits({.fpr = config.maximum_fpr,
                                                                .hash_count = config.number_of_hash_functions,
                                                                .elements = max_split_size})};
 
-            // the potential size of the TBs of this IBF given the allowed merged bin FPR
-            size_t const merged_bits{build::bin_size_in_bits({.fpr = config.relaxed_fpr,
+            // The potential size of the TBs of this IBF given the allowed merged bin FPR.
+            size_t const merged_bits{build::bin_size_in_bits({.fpr = config.relaxed_fpr, //
                                                               .hash_count = config.number_of_hash_functions,
                                                               .elements = max_size})};
 

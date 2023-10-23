@@ -59,7 +59,7 @@ size_t max_bin_size(config & configuration)
         max_size = std::max(max_size, kmers.size());
     }
 
-    return build::bin_size_in_bits({.fpr = configuration.maximum_false_positive_rate,
+    return build::bin_size_in_bits({.fpr = configuration.maximum_fpr, //
                                     .hash_count = configuration.number_of_hash_functions,
                                     .elements = max_size});
 }
