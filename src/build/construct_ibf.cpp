@@ -28,7 +28,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
                                                     build_data & data,
                                                     bool is_root)
 {
-    bool const max_bin_is_merged = ibf_node.favourite_child_idx.has_value();
+    bool const max_bin_is_merged = ibf_node.max_bin_is_merged();
     assert(!max_bin_is_merged || number_of_bins == 1u); // merged max bin implies (=>) number of bins == 1
 
     size_t const kmers_per_bin{(kmers.size() + number_of_bins - 1u) / number_of_bins}; // Integer ceil

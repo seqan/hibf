@@ -11,7 +11,18 @@
 #include <hibf/layout/graph.hpp>  // for graph
 #include <hibf/layout/layout.hpp> // for layout
 
-TEST(layout_test, printing_max_bins)
+TEST(graph_node_test, function_max_bin_is_merged)
+{
+    seqan::hibf::layout::graph::node current_node{};
+
+    EXPECT_FALSE(current_node.max_bin_is_merged());
+
+    current_node.favourite_child_idx = 0;
+
+    EXPECT_TRUE(current_node.max_bin_is_merged());
+}
+
+TEST(graph_test, construction_from_layout)
 {
     // prepare layout
     seqan::hibf::layout::layout hibf_layout;
