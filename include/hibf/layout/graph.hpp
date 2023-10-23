@@ -48,6 +48,11 @@ struct graph
         std::optional<size_t> favourite_child_idx{std::nullopt};
         std::vector<layout::layout::user_bin> remaining_records{}; // non-merged bins (either split or single)
 
+        bool max_bin_is_merged() const
+        {
+            return favourite_child_idx.has_value();
+        }
+
         // Doesn't work, because the type is incomplete. To compare node, a comparison for the children member is needed.
         // But children is a std::vector<node>, so a comparison for node is needed to compare children.
         // https://godbolt.org/z/arrr4YKae

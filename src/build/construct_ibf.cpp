@@ -28,12 +28,20 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
                                                     build_data & data,
                                                     bool is_root)
 {
-    size_t const kmers_per_bin{static_cast<size_t>(std::ceil(static_cast<double>(kmers.size()) / number_of_bins))};
-    double const bin_bits{static_cast<double>(bin_size_in_bits({.fpr = data.config.maximum_false_positive_rate,
-                                                                .hash_count = data.config.number_of_hash_functions,
-                                                                .elements = kmers_per_bin}))};
+    bool const max_bin_is_merged = ibf_node.max_bin_is_merged();
+    assert(!max_bin_is_merged || number_of_bins == 1u); // merged max bin implies (=>) number of bins == 1
+
+    size_t const kmers_per_bin{(kmers.size() + number_of_bins - 1u) / number_of_bins}; // Integer ceil
+    double const fpr = max_bin_is_merged ? data.config.relaxed_fpr : data.config.maximum_fpr;
+
+    size_t const bin_bits{bin_size_in_bits({.fpr = fpr, //
+                                            .hash_count = data.config.number_of_hash_functions,
+                                            .elements = kmers_per_bin})};
+    // data.fpr_correction[1] == 1.0, but we can avoid floating point operations with the ternary.
+    // Check number_of_bins instead of max_bin_is_merged, because split bins can also occupy only one technical bin.
     seqan::hibf::bin_size const bin_size{
-        static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
+        number_of_bins == 1u ? bin_bits
+                             : static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
     seqan::hibf::bin_count const bin_count{ibf_node.number_of_technical_bins};
 
     timer<concurrent::no> local_index_allocation_timer{};

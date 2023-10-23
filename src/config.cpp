@@ -72,8 +72,15 @@ void config::validate_and_set_defaults()
     if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
 
-    if (maximum_false_positive_rate <= 0.0 || maximum_false_positive_rate >= 1.0)
-        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in (0.0,1.0)."};
+    if (maximum_fpr <= 0.0 || maximum_fpr >= 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::maximum_fpr must be in (0.0,1.0)."};
+
+    if (relaxed_fpr <= 0.0 || relaxed_fpr >= 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::relaxed_fpr must be in (0.0,1.0)."};
+
+    if (relaxed_fpr < maximum_fpr)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::relaxed_fpr must be "
+                                    "greater than or equal to config::maximum_fpr."};
 
     if (threads == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::threads must be greater than 0."};

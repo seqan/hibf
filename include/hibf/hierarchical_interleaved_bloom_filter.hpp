@@ -161,7 +161,7 @@ public:
      *
      * Options recommended to adapt to your setup:
      * * `threads` - Choose number of threads depending on your hardware settings to speed up construction
-     * * `maximum_false_positive_rate` - How many false positive answers can you tolerate? A low FPR (e.g. 0.001) is
+     * * `maximum_fpr` - How many false positive answers can you tolerate? A low FPR (e.g. 0.001) is
      *   needed if you can tolerate a high RAM peak when using the HIBF but post-processing steps are heavy and FPs
      *   should be avoided. A high FPR (e.g. `0.3`) can be chosed if you want a very small HIBF and false positive
      *   can be easily filtered in the down-stream analysis

@@ -28,7 +28,7 @@ TEST(hierarchical_binning_test, small_example)
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
     seqan::hibf::layout::hierarchical_binning algo{data, config};
-    EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:3
+    EXPECT_EQ(algo.execute(), 3u); // #HIGH_LEVEL_IBF max_bin_id:3
 
     std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{1}, 22}, {{2}, 22}};
 

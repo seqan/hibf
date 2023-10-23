@@ -47,7 +47,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
     auto initialise_max_bin_kmers = [&]() -> size_t
     {
-        if (current_node.favourite_child_idx.has_value()) // max bin is a merged bin
+        if (current_node.max_bin_is_merged())
         {
             // recursively initialize favourite child first
             ibf_positions[current_node.max_bin_index] =
@@ -91,7 +91,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
         // We do not want to process the favourite child. It has already been processed prior.
         // https://godbolt.org/z/6Yav7hrG1
-        if (current_node.favourite_child_idx.has_value())
+        if (current_node.max_bin_is_merged())
             std::erase(indices, current_node.favourite_child_idx.value());
 
         if (is_root)
@@ -127,7 +127,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
     loop_over_children();
 
     // If max bin was a merged bin, process all remaining records, otherwise the first one has already been processed
-    size_t const start{(current_node.favourite_child_idx.has_value()) ? 0u : 1u};
+    size_t const start{(current_node.max_bin_is_merged()) ? 0u : 1u};
     for (size_t i = start; i < current_node.remaining_records.size(); ++i)
     {
         auto const & record = current_node.remaining_records[i];
@@ -182,8 +182,9 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
     layout::graph::node const & root_node = data.ibf_graph.root;
 
     size_t const t_max{root_node.number_of_technical_bins};
-    data.fpr_correction = layout::compute_fpr_correction(
-        {.fpr = config.maximum_false_positive_rate, .hash_count = config.number_of_hash_functions, .t_max = t_max});
+    data.fpr_correction = layout::compute_fpr_correction({.fpr = config.maximum_fpr, //
+                                                          .hash_count = config.number_of_hash_functions,
+                                                          .t_max = t_max});
 
     hierarchical_build(hibf, root_node, data);
 

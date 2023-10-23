@@ -52,7 +52,7 @@ int main()
     seqan::hibf::config config{.input_fn = get_user_bin_data, // required
                                .number_of_user_bins = 3u,     // required
                                .number_of_hash_functions = 2u,
-                               .maximum_false_positive_rate = 0.05,
+                               .maximum_fpr = 0.05,
                                .threads = 1u};
 
     // The HIBF constructor will determine a hierarchical layout for the user bins and build the filter.
