@@ -137,7 +137,7 @@ struct config
      * The internal Bloom Filters will be configured accordingly. Individual Bloom Filters might have a different
      * but always lower false positive rate (FPR).
      *
-     * Value must be in range [0,1].
+     * Value must be in range (0.0,1.0).
      * Recommendation: default value (0.05)
      *
      * The FPR influences the memory consumption of the (H)IBF:
@@ -209,7 +209,7 @@ struct config
      * The higher alpha, the less merged bins are chosen in the layout. This improves query times but leads to a bigger
      * index.
      *
-     * Value must be in range [0,max(double)].
+     * Value must be in range [0.0,max(double)].
      * Recommendation: default value (1.2).
      * disable_estimate_union
      * Be sure to experiment with this option with your data before changing it.
@@ -225,7 +225,7 @@ struct config
      * the larger the intervals. This potentially improves the layout, but increases the runtime of the layout
      * algorithm.
      *
-     * Value must be in range [0,1].
+     * Value must be in range [0.0,1.0].
      * Recommendation: default value (0.5).
      */
     double max_rearrangement_ratio{0.5};
@@ -264,7 +264,7 @@ struct config
      *
      * Constrains:
      *   * seqan::hibf::config::number_of_hash_functions must be in `[1,5]`.
-     *   * seqan::hibf::config::maximum_false_positive_rate must be in `[0.0,1.0]`.
+     *   * seqan::hibf::config::maximum_false_positive_rate must be in `(0.0,1.0)`.
      *   * seqan::hibf::config::threads must be greater than `0`.
      *   * seqan::hibf::config::sketch_bits must be in `[5,32]`.
      *   * seqan::hibf::config::tmax must be at most `18446744073709551552`.
