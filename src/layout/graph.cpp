@@ -7,7 +7,6 @@
 #include <cstddef>   // for size_t
 #include <optional>  // for nullopt, optional
 #include <ranges>    // for __prev_fn, prev
-#include <utility>   // for move
 #include <vector>    // for vector
 
 #include <hibf/layout/graph.hpp>  // for graph
