@@ -11,6 +11,7 @@
 #include <hibf/layout/data_store.hpp>     // for data_store
 #include <hibf/layout/layout.hpp>         // for layout
 #include <hibf/layout/simple_binning.hpp> // for simple_binning
+#include <hibf/misc/divide_and_ceil.hpp>  // for divide_and_ceil
 
 namespace seqan::hibf::layout
 {
@@ -36,7 +37,7 @@ size_t simple_binning::execute()
     for (size_t i = 0; i < extra_bins; ++i)
     {
         size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
-        matrix[i][0] = corrected_ub_cardinality / (i + 1);
+        matrix[i][0] = divide_and_ceil(corrected_ub_cardinality, i + 1u);
     }
 
     // we must iterate column wise
@@ -52,7 +53,8 @@ size_t simple_binning::execute()
             {
                 size_t const corrected_ub_cardinality =
                     static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
-                size_t score = std::max<size_t>(corrected_ub_cardinality / (i - i_prime), matrix[i_prime][j - 1]);
+                size_t score =
+                    std::max<size_t>(divide_and_ceil(corrected_ub_cardinality, i - i_prime), matrix[i_prime][j - 1]);
 
                 // std::cout << "j:" << j << " i:" << i << " i':" << i_prime << " score:" << score << std::endl;
 
@@ -81,7 +83,7 @@ size_t simple_binning::execute()
         size_t const number_of_bins = (trace_i - next_i);
         size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
         size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
-        size_t const cardinality_per_bin = (corrected_cardinality + number_of_bins - 1) / number_of_bins; // round up
+        size_t const cardinality_per_bin = divide_and_ceil(corrected_cardinality, number_of_bins);
 
         data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices,
                                                   bin_id,
@@ -103,7 +105,7 @@ size_t simple_binning::execute()
     size_t const cardinality = (*data->kmer_counts)[data->positions[0]];
     size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[trace_i]);
     // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
-    size_t const cardinality_per_bin = (corrected_cardinality + trace_i - 1) / trace_i;
+    size_t const cardinality_per_bin = divide_and_ceil(corrected_cardinality, trace_i);
 
     data->hibf_layout->user_bins.emplace_back(data->previous.bin_indices, bin_id, trace_i, data->positions[0]);
 

@@ -18,6 +18,7 @@
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
 #include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
 #include <hibf/layout/layout.hpp>                   // for layout
+#include <hibf/misc/divide_and_ceil.hpp>            // for divide_and_ceil
 #include <hibf/misc/timer.hpp>                      // for concurrent, timer
 
 namespace seqan::hibf::build
@@ -30,7 +31,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      seqan::hibf::interleaved_bloom_filter & ibf,
                      timer<concurrent::yes> & fill_ibf_timer)
 {
-    size_t const chunk_size = kmers.size() / number_of_bins + 1;
+    size_t const chunk_size = divide_and_ceil(kmers.size(), number_of_bins);
     size_t chunk_number{};
 
     timer<concurrent::no> local_fill_ibf_timer{};
