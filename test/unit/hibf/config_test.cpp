@@ -173,17 +173,17 @@ TEST(config_test, validate_and_set_defaults)
         check_error_message(configuration, "[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5].");
     }
 
-    // maximum_false_positive_rate must be in [0.0,1.0]
+    // maximum_false_positive_rate must be in (0.0,1.0)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn,
                                           .number_of_user_bins = 1u,
-                                          .maximum_false_positive_rate = -0.1};
+                                          .maximum_false_positive_rate = 0.0};
         check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in [0.0,1.0].");
+                            "[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in (0.0,1.0).");
 
-        configuration.maximum_false_positive_rate = 1.1;
+        configuration.maximum_false_positive_rate = 1.0;
         check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in [0.0,1.0].");
+                            "[HIBF CONFIG ERROR] config::maximum_false_positive_rate must be in (0.0,1.0).");
     }
 
     // threads cannot be 0

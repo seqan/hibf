@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <cassert>
 #include <cmath>   // for log, ceil, exp
 #include <cstddef> // for size_t
 
@@ -31,8 +32,12 @@ struct bin_size_parameters
 /*!\brief Computes the bin size.
  * \ingroup hibf_build
  */
-inline size_t bin_size_in_bits(bin_size_parameters const & params)
+inline constexpr size_t bin_size_in_bits(bin_size_parameters const & params)
 {
+    assert(params.hash_count > 0);
+    assert(params.fpr > 0.0);
+    assert(params.fpr < 1.0);
+
     double const numerator{-static_cast<double>(params.elements * params.hash_count)};
     double const denominator{std::log(1 - std::exp(std::log(params.fpr) / params.hash_count))};
     double const result{std::ceil(numerator / denominator)};
