@@ -11,10 +11,11 @@
 #include <ranges>     // for _Size, size
 #include <span>       // for span
 #include <stdexcept>  // for invalid_argument
+#include <string>     // for basic_string
 #include <tuple>      // for make_tuple
 #include <vector>     // for allocator, vector
 
-#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
 inline benchmark::Counter hashes_per_second(size_t const count)

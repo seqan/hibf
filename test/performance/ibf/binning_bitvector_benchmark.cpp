@@ -8,9 +8,9 @@
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
 #include <functional> // for identity
-#include <memory>     // for allocator
+#include <vector>     // for allocator, vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp> // for binning_bitvector
 
 #include <sdsl/int_vector.hpp> // for operator-
 
