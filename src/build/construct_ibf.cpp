@@ -15,8 +15,9 @@
 #include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
-#include <hibf/layout/graph.hpp>
-#include <hibf/misc/timer.hpp> // for concurrent, timer
+#include <hibf/layout/graph.hpp>              // for graph
+#include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
+#include <hibf/misc/timer.hpp>                // for concurrent, timer
 
 namespace seqan::hibf::build
 {
@@ -31,7 +32,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
     bool const max_bin_is_merged = ibf_node.max_bin_is_merged();
     assert(!max_bin_is_merged || number_of_bins == 1u); // merged max bin implies (=>) number of bins == 1
 
-    size_t const kmers_per_bin{(kmers.size() + number_of_bins - 1u) / number_of_bins}; // Integer ceil
+    size_t const kmers_per_bin = divide_and_ceil(kmers.size(), number_of_bins);
     double const fpr = max_bin_is_merged ? data.config.relaxed_fpr : data.config.maximum_fpr;
 
     size_t const bin_bits{bin_size_in_bits({.fpr = fpr, //

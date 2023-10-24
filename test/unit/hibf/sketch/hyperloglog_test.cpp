@@ -18,6 +18,7 @@
 #include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
+#include <hibf/misc/divide_and_ceil.hpp>            // for divide_and_ceil
 #include <hibf/sketch/hyperloglog.hpp>              // for hyperloglog
 #include <hibf/test/sandboxed_path.hpp>             // for operator/, sandboxed_path
 #include <hibf/test/tmp_directory.hpp>              // for tmp_directory
@@ -131,7 +132,7 @@ TEST(hyperloglog, add_and_estimate_large)
 TEST(hyperloglog, merge)
 {
     size_t const chunks{10u};
-    size_t const chunk_size{(input_values.size() + chunks - 1u) / chunks};
+    size_t const chunk_size = seqan::hibf::divide_and_ceil(input_values.size(), chunks);
 
     seqan::hibf::sketch::hyperloglog full_sketch{};
     seqan::hibf::sketch::hyperloglog merge_sketch{};

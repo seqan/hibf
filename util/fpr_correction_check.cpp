@@ -9,6 +9,7 @@
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/layout/compute_fpr_correction.hpp>
+#include <hibf/misc/divide_and_ceil.hpp>
 
 #include <sharg/parser.hpp>
 
@@ -198,7 +199,7 @@ int main(int argc, char ** argv)
         cfg.elements = cfg.number_of_kmers;
     }
 
-    cfg.split_elements_per_bin = (cfg.elements + cfg.splits - 1) / cfg.splits; // ceil for positive integers
+    cfg.split_elements_per_bin = seqan::hibf::divide_and_ceil(cfg.elements, cfg.splits);
 
     std::cout << "kmer: " << cfg.kmer_size << '\n';
     std::cout << "elements: " << cfg.elements << '\n';
