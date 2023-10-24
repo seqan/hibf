@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
+#include <cassert>   // for assert
 #include <cinttypes> // for uint64_t
 #include <cmath>     // for ceil
 #include <cstddef>   // for size_t
@@ -14,7 +15,7 @@
 #include <hibf/build/update_parent_kmers.hpp> // for update_parent_kmers
 #include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set
-#include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_fun...
+#include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_function_c...
 #include <hibf/layout/graph.hpp>              // for graph
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
 #include <hibf/misc/timer.hpp>                // for concurrent, timer

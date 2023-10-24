@@ -4,10 +4,9 @@
 
 #pragma once
 
-#include <cassert>
-#include <concepts>
-#include <cstddef> // for size_t
-#include <limits>
+#include <cassert>  // for assert
+#include <concepts> // for unsigned_integral
+#include <cstddef>  // for size_t
 
 #include <hibf/platform.hpp>
 
