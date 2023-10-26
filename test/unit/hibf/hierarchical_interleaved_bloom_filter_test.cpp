@@ -155,16 +155,16 @@ TEST(hibf_test, three_level_hibf)
     EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
+// std::pow(number, 2) does conversion to double and back to size_t.
+// If used more often, consider porting pow with integer overloads from
+// https://github.com/seqan/seqan3/blob/8b7d02cb8695369b7baeb4b3042ae7c864b67b8c/include/seqan3/utility/math.hpp
+inline size_t squared(size_t const number)
+{
+    return number * number;
+}
+
 TEST(hibf_test, unevenly_sized_and_unique_user_bins)
 {
-    // std::pow(number, 2) does conversion do double and back to size_t.
-    // If used more often, consider porting pow with integer overloads from
-    // https://github.com/seqan/seqan3/blob/8b7d02cb8695369b7baeb4b3042ae7c864b67b8c/include/seqan3/utility/math.hpp
-    auto squared = [](size_t const number)
-    {
-        return number * number;
-    };
-
     // Simulate 500 user bins of exponentially increasing size
     // No overlap between the user bins happens.
     seqan::hibf::config config{.input_fn =
@@ -232,83 +232,66 @@ TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
     EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
-// #ifdef HIBF_HAS_SEQAN3
+TEST(hibf_test, counting_agent_same_bins)
+{
+    // Simulate 500 bins, with the same 500 elements each
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const, seqan::hibf::insert_iterator it)
+                               {
+                                   for (size_t i = 0u; i < 500u; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 500,
+                               .maximum_fpr = 0.001,
+                               .threads = 4,
+                               .tmax = 64,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = true};
 
-// #include <seqan3/alphabet/nucleotide/dna4.hpp>
-// #include <seqan3/core/debug_stream.hpp>
-// #include <seqan3/core/detail/all_view.hpp>
-// #include <seqan3/io/sequence_file/all.hpp>
-// #include <seqan3/test/cereal.hpp>
-// #include <seqan3/utility/views/deep.hpp>
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.template counting_agent<uint32_t>();
 
-// TEST(hibf_seqan3_test, input_sequences_of_sequences)
-// {
-//     using namespace seqan::hibf::literals;
+    auto query = std::views::iota(0u, 500u);
+    auto & result = agent.bulk_count(query, 1u);
 
-//     auto kmer_transformation = seqan::hibf::views::kmer_hash(seqan::hibf::ungapped{2u});
+    for (size_t ub_id = 0u; ub_id < config.number_of_user_bins; ++ub_id)
+    {
+        ASSERT_GE(result[ub_id], 500u) << "ub_id: " << ub_id;
+        // Split bins might have FP
+        ASSERT_LE(result[ub_id], 502u) << "ub_id: " << ub_id;
+    }
+}
 
-//     // range of range of sequences
-//     std::vector<std::vector<std::vector<seqan::hibf::dna4>>> seqs{{"AAAGGGGGGC"_dna4}, {"TTTTTT"_dna4}};
+TEST(hibf_test, counting_agent_different_bins)
+{
+    // Simulate 500 user bins of exponentially increasing size
+    // No overlap between the user bins happens.
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const ub_id, seqan::hibf::insert_iterator it)
+                               {
+                                   size_t const start = squared(ub_id + 1u);
+                                   size_t const end = squared(ub_id + 2u) - 1u;
+                                   for (size_t i = start; i < end; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 500,
+                               .maximum_fpr = 0.001,
+                               .threads = 4,
+                               .tmax = 64,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = true};
 
-//     seqan::hibf::config config
-//     {
-//         .input = seqs | seqan::hibf::views::deep{kmer_transformation},
-//         .rearrange_user_bins = false
-//     };
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto agent = hibf.template counting_agent<uint32_t>();
 
-//     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    auto query = std::views::iota(1u, 251'000u); // 501^2 - 1
+    auto & result = agent.bulk_count(query, 1u);
 
-//     auto agent = hibf.membership_agent();
-
-//     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
-//     auto query_kmers = query | kmer_transformation;
-
-//     auto result = agent.membership_for(query_kmers, 1);
-
-//     seqan::hibf::debug_stream << result << std::endl;
-// }
-
-// TEST(hibf_seqan3_test, input_files)
-// {
-//     seqan::hibf::test::tmp_directory tmp{};
-//     std::filesystem::path f1{tmp.path() / "f1.fa"};
-//     std::filesystem::path f2{tmp.path() / "f2.fa"};
-
-//     {
-//         std::ofstream out{f1};
-//         out << ">seq1\nAAAGGGGGGC\n";
-
-//         std::ofstream out2{f2};
-//         out2 << ">seq1\nTTTTTT\n";
-//     }
-
-//     auto transform = seqan::hibf::views::kmer_hash(seqan::hibf::ungapped{2u});
-
-//     // range of range of sequences
-//     std::vector<std::string> filenames{f1.string(), f2.string()};
-//     auto file_range = filenames | std::views::transform([&transform](auto const & f)
-//     {
-//         auto record_transform = std::views::transform([&transform](auto && rec){ return rec.sequence() | transform; });
-//         return seqan::hibf::detail::all(seqan::hibf::sequence_file_input{f}) | record_transform;
-//     });
-
-//     seqan::hibf::config config
-//     {
-//         .input = file_range,
-//         .rearrange_user_bins = false
-//     };
-
-//     seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
-
-//     auto agent = hibf.membership_agent();
-
-//     using namespace seqan::hibf::literals;
-
-//     std::vector<seqan::hibf::dna4> query{"AAGG"_dna4};
-
-//     auto result = agent.membership_for(query | transform, 1);
-
-//     seqan::hibf::debug_stream << result << std::endl; // prints [0] since query is found in user bin 0
-// }
-
-// #endif // HIBF_HAS_SEQAN3
+    for (size_t ub_id = 0u; ub_id < config.number_of_user_bins; ++ub_id)
+    {
+        // Hashes are consecutive integer values and are hence a bad input for the HIBF.
+        // Only checking for minimum count.
+        size_t const min_count = 2 * ub_id + 2; // size of [ squared(ub_id + 1u), ..., squared(ub_id + 2u) - 1u )
+        ASSERT_GE(result[ub_id], min_count) << "ub_id: " << ub_id;
+    }
+}
