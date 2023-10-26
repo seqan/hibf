@@ -125,6 +125,17 @@ namespace seqan::hibf
 class hierarchical_interleaved_bloom_filter
 {
 public:
+    /*!\brief Computes `number_of_user_bins` from `ibf_bin_to_user_bin_id`.
+     * \todo `number_of_user_bins` can be serialised once RAPTOR_OLD_HIBF is removed.
+     * \private
+     */
+    void set_number_of_user_bins();
+
+    /*!\brief The number of user bins. Used for counting.
+     * \private
+     */
+    size_t number_of_user_bins{};
+
     /*!\brief Manages membership queries for the seqan::hibf::hierarchical_interleaved_bloom_filter.
     * \see seqan::hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
@@ -215,15 +226,28 @@ public:
      * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
      */
     template <seqan::hibf::cereal_archive archive_t>
-    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
+    void CEREAL_SAVE_FUNCTION_NAME(archive_t & archive)
     {
         archive(ibf_vector);
         archive(next_ibf_id);
-#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF.
+#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF. Also resolve set_number_of_user_bins todo.
         std::vector<std::string> filenames{};
         archive(filenames);
 #endif
         archive(ibf_bin_to_user_bin_id);
+    }
+
+    template <seqan::hibf::cereal_archive archive_t>
+    void CEREAL_LOAD_FUNCTION_NAME(archive_t & archive)
+    {
+        archive(ibf_vector);
+        archive(next_ibf_id);
+#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF. Also resolve set_number_of_user_bins todo.
+        std::vector<std::string> filenames{};
+        archive(filenames);
+#endif
+        archive(ibf_bin_to_user_bin_id);
+        set_number_of_user_bins(); // Resolve set_number_of_user_bins todo.
     }
 
     /*!\name Timer

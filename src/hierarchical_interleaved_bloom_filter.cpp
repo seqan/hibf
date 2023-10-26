@@ -34,6 +34,14 @@
 namespace seqan::hibf
 {
 
+void hierarchical_interleaved_bloom_filter::set_number_of_user_bins()
+{
+    int64_t max_bin_id{-1};
+    for (auto const & ibf : ibf_bin_to_user_bin_id)
+        max_bin_id = std::max(max_bin_id, std::ranges::max(ibf));
+    number_of_user_bins = static_cast<size_t>(++max_bin_id);
+}
+
 size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                           robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                           layout::graph::node const & current_node,
@@ -206,6 +214,7 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
     sketch::compute_sketches(configuration, kmer_counts, sketches);
 
     auto layout = layout::compute_layout(configuration, kmer_counts, sketches);
+    number_of_user_bins = configuration.number_of_user_bins;
     build_index(*this, configuration, layout);
 }
 
@@ -214,6 +223,7 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
                                                                              layout::layout const & layout)
 {
     configuration.validate_and_set_defaults();
+    number_of_user_bins = configuration.number_of_user_bins;
     build_index(*this, configuration, layout);
 }
 

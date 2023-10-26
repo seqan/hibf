@@ -36,6 +36,27 @@ TEST(hibf_test, small_example_with_direct_hashes)
     auto & result = agent.membership_for(query, 2u);
     agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
+}
+
+TEST(hibf_test, set_number_of_user_bins)
+{
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const, seqan::hibf::insert_iterator it)
+                               {
+                                   it = 5u;
+                               },
+                               .number_of_user_bins = 73};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
+
+    hibf.set_number_of_user_bins();
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
+
+    hibf.ibf_bin_to_user_bin_id.emplace_back(1u, 73);
+    hibf.set_number_of_user_bins();
+    EXPECT_EQ(config.number_of_user_bins + 1u, hibf.number_of_user_bins);
 }
 
 TEST(hibf_test, build_from_layout)
@@ -87,6 +108,7 @@ TEST(hibf_test, build_from_layout)
     auto & result = agent.membership_for(query, 2u);
     agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    EXPECT_EQ(configuration.number_of_user_bins, hibf.number_of_user_bins);
 }
 
 TEST(hibf_test, three_level_hibf)
@@ -130,6 +152,7 @@ TEST(hibf_test, three_level_hibf)
         EXPECT_EQ(unique_result.size(), 1u);
         EXPECT_EQ(unique_result[0], ub_id);
     }
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
 TEST(hibf_test, unevenly_sized_and_unique_user_bins)
@@ -171,6 +194,7 @@ TEST(hibf_test, unevenly_sized_and_unique_user_bins)
         EXPECT_EQ(unique_result.size(), 1u);
         EXPECT_EQ(unique_result[0], ub_id);
     }
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
 TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
@@ -205,6 +229,7 @@ TEST(hibf_test, evenly_sized_and_highly_similar_user_bins)
         agent.sort_results();
         EXPECT_RANGE_EQ(similar_result, (std::views::iota(ub_id - 6u, ub_id + 1u)));
     }
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
 // #ifdef HIBF_HAS_SEQAN3
