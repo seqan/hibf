@@ -15,6 +15,7 @@
 #include <hibf/config.hpp>                   // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
+#include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 
 #include <sdsl/int_vector.hpp> // for bit_vector
@@ -38,9 +39,9 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
         throw std::logic_error{"The size of a bin must be > 0."};
 
     hash_shift = std::countl_zero(bin_size_);
-    bin_words = (bins + 63) >> 6;    // = ceil(bins/64)
-    technical_bins = bin_words << 6; // = bin_words * 64
-    data = sdsl::bit_vector(technical_bins * bin_size_);
+    bin_words = divide_and_ceil(bins, 64u);
+    technical_bins = bin_words * 64u;
+    resize(technical_bins * bin_size_);
 }
 
 size_t max_bin_size(config & configuration)
@@ -92,8 +93,8 @@ void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) 
     {
         size_t idx = hash_and_fit(value, hash_seeds[i]);
         idx += bin.value;
-        assert(idx < data.size());
-        data[idx] = 1;
+        assert(idx < size());
+        (*this)[idx] = 1;
     };
 }
 
@@ -101,41 +102,45 @@ void interleaved_bloom_filter::clear(bin_index const bin) noexcept
 {
     assert(bin.value < bins);
     for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
-        data[idx] = 0;
+        (*this)[idx] = 0;
 }
 
 void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bins_)
 {
-    size_t new_bins = new_bins_.value;
+    size_t const new_bins = new_bins_.value;
 
     if (new_bins < bins)
         throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
 
-    // Equivalent to ceil(new_bins / 64)
-    size_t new_bin_words = (new_bins + 63) >> 6;
+    size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
 
     bins = new_bins;
 
     if (new_bin_words == bin_words) // No need for internal resize if bin_words does not change.
         return;
 
-    size_t new_technical_bins = new_bin_words << 6;
-    size_t new_bits = bin_size_ * new_technical_bins;
+    size_t const new_technical_bins = new_bin_words * 64u;
+    size_t const new_bit_size = bin_size_ * new_technical_bins;
+    size_t const old_bit_size = size();
+    size_t const delta = new_technical_bins - technical_bins + 64;
 
-    size_t idx_{new_bits}, idx{data.size()};
-    size_t delta = new_technical_bins - technical_bins + 64;
+    resize(new_bit_size);
+    uint64_t * const ptr = data();
 
-    data.resize(new_bits);
-
-    for (size_t i = idx_, j = idx; j > 0; i -= new_technical_bins, j -= technical_bins)
+    //               old       new
+    // |-------------|---------|
+    // Backwards copy blocks of size (old_)technical_bins such that the new blocks are of size new_technical_bins.
+    for (size_t new_block_end = new_bit_size, old_block_end = old_bit_size; old_block_end > 0;
+         new_block_end -= new_technical_bins, old_block_end -= technical_bins)
     {
-        size_t stop = i - new_technical_bins;
+        size_t const stop = new_block_end - new_technical_bins;
 
-        for (size_t ii = i - delta, jj = j - 64; stop && ii >= stop; ii -= 64, jj -= 64)
+        // Need to copy word-wise (64 bits) inside the block
+        for (size_t i = new_block_end - delta, j = old_block_end - 64u; stop && i >= stop; i -= 64u, j -= 64u)
         {
-            uint64_t old = data.get_int(jj);
-            data.set_int(jj, 0);
-            data.set_int(ii, old);
+            // We are working on the bit size, so we need to convert the indices to 64-bit pointer indices
+            ptr[i / 64u] = ptr[j / 64u];
+            ptr[j / 64u] = 0ULL;
         }
     }
 
@@ -147,7 +152,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
 #    pragma GCC diagnostic push
 #    pragma GCC diagnostic ignored "-Wattributes"
 #endif // HIBF_COMPILER_IS_GCC
-[[gnu::always_inline]] binning_bitvector const &
+[[gnu::always_inline]] bit_vector const &
 interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const value) & noexcept
 {
 #if HIBF_COMPILER_IS_GCC
@@ -172,95 +177,69 @@ interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const valu
 #endif
 
     for (size_t i = 0; i < hash_funs; ++i)
-        bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) >> 6;
+        bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) / 64u;
 
-    uint64_t * const raw = result_buffer.raw_data().data(); // TODO: std::assume_aligned<64> once memory-aligned
-    uint64_t const * const ibf_data = ibf_ptr->data.data(); // TODO: std::assume_aligned<64> once memory-aligned
+    uint64_t * const raw = result_buffer.data();
+    uint64_t const * const ibf_data = ibf_ptr->data();
     std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words);
 
-    // https://godbolt.org/z/1nbhvqeGj
-    // Having the loop inside is faster.
     // GCOVR_EXCL_START
+    auto impl = [&]<size_t extent = 0u>()
+    {
+        for (size_t i = 1; i < hash_funs; ++i)
+        {
+            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
+
+            if constexpr (extent == 0u)
+            {
+#pragma omp simd
+                for (size_t i = 0; i < bin_words; ++i)
+                    raw[i] &= ibf_raw[i];
+            }
+            else if constexpr (extent == 2u || extent == 4u || extent == 8u)
+            {
+#pragma omp simd
+                for (size_t i = 0; i < extent; ++i)
+                    raw[i] &= ibf_raw[i];
+            }
+            else
+            {
+                for (size_t i = 0; i < extent; ++i)
+                    raw[i] &= ibf_raw[i];
+            }
+        }
+    };
+
+    // https://godbolt.org/z/rqaeWGGer
+    // Having the loop inside impl instead of around the switch/case is faster.
     switch (bin_words)
     {
     case 1u: // 1 AND (64 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-            raw[0] &= ibf_raw[0];
-        }
+        impl.operator()<1u>();
         break;
     case 2u: // 1 SSE4 instruction (128 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 2u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+        impl.operator()<2u>();
         break;
-    case 3u: // 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 3u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+    case 3u: // 3 AND (64 bit) + Loop Unroll
+        impl.operator()<3u>();
         break;
     case 4u: // 1 AVX2 instruction (256 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 4u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+        impl.operator()<4u>();
         break;
-    case 5u: // 1 AVX2 instruction (256 bit) + 1 AND (64 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 5u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+    case 5u: // 5 AND (64 bit) + Loop Unroll
+        impl.operator()<5u>();
         break;
-    case 6u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 6u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+    case 6u: // 6 AND (64 bit) + Loop Unroll
+        impl.operator()<6u>();
         break;
-    case 7u: // 1 AVX2 instruction (256 bit) + 1 SSE4 instruction (128 bit) + 1 AND (64 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 7u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+    case 7u: // 7 AND (64 bit) + Loop Unroll
+        impl.operator()<7u>();
         break;
     case 8u: // 1 AVX512 instruction (512 bit)
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < 8u; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+        impl.operator()<8u>();
         break;
     default: // Auto vectorize. Might create different versions.
-        for (size_t i = 1; i < hash_funs; ++i)
-        {
-            uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
-#pragma omp simd
-            for (size_t batch = 0; batch < bin_words; ++batch)
-                raw[batch] &= ibf_raw[batch];
-        }
+        impl();
     }
     // GCOVR_EXCL_STOP
 

@@ -341,7 +341,7 @@ INCLUDE_PATH           = ${HIBF_DOXYGEN_SOURCE_DIR}/include
 INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = "HIBF_DOXYGEN_ONLY(x)= x" \
                          ${HIBF_DOXYGEN_PREDEFINED_NDEBUG} \
-                         HIBF_WORKAROUND_LITERAL=constexpr
+                         HIBF_CONSTEXPR_VECTOR=constexpr
 EXPAND_AS_DEFINED      =
 SKIP_FUNCTION_MACROS   = NO
 #---------------------------------------------------------------------------

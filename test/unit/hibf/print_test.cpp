@@ -10,13 +10,13 @@
 #include <ranges>    // for range_value_t
 #include <vector>    // for allocator, vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, bit_vector
 #include <hibf/misc/print.hpp>               // for print
 
 template <typename t>
 using print_test = ::testing::Test;
 
-using test_types = ::testing::Types<seqan::hibf::binning_bitvector,
+using test_types = ::testing::Types<seqan::hibf::bit_vector,
                                     seqan::hibf::counting_vector<uint8_t>,
                                     seqan::hibf::counting_vector<uint16_t>,
                                     seqan::hibf::counting_vector<uint32_t>,
@@ -42,7 +42,7 @@ TYPED_TEST(print_test, to_stdout)
 {
     testing::internal::CaptureStdout();
     testing::internal::CaptureStderr();
-    if constexpr (std::same_as<TypeParam, seqan::hibf::binning_bitvector>)
+    if constexpr (std::same_as<TypeParam, seqan::hibf::bit_vector>)
     {
         TypeParam vector(5u);
         vector[0] = vector[2] = vector[4] = true;
@@ -70,7 +70,7 @@ TYPED_TEST(print_test, to_stderr)
 {
     testing::internal::CaptureStdout();
     testing::internal::CaptureStderr();
-    if constexpr (std::same_as<TypeParam, seqan::hibf::binning_bitvector>)
+    if constexpr (std::same_as<TypeParam, seqan::hibf::bit_vector>)
     {
         TypeParam vector(5u);
         vector[0] = vector[2] = vector[4] = true;

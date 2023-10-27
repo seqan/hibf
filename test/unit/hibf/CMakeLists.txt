@@ -4,6 +4,7 @@
 
 add_subdirectories ()
 
+hibf_test (bit_vector_test.cpp)
 hibf_test (config_test.cpp)
 hibf_test (hierarchical_interleaved_bloom_filter_test.cpp)
 hibf_test (interleaved_bloom_filter_test.cpp)

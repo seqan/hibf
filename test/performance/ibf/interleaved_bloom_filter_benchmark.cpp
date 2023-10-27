@@ -33,6 +33,10 @@ static void arguments(benchmark::internal::Benchmark * b)
     b->Args({128, 1LL << 16, 2, 1LL << 17});
     b->Args({192, 1LL << 16, 2, 1LL << 17});
     b->Args({256, 1LL << 15, 2, 1LL << 17});
+    // b->Args({320, 1LL << 15, 2, 1LL << 17});
+    // b->Args({384, 1LL << 14, 2, 1LL << 17});
+    // b->Args({448, 1LL << 14, 2, 1LL << 17});
+    // b->Args({512, 1LL << 13, 2, 1LL << 17});
     b->Args({1024, 1LL << 10, 2, 1LL << 17});
 }
 #else

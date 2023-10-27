@@ -8,7 +8,7 @@
 #include <ranges>    // for range_value_t, empty
 #include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, bit_vector
 #include <hibf/misc/print.hpp>               // for print_t
 
 namespace seqan::hibf
@@ -55,7 +55,7 @@ void print_impl(vector_t const & vector, std::ostream & stream)
     stream << "]\n";
 }
 
-void print_t::operator()(seqan::hibf::binning_bitvector const & vector, std::ostream & stream) const
+void print_t::operator()(seqan::hibf::bit_vector const & vector, std::ostream & stream) const
 {
     print_impl(vector, stream);
 }
