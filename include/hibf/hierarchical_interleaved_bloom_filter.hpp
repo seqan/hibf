@@ -125,12 +125,27 @@ namespace seqan::hibf
 class hierarchical_interleaved_bloom_filter
 {
 public:
+    /*!\brief Computes `number_of_user_bins` from `ibf_bin_to_user_bin_id`.
+     * \todo `number_of_user_bins` can be serialised once RAPTOR_OLD_HIBF is removed.
+     * \private
+     */
+    void set_number_of_user_bins();
+
+    /*!\brief The number of user bins. Used for counting.
+     * \private
+     */
+    size_t number_of_user_bins{};
+
     /*!\brief Manages membership queries for the seqan::hibf::hierarchical_interleaved_bloom_filter.
     * \see seqan::hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
     * In contrast to the seqan::hibf::interleaved_bloom_filter, the result will consist of indices of user bins.
     */
     class membership_agent_type;
+
+    //!\brief Manages counting ranges of values for the seqan::hibf::hierarchical_interleaved_bloom_filter.
+    template <std::integral value_t>
+    class counting_agent_type;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -206,6 +221,12 @@ public:
     //!\brief Returns a membership_agent to be used for counting.
     membership_agent_type membership_agent() const;
 
+    /*!\brief Returns a counting_agent_type to be used for counting.
+     * \tparam value_t The type to use for the counters; must model std::integral.
+     */
+    template <std::integral value_t = uint16_t>
+    counting_agent_type<value_t> counting_agent() const;
+
     /*!\cond DEV
      * \brief Serialisation support function.
      * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.
@@ -215,15 +236,28 @@ public:
      * \sa https://docs.seqan.de/seqan/3.2.0/group__io.html#serialisation
      */
     template <seqan::hibf::cereal_archive archive_t>
-    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
+    void CEREAL_SAVE_FUNCTION_NAME(archive_t & archive)
     {
         archive(ibf_vector);
         archive(next_ibf_id);
-#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF.
+#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF. Also resolve set_number_of_user_bins todo.
         std::vector<std::string> filenames{};
         archive(filenames);
 #endif
         archive(ibf_bin_to_user_bin_id);
+    }
+
+    template <seqan::hibf::cereal_archive archive_t>
+    void CEREAL_LOAD_FUNCTION_NAME(archive_t & archive)
+    {
+        archive(ibf_vector);
+        archive(next_ibf_id);
+#ifdef RAPTOR_OLD_HIBF // Temporary compatibility with Raptor's HIBF. Also resolve set_number_of_user_bins todo.
+        std::vector<std::string> filenames{};
+        archive(filenames);
+#endif
+        archive(ibf_bin_to_user_bin_id);
+        set_number_of_user_bins(); // Resolve set_number_of_user_bins todo.
     }
 
     /*!\name Timer
@@ -371,6 +405,128 @@ inline hierarchical_interleaved_bloom_filter::membership_agent_type
 hierarchical_interleaved_bloom_filter::membership_agent() const
 {
     return typename hierarchical_interleaved_bloom_filter::membership_agent_type{*this};
+}
+
+template <std::integral value_t>
+class hierarchical_interleaved_bloom_filter::counting_agent_type
+{
+private:
+    //!\brief A pointer to the augmented hierarchical_interleaved_bloom_filter.
+    hierarchical_interleaved_bloom_filter const * const hibf_ptr{nullptr};
+
+    //!\brief Helper for recursive bulk counting.
+    template <std::ranges::forward_range value_range_t>
+    void bulk_count_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+    {
+        auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<value_t>();
+        auto & result = agent.bulk_count(values);
+
+        value_t sum{};
+
+        for (size_t bin{}; bin < result.size(); ++bin)
+        {
+            sum += result[bin];
+            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
+
+            if (current_filename_index < 0) // merged bin
+            {
+                if (sum >= threshold)
+                    bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                sum = 0u;
+            }
+            else if (bin + 1u == result.size() ||                                                  // last bin
+                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
+            {
+                if (sum >= threshold)
+                    result_buffer[current_filename_index] = sum;
+                sum = 0u;
+            }
+        }
+    }
+
+    //!\brief Stores the result of bulk_count().
+    counting_vector<value_t> result_buffer;
+
+public:
+    /*!\name Constructors, destructor and assignment
+     * \{
+     */
+    counting_agent_type() = default;                                       //!< Defaulted.
+    counting_agent_type(counting_agent_type const &) = default;            //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
+    counting_agent_type(counting_agent_type &&) = default;                 //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type &&) = delete;      //!< Deleted. hibf_ptr is const.
+    ~counting_agent_type() = default;                                      //!< Defaulted.
+
+    /*!\brief Construct a counting_agent_type for an existing hierarchical_interleaved_bloom_filter.
+     * \private
+     * \param hibf The hierarchical_interleaved_bloom_filter.
+     */
+    explicit counting_agent_type(hierarchical_interleaved_bloom_filter const & hibf) :
+        hibf_ptr(std::addressof(hibf)),
+        result_buffer(hibf_ptr->number_of_user_bins)
+    {}
+    //!\}
+
+    /*!\name Counting
+     * \{
+     */
+    /*!\brief Counts the occurrences in each bin for all values in a range.
+     * \tparam value_range_t The type of the range of values. Must model std::ranges::forward_range. The reference type
+     *                       must model std::unsigned_integral.
+     * \param[in] values The range of values to process.
+     * \param[in] threshold Only determine counts when the count is at least (>=) this high. Must be greater than 0.
+     * \returns A reference to a seqan::hibf::counting_vector that has a count value for each user bin.
+     *
+     * \attention The result of this function must always be bound via reference, e.g. `auto &`, to prevent copying.
+     * \attention Sequential calls to this function invalidate the previously returned reference.
+     *
+     * \details
+     *
+     * ### Performance
+     *
+     * Providing a threshold can significantly speed up the query as the hierarchical structure
+     * may avoid to recurse into every part of the HIBF.
+     *
+     * Counts that do not exceed the threshold will be reported as `0`.
+     *
+     * ### Thread safety
+     *
+     * Concurrent invocations of this function are not thread safe, please create a
+     * seqan::hibf::hierarchical_interleaved_bloom_filter::counting_agent_type for each thread.
+     */
+    template <std::ranges::forward_range value_range_t>
+    [[nodiscard]] counting_vector<value_t> const & bulk_count(value_range_t && values,
+                                                              size_t const threshold) & noexcept
+    {
+        assert(hibf_ptr != nullptr);
+        assert(threshold > 0u);
+        assert(result_buffer.size() == hibf_ptr->number_of_user_bins);
+
+        static_assert(std::ranges::forward_range<value_range_t>, "The values must model forward_range.");
+        static_assert(std::unsigned_integral<std::ranges::range_value_t<value_range_t>>,
+                      "An individual value must be an unsigned integral.");
+
+        std::ranges::fill(result_buffer, static_cast<value_t>(0));
+
+        bulk_count_impl(values, 0, threshold);
+
+        return result_buffer;
+    }
+
+    // `bulk_count` cannot be called on a temporary, since the object the returned reference points to
+    // is immediately destroyed.
+    template <std::ranges::range value_range_t>
+    [[nodiscard]] counting_vector<value_t> const & bulk_count(value_range_t && values,
+                                                              size_t const threshold) && noexcept = delete;
+    //!\}
+};
+
+template <std::integral value_t>
+inline hierarchical_interleaved_bloom_filter::counting_agent_type<value_t>
+hierarchical_interleaved_bloom_filter::counting_agent() const
+{
+    return typename hierarchical_interleaved_bloom_filter::counting_agent_type<value_t>{*this};
 }
 
 } // namespace seqan::hibf
