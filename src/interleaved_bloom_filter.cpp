@@ -18,8 +18,6 @@
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 
-#include <sdsl/int_vector.hpp> // for bit_vector
-
 namespace seqan::hibf
 {
 
