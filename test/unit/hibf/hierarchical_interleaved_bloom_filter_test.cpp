@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, Message, TestInfo, TestPartResult, EXPECT_EQ
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, TestInfo, EXPECT_EQ
 
+#include <cinttypes>  // for uint32_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <ranges>     // for _Iota, iota, views
@@ -12,6 +13,7 @@
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp>              // for counting_vector
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 
