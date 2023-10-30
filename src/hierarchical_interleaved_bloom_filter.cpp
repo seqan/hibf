@@ -2,15 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for max, fill_n, shuffle
-#include <cinttypes> // for uint64_t, int64_t
-#include <cstddef>   // for size_t
-#include <mutex>     // for mutex, lock_guard
-#include <numeric>   // for iota
-#include <optional>  // for optional
-#include <random>    // for random_device, mt19937_64
-#include <utility>   // for move
-#include <vector>    // for vector, erase
+#include <algorithm>  // for max, fill_n, shuffle, __max_fn
+#include <cassert>    // for assert
+#include <cinttypes>  // for int64_t, uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for identity, less
+#include <mutex>      // for mutex, lock_guard
+#include <numeric>    // for iota
+#include <optional>   // for optional
+#include <random>     // for random_device, mt19937_64
+#include <utility>    // for move
+#include <vector>     // for vector, erase
 
 #include <hibf/build/build_data.hpp>                      // for build_data
 #include <hibf/build/compute_kmers.hpp>                   // for compute_kmers
