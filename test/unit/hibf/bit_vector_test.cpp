@@ -4,13 +4,20 @@
 
 // Authored by: Rene Rahn <rene.rahn AT fu-berlin.de>
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for AssertionResult, Message, TestPartResult, Test, EXPECT_TRUE
 
-#include <concepts>
-#include <type_traits>
+#include <algorithm>        // for for_each
+#include <concepts>         // for convertible_to, same_as, integral
+#include <cstddef>          // for size_t
+#include <initializer_list> // for initializer_list
+#include <iterator>         // for output_iterator, random_access_iterator_tag
+#include <ranges>           // for _CBegin, _CEnd, cbegin, cend
+#include <stdexcept>        // for out_of_range
+#include <utility>          // for as_const, move
+#include <vector>           // for allocator, vector
 
-#include <hibf/misc/bit_vector.hpp>
-#include <hibf/test/iterator_test_template.hpp>
+#include <hibf/misc/bit_vector.hpp>             // for bit_vector, operator&, operator^, operator|
+#include <hibf/test/iterator_test_template.hpp> // for iterator_fixture, gtest_registered_test_names_iterator_fixture_
 
 // ----------------------------------------------------------------------------
 // associated types

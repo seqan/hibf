@@ -8,7 +8,8 @@
 #include <ranges>    // for range_value_t, empty
 #include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, bit_vector
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector
+#include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/print.hpp>               // for print_t
 
 namespace seqan::hibf

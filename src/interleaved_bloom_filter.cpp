@@ -15,6 +15,7 @@
 #include <hibf/config.hpp>                   // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
+#include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 

@@ -18,16 +18,17 @@
 #include <cstring>     // for size_t
 #include <functional>  // for plus
 #include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
-#include <tuple>       // for tie, operator==, tuple
 #include <type_traits> // for remove_cvref_t
 #include <utility>     // for addressof
 #include <vector>      // for vector
 
-#include <hibf/cereal/concepts.hpp> // for cereal_archive
-#include <hibf/config.hpp>          // for config
-#include <hibf/misc/bit_vector.hpp>
+#include <hibf/cereal/concepts.hpp>           // for cereal_archive
+#include <hibf/config.hpp>                    // for config
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/misc/bit_vector.hpp>           // for bit_vector
 
-#include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/types/base_class.hpp> // for base_class
 
 namespace seqan::hibf
 {

@@ -2,18 +2,21 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, EXPECT_EQ, TEST
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, AssertionResult, EXPECT_EQ, Test...
 
-#include <algorithm>  // for for_each
-#include <array>      // for array
-#include <cstddef>    // for size_t
-#include <functional> // for function
-#include <ranges>     // for iota_view, operator==, _Iota, iota
-#include <stdexcept>  // for logic_error, invalid_argument
-#include <vector>     // for vector, allocator
+#include <algorithm>   // for __for_each_fn, for_each
+#include <array>       // for array
+#include <compare>     // for operator<, strong_ordering
+#include <cstddef>     // for size_t
+#include <functional>  // for identity, function
+#include <ranges>      // for iota_view, operator==, _Iota, iota, views
+#include <stdexcept>   // for logic_error, invalid_argument
+#include <type_traits> // for is_copy_assignable_v, is_copy_constructible_v, is_default_const...
+#include <vector>      // for vector, allocator
 
 #include <hibf/config.hpp>                   // for insert_iterator, config
-#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...
+#include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(ibf_test, construction)

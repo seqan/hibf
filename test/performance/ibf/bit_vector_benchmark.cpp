@@ -4,11 +4,17 @@
 
 // Authored by: Rene Rahn <rene.rahn AT fu-berlin.de>
 
-#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h> // for Benchmark, State, BENCHMARK_CAPTURE, DoNotOptimize, BENCHMARK_MAIN
 
-#include <random>
+#include <algorithm>   // for __generate_fn, generate
+#include <cinttypes>   // for int32_t, uint8_t
+#include <cstddef>     // for size_t
+#include <memory>      // for allocator
+#include <random>      // for uniform_int_distribution, mt19937_64
+#include <type_traits> // for invoke_result_t
+#include <utility>     // for move, pair
 
-#include <hibf/misc/bit_vector.hpp>
+#include <hibf/misc/bit_vector.hpp> // for bit_vector
 
 seqan::hibf::bit_vector generate_bit_vector(size_t const size, size_t const seed)
 {
