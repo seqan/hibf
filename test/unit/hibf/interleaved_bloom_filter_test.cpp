@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, EXPECT_EQ, TYPED_TEST
+#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, EXPECT_EQ, TEST
 
 #include <algorithm>  // for for_each
 #include <array>      // for array
@@ -16,113 +16,41 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
 #include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
-#include <sdsl/io.hpp> // for size_in_mega_bytes
-
-template <typename ibf_type>
-struct interleaved_bloom_filter_test : public ::testing::Test
+TEST(ibf_test, construction)
 {
-    static ibf_type make_ibf(seqan::hibf::bin_count bins, seqan::hibf::bin_size bits)
-    {
-        return ibf_type{seqan::hibf::interleaved_bloom_filter{bins, bits}};
-    }
-
-    static ibf_type
-    make_ibf(seqan::hibf::bin_count bins, seqan::hibf::bin_size bits, seqan::hibf::hash_function_count funs)
-    {
-        return ibf_type{seqan::hibf::interleaved_bloom_filter{bins, bits, funs}};
-    }
-};
-
-using ibf_types = ::testing::Types<seqan::hibf::interleaved_bloom_filter>;
-
-TYPED_TEST_SUITE(interleaved_bloom_filter_test, ibf_types, );
-
-TYPED_TEST(interleaved_bloom_filter_test, construction)
-{
-    EXPECT_TRUE(std::is_default_constructible_v<TypeParam>);
-    EXPECT_TRUE(std::is_copy_constructible_v<TypeParam>);
-    EXPECT_TRUE(std::is_move_constructible_v<TypeParam>);
-    EXPECT_TRUE(std::is_copy_assignable_v<TypeParam>);
-    EXPECT_TRUE(std::is_move_assignable_v<TypeParam>);
-    EXPECT_TRUE(std::is_destructible_v<TypeParam>);
+    EXPECT_TRUE(std::is_default_constructible_v<seqan::hibf::interleaved_bloom_filter>);
+    EXPECT_TRUE(std::is_copy_constructible_v<seqan::hibf::interleaved_bloom_filter>);
+    EXPECT_TRUE(std::is_move_constructible_v<seqan::hibf::interleaved_bloom_filter>);
+    EXPECT_TRUE(std::is_copy_assignable_v<seqan::hibf::interleaved_bloom_filter>);
+    EXPECT_TRUE(std::is_move_assignable_v<seqan::hibf::interleaved_bloom_filter>);
+    EXPECT_TRUE(std::is_destructible_v<seqan::hibf::interleaved_bloom_filter>);
 
     // num hash functions defaults to two
-    TypeParam ibf1{TestFixture::make_ibf(seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u})};
-    TypeParam ibf2{TestFixture::make_ibf(seqan::hibf::bin_count{64u},
-                                         seqan::hibf::bin_size{1024u},
-                                         seqan::hibf::hash_function_count{2u})};
+    seqan::hibf::interleaved_bloom_filter ibf1{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
+    seqan::hibf::interleaved_bloom_filter ibf2{seqan::hibf::bin_count{64u},
+                                               seqan::hibf::bin_size{1024u},
+                                               seqan::hibf::hash_function_count{2u}};
     EXPECT_TRUE(ibf1 == ibf2);
 
     // bin_size parameter is too small
-    EXPECT_THROW((TestFixture::make_ibf(seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{0u})), std::logic_error);
+    EXPECT_THROW((seqan::hibf::interleaved_bloom_filter{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{0u}}),
+                 std::logic_error);
     // not enough bins
-    EXPECT_THROW((TestFixture::make_ibf(seqan::hibf::bin_count{0u}, seqan::hibf::bin_size{32u})), std::logic_error);
+    EXPECT_THROW((seqan::hibf::interleaved_bloom_filter{seqan::hibf::bin_count{0u}, seqan::hibf::bin_size{32u}}),
+                 std::logic_error);
     // not enough hash functions
-    EXPECT_THROW((TestFixture::make_ibf(seqan::hibf::bin_count{64u},
-                                        seqan::hibf::bin_size{32u},
-                                        seqan::hibf::hash_function_count{0u})),
+    EXPECT_THROW((seqan::hibf::interleaved_bloom_filter{seqan::hibf::bin_count{64u},
+                                                        seqan::hibf::bin_size{32u},
+                                                        seqan::hibf::hash_function_count{0u}}),
                  std::logic_error);
     // too many hash functions
-    EXPECT_THROW((TestFixture::make_ibf(seqan::hibf::bin_count{64u},
-                                        seqan::hibf::bin_size{32u},
-                                        seqan::hibf::hash_function_count{6u})),
+    EXPECT_THROW((seqan::hibf::interleaved_bloom_filter{seqan::hibf::bin_count{64u},
+                                                        seqan::hibf::bin_size{32u},
+                                                        seqan::hibf::hash_function_count{6u}}),
                  std::logic_error);
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, member_getter)
-{
-    TypeParam t1{TestFixture::make_ibf(seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u})};
-    EXPECT_EQ(t1.bin_count(), 64u);
-    EXPECT_EQ(t1.bin_size(), 1024u);
-    EXPECT_EQ(t1.bit_size(), 65'536ull);
-    EXPECT_EQ(t1.hash_function_count(), 2u);
-
-    TypeParam t2{TestFixture::make_ibf(seqan::hibf::bin_count{73u},
-                                       seqan::hibf::bin_size{1019u},
-                                       seqan::hibf::hash_function_count{3u})};
-    EXPECT_EQ(t2.bin_count(), 73u);
-    EXPECT_EQ(t2.bin_size(), 1019u);
-    EXPECT_EQ(t2.bit_size(), 130'432ull);
-    EXPECT_EQ(t2.hash_function_count(), 3u);
-}
-
-TYPED_TEST(interleaved_bloom_filter_test, bulk_contains)
-{
-    TypeParam ibf{TestFixture::make_ibf(seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u})};
-    std::vector<bool> expected(64); // empty bitvector is expected since we did not insert anything
-    auto agent = ibf.membership_agent();
-
-    for (size_t hash : std::views::iota(0, 64)) // test correct resize for each bin individually
-    {
-        auto & res = agent.bulk_contains(hash);
-        EXPECT_RANGE_EQ(res, expected);
-    }
-
-    // Test iterator interface
-    for (size_t hash : std::views::iota(0, 64)) // test correct resize for each bin individually
-    {
-        auto & res = agent.bulk_contains(hash);
-        size_t i = 0;
-        for (auto it = res.begin(); it < res.end(); ++it, ++i)
-        {
-            EXPECT_EQ(*it, expected[i]);
-        }
-        EXPECT_EQ(i, expected.size());
-    }
-
-    // Test operator[] interface
-    for (size_t hash : std::views::iota(0, 64)) // test correct resize for each bin individually
-    {
-        auto & res = agent.bulk_contains(hash);
-        EXPECT_EQ(expected.size(), res.size());
-        for (size_t i = 0; i < res.size(); ++i)
-        {
-            EXPECT_EQ(res[i], expected[i]);
-        }
-    }
-}
-
-TEST(interleaved_bloom_filter_single_test, construction_from_config)
+TEST(ibf_test, construction_from_config)
 {
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {0u, 2u, 3u, 4u, 5u}};
     size_t const number_of_ub{hashes.size()};
@@ -137,31 +65,82 @@ TEST(interleaved_bloom_filter_single_test, construction_from_config)
 
     seqan::hibf::interleaved_bloom_filter ibf{ibf_config};
 
+    auto agent = ibf.membership_agent();
+
+    std::vector<size_t> query{1, 2, 3, 4, 5};
+
+    // value 2 is in both user bins
+    std::vector<bool> expected_v2(number_of_ub);
+    expected_v2[0] = 1;
+    expected_v2[1] = 1;
+    // value 8 is only in user bin 0
+    std::vector<bool> expected_v8(number_of_ub);
+    expected_v8[0] = 1;
+    // value 0 is only in user bin 1
+    std::vector<bool> expected_v0(number_of_ub);
+    expected_v0[1] = 1;
+
+    EXPECT_RANGE_EQ(agent.bulk_contains(2), expected_v2);
+    EXPECT_RANGE_EQ(agent.bulk_contains(8), expected_v8);
+    EXPECT_RANGE_EQ(agent.bulk_contains(0), expected_v0);
+}
+
+TEST(ibf_test, member_getter)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
+    EXPECT_EQ(ibf.bin_count(), 64u);
+    EXPECT_EQ(ibf.bin_size(), 1024u);
+    EXPECT_EQ(ibf.bit_size(), 65'536ull);
+    EXPECT_EQ(ibf.hash_function_count(), 2u);
+
+    ibf = seqan::hibf::interleaved_bloom_filter{seqan::hibf::bin_count{73u},
+                                                seqan::hibf::bin_size{1019u},
+                                                seqan::hibf::hash_function_count{3u}};
+    EXPECT_EQ(ibf.bin_count(), 73u);
+    EXPECT_EQ(ibf.bin_size(), 1019u);
+    EXPECT_EQ(ibf.bit_size(), 130'432ull);
+    EXPECT_EQ(ibf.hash_function_count(), 3u);
+}
+
+TEST(ibf_test, bulk_contains)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
+    std::vector<bool> expected(64); // empty bitvector is expected since we did not insert anything
+    auto agent = ibf.membership_agent();
+
+    for (size_t hash : std::views::iota(0, 64))
     {
-        auto agent = ibf.membership_agent();
+        auto & res = agent.bulk_contains(hash);
+        EXPECT_RANGE_EQ(res, expected);
+    }
 
-        std::vector<size_t> query{1, 2, 3, 4, 5};
+    // Test iterator interface
+    for (size_t hash : std::views::iota(0, 64))
+    {
+        auto & res = agent.bulk_contains(hash);
+        size_t i = 0;
+        for (auto it = res.begin(); it < res.end(); ++it, ++i)
+        {
+            EXPECT_EQ(*it, expected[i]);
+        }
+        EXPECT_EQ(i, expected.size());
+    }
 
-        // value 2 is in both user bins
-        std::vector<bool> expected_v2(number_of_ub);
-        expected_v2[0] = 1;
-        expected_v2[1] = 1;
-        // value 8 is only in user bin 0
-        std::vector<bool> expected_v8(number_of_ub);
-        expected_v8[0] = 1;
-        // value 0 is only in user bin 1
-        std::vector<bool> expected_v0(number_of_ub);
-        expected_v0[1] = 1;
-
-        EXPECT_RANGE_EQ(agent.bulk_contains(2), expected_v2);
-        EXPECT_RANGE_EQ(agent.bulk_contains(8), expected_v8);
-        EXPECT_RANGE_EQ(agent.bulk_contains(0), expected_v0);
+    // Test operator[] interface
+    for (size_t hash : std::views::iota(0, 64))
+    {
+        auto & res = agent.bulk_contains(hash);
+        EXPECT_EQ(expected.size(), res.size());
+        for (size_t i = 0; i < res.size(); ++i)
+        {
+            EXPECT_EQ(res[i], expected[i]);
+        }
     }
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, emplace)
+TEST(ibf_test, emplace)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -170,9 +149,8 @@ TYPED_TEST(interleaved_bloom_filter_test, emplace)
         for (size_t hash : std::views::iota(0, 64))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
-    auto agent = ibf2.membership_agent();
+    // 2. Test for correctness
+    auto agent = ibf.membership_agent();
     std::vector<bool> expected(64, 1);          // every hash value should be set for every bin
     for (size_t hash : std::views::iota(0, 64)) // test correct resize for each bin individually
     {
@@ -181,9 +159,9 @@ TYPED_TEST(interleaved_bloom_filter_test, emplace)
     }
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, clear)
+TEST(ibf_test, clear)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -195,9 +173,8 @@ TYPED_TEST(interleaved_bloom_filter_test, clear)
     // 2. Clear a bin
     ibf.clear(seqan::hibf::bin_index{17u});
 
-    // 3. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
-    auto agent = ibf2.membership_agent();
+    // 3. Test for correctness
+    auto agent = ibf.membership_agent();
     std::vector<bool> expected(64, 1); // every hash value should be set for every bin...
     expected[17] = 0;                  // ...except bin 17
     for (size_t hash : std::views::iota(0, 64))
@@ -207,9 +184,9 @@ TYPED_TEST(interleaved_bloom_filter_test, clear)
     }
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, clear_range)
+TEST(ibf_test, clear_range)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -224,9 +201,8 @@ TYPED_TEST(interleaved_bloom_filter_test, clear_range)
                                                   seqan::hibf::bin_index{45u}};
     ibf.clear(bin_range);
 
-    // 3. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
-    auto agent = ibf2.membership_agent();
+    // 3. Test for correctness
+    auto agent = ibf.membership_agent();
     std::vector<bool> expected(64, 1); // every hash value should be set for every bin...
     expected[8] = 0;                   // ...except bin 8
     expected[17] = 0;                  // ...except bin 17
@@ -238,9 +214,9 @@ TYPED_TEST(interleaved_bloom_filter_test, clear_range)
     }
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, counting)
+TEST(ibf_test, counting)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -249,10 +225,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting)
         for (size_t hash : std::views::iota(0, 128))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
+    // 2. Test for correctness
     seqan::hibf::counting_vector<size_t> counting(128, 0);
-    auto agent = ibf2.membership_agent();
+    auto agent = ibf.membership_agent();
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting += agent.bulk_contains(hash);
@@ -265,7 +240,7 @@ TYPED_TEST(interleaved_bloom_filter_test, counting)
     counting += counting;
     EXPECT_EQ(counting, expected2);
 
-    // minus binning_bitvector
+    // minus bit_vector
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting -= agent.bulk_contains(hash);
@@ -277,9 +252,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting)
     EXPECT_EQ(counting, std::vector<size_t>(128, 42));
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, counting_agent)
+TEST(ibf_test, counting_agent)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -288,10 +263,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_agent)
         for (size_t hash : std::views::iota(0, 128))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_count
-    TypeParam ibf2{ibf};
-    auto agent = ibf2.counting_agent();
-    auto agent2 = ibf2.template counting_agent<size_t>();
+    // 2. Test for correctness
+    auto agent = ibf.counting_agent();
+    auto agent2 = ibf.template counting_agent<size_t>();
 
     std::vector<size_t> expected(128, 128);
     EXPECT_RANGE_EQ(agent.bulk_count(std::views::iota(0u, 128u)), expected);
@@ -299,9 +273,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_agent)
 }
 
 // Check special case where there is only one `1` in the bitvector.
-TYPED_TEST(interleaved_bloom_filter_test, counting_no_ub)
+TEST(ibf_test, counting_no_ub)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -310,10 +284,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_no_ub)
         for (size_t hash : std::views::iota(0, 128))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
+    // 2. Test for correctness
     seqan::hibf::counting_vector<size_t> counting(128, 0);
-    auto agent = ibf2.membership_agent();
+    auto agent = ibf.membership_agent();
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting += agent.bulk_contains(hash);
@@ -332,9 +305,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_no_ub)
 }
 
 // Check special case where there is only one `1` in the bitvector.
-TYPED_TEST(interleaved_bloom_filter_test, counting_agent_no_ub)
+TEST(ibf_test, counting_agent_no_ub)
 {
-    // 1. Test uncompressed interleaved_bloom_filter directly because the compressed one is not mutable.
+    // 1. Construct and emplace
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
@@ -343,10 +316,9 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_agent_no_ub)
         for (size_t hash : std::views::iota(0, 128))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Construct either the uncompressed or compressed interleaved_bloom_filter and test set with bulk_contains
-    TypeParam ibf2{ibf};
-    auto agent = ibf2.counting_agent();
-    auto agent2 = ibf2.template counting_agent<size_t>();
+    // 2. Test for correctness
+    auto agent = ibf.counting_agent();
+    auto agent2 = ibf.template counting_agent<size_t>();
 
     std::vector<size_t> expected(128, 0);
     expected[63] = 128;
@@ -355,24 +327,27 @@ TYPED_TEST(interleaved_bloom_filter_test, counting_agent_no_ub)
     EXPECT_RANGE_EQ(agent2.bulk_count(std::views::iota(0u, 128u)), expected);
 }
 
-TYPED_TEST(interleaved_bloom_filter_test, increase_bin_number_to)
+TEST(ibf_test, increase_bin_number_to)
 {
-    seqan::hibf::interleaved_bloom_filter ibf1{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};
-    seqan::hibf::interleaved_bloom_filter ibf2{ibf1};
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};
+    size_t const original_bitsize{ibf.bit_size()};
 
     // 1. Throw if trying to reduce number of bins.
-    EXPECT_THROW(ibf1.increase_bin_number_to(seqan::hibf::bin_count{62u}), std::invalid_argument);
+    EXPECT_THROW(ibf.increase_bin_number_to(seqan::hibf::bin_count{62u}), std::invalid_argument);
+    EXPECT_EQ(ibf.bin_count(), 73u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
 
     // 2. No change in bin_words implies no change in size.
-    ibf2.increase_bin_number_to({seqan::hibf::bin_count{127u}});
-    EXPECT_EQ(ibf1.bit_size(), ibf2.bit_size());
-    EXPECT_EQ(ibf2.bin_count(), 127u);
+    ibf.increase_bin_number_to({seqan::hibf::bin_count{127u}});
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+    EXPECT_EQ(ibf.bin_count(), 127u);
 
     // 3. If resizing takes place, the inserted values must still be valid.
     auto hashes = std::views::iota(0, 64);
     for (size_t current_bin : std::views::iota(0, 64)) // test correct resize for each bin individually
     {
-        seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
+        seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{8u}};
+        EXPECT_EQ(ibf.bit_size(), 512u);
         std::ranges::for_each(hashes,
                               [&ibf, &current_bin](auto const h)
                               {
@@ -382,12 +357,11 @@ TYPED_TEST(interleaved_bloom_filter_test, increase_bin_number_to)
         ibf.increase_bin_number_to(seqan::hibf::bin_count{73u});
 
         EXPECT_EQ(ibf.bin_count(), 73u);
-        EXPECT_GE(ibf.bit_size(), 1024u);
+        EXPECT_EQ(ibf.bit_size(), 1024u);
 
         std::vector<bool> expected(73, 0);
         expected[current_bin] = 1; // none of the bins except current_bin stores the hash values.
-        TypeParam tibf{ibf};       // test output on compressed and uncompressed
-        auto agent = tibf.membership_agent();
+        auto agent = ibf.membership_agent();
         for (size_t const h : hashes)
         {
             auto & res = agent.bulk_contains(h);
@@ -395,37 +369,3 @@ TYPED_TEST(interleaved_bloom_filter_test, increase_bin_number_to)
         }
     }
 }
-
-TYPED_TEST(interleaved_bloom_filter_test, data_access)
-{
-    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{1024u}, seqan::hibf::bin_size{1024u}};
-
-    EXPECT_LE(sdsl::size_in_mega_bytes(ibf.raw_data()), 1.0f);
-}
-
-// MIGRATION_TODO
-// TYPED_TEST(interleaved_bloom_filter_test, serialisation)
-// {
-//     TypeParam ibf{TestFixture::make_ibf(seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u})};
-//     seqan::hibf::test::do_serialisation(ibf);
-// }
-
-// TEST(interleaved_bloom_filter_test, decompression)
-// {
-//     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
-
-//     // Only use every other bin.
-//     auto take_odd = [](auto number)
-//     {
-//         return number & 1;
-//     };
-//     for (size_t bin_idx : std::views::iota(0, 64) | std::views::filter(take_odd))
-//         for (size_t hash : std::views::iota(0, 64))
-//             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
-
-//     seqan::hibf::interleaved_bloom_filter<seqan::hibf::data_layout::compressed> ibf_compressed{ibf};
-
-//     seqan::hibf::interleaved_bloom_filter ibf_decompressed{ibf_compressed};
-
-//     EXPECT_TRUE(ibf == ibf_decompressed);
-// }

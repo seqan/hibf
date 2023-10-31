@@ -142,6 +142,13 @@
 //  Workarounds
 // ============================================================================
 
+//!\brief std::vector constexpr support.
+#if defined(__cpp_lib_constexpr_vector)
+#    define HIBF_CONSTEXPR_VECTOR constexpr
+#else
+#    define HIBF_CONSTEXPR_VECTOR
+#endif
+
 /*!\brief Workaround bogus memcpy errors in GCC 12. (Wrestrict and Wstringop-overflow)
  * \see https://gcc.gnu.org/bugzilla/show_bug.cgi?id=105545
  */

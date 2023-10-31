@@ -99,6 +99,7 @@ jobs:
                 --filter ${{ github.workspace }}/test/include \
                 --filter ${{ github.workspace }}/src \
                 --exclude ${{ github.workspace }}/include/hibf/contrib \
+                --exclude ${{ github.workspace }}/test/include/hibf/test/iterator_test_template.hpp \
                 --exclude-lines-by-pattern '^\s*$' \
                 --exclude-lines-by-pattern '^\s*};$' \
                 --exclude-unreachable-branches \

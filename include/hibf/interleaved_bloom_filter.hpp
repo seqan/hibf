@@ -25,9 +25,9 @@
 
 #include <hibf/cereal/concepts.hpp> // for cereal_archive
 #include <hibf/config.hpp>          // for config
+#include <hibf/misc/bit_vector.hpp>
 
-#include <cereal/macros.hpp>   // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <sdsl/int_vector.hpp> // for bit_vector
+#include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
 namespace seqan::hibf
 {
@@ -138,11 +138,11 @@ struct bin_index
  * For example, calls to `emplace` from multiple threads are safe if `thread_1` accesses bins 0-63, `thread_2` bins
  * 64-127, and so on.
  */
-class interleaved_bloom_filter
+class interleaved_bloom_filter : private seqan::hibf::bit_vector
 {
 private:
     //!\brief The underlying datatype to use.
-    using data_type = sdsl::bit_vector;
+    using base_t = seqan::hibf::bit_vector;
 
     //!\brief The number of bins specified by the user.
     size_t bins{};
@@ -156,8 +156,6 @@ private:
     size_t bin_words{};
     //!\brief The number of hash functions.
     size_t hash_funs{};
-    //!\brief The bitvector.
-    data_type data{};
     //!\brief Precalculated seeds for multiplicative hashing. We use large irrational numbers for a uniform hashing.
     static constexpr std::array<size_t, 5> hash_seeds{13572355802537770549ULL, // 2**64 / (e/2)
                                                       13043817825332782213ULL, // 2**64 / sqrt(2)
@@ -276,7 +274,7 @@ public:
 
         for (size_t offset = 0, i = 0; i < bin_size_; offset += technical_bins, ++i)
             for (auto && bin : bin_range)
-                data[bin.value + offset] = 0;
+                (*this)[bin.value + offset] = 0;
     }
 
     /*!\brief Increases the number of bins stored in the Interleaved Bloom Filter.
@@ -371,45 +369,14 @@ public:
      */
     size_t bit_size() const noexcept
     {
-        return data.size();
+        return base_t::size();
     }
     //!\}
 
     /*!\name Comparison operators
      * \{
      */
-    /*!\brief Test for equality.
-     * \param[in] lhs A `seqan::hibf::interleaved_bloom_filter`.
-     * \param[in] rhs `seqan::hibf::interleaved_bloom_filter` to compare to.
-     * \returns `true` if equal, `false` otherwise.
-     */
-    friend bool operator==(interleaved_bloom_filter const & lhs, interleaved_bloom_filter const & rhs) noexcept
-    {
-        return std::tie(lhs.bins,
-                        lhs.technical_bins,
-                        lhs.bin_size_,
-                        lhs.hash_shift,
-                        lhs.bin_words,
-                        lhs.hash_funs,
-                        lhs.data)
-            == std::tie(rhs.bins,
-                        rhs.technical_bins,
-                        rhs.bin_size_,
-                        rhs.hash_shift,
-                        rhs.bin_words,
-                        rhs.hash_funs,
-                        rhs.data);
-    }
-
-    /*!\brief Test for inequality.
-     * \param[in] lhs A `seqan::hibf::interleaved_bloom_filter`.
-     * \param[in] rhs `seqan::hibf::interleaved_bloom_filter` to compare to.
-     * \returns `true` if unequal, `false` otherwise.
-     */
-    friend bool operator!=(interleaved_bloom_filter const & lhs, interleaved_bloom_filter const & rhs) noexcept
-    {
-        return !(lhs == rhs);
-    }
+    constexpr bool operator==(interleaved_bloom_filter const &) const = default;
     //!\}
 
     /*!\name Access
@@ -422,16 +389,7 @@ public:
      *
      * \noapi{The exact representation of the data is implementation defined.}
      */
-    constexpr data_type & raw_data() noexcept
-    {
-        return data;
-    }
-
-    //!\copydoc raw_data()
-    constexpr data_type const & raw_data() const noexcept
-    {
-        return data;
-    }
+    using base_t::data;
     //!\}
 
     /*!\cond DEV
@@ -450,125 +408,9 @@ public:
         archive(hash_shift);
         archive(bin_words);
         archive(hash_funs);
-        archive(data);
+        archive(cereal::base_class<base_t>(this));
     }
     //!\endcond
-};
-
-/*!\brief A bitvector representing the result of a call to `bulk_contains` of the seqan::hibf::interleaved_bloom_filter.
- * \ingroup ibf
- */
-class binning_bitvector
-{
-private:
-    //!\brief The underlying datatype to use.
-    using data_type = sdsl::bit_vector;
-    //!\brief The bitvector.
-    data_type data{};
-
-    friend class membership_agent_type;
-
-public:
-    /*!\name Constructors, destructor and assignment
-     * \{
-     */
-    binning_bitvector() = default;                                          //!< Defaulted.
-    binning_bitvector(binning_bitvector const &) = default;                 //!< Defaulted.
-    binning_bitvector & operator=(binning_bitvector const &) = default;     //!< Defaulted.
-    binning_bitvector(binning_bitvector &&) noexcept = default;             //!< Defaulted.
-    binning_bitvector & operator=(binning_bitvector &&) noexcept = default; //!< Defaulted.
-    ~binning_bitvector() = default;                                         //!< Defaulted.
-
-    //!\brief Construct with given size.
-    explicit binning_bitvector(size_t const size) : data(size)
-    {}
-    //!\}
-
-    //!\brief Returns the number of elements.
-    size_t size() const noexcept
-    {
-        return data.size();
-    }
-
-    /*!\name Iterators
-     * \{
-     */
-    //!\brief Returns an iterator to the first element of the container.
-    auto begin() noexcept
-    {
-        return data.begin();
-    }
-
-    //!\copydoc begin()
-    auto begin() const noexcept
-    {
-        return data.begin();
-    }
-
-    //!\brief Returns an iterator to the element following the last element of the container.
-    auto end() noexcept
-    {
-        return data.end();
-    }
-
-    //!\copydoc end()
-    auto end() const noexcept
-    {
-        return data.end();
-    }
-    //!\}
-
-    /*!\name Comparison operators
-     * \{
-     */
-    //!\brief Test for equality.
-    friend bool operator==(binning_bitvector const & lhs, binning_bitvector const & rhs) noexcept
-    {
-        return lhs.data == rhs.data;
-    }
-
-    //!\brief Test for inequality.
-    friend bool operator!=(binning_bitvector const & lhs, binning_bitvector const & rhs) noexcept
-    {
-        return !(lhs == rhs);
-    }
-    //!\}
-
-    /*!\name Access
-     * \{
-     */
-    //!\brief Return the i-th element.
-    auto operator[](size_t const i) noexcept
-    {
-        assert(i < size());
-        return data[i];
-    }
-
-    //!\copydoc operator[]()
-    auto operator[](size_t const i) const noexcept
-    {
-        assert(i < size());
-        return data[i];
-    }
-
-    /*!\brief Provides direct, unsafe access to the underlying data structure.
-     * \returns A reference to an SDSL bitvector.
-     *
-     * \details
-     *
-     * \noapi{The exact representation of the data is implementation defined.}
-     */
-    constexpr data_type & raw_data() noexcept
-    {
-        return data;
-    }
-
-    //!\copydoc raw_data()
-    constexpr data_type const & raw_data() const noexcept
-    {
-        return data;
-    }
-    //!\}
 };
 
 /*!\brief Manages membership queries for the seqan::hibf::interleaved_bloom_filter.
@@ -591,7 +433,7 @@ private:
     std::array<size_t, 5> bloom_filter_indices;
 
     //!\brief Stores the result of bulk_contains().
-    binning_bitvector result_buffer;
+    bit_vector result_buffer;
 
 public:
     /*!\name Constructors, destructor and assignment
@@ -634,11 +476,11 @@ public:
      * Concurrent invocations of this function are not thread safe, please create a
      * seqan::hibf::interleaved_bloom_filter::membership_agent_type for each thread.
      */
-    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) & noexcept;
+    [[nodiscard]] bit_vector const & bulk_contains(size_t const value) & noexcept;
 
     // `bulk_contains` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
-    [[nodiscard]] binning_bitvector const & bulk_contains(size_t const value) && noexcept = delete;
+    [[nodiscard]] bit_vector const & bulk_contains(size_t const value) && noexcept = delete;
     //!\}
 };
 
@@ -660,7 +502,7 @@ inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter:
  * based on the k-mer counts.
  *
  * The seqan::hibf::counting_vector offers an easy way to add up the individual
- * seqan::hibf::binning_bitvector by offering an `+=` operator.
+ * seqan::hibf::bit_vector by offering an `+=` operator.
  *
  * The `value_t` template parameter should be chosen in a way that no overflow occurs if all calls to `bulk_contains`
  * return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina reads, whereas
@@ -691,9 +533,9 @@ public:
     using base_t::base_t;
     //!\}
 
-    /*!\brief Bin-wise adds the bits of a seqan::hibf::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::binning_bitvector.
-     * \attention The counting_vector must be at least as big as `binning_bitvector`.
+    /*!\brief Bin-wise adds the bits of a seqan::hibf::bit_vector.
+     * \param bit_vector The seqan::hibf::bit_vector.
+     * \attention The counting_vector must be at least as big as `bit_vector`.
      *
      * \details
      *
@@ -701,9 +543,9 @@ public:
      *
      * \include test/snippet/ibf/counting_vector.cpp
      */
-    counting_vector & operator+=(binning_bitvector const & binning_bitvector)
+    counting_vector & operator+=(bit_vector const & bit_vector)
     {
-        for_each_set_bin(binning_bitvector,
+        for_each_set_bin(bit_vector,
                          [this](size_t const bin)
                          {
                              ++(*this)[bin];
@@ -711,13 +553,13 @@ public:
         return *this;
     }
 
-    /*!\brief Bin-wise subtracts the bits of a seqan::hibf::binning_bitvector.
-     * \param binning_bitvector The seqan::hibf::binning_bitvector.
-     * \attention The counting_vector must be at least as big as `binning_bitvector`.
+    /*!\brief Bin-wise subtracts the bits of a seqan::hibf::bit_vector.
+     * \param bit_vector The seqan::hibf::bit_vector.
+     * \attention The counting_vector must be at least as big as `bit_vector`.
      */
-    counting_vector & operator-=(binning_bitvector const & binning_bitvector)
+    counting_vector & operator-=(bit_vector const & bit_vector)
     {
-        for_each_set_bin(binning_bitvector,
+        for_each_set_bin(bit_vector,
                          [this](size_t const bin)
                          {
                              assert((*this)[bin] > 0);
@@ -767,13 +609,13 @@ public:
     }
 
 private:
-    //!\brief Enumerates all bins of a seqan::hibf::binning_bitvector.
+    //!\brief Enumerates all bins of a seqan::hibf::bit_vector.
     template <typename on_bin_fn_t>
-    void for_each_set_bin(binning_bitvector const & binning_bitvector, on_bin_fn_t && on_bin_fn)
+    void for_each_set_bin(bit_vector const & bit_vector, on_bin_fn_t && on_bin_fn)
     {
-        assert(this->size() >= binning_bitvector.size()); // The counting vector may be bigger than what we need.
-        size_t const words = (binning_bitvector.size() + 63u) >> 6;
-        uint64_t const * const bitvector_raw = binning_bitvector.raw_data().data();
+        assert(this->size() >= bit_vector.size()); // The counting vector may be bigger than what we need.
+        size_t const words = (bit_vector.size() + 63u) >> 6;
+        uint64_t const * const bitvector_raw = bit_vector.data();
 
         // Jump to the next 1 and return the number of places jumped in the bit_sequence
         auto jump_to_next_1bit = [](uint64_t & x)

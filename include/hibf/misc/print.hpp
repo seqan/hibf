@@ -8,7 +8,7 @@
 #include <iostream>  // for cout, ostream
 #include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, binning_bitvector
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, bit_vector
 
 namespace seqan::hibf
 {
@@ -20,7 +20,7 @@ namespace seqan::hibf
 // A free function for `std::vector<int64_t>` might also cause problems.
 struct print_t
 {
-    void operator()(seqan::hibf::binning_bitvector const & vector, std::ostream & stream = std::cout) const;
+    void operator()(seqan::hibf::bit_vector const & vector, std::ostream & stream = std::cout) const;
     void operator()(seqan::hibf::counting_vector<uint8_t> const & vector, std::ostream & stream = std::cout) const;
     void operator()(seqan::hibf::counting_vector<uint16_t> const & vector, std::ostream & stream = std::cout) const;
     void operator()(seqan::hibf::counting_vector<uint32_t> const & vector, std::ostream & stream = std::cout) const;
