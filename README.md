@@ -86,7 +86,17 @@ int main()
 }
 ```
 
-### A more detailed example
+## Where to look for more information
+
+* The [online API documentation](https://hibf.vercel.app/topics.html) for details on the data structures
+
+## Please cite
+
+If you are working with the HIBF, please cite:
+
+> Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries; Svenja Mehringer, Enrico Seiler, Felix Droop, Mitra Darvish, René Rahn, Martin Vingron, and Knut Reinert; Genome Biol 24, 131 (2023). doi: https://doi.org/10.1186/s13059-023-02971-4
+
+## A more detailed example
 
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme.cpp) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme.cpp -->
