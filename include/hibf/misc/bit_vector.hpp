@@ -21,15 +21,31 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cassert>
-#include <climits>
-#include <vector>
+#include <algorithm>        // for max, __for_each_fn, for_each, __all_of_fn, __any_of_fn, __fill_fn
+#include <bit>              // for countr_zero
+#include <cassert>          // for assert
+#include <cinttypes>        // for uint64_t
+#include <climits>          // for CHAR_BIT
+#include <compare>          // for strong_ordering, operator==
+#include <concepts>         // for assignable_from
+#include <cstddef>          // for size_t, ptrdiff_t
+#include <functional>       // for identity
+#include <initializer_list> // for initializer_list
+#include <iterator>         // for back_inserter, iter_reference_t, random_access_iterator_tag
+#include <memory>           // for assume_aligned, allocator_traits
+#include <ranges>           // for __next_fn, distance, next, _Begin, _End, __distance_fn, begin
+#include <stdexcept>        // for out_of_range
+#include <string>           // for operator+, char_traits, to_string, operator""s
+#include <type_traits>      // for conditional_t
+#include <utility>          // for swap
+#include <vector>           // for allocator, vector
 
-#include <hibf/cereal/concepts.hpp>
-#include <hibf/contrib/aligned_allocator.hpp>
+#include <hibf/cereal/concepts.hpp>           // for cereal_archive
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR
 
-#include <cereal/types/base_class.hpp>
+#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/types/base_class.hpp> // for base_class
 
 namespace seqan::hibf
 {

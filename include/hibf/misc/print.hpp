@@ -8,7 +8,8 @@
 #include <iostream>  // for cout, ostream
 #include <vector>    // for vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector, bit_vector
+#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector
+#include <hibf/misc/bit_vector.hpp>          // for bit_vector
 
 namespace seqan::hibf
 {
