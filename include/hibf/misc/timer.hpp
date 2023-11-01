@@ -101,6 +101,12 @@ public:
     }
     // GCOVR_EXCL_STOP
 
+    // Timer are always equal.
+    constexpr bool operator==(timer const &) const
+    {
+        return true;
+    }
+
 private:
     std::chrono::steady_clock::time_point start_{std::chrono::time_point<std::chrono::steady_clock>::max()};
     std::chrono::steady_clock::time_point stop_{};

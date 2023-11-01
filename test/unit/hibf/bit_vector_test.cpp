@@ -17,6 +17,7 @@
 #include <vector>           // for allocator, vector
 
 #include <hibf/misc/bit_vector.hpp>             // for bit_vector, operator&, operator^, operator|
+#include <hibf/test/cereal.hpp>                 // for test_serialisation
 #include <hibf/test/iterator_test_template.hpp> // for iterator_fixture, gtest_registered_test_names_iterator_fixture_
 
 // ----------------------------------------------------------------------------
@@ -792,4 +793,10 @@ TEST(bit_vector_test, output_iterator)
 
     for (auto it = test_vector.begin(); it != test_vector.end(); ++it)
         EXPECT_EQ(*it, (it - test_vector.begin()) % 2);
+}
+
+TEST(bit_vector_test, serialisation)
+{
+    seqan::hibf::bit_vector test_vector(100, true);
+    seqan::hibf::test::test_serialisation(std::move(test_vector));
 }

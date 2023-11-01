@@ -17,6 +17,7 @@
 #include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
+#include <hibf/test/cereal.hpp>              // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(ibf_test, construction)
@@ -371,4 +372,12 @@ TEST(ibf_test, increase_bin_number_to)
             EXPECT_RANGE_EQ(res, expected);
         }
     }
+}
+
+TEST(ibf_test, serialisation)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
+                                              seqan::hibf::bin_size{1024u},
+                                              seqan::hibf::hash_function_count{3u}};
+    seqan::hibf::test::test_serialisation(std::move(ibf));
 }

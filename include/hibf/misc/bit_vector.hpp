@@ -46,6 +46,7 @@
 
 #include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/base_class.hpp> // for base_class
+#include <cereal/types/vector.hpp>     // for base_class
 
 namespace seqan::hibf
 {
@@ -946,3 +947,21 @@ private:
 };
 
 } // namespace seqan::hibf
+
+//!\cond
+// See https://uscilab.github.io/cereal/serialization_functions.html#inheritance
+// seqan::hibf::bit_vector's base class is std::vector
+// We include <cereal/types/vector.hpp> for std::vector serialisation
+// cereal provides these as separate load/save functions
+// bit_vector inherits those and also provides a serialise function
+// Since both load/save member functions (from std::vector) and a serialise function (bit_vector) are available,
+// cereal needs to be told which one to use.
+namespace cereal
+{
+
+template <typename archive_t>
+struct specialize<archive_t, seqan::hibf::bit_vector, cereal::specialization::member_serialize>
+{};
+
+} // namespace cereal
+//!\endcond
