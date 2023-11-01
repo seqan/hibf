@@ -15,6 +15,7 @@
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for counting_vector
 #include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/test/cereal.hpp>                           // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(hibf_test, small_example_with_direct_hashes)
@@ -38,6 +39,19 @@ TEST(hibf_test, small_example_with_direct_hashes)
     auto & result = agent.membership_for(query, 2u);
     agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
+}
+
+TEST(hibf_test, simple_user_bins)
+{
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const, seqan::hibf::insert_iterator it)
+                               {
+                                   it = 5u;
+                               },
+                               .number_of_user_bins = 73};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
     EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
@@ -276,4 +290,22 @@ TEST(hibf_test, counting_agent_different_bins)
         size_t const min_count = 2 * ub_id + 2; // size of [ squared(ub_id + 1u), ..., squared(ub_id + 2u) - 1u )
         ASSERT_GE(result[ub_id], min_count) << "ub_id: " << ub_id;
     }
+}
+
+TEST(hibf_test, serialisation)
+{
+    // range of range of sequences
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
+
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const num, seqan::hibf::insert_iterator it)
+                               {
+                                   for (auto const hash : hashes[num])
+                                       it = hash;
+                               },
+                               .number_of_user_bins = 2};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+
+    seqan::hibf::test::test_serialisation(std::move(hibf));
 }

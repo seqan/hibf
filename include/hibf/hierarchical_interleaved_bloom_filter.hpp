@@ -221,6 +221,12 @@ public:
     template <std::integral value_t = uint16_t>
     counting_agent_type<value_t> counting_agent() const;
 
+    /*!\name Comparison operators
+     * \{
+     */
+    HIBF_CONSTEXPR_VECTOR bool operator==(hierarchical_interleaved_bloom_filter const &) const = default;
+    //!\}
+
     /*!\cond DEV
      * \brief Serialisation support function.
      * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.

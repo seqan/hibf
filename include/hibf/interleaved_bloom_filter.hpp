@@ -145,6 +145,10 @@ private:
     //!\brief The underlying datatype to use.
     using base_t = seqan::hibf::bit_vector;
 
+    //!\brief Allow cereal to cast the IBF into its base class.
+    template <typename t>
+    friend class cereal::base_class;
+
     //!\brief The number of bins specified by the user.
     size_t bins{};
     //!\brief The number of bins stored in the IBF (next multiple of 64 of `bins`).
