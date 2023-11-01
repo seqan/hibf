@@ -8,7 +8,8 @@
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <ranges>     // for _Iota, iota, views
-#include <sstream>    // for basic_stringstream, stringstream
+#include <sstream>    // for basic_stringstream, char_traits, stringstream
+#include <utility>    // for move
 #include <vector>     // for vector, allocator
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
