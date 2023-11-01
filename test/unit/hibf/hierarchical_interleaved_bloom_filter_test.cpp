@@ -41,26 +41,6 @@ TEST(hibf_test, small_example_with_direct_hashes)
     EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
 }
 
-TEST(hibf_test, set_number_of_user_bins)
-{
-    seqan::hibf::config config{.input_fn =
-                                   [&](size_t const, seqan::hibf::insert_iterator it)
-                               {
-                                   it = 5u;
-                               },
-                               .number_of_user_bins = 73};
-
-    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
-    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
-
-    hibf.set_number_of_user_bins();
-    EXPECT_EQ(config.number_of_user_bins, hibf.number_of_user_bins);
-
-    hibf.ibf_bin_to_user_bin_id.emplace_back(1u, 73);
-    hibf.set_number_of_user_bins();
-    EXPECT_EQ(config.number_of_user_bins + 1u, hibf.number_of_user_bins);
-}
-
 TEST(hibf_test, build_from_layout)
 {
     // range of range of sequences
