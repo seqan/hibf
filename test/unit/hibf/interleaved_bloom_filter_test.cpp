@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, Message, TestPartResult, AssertionResult, EXPECT_EQ, Test...
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, AssertionResult, TestInfo, EXPEC...
 
 #include <algorithm>   // for __for_each_fn, for_each
 #include <array>       // for array
@@ -12,6 +12,7 @@
 #include <ranges>      // for iota_view, operator==, _Iota, iota, views
 #include <stdexcept>   // for logic_error, invalid_argument
 #include <type_traits> // for is_copy_assignable_v, is_copy_constructible_v, is_default_const...
+#include <utility>     // for move
 #include <vector>      // for vector, allocator
 
 #include <hibf/config.hpp>                   // for insert_iterator, config

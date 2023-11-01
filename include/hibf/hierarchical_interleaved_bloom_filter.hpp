@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <algorithm>  // for __sort_fn, sort
+#include <algorithm>  // for max, __sort_fn, fill, sort
 #include <cassert>    // for assert
 #include <cinttypes>  // for int64_t, uint16_t
-#include <concepts>   // for unsigned_integral
+#include <concepts>   // for integral, unsigned_integral
 #include <cstddef>    // for size_t
 #include <functional> // for identity, less
 #include <ranges>     // for forward_range, range, range_value_t
@@ -16,9 +16,10 @@
 
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config
-#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, counting_vector
 #include <hibf/layout/layout.hpp>            // for layout
 #include <hibf/misc/timer.hpp>               // for concurrent, timer
+#include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
 
