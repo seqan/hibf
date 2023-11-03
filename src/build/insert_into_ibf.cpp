@@ -29,12 +29,12 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan::hibf::interleaved_bloom_filter & ibf,
-                     timer<concurrent::yes> & fill_ibf_timer)
+                     concurrent_timer & fill_ibf_timer)
 {
     size_t const chunk_size = divide_and_ceil(kmers.size(), number_of_bins);
     size_t chunk_number{};
 
-    timer<concurrent::no> local_fill_ibf_timer{};
+    serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto chunk : kmers | seqan::stl::views::chunk(chunk_size))
     {
@@ -55,13 +55,13 @@ void insert_into_ibf(build_data const & data,
     auto const bin_index = seqan::hibf::bin_index{static_cast<size_t>(record.storage_TB_id)};
     std::vector<uint64_t> values;
 
-    timer<concurrent::no> local_user_bin_io_timer{};
+    serial_timer local_user_bin_io_timer{};
     local_user_bin_io_timer.start();
     data.config.input_fn(record.idx, insert_iterator{values});
     local_user_bin_io_timer.stop();
     data.user_bin_io_timer += local_user_bin_io_timer;
 
-    timer<concurrent::no> local_fill_ibf_timer{};
+    serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto && value : values)
         ibf.emplace(value, bin_index);

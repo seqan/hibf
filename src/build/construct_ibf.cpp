@@ -46,7 +46,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
                              : static_cast<size_t>(std::ceil(bin_bits * data.fpr_correction[number_of_bins]))};
     seqan::hibf::bin_count const bin_count{ibf_node.number_of_technical_bins};
 
-    timer<concurrent::no> local_index_allocation_timer{};
+    serial_timer local_index_allocation_timer{};
     local_index_allocation_timer.start();
     seqan::hibf::interleaved_bloom_filter ibf{bin_count,
                                               bin_size,
