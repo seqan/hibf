@@ -7,6 +7,7 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
+#include <algorithm>  // for max
 #include <cinttypes>  // for uint64_t
 #include <functional> // for function
 
