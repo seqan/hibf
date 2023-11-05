@@ -9,9 +9,11 @@
 
 #pragma once
 
-#include <atomic>      // for atomic
+#include <algorithm>   // for max
+#include <atomic>      // for atomic, memory_order_relaxed
 #include <cassert>     // for assert
 #include <chrono>      // for steady_clock, duration, operator-, time_point
+#include <cinttypes>   // for uint64_t
 #include <type_traits> // for conditional_t
 
 #include <hibf/platform.hpp>
