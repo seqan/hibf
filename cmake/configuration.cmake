@@ -16,6 +16,7 @@ message (STATUS "Finding HIBF (${HIBF_VERSION}) and checking requirements")
 
 include (CheckIncludeFileCXX)
 include (CheckCXXSourceCompiles)
+include (CheckCXXSourceRuns)
 include (CheckCXXCompilerFlag)
 
 # ----------------------------------------------------------------------------
@@ -159,6 +160,40 @@ check_cxx_compiler_flag ("-Wno-psabi" HIBF_SUPPRESS_GCC4_ABI)
 if (HIBF_SUPPRESS_GCC4_ABI)
     set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -Wno-psabi")
     hibf_config_print ("Suppressing GCC 4 warnings: via -Wno-psabi")
+endif ()
+
+# ----------------------------------------------------------------------------
+# Optional: seqan::hibf::bit_vector::resize_for_overwrite
+# ----------------------------------------------------------------------------
+
+set (HIBF_UNINITIALISED_RESIZE_TEST_SOURCE
+     "#include <cstddef>
+      #include <vector>
+
+      struct my_vector : public std::vector<int>
+      {
+          void resize_for_overwrite(size_t const size)
+          {
+              this->_M_create_storage(size);
+              this->_M_impl._M_finish = this->_M_impl._M_end_of_storage;
+          }
+      };
+
+      int main()
+      {
+          my_vector vec{};
+          vec.resize_for_overwrite(10u);
+          return vec.size() != 10u;
+      }
+     ")
+
+check_cxx_source_runs ("${HIBF_UNINITIALISED_RESIZE_TEST_SOURCE}" HIBF_UNINITIALISED_RESIZE_SUPPORT)
+
+if (HIBF_UNINITIALISED_RESIZE_SUPPORT)
+    hibf_config_print ("Unitialised resize support: enabled")
+    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DHIBF_UNINITIALISED_RESIZE")
+else ()
+    hibf_config_print ("Unitialised resize support: disabled")
 endif ()
 
 # ----------------------------------------------------------------------------

@@ -44,10 +44,9 @@
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR
 
-#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/specialize.hpp>       // for specialization, specialize
-#include <cereal/types/base_class.hpp> // for base_class
-#include <cereal/types/vector.hpp>     // IWYU pragma: keep
+#include <cereal/cereal.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/macros.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/specialize.hpp> // for specialization, specialize
 
 namespace seqan::hibf
 {
@@ -876,13 +875,59 @@ public:
      * \attention These functions are never called directly.
      */
     template <cereal_archive archive_t>
-    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
+    void CEREAL_LOAD_FUNCTION_NAME(archive_t & archive)
     {
-        archive(cereal::base_class<base_t>(this), _size);
+        // Not using `cereal::make_size_tag(_size)`, because the size tag is inferred for text (XML/JSON) archives.
+        // For text archives, `cereal::make_size_tag(_size)` would be the number of elements serialised in the for-loop.
+        // E.g., `_size == 100` would store `2` (`== host_size_impl(_size)`).
+        archive(_size);
+        size_t const vector_size = host_size_impl(_size);
+
+        resize_for_overwrite(vector_size);
+
+        if constexpr (cereal_text_archive<archive_t>)
+        {
+            for (auto && v : *as_base())
+                archive(v);
+        }
+        else
+        {
+            archive(cereal::binary_data(data(), vector_size * sizeof(chunk_type)));
+        }
+    }
+
+    //!\copydoc load
+    template <cereal_archive archive_t>
+    void CEREAL_SAVE_FUNCTION_NAME(archive_t & archive) const
+    {
+        // Not using `cereal::make_size_tag(_size)`, because the size tag is inferred for text (XML/JSON) archives.
+        // For text archives, `cereal::make_size_tag(_size)` would be the number of elements serialised in the for-loop.
+        // E.g., `_size == 100` would store `2` (`== host_size_impl(_size)`).
+        archive(_size);
+
+        if constexpr (cereal_text_archive<archive_t>)
+        {
+            for (auto && v : *as_base())
+                archive(v);
+        }
+        else
+        {
+            archive(cereal::binary_data(data(), base_t::size() * sizeof(chunk_type)));
+        }
     }
     //!\endcond
 
 private:
+    HIBF_CONSTEXPR_VECTOR inline void resize_for_overwrite(size_t const size)
+    {
+#ifdef HIBF_UNINITIALISED_RESIZE
+        this->_M_create_storage(size);
+        this->_M_impl._M_finish = this->_M_impl._M_end_of_storage;
+#else
+        base_t::resize(size);
+#endif
+    }
+
     //!\brief Performs the binary bitwise-operation on the underlying chunks.
     template <typename binary_operator_t>
     constexpr bit_vector & binary_transform_impl(bit_vector const & rhs, binary_operator_t && op) noexcept
@@ -952,16 +997,15 @@ private:
 //!\cond
 // See https://uscilab.github.io/cereal/serialization_functions.html#inheritance
 // seqan::hibf::bit_vector's base class is std::vector
-// We include <cereal/types/vector.hpp> for std::vector serialisation
-// cereal provides these as separate load/save functions
-// bit_vector inherits those and also provides a serialise function
-// Since both load/save member functions (from std::vector) and a serialise function (bit_vector) are available,
+// If we include <cereal/types/vector.hpp> for std::vector serialisation (e.g., HIBF),
+// cereal provides these as non-member load/save functions.
+// Since both load/save non-member functions (std::vector) and load/save member functions (bit_vector) are available,
 // cereal needs to be told which one to use.
 namespace cereal
 {
 
 template <typename archive_t>
-struct specialize<archive_t, seqan::hibf::bit_vector, cereal::specialization::member_serialize>
+struct specialize<archive_t, seqan::hibf::bit_vector, cereal::specialization::member_load_save>
 {};
 
 } // namespace cereal

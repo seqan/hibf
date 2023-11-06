@@ -340,6 +340,9 @@ SEARCH_INCLUDES        = YES
 INCLUDE_PATH           = ${HIBF_DOXYGEN_SOURCE_DIR}/include
 INCLUDE_FILE_PATTERNS  =
 PREDEFINED             = "HIBF_DOXYGEN_ONLY(x)= x" \
+                         CEREAL_SERIALIZE_FUNCTION_NAME=serialize \
+                         CEREAL_LOAD_FUNCTION_NAME=load \
+                         CEREAL_SAVE_FUNCTION_NAME=save \
                          ${HIBF_DOXYGEN_PREDEFINED_NDEBUG} \
                          HIBF_CONSTEXPR_VECTOR=constexpr
 EXPAND_AS_DEFINED      =
