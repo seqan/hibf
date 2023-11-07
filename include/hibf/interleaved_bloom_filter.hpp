@@ -147,7 +147,7 @@ private:
 
     //!\brief Allow cereal to cast the IBF into its base class.
     template <typename t>
-    friend class cereal::base_class;
+    friend struct cereal::base_class;
 
     //!\brief The number of bins specified by the user.
     size_t bins{};
