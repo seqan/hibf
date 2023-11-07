@@ -23,9 +23,9 @@ namespace seqan::hibf::build
  */
 inline void update_parent_kmers(robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                                 robin_hood::unordered_flat_set<uint64_t> const & kmers,
-                                timer<concurrent::yes> & merge_kmers_timer)
+                                concurrent_timer & merge_kmers_timer)
 {
-    timer<concurrent::no> local_merge_kmers_timer{};
+    serial_timer local_merge_kmers_timer{};
     local_merge_kmers_timer.start();
     parent_kmers.insert(kmers.begin(), kmers.end());
     local_merge_kmers_timer.stop();

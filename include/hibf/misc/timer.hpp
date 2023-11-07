@@ -21,168 +21,275 @@
 namespace seqan::hibf
 {
 
-/*!\brief Whether the timer is concurrent.
- * \ingroup hibf_build
- */
-enum class concurrent
-{
-    no, //!< Not concurrent.
-    yes //!< Concurrent.
-};
+class concurrent_timer;
 
-/*!\brief Timer.
- * \ingroup hibf_build
+/*!\brief A timer.
+ * \ingroup hibf
  */
-template <concurrent concurrency>
-class timer
+class serial_timer
 {
 private:
-    static constexpr bool is_concurrent{concurrency == concurrent::yes};
+    using steady_clock_t = std::chrono::steady_clock;
 
-    using rep_t =
-        std::conditional_t<is_concurrent, std::atomic<std::chrono::steady_clock::rep>, std::chrono::steady_clock::rep>;
+    steady_clock_t::time_point start_point{std::chrono::time_point<steady_clock_t>::max()};
+    steady_clock_t::time_point stop_point{};
 
-    using count_t = std::conditional_t<is_concurrent, std::atomic<uint64_t>, uint64_t>;
+    steady_clock_t::rep ticks{};
+    steady_clock_t::rep max{};
+    uint64_t count{};
 
-    static constexpr int alignment = is_concurrent ? 64 : 8;
-
-    template <concurrent concurrency_>
-    friend class timer;
+    friend class concurrent_timer;
 
 public:
-    timer() = default;
-    timer(timer &&) = default;
-    timer & operator=(timer &&) = default;
-    ~timer() = default;
+    /*!\name Constructors, destructor and assignment
+     * \{
+     */
+    serial_timer() = default;                                 //!< Defaulted.
+    serial_timer(serial_timer const &) = default;             //!< Defaulted.
+    serial_timer & operator=(serial_timer const &) = default; //!< Defaulted.
+    serial_timer(serial_timer &&) = default;                  //!< Defaulted.
+    serial_timer & operator=(serial_timer &&) = default;      //!< Defaulted.
+    ~serial_timer() = default;                                //!< Defaulted.
 
-    timer(timer const & other)
-        requires (!is_concurrent)
-    = default;
-    timer & operator=(timer const & other)
-        requires (!is_concurrent)
-    = default;
+    //!\}
 
-    timer(timer const & other)
-        requires is_concurrent
-        :
-        start_{other.start_},
-        stop_{other.stop_},
+    /*!\name Modification
+     * \{
+     */
+    //!\brief Starts the timer.
+    void start()
+    {
+        start_point = steady_clock_t::now();
+    }
+
+    /*!\brief Stops the timer.
+     * \details
+     * In Debug mode, an assertion checks that `start()` has been called before.
+     */
+    void stop()
+    {
+        stop_point = steady_clock_t::now();
+        assert(stop_point >= start_point);
+        steady_clock_t::rep duration = (stop_point - start_point).count();
+
+        ticks += duration;
+        max = std::max(max, duration);
+        ++count;
+    }
+
+    //!\brief Adds another timer.
+    template <typename timer_t>
+        requires (std::same_as<timer_t, serial_timer> || std::same_as<timer_t, concurrent_timer>)
+    void operator+=(timer_t const & other)
+    {
+        steady_clock_t::rep ticks_to_add{};
+        if constexpr (std::same_as<timer_t, concurrent_timer>)
+            ticks_to_add = other.ticks.load();
+        else
+            ticks_to_add = other.ticks;
+
+        ticks += ticks_to_add;
+        max = std::max(max, ticks_to_add);
+        ++count;
+    }
+    //!\}
+
+    /*!\name Access
+     * \{
+     */
+    //!\brief Returns the measured time in seconds.
+    double in_seconds() const
+    {
+        return std::chrono::duration<double>(steady_clock_t::duration{ticks}).count();
+    }
+
+    /*!\brief Returns the maximum measured time interval in seconds.
+     * \details
+     * A time interval may be:
+     * * The elpased time between `start()` and `stop()`.
+     * * The elapsed time added via `operator+=()`.
+     */
+    double max_in_seconds() const
+    {
+        return std::chrono::duration<double>(steady_clock_t::duration{max}).count();
+    }
+
+    /*!\brief Returns the average measured time interval in seconds.
+     * \details
+     * A time interval may be:
+     * * The elpased time between `start()` and `stop()`.
+     * * The elapsed time added via `operator+=()`.
+     *
+     * The count used for averaging is the number of calls to `stop()` and `operator+=()`.
+     * \warning Calling this function when neither `stop()` or `operator+=()` have been used is undefined behaviour.
+     */
+    double avg_in_seconds() const
+    {
+        assert(count > 0u);
+        return in_seconds() / count;
+    }
+    //!\}
+
+    /*!\name Comparison
+     * \{
+     */
+    //!\brief Two timer are always equal.
+    constexpr bool operator==(serial_timer const &) const
+    {
+        return true;
+    }
+
+    //!\brief Two timer are always equal.
+    constexpr bool operator==(concurrent_timer const &) const
+    {
+        return true;
+    }
+    //!\}
+};
+
+/*!\brief A timer with a thread-safe `operator+=()`.
+ * \ingroup hibf
+ */
+class concurrent_timer
+{
+private:
+    using steady_clock_t = std::chrono::steady_clock;
+
+    steady_clock_t::time_point start_point{std::chrono::time_point<steady_clock_t>::max()};
+    steady_clock_t::time_point stop_point{};
+
+    alignas(64) std::atomic<steady_clock_t::rep> ticks{};
+    alignas(64) std::atomic<steady_clock_t::rep> max{};
+    alignas(64) std::atomic<uint64_t> count{};
+
+    friend class serial_timer;
+
+    void update_max(steady_clock_t::rep const value)
+    {
+        for (steady_clock_t::rep previous_value = max;
+             previous_value < value && !max.compare_exchange_weak(previous_value, value, std::memory_order_relaxed);)
+            ;
+    }
+
+public:
+    /*!\name Constructors, destructor and assignment
+     * \{
+     */
+    //!\brief Defaulted.
+    concurrent_timer() = default;
+    //!\brief Defaulted.
+    concurrent_timer(concurrent_timer const & other) :
+        start_point{other.start_point},
+        stop_point{other.stop_point},
         ticks{other.ticks.load()},
         max{other.max.load()},
         count{other.count.load()}
     {}
-    timer & operator=(timer const & other)
-        requires is_concurrent
+    //!\brief Defaulted.
+    concurrent_timer & operator=(concurrent_timer const & other)
     {
-        start_ = other.start_;
-        stop_ = other.stop_;
+        start_point = other.start_point;
+        stop_point = other.stop_point;
         ticks = other.ticks.load();
         max = other.max.load();
         count = other.count.load();
         return *this;
     }
+    //!\brief Defaulted.
+    concurrent_timer(concurrent_timer && other) :
+        start_point{std::move(other.start_point)},
+        stop_point{std::move(other.stop_point)},
+        ticks{std::move(other.ticks.load())},
+        max{std::move(other.max.load())},
+        count{std::move(other.count.load())}
+    {}
+    //!\brief Defaulted.
+    concurrent_timer & operator=(concurrent_timer && other)
+    {
+        start_point = std::move(other.start_point);
+        stop_point = std::move(other.stop_point);
+        ticks = std::move(other.ticks.load());
+        max = std::move(other.max.load());
+        count = std::move(other.count.load());
+        return *this;
+    }
+    //!\brief Defaulted.
+    ~concurrent_timer() = default;
+    //!\}
 
+    /*!\name Modification
+     * \{
+     */
+    //!\copydoc seqan::hibf::serial_timer::start
     void start()
     {
-        start_ = std::chrono::steady_clock::now();
+        start_point = steady_clock_t::now();
     }
 
+    /*!\copydoc seqan::hibf::serial_timer::stop
+     * \attention This function is **not** thread-safe.
+     */
     void stop()
     {
-        stop_ = std::chrono::steady_clock::now();
-        assert(stop_ >= start_);
-        std::chrono::steady_clock::rep duration = (stop_ - start_).count();
+        stop_point = steady_clock_t::now();
+        assert(stop_point >= start_point);
+        steady_clock_t::rep duration = (stop_point - start_point).count();
+
         ticks += duration;
         update_max(duration);
         ++count;
     }
 
-    template <concurrent concurrency_>
-    void operator+=(timer<concurrency_> const & other)
+    /*!\copydoc seqan::hibf::serial_timer::operator+=
+     * This function is thread-safe.
+     */
+    template <typename timer_t>
+        requires (std::same_as<timer_t, serial_timer> || std::same_as<timer_t, concurrent_timer>)
+    void operator+=(timer_t const & other)
     {
         ticks += other.ticks;
         update_max(other.ticks);
         ++count;
     }
+    //!\}
 
+    /*!\name Access
+     * \{
+     */
+    //!\copydoc seqan::hibf::serial_timer::in_seconds
     double in_seconds() const
-        requires is_concurrent
     {
-        return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks.load()}).count();
+        return std::chrono::duration<double>(steady_clock_t::duration{ticks.load()}).count();
     }
 
+    //!\copydoc seqan::hibf::serial_timer::max_in_seconds
     double max_in_seconds() const
-        requires is_concurrent
     {
-        return std::chrono::duration<double>(std::chrono::steady_clock::duration{max.load()}).count();
+        return std::chrono::duration<double>(steady_clock_t::duration{max.load()}).count();
     }
 
+    //!\copydoc seqan::hibf::serial_timer::avg_in_seconds
     double avg_in_seconds() const
-        requires is_concurrent
     {
         assert(count.load() > 0u);
         return in_seconds() / count.load();
     }
 
-    // GCOVR_EXCL_START
-    double in_seconds() const
-        requires (!is_concurrent)
-    {
-        return std::chrono::duration<double>(std::chrono::steady_clock::duration{ticks}).count();
-    }
-
-    double max_in_seconds() const
-        requires (!is_concurrent)
-    {
-        return std::chrono::duration<double>(std::chrono::steady_clock::duration{max}).count();
-    }
-
-    double avg_in_seconds() const
-        requires (!is_concurrent)
-    {
-        assert(count > 0u);
-        return in_seconds() / count;
-    }
-    // GCOVR_EXCL_STOP
-
-    // Timer are always equal.
-    constexpr bool operator==(timer const &) const
+    /*!\name Comparison
+     * \{
+     */
+    //!\copydoc seqan::hibf::serial_timer::operator==
+    constexpr bool operator==(serial_timer const &) const
     {
         return true;
     }
 
-private:
-    std::chrono::steady_clock::time_point start_{std::chrono::time_point<std::chrono::steady_clock>::max()};
-    std::chrono::steady_clock::time_point stop_{};
-
-    alignas(alignment) rep_t ticks{};
-    alignas(alignment) rep_t max{};
-    alignas(alignment) count_t count{};
-
-    void update_max(std::chrono::steady_clock::rep const value)
-        requires is_concurrent
+    //!\copydoc seqan::hibf::serial_timer::operator==
+    constexpr bool operator==(concurrent_timer const &) const
     {
-        for (std::chrono::steady_clock::rep previous_value = max;
-             previous_value < value && !max.compare_exchange_weak(previous_value, value, std::memory_order_relaxed);)
-            ;
+        return true;
     }
-
-    // GCOVR_EXCL_START
-    void update_max(std::chrono::steady_clock::rep const value)
-        requires (!is_concurrent)
-    {
-        max = std::max(max, value);
-    }
-    // GCOVR_EXCL_STOP
+    //!\}
 };
-
-/*!\brief Alias for timer<concurrent::no>
- * \ingroup hibf_build
- */
-using serial_timer = timer<concurrent::no>;
-/*!\brief Alias for timer<concurrent::yes>
- * \ingroup hibf_build
- */
-using concurrent_timer = timer<concurrent::yes>;
 
 } // namespace seqan::hibf

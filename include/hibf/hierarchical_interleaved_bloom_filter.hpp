@@ -249,10 +249,10 @@ public:
      * \brief Only contains values after the HIBF has been constructed.
      * \{
      */
-    timer<concurrent::yes> index_allocation_timer{};
-    timer<concurrent::yes> user_bin_io_timer{};
-    timer<concurrent::yes> merge_kmers_timer{};
-    timer<concurrent::yes> fill_ibf_timer{};
+    concurrent_timer index_allocation_timer{};
+    concurrent_timer user_bin_io_timer{};
+    concurrent_timer merge_kmers_timer{};
+    concurrent_timer fill_ibf_timer{};
     //!\}
     //!\endcond
 };
