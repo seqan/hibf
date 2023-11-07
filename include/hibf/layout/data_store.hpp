@@ -13,6 +13,7 @@
 #include <vector>    // for vector
 
 #include <hibf/layout/layout.hpp>      // for layout
+#include <hibf/misc/timer.hpp>         // for concurrent, timer
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::layout
@@ -83,6 +84,12 @@ struct data_store
     std::vector<uint64_t> union_estimates{};
 
     bool user_bins_arranged{false};
+
+    //!\brief Tracks the time the algorithm spends on estimating the union of user bins (merged bins).
+    concurrent_timer union_estimation_timer{};
+
+    //!\brief Tracks the time the algorithm spends on rearranging user bins (merged bins).
+    concurrent_timer rearrangement_timer{};
     //!\}
 };
 

@@ -9,6 +9,7 @@
 
 #include <hibf/config.hpp>             // for config
 #include <hibf/layout/layout.hpp>      // for layout
+#include <hibf/misc/timer.hpp>         // for concurrent, timer
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::layout
@@ -19,8 +20,17 @@ namespace seqan::hibf::layout
  * \param[in] config The configuration to compute the layout with.
  * \param[in] kmer_counts The vector that will store the kmer counts (estimations).
  * \param[in] sketches The vector that will store the sketches.
+ * \param[in,out] union_estimation_timer The timer that measures the union estimation time.
+ * \param[in,out] rearrangement_timer The timer that measures the rearrangement time.
  * \returns layout
  */
+layout compute_layout(config const & config,
+                      std::vector<size_t> const & kmer_counts,
+                      std::vector<sketch::hyperloglog> const & sketches,
+                      concurrent_timer & union_estimation_timer,
+                      concurrent_timer & rearrangement_timer);
+
+//!\overload
 layout compute_layout(config const & config,
                       std::vector<size_t> const & kmer_counts,
                       std::vector<sketch::hyperloglog> const & sketches);

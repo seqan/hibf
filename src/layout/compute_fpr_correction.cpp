@@ -17,6 +17,7 @@ std::vector<double> compute_fpr_correction(fpr_correction_parameters const & par
 {
     assert(params.fpr > 0.0 && params.fpr <= 1.0);
     assert(params.hash_count > 0u);
+    assert(params.t_max > 0u);
 
     size_t const max_tb = next_multiple_of_64(params.t_max);
 
