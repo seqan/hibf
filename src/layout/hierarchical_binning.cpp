@@ -40,11 +40,13 @@ size_t hierarchical_binning::execute()
         if (!config.disable_estimate_union && !config.disable_rearrangement)
         {
             assert(data->sketches != nullptr);
+            data->rearrangement_timer.start();
             sketch::toolbox::rearrange_bins(*data->sketches,
                                             *data->kmer_counts,
                                             data->positions,
                                             config.max_rearrangement_ratio,
                                             config.threads);
+            data->rearrangement_timer.stop();
         }
 
         data->user_bins_arranged = true;
@@ -105,10 +107,12 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     size_t sum = (*data->kmer_counts)[data->positions[0]];
     if (!config.disable_estimate_union)
     {
+        data->union_estimation_timer.start();
         sketch::toolbox::precompute_initial_union_estimates(data->union_estimates,
                                                             *data->sketches,
                                                             *data->kmer_counts,
                                                             data->positions);
+        data->union_estimation_timer.stop();
 
         for (size_t j = 1; j < num_user_bins; ++j)
         {
@@ -153,11 +157,15 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
         double const ub_cardinality = static_cast<double>(current_weight);
 
         if (!config.disable_estimate_union)
+        {
+            data->union_estimation_timer.start();
             sketch::toolbox::precompute_union_estimates_for(data->union_estimates,
                                                             *data->sketches,
                                                             *data->kmer_counts,
                                                             data->positions,
                                                             j);
+            data->union_estimation_timer.stop();
+        }
 
         for (size_t i = 1; i < num_technical_bins; ++i)
         {
@@ -263,6 +271,8 @@ void hierarchical_binning::backtrack_merged_bin(size_t trace_j,
     }
 
     process_merged_bin(libf_data, bin_id);
+    data->union_estimation_timer += libf_data.union_estimation_timer;
+    data->rearrangement_timer += libf_data.rearrangement_timer;
 
     if (!config.disable_estimate_union)
         kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin

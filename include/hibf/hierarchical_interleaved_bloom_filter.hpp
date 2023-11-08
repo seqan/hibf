@@ -249,6 +249,10 @@ public:
      * \brief Only contains values after the HIBF has been constructed.
      * \{
      */
+    concurrent_timer layout_compute_sketches_timer{};
+    concurrent_timer layout_union_estimation_timer{};
+    concurrent_timer layout_rearrangement_timer{};
+    concurrent_timer layout_dp_algorithm_timer{};
     concurrent_timer index_allocation_timer{};
     concurrent_timer user_bin_io_timer{};
     concurrent_timer merge_kmers_timer{};

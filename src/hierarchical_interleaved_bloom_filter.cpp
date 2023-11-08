@@ -204,7 +204,9 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
 
     std::vector<size_t> kmer_counts{};
     std::vector<sketch::hyperloglog> sketches{};
+    layout_compute_sketches_timer.start();
     sketch::compute_sketches(configuration, kmer_counts, sketches);
+    layout_compute_sketches_timer.stop();
 
     // If rearrangement is enabled, i.e. seqan::hibf::config::disable_rearrangement is false:
     // `min_id == none` in seqan::hibf::sketch::toolbox::cluster_bins -> std::out_of_range "key not found"
@@ -216,7 +218,14 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
                                     return count == 0u;
                                 }));
 
-    auto layout = layout::compute_layout(configuration, kmer_counts, sketches);
+    layout_dp_algorithm_timer.start();
+    auto layout = layout::compute_layout(configuration,
+                                         kmer_counts,
+                                         sketches,
+                                         layout_union_estimation_timer,
+                                         layout_rearrangement_timer);
+    layout_dp_algorithm_timer.stop();
+
     number_of_user_bins = configuration.number_of_user_bins;
     build_index(*this, configuration, layout);
 }
