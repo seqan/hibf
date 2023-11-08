@@ -12,6 +12,7 @@
 #include <string_view> // for string_view
 
 #include <hibf/config.hpp> // for config, insert_iterator
+#include <hibf/test/cereal.hpp>
 
 TEST(config_test, write_to)
 {
@@ -318,4 +319,19 @@ TEST(config_test, validate_and_set_defaults)
         EXPECT_TRUE(configuration.disable_rearrangement);
         EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
     }
+}
+
+TEST(config_test, serialisation)
+{
+    seqan::hibf::config config{.number_of_user_bins = 123456789,
+                               .number_of_hash_functions = 4,
+                               .maximum_fpr = 0.0001,
+                               .threads = 31,
+                               .sketch_bits = 8,
+                               .tmax = 128,
+                               .alpha = 1.0,
+                               .max_rearrangement_ratio = 0.333,
+                               .disable_estimate_union = true,
+                               .disable_rearrangement = false};
+    seqan::hibf::test::test_serialisation(std::move(config));
 }
