@@ -22,6 +22,7 @@
 #include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/types/vector.hpp>
 
 namespace seqan::hibf
 {

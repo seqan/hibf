@@ -7,6 +7,7 @@
 #include <hibf/platform.hpp>
 
 #include <cereal/details/helpers.hpp> // for InputArchiveBase, OutputArchiveBase
+#include <cereal/details/traits.hpp>  // for InputArchiveBase, OutputArchiveBase
 
 namespace seqan::hibf
 {
@@ -19,5 +20,8 @@ concept cereal_input_archive = std::is_base_of_v<cereal::detail::InputArchiveBas
 
 template <typename t>
 concept cereal_archive = cereal_output_archive<t> || cereal_input_archive<t>;
+
+template <typename t>
+concept cereal_text_archive = std::is_base_of_v<cereal::traits::TextArchive, t>;
 
 } // namespace seqan::hibf
