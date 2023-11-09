@@ -9,8 +9,8 @@
 
 #include <hibf/platform.hpp>
 
-#include <cereal/macros.hpp> // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
-#include <cereal/types/string.hpp>
+#include <cereal/macros.hpp>       // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
+#include <cereal/types/string.hpp> // IWYU pragma: keep
 
 namespace cereal
 {

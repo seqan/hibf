@@ -15,6 +15,7 @@
 #include <hibf/layout/data_store.hpp>             // for data_store
 #include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
 #include <hibf/layout/layout.hpp>                 // for layout
+#include <hibf/misc/timer.hpp>                    // for concurrent_timer
 #include <hibf/sketch/hyperloglog.hpp>            // for hyperloglog
 
 namespace seqan::hibf::layout

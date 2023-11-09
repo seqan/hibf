@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for max, copy, fill_n, min
+#include <algorithm> // for copy, max, fill_n, min
 #include <cassert>   // for assert
 #include <cmath>     // for log, ceil
 #include <cstddef>   // for size_t
@@ -18,6 +18,7 @@
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/misc/divide_and_ceil.hpp>        // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
+#include <hibf/misc/timer.hpp>                  // for concurrent_timer
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 #include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 #include <hibf/sketch/toolbox.hpp>              // for precompute_initial_union_estimates, precompute_union_estimat...

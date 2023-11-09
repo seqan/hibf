@@ -7,7 +7,6 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <algorithm>  // for max
 #include <cinttypes>  // for uint64_t
 #include <functional> // for function
 
@@ -16,7 +15,7 @@
 #include <hibf/config.hpp>              // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>  // for unordered_flat_set
 #include <hibf/layout/layout.hpp>       // for layout
-#include <hibf/misc/timer.hpp>          // for concurrent, timer
+#include <hibf/misc/timer.hpp>          // for serial_timer, concurrent_timer
 
 namespace seqan::hibf::build
 {

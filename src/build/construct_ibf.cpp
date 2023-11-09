@@ -2,7 +2,6 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for max
 #include <cassert>   // for assert
 #include <cinttypes> // for uint64_t
 #include <cmath>     // for ceil
@@ -19,7 +18,7 @@
 #include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_function_c...
 #include <hibf/layout/graph.hpp>              // for graph
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
-#include <hibf/misc/timer.hpp>                // for concurrent, timer
+#include <hibf/misc/timer.hpp>                // for serial_timer, concurrent_timer
 
 namespace seqan::hibf::build
 {

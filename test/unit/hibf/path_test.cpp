@@ -2,10 +2,14 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, TestInfo, TEST
 
-#include <hibf/cereal/path.hpp>
-#include <hibf/test/cereal.hpp>
+#include <filesystem> // for operator==, path
+#include <memory>     // for allocator
+#include <utility>    // for move
+
+#include <hibf/cereal/path.hpp> // IWYU pragma: keep
+#include <hibf/test/cereal.hpp> // for test_serialisation
 
 TEST(path_test, serialisation)
 {
