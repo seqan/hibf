@@ -27,6 +27,7 @@ namespace seqan::hibf::layout
 layout compute_layout(config const & config,
                       std::vector<size_t> const & kmer_counts,
                       std::vector<sketch::hyperloglog> const & sketches,
+                      std::vector<size_t> && positions,
                       concurrent_timer & union_estimation_timer,
                       concurrent_timer & rearrangement_timer);
 

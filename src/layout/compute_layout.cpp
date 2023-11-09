@@ -24,9 +24,15 @@ namespace seqan::hibf::layout
 layout compute_layout(config const & config,
                       std::vector<size_t> const & kmer_counts,
                       std::vector<sketch::hyperloglog> const & sketches,
+                      std::vector<size_t> && positions,
                       concurrent_timer & union_estimation_timer,
                       concurrent_timer & rearrangement_timer)
 {
+    assert(kmer_counts.size() == sketches.size());
+    assert(positions.size() <= sketches.size());
+    assert(sketches.size() == config.number_of_user_bins);
+    assert(*std::ranges::max_element(positions) <= config.number_of_user_bins);
+
     layout resulting_layout{};
 
     // The output streams facilitate writing the layout file in hierarchical structure.
@@ -37,7 +43,8 @@ layout compute_layout(config const & config,
     data_store store{.false_positive_rate = config.maximum_fpr,
                      .hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),
-                     .sketches = std::addressof(sketches)};
+                     .sketches = std::addressof(sketches),
+                     .positions = std::move(positions)};
 
     store.fpr_correction = compute_fpr_correction({.fpr = config.maximum_fpr, //
                                                    .hash_count = config.number_of_hash_functions,
@@ -66,7 +73,15 @@ layout compute_layout(config const & config,
     concurrent_timer union_estimation_timer;
     concurrent_timer rearrangement_timer;
 
-    return compute_layout(config, kmer_counts, sketches, union_estimation_timer, rearrangement_timer);
+    std::vector<size_t> positions = [&kmer_counts]()
+    {
+        std::vector<size_t> ps;
+        ps.resize(kmer_counts.size());
+        std::iota(ps.begin(), ps.end(), 0);
+        return ps;
+    }();
+
+    return compute_layout(config, kmer_counts, sketches, std::move(positions), union_estimation_timer, rearrangement_timer);
 }
 
 } // namespace seqan::hibf::layout

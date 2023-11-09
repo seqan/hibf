@@ -6,6 +6,7 @@
 
 #include <cstddef>    // for size_t
 #include <functional> // for function
+#include <numeric>    // for iota
 #include <vector>     // for vector, allocator
 
 #include <hibf/config.hpp>                  // for insert_iterator, config
@@ -39,8 +40,16 @@ TEST(compute_layout, dispatch)
     seqan::hibf::concurrent_timer union_estimation_timer{};
     seqan::hibf::concurrent_timer rearrangement_timer{};
 
+    std::vector<size_t> positions = [&kmer_counts]()
+    {
+        std::vector<size_t> ps;
+        ps.resize(kmer_counts.size());
+        std::iota(ps.begin(), ps.end(), 0);
+        return ps;
+    }();
+
     auto layout2 =
-        seqan::hibf::layout::compute_layout(config, kmer_counts, sketches, union_estimation_timer, rearrangement_timer);
+        seqan::hibf::layout::compute_layout(config, kmer_counts, sketches, std::move(positions), union_estimation_timer, rearrangement_timer);
 
     EXPECT_TRUE(layout1 == layout2);
 }
