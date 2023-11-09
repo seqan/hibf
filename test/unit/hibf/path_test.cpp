@@ -8,9 +8,8 @@
 #include <memory>     // for allocator
 #include <utility>    // for move
 
+#include <hibf/cereal/path.hpp> // IWYU pragma: keep
 #include <hibf/test/cereal.hpp> // for test_serialisation
-
-#include <cereal/specialize.hpp> // for specialization
 
 TEST(path_test, serialisation)
 {
