@@ -44,7 +44,6 @@ jobs:
       - name: Install Dependencies
         run: |
           install libomp-17-dev libclang-17-dev
-          sudo ln -s /usr/lib/llvm-17/lib/clang/17 /usr/lib/llvm-17/lib/clang/17.0.0
 
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
@@ -56,7 +55,7 @@ jobs:
           clang-17 -print-resource-dir
           mkdir iwyu
           cd iwyu
-          git clone https://github.com/include-what-you-use/include-what-you-use.git
+          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch 0.21
           mkdir build
           cd build
           cmake ../include-what-you-use -G "Unix Makefiles" \
