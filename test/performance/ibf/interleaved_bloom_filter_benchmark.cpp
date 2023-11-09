@@ -30,9 +30,9 @@ static void arguments(benchmark::internal::Benchmark * b)
     // Total size: 1MiB
     // bins, bin_size, hash_num, sequence_length
     b->Args({64, 1LL << 17, 2, 1LL << 17});
-    b->Args({128, 1LL << 16, 2, 1LL << 17});
-    b->Args({192, 1LL << 16, 2, 1LL << 17});
-    b->Args({256, 1LL << 15, 2, 1LL << 17});
+    // b->Args({128, 1LL << 16, 2, 1LL << 17});
+    // b->Args({192, 1LL << 16, 2, 1LL << 17});
+    // b->Args({256, 1LL << 15, 2, 1LL << 17});
     // b->Args({320, 1LL << 15, 2, 1LL << 17});
     // b->Args({384, 1LL << 14, 2, 1LL << 17});
     // b->Args({448, 1LL << 14, 2, 1LL << 17});

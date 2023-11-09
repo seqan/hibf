@@ -49,7 +49,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: ${{ steps.fetch_depth.outputs.depth }}
-          submodules: true
+          submodules: false
 
       - name: Setup toolchain
         uses: seqan/actions/setup-toolchain@main
@@ -60,7 +60,7 @@ jobs:
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.16.9
+          cmake: 3.18.6
 
       - name: Install gcovr
         run: |
@@ -74,7 +74,7 @@ jobs:
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF
-          make -j2 gtest_build
+          make -j2 gtest_main
 
       - name: Build tests
         env:

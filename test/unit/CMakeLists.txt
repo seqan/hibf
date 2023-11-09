@@ -43,7 +43,7 @@ macro (hibf_test unit_test_cpp)
     unset (test_name)
 endmacro ()
 
-hibf_require_test ()
+CPMGetPackage (googletest)
 
 add_subdirectories ()
 

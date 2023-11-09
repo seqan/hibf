@@ -1,0 +1,23 @@
+# SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: BSD-3-Clause
+
+@PACKAGE_INIT@
+
+include (CMakeFindDependencyMacro)
+find_dependency (cereal @HIBF_CEREAL_VERSION@ REQUIRED)
+
+find_package (PkgConfig QUIET)
+if (PKG_CONFIG_FOUND)
+    pkg_check_modules (simde QUIET simde>=@HIBF_SIMDE_VERSION@)
+endif ()
+
+if (simde_FOUND)
+    add_library (simde IMPORTED INTERFACE)
+    add_library (simde::simde ALIAS simde)
+    target_include_directories (simde INTERFACE ${simde_INCLUDEDIR})
+else ()
+    find_dependency (simde @HIBF_SIMDE_VERSION@ REQUIRED)
+endif ()
+
+include ("${CMAKE_CURRENT_LIST_DIR}/hibf-targets.cmake")

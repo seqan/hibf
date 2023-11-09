@@ -49,7 +49,7 @@ macro (hibf_snippets test_name_prefix snippet_base_path)
     endforeach ()
 endmacro ()
 
-hibf_require_test ()
+CPMGetPackage (googletest)
 
 hibf_snippets ("snippet" "${CMAKE_CURRENT_SOURCE_DIR}")
 hibf_snippets ("doc/snippet" "${CMAKE_CURRENT_SOURCE_DIR}/../../doc")

@@ -8,7 +8,7 @@ project (hibf_test_performance CXX)
 include (../hibf-test.cmake)
 
 set (HIBF_BENCHMARK_MIN_TIME
-     "1"
+     "0.01s"
      CACHE STRING "Set --benchmark_min_time= for each bechmark. Timings are unreliable in CI.")
 
 macro (hibf_benchmark benchmark_cpp)
@@ -25,6 +25,6 @@ macro (hibf_benchmark benchmark_cpp)
     unset (test_name)
 endmacro ()
 
-hibf_require_benchmark ()
+CPMGetPackage (benchmark)
 
 add_subdirectories ()

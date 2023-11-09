@@ -2,38 +2,43 @@
 # SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-install (TARGETS hibf
+set (HIBF_EXPORT_TARGETS "hibf")
+if (TARGET cereal)
+    list (APPEND HIBF_EXPORT_TARGETS "cereal")
+endif ()
+if (TARGET simde)
+    list (APPEND HIBF_EXPORT_TARGETS "simde")
+endif ()
+
+# cmake-format: off
+install (TARGETS ${HIBF_EXPORT_TARGETS}
          EXPORT hibf_targets
+         INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
          RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
          LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
          ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
          FRAMEWORK DESTINATION ${CMAKE_INSTALL_LIBDIR})
+# cmake-format: on
 
-install (DIRECTORY "${HIBF_HEADER_PATH}/hibf" TYPE INCLUDE)
-# install submodule header files, e.g. all external dependencies in /home/user/hibf/submodules/*,
-# in /include/hibf/submodules/<submodule>/include
-foreach (submodule_dir ${HIBF_DEPENDENCY_HEADER_PATHS})
-    # e.g. submodule_dir: (1) /home/user/hibf/submodules/sdsl-lite/include or (2) /usr/include
-    # strip /home/user/hibf/submodules/ and /include part.
-    file (RELATIVE_PATH submodule "${HIBF_SOURCE_DIR}/submodules" "${submodule_dir}/..")
-    # submodule is either a single module name, like sdsl-lite or a relative path to a folder ../../../usr
-    # skip relative folders and only keep submodules that reside in the submodules folder
-    if (NOT submodule MATCHES "^\\.\\.") # skip relative folders
-        install (DIRECTORY "${submodule_dir}" DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/hibf/submodules/${submodule}")
-    endif ()
-endforeach ()
+install (DIRECTORY "${HIBF_HEADER_PATH}/hibf" DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 install (EXPORT hibf_targets
          NAMESPACE seqan::
          DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hibf
-         FILE hibf-config.cmake)
+         EXPORT_LINK_INTERFACE_LIBRARIES
+         FILE hibf-targets.cmake)
 
 include (CMakePackageConfigHelpers)
+configure_package_config_file (cmake/hibf-config.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/hibf-config.cmake
+                               INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hibf)
+install (FILES ${CMAKE_CURRENT_BINARY_DIR}/hibf-config.cmake DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hibf)
+
 set (version_file "${CMAKE_CURRENT_BINARY_DIR}/cmake/hibf-config-version.cmake")
 write_basic_package_version_file (
     ${version_file}
     VERSION ${HIBF_VERSION}
-    COMPATIBILITY AnyNewerVersion)
+    COMPATIBILITY SameMajorVersion)
 install (FILES ${version_file} DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/hibf)
 
 install (FILES "${HIBF_SOURCE_DIR}/LICENSE.md" "${HIBF_SOURCE_DIR}/README.md" TYPE DOC)
+install (DIRECTORY "${HIBF_SOURCE_DIR}/LICENSES" TYPE DOC)
