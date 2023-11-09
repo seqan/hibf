@@ -2,12 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for AssertionResult, Message, TestPartResult, CmpHelperGE, CmpHelperGT, EXPECT_TRUE
 
-#include <chrono>
-#include <thread>
+#include <chrono> // for operator""ms
+#include <memory> // for allocator
+#include <thread> // for sleep_for
 
-#include <hibf/misc/timer.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent_timer, serial_timer
 
 static inline void waste_time()
 {

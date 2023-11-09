@@ -2,11 +2,18 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Test, AssertionResult, TestInfo, EXPECT_TRUE, Message, TEST, Tes...
 
-#include <hibf/layout/compute_layout.hpp>
-#include <hibf/misc/timer.hpp>
-#include <hibf/sketch/compute_sketches.hpp>
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <vector>     // for vector, allocator
+
+#include <hibf/config.hpp>                  // for insert_iterator, config
+#include <hibf/layout/compute_layout.hpp>   // for compute_layout
+#include <hibf/layout/layout.hpp>           // for layout
+#include <hibf/misc/timer.hpp>              // for concurrent_timer
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 
 TEST(compute_layout, dispatch)
 {

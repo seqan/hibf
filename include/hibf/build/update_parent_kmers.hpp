@@ -8,11 +8,10 @@
  */
 #pragma once
 
-#include <algorithm> // for max
 #include <cinttypes> // for uint64_t
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
-#include <hibf/misc/timer.hpp>         // for concurrent, timer
+#include <hibf/misc/timer.hpp>         // for serial_timer, concurrent_timer
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::build

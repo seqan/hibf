@@ -18,11 +18,10 @@
 #include <hibf/config.hpp>                   // for config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, counting_vector
 #include <hibf/layout/layout.hpp>            // for layout
-#include <hibf/misc/timer.hpp>               // for concurrent, timer
+#include <hibf/misc/timer.hpp>               // for concurrent_timer
 #include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
 
 #include <cereal/macros.hpp> // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/types/vector.hpp>
 
 namespace seqan::hibf
 {
@@ -138,7 +137,6 @@ public:
     * In contrast to the seqan::hibf::interleaved_bloom_filter, the result will consist of indices of user bins.
     */
     class membership_agent_type;
-
     //!\brief Manages counting ranges of values for the seqan::hibf::hierarchical_interleaved_bloom_filter.
     template <std::integral value_t>
     class counting_agent_type;

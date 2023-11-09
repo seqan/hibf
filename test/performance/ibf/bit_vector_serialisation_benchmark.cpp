@@ -2,23 +2,23 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for Benchmark, State, BENCHMARK_CAPTURE, DoNotOptimize, BENCHMARK_MAIN
+#include <benchmark/benchmark.h> // for State, Counter, DoNotOptimize, Benchmark, BENCHMARK, BENCHMARK_MAIN
 
-#include <algorithm> // for __generate_fn, generate
-#include <cinttypes> // for int32_t, uint8_t
-#include <cstddef>   // for size_t
-#include <filesystem>
-#include <fstream>
-#include <memory>      // for allocator
-#include <random>      // for uniform_int_distribution, mt19937_64
-#include <type_traits> // for invoke_result_t
-#include <utility>     // for move, pair
+#include <algorithm>  // for __generate_fn, generate
+#include <cinttypes>  // for int32_t, uint8_t, int64_t
+#include <cstddef>    // for size_t
+#include <filesystem> // for exists, file_size
+#include <fstream>    // for basic_ifstream, basic_ios, basic_ofstream, ios, ifstream, ofstream
+#include <random>     // for uniform_int_distribution, mt19937_64
+#include <stdexcept>  // for logic_error
+#include <string>     // for allocator, to_string, basic_string
 
 #include <hibf/misc/bit_vector.hpp>     // for bit_vector
 #include <hibf/test/sandboxed_path.hpp> // for sandboxed_path, operator/
 #include <hibf/test/tmp_directory.hpp>  // for tmp_directory
 
 #include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
+#include <cereal/cereal.hpp>          // for InputArchive, OutputArchive
 
 seqan::hibf::bit_vector generate_bit_vector(size_t const size_in_bits, size_t const seed = 0u)
 {
