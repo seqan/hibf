@@ -121,8 +121,8 @@ macro (hibf_header_test component header_base_path exclude_regex)
     unset (header_target)
 endmacro ()
 
-hibf_require_benchmark ()
-hibf_require_test ()
+CPMGetPackage (benchmark)
+CPMGetPackage (googletest)
 
 # note: hibf/version.hpp is one of the only header that is not required to have a hibf/core/platform.hpp include
 hibf_header_test (hibf "${HIBF_SOURCE_DIR}/include" "hibf/version.hpp|hibf/contrib|hibf/")

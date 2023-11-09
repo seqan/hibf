@@ -14,10 +14,27 @@ message (STATUS "Finding HIBF (${HIBF_VERSION}) and checking requirements")
 # Includes
 # ----------------------------------------------------------------------------
 
+set (CPM_INDENT "  CMake Package Manager CPM: ")
+include (${CMAKE_CURRENT_LIST_DIR}/CPM.cmake)
+CPMUsePackageLock (${CMAKE_CURRENT_LIST_DIR}/package-lock.cmake)
+
 include (CheckIncludeFileCXX)
 include (CheckCXXSourceCompiles)
 include (CheckCXXSourceRuns)
 include (CheckCXXCompilerFlag)
+
+# ----------------------------------------------------------------------------
+# Find or add dependencies
+# ----------------------------------------------------------------------------
+
+CPMGetPackage (cereal)
+
+if (cereal_ADDED)
+    set_target_properties (cereal PROPERTIES INTERFACE_SYSTEM_INCLUDE_DIRECTORIES
+                                             $<TARGET_PROPERTY:cereal,INTERFACE_INCLUDE_DIRECTORIES>)
+endif ()
+
+include (${CMAKE_CURRENT_LIST_DIR}/simde.cmake)
 
 # ----------------------------------------------------------------------------
 # Pretty printing and error handling
@@ -33,29 +50,13 @@ macro (hibf_config_error text)
 endmacro ()
 
 # ----------------------------------------------------------------------------
-# Add submodules
-# ----------------------------------------------------------------------------
-
-set (HIBF_SUBMODULES_DIR
-     "${HIBF_SOURCE_DIR}"
-     CACHE STRING "Directory containing submodules.")
-file (GLOB submodules ${HIBF_SUBMODULES_DIR}/submodules/*/include ${HIBF_SUBMODULES_DIR}/submodules/simde
-      ${HIBF_SUBMODULES_DIR}/simde)
-foreach (submodule ${submodules})
-    if (IS_DIRECTORY ${submodule})
-        hibf_config_print ("  …adding submodule include: ${submodule}")
-        set (HIBF_DEPENDENCY_HEADER_PATHS ${submodule} ${HIBF_DEPENDENCY_HEADER_PATHS})
-    endif ()
-endforeach ()
-
-# ----------------------------------------------------------------------------
 # Options for CheckCXXSourceCompiles
 # ----------------------------------------------------------------------------
 
 # deactivate messages in check_*
 set (CMAKE_REQUIRED_QUIET 1)
 # use global variables in Check* calls
-set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_HEADER_PATH} ${HIBF_DEPENDENCY_HEADER_PATHS})
+set (CMAKE_REQUIRED_INCLUDES ${CMAKE_INCLUDE_PATH} ${HIBF_HEADER_PATH})
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 
 # ----------------------------------------------------------------------------
@@ -272,7 +273,7 @@ if (Threads_FOUND)
     if ("${CMAKE_THREAD_LIBS_INIT}" STREQUAL "")
         hibf_config_print ("Thread support:             builtin")
     else ()
-        set (HIBF_LIBRARIES ${HIBF_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+        list (APPEND HIBF_LIBRARIES "${CMAKE_THREAD_LIBS_INIT}")
         hibf_config_print ("Thread support:             via ${CMAKE_THREAD_LIBS_INIT}")
     endif ()
 else ()
@@ -302,7 +303,7 @@ unset (HIBF_ROBIN_HOOD_DIR)
 if ((${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     OR (${CMAKE_SYSTEM_NAME} STREQUAL "kFreeBSD")
     OR (${CMAKE_SYSTEM_NAME} STREQUAL "GNU"))
-    set (HIBF_LIBRARIES ${HIBF_LIBRARIES} rt)
+    list (APPEND HIBF_LIBRARIES "rt")
 endif ()
 
 # libexecinfo -- implicit
@@ -311,7 +312,8 @@ mark_as_advanced (_HIBF_HAVE_EXECINFO)
 if (_HIBF_HAVE_EXECINFO)
     hibf_config_print ("Optional dependency:        libexecinfo found")
     if ((${CMAKE_SYSTEM_NAME} STREQUAL "FreeBSD") OR (${CMAKE_SYSTEM_NAME} STREQUAL "OpenBSD"))
-        set (HIBF_LIBRARIES ${HIBF_LIBRARIES} execinfo elf)
+        list (APPEND HIBF_LIBRARIES "execinfo")
+        list (APPEND HIBF_LIBRARIES "elf")
     endif ()
 else ()
     hibf_config_print ("Optional dependency:        libexecinfo not found")
@@ -331,7 +333,7 @@ try_compile (HIBF_PLATFORM_TEST #
              ${CMAKE_BINARY_DIR}
              ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
              CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${HIBF_CXX_FLAGS}"
-                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH};${HIBF_DEPENDENCY_HEADER_PATHS}"
+                         "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH}"
              COMPILE_DEFINITIONS ${HIBF_DEFINITIONS}
              LINK_LIBRARIES ${HIBF_LIBRARIES}
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)

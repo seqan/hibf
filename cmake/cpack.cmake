@@ -17,6 +17,20 @@ set (CPACK_RESOURCE_FILE_README "${HIBF_SOURCE_DIR}/README.md")
 
 # Source Package
 set (CPACK_SOURCE_GENERATOR "TXZ")
-set (CPACK_SOURCE_IGNORE_FILES "\\\\.git($|/)")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\.git($|/)")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\.github/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/\.vscode/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/build/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/submodules/")
+list (APPEND CPACK_SOURCE_IGNORE_FILES "/cmake/CPM.cmake")
+
+# Already being called on source package
+if (NOT CPM_DOWNLOAD_LOCATION)
+    set (CPM_DOWNLOAD_LOCATION "${HIBF_SOURCE_DIR}/cmake/CPM.cmake")
+endif ()
+
+configure_file ("${HIBF_SOURCE_DIR}/cmake/cpack_install.cmake.in" "${CMAKE_CURRENT_BINARY_DIR}/cpack_install.cmake"
+                @ONLY)
+set (CPACK_INSTALL_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/cpack_install.cmake")
 
 include (CPack)
