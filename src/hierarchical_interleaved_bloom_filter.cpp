@@ -218,10 +218,19 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
                                     return count == 0u;
                                 }));
 
+    std::vector<size_t> positions = [&kmer_counts]()
+    {
+        std::vector<size_t> ps;
+        ps.resize(kmer_counts.size());
+        std::iota(ps.begin(), ps.end(), 0);
+        return ps;
+    }();
+
     layout_dp_algorithm_timer.start();
     auto layout = layout::compute_layout(configuration,
                                          kmer_counts,
                                          sketches,
+                                         std::move(positions),
                                          layout_union_estimation_timer,
                                          layout_rearrangement_timer);
     layout_dp_algorithm_timer.stop();
