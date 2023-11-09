@@ -312,6 +312,23 @@ struct config
      */
     void validate_and_set_defaults();
 
+    //!\brief Two configs are equal if all options, except seqan::hibf::config::input_fn, are equal.
+    constexpr bool operator==(config const & other) const
+    {
+        // clang-format off
+        return number_of_user_bins == other.number_of_user_bins &&
+               maximum_fpr == other.maximum_fpr &&
+               relaxed_fpr == other.relaxed_fpr &&
+               threads == other.threads &&
+               sketch_bits == other.sketch_bits &&
+               tmax == other.tmax &&
+               alpha == other.alpha &&
+               max_rearrangement_ratio == other.max_rearrangement_ratio &&
+               disable_estimate_union == other.disable_estimate_union &&
+               disable_rearrangement == other.disable_rearrangement;
+        // clang-format on
+    }
+
 private:
     friend class cereal::access;
 
