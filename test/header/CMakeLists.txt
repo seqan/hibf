@@ -107,7 +107,10 @@ macro (hibf_header_test component header_base_path exclude_regex)
                                         "${CMAKE_CURRENT_SOURCE_DIR}/generate_header_source.cmake")
 
             add_library (${header_target} OBJECT "${header_target_source}")
-            target_link_libraries (${header_target} hibf::test::header)
+            # Link hibf::test first, even though it is also linked by hibf::test:header.
+            # Without this, the compile options of hibf::test are appended, e.g.,
+            # `-Wno-error=... -Werror -Wall`, instead of `-Werror -Wall -Wno-error=...`
+            target_link_libraries (${header_target} hibf::test hibf::test::header)
             target_sources (${target} PRIVATE $<TARGET_OBJECTS:${header_target}>)
         endforeach ()
     endforeach ()
