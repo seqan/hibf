@@ -95,7 +95,11 @@ TEST_F(toolbox_test, random_shuffle)
     seqan::hibf::sketch::toolbox::random_shuffle(dist, ids);
 
     // since randomness is seeded, the output is deterministic
+#ifdef _LIBCPP_VERSION
+    auto [new_pos_0, new_pos_1, new_pos_2, new_pos_3, new_pos_4] = std::make_tuple(0u, 4u, 2u, 1u, 3u);
+#else
     auto [new_pos_0, new_pos_1, new_pos_2, new_pos_3, new_pos_4] = std::make_tuple(3u, 2u, 1u, 0u, 4u);
+#endif
 
     EXPECT_EQ(ids[0], new_pos_0);
     EXPECT_EQ(ids[1], new_pos_1);

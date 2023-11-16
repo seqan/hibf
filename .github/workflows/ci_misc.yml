@@ -34,17 +34,38 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: "Snippet clang17"
+            compiler: "clang-17"
+            build: snippet
+            build_type: Release
+            use_include_dependencies: "OFF"
+            cxx_flags: "-stdlib=libc++"
+
           - name: "Snippet gcc11"
             compiler: "gcc-11"
             build: snippet
             build_type: Release
             use_include_dependencies: "OFF"
 
+          - name: "Performance clang17"
+            compiler: "clang-17"
+            build: performance
+            build_type: Release
+            use_include_dependencies: "OFF"
+            cxx_flags: "-stdlib=libc++"
+
           - name: "Performance gcc11"
             compiler: "gcc-11"
             build: performance
             build_type: Release
             use_include_dependencies: "OFF"
+
+          - name: "Header clang17"
+            compiler: "clang-17"
+            build: header
+            build_type: Release
+            use_include_dependencies: "OFF"
+            cxx_flags: "-stdlib=libc++"
 
           - name: "Header gcc13"
             compiler: "gcc-13"
@@ -87,6 +108,7 @@ jobs:
           mkdir build
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
                                             -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF \
                                             -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"

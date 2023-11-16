@@ -38,6 +38,7 @@ jobs:
             compiler: "clang-17"
             build: unit
             build_type: Release
+            cxx_flags: "-stdlib=libc++"
 
           - name: "gcc13"
             compiler: "gcc-13"
@@ -73,11 +74,8 @@ jobs:
           compiler: ${{ matrix.compiler }}
           ccache_size: 75M
 
-      - name: Install OpenMP
-        if: contains(matrix.name, 'clang')
-        run: install libomp-17-dev
-
       - name: Install CMake
+        if: contains(matrix.compiler, 'intel') == false
         uses: seqan/actions/setup-cmake@main
         with:
           cmake: 3.18.6
