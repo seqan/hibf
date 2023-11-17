@@ -71,18 +71,55 @@ void hyperloglog::add(uint64_t const value)
 
 double hyperloglog::estimate() const
 {
-    float sum = 0.0;
+    simde__m256i const * const raw = reinterpret_cast<simde__m256i const *>(data.data());
+    simde__m256 packed_sum = simde_mm256_set1_ps(0.0f);
 
-#pragma omp simd
-    for (size_t i = 0; i < size; ++i)
-        sum += expectation_values[data[i]];
+    // We can do 256 bits = 32 bytes at once.
+    // We store `uint8_t`, so `size` is the size in bytes.
+    // Hence, we need to do `size / 32` iterations.
+    // The loop is equivalent to:
+    // float sum{};
+    // for (size_t i = 0; i < size; ++i)
+    //    sum += expectation_values[data[i]];
+    for (size_t i = 0; i < size / 32; ++i)
+    {
+        // Points to the start of the 32-byte block we are processing.
+        uint8_t const * const current = reinterpret_cast<uint8_t const *>(raw + i);
+
+        // Sum up 32 values.
+        for (size_t j = 0; j <= 24; j += 8)
+        {
+            packed_sum = simde_mm256_add_ps(packed_sum,
+                                            simde_mm256_set_ps(expectation_values[*(current + j + 0)],
+                                                               expectation_values[*(current + j + 1)],
+                                                               expectation_values[*(current + j + 2)],
+                                                               expectation_values[*(current + j + 3)],
+                                                               expectation_values[*(current + j + 4)],
+                                                               expectation_values[*(current + j + 5)],
+                                                               expectation_values[*(current + j + 6)],
+                                                               expectation_values[*(current + j + 7)]));
+        }
+    }
+
+    float sum{};
+
+    // Sum up the 8 float values in packed_sum.
+    float const * const sum_it = reinterpret_cast<float const *>(&packed_sum);
+    for (size_t i = 0; i < 8; ++i)
+    {
+        sum += *(sum_it + i);
+    }
 
     double estimate = normalization_factor / sum;
 
     // Small value correction: linear counting of zeros
     if (estimate <= 2.5 * size)
     {
-        uint32_t const zeros = std::ranges::count(data, uint8_t{});
+        uint32_t zeros{};
+
+        for (size_t i = 0; i < size; ++i)
+            zeros += (data[i] == 0u);
+
         if (zeros != 0u)
             estimate = size * std::log(static_cast<double>(size) / zeros);
     }
