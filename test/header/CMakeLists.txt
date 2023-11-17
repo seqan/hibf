@@ -127,6 +127,6 @@ endmacro ()
 CPMGetPackage (benchmark)
 CPMGetPackage (googletest)
 
-# note: hibf/version.hpp is one of the only header that is not required to have a hibf/core/platform.hpp include
-hibf_header_test (hibf "${HIBF_SOURCE_DIR}/include" "hibf/version.hpp|hibf/contrib|hibf/")
+# note: hibf/version.hpp is one of the only header that is not required to have a hibf/platform.hpp include
+hibf_header_test (hibf "${HIBF_SOURCE_DIR}/include" "hibf/version.hpp|hibf/contrib")
 hibf_header_test (hibf_test "${HIBF_SOURCE_DIR}/test/include" "hibf/test/iterator_test_template.hpp")

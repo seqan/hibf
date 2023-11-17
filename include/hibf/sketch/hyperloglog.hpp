@@ -19,6 +19,7 @@
 #include <vector>    // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/platform.hpp>
 
 namespace seqan::hibf::sketch
 {
