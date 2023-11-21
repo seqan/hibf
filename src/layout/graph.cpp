@@ -21,11 +21,14 @@ void update_header_node_data(std::vector<layout::layout::max_bin> const & header
 {
 #ifndef NDEBUG
     // head_max_bins must be sorted ascending by the number of bin indices (corresponds to the IBF levels)
-    layout::layout::max_bin current = (header_max_bins.empty()) ? layout::layout::max_bin{} : *header_max_bins.begin();
-    for (auto it = header_max_bins.begin() + 1; it < header_max_bins.end(); ++it)
+    if (!header_max_bins.empty())
     {
-        assert(current.previous_TB_indices.size() <= it->previous_TB_indices.size());
-        current = *it;
+        layout::layout::max_bin current = header_max_bins.front();
+        for (auto it = header_max_bins.begin() + 1; it < header_max_bins.end(); ++it)
+        {
+            assert(current.previous_TB_indices.size() <= it->previous_TB_indices.size());
+            current = *it;
+        }
     }
 #endif
 
