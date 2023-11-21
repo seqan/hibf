@@ -27,7 +27,7 @@ if (NOT TARGET hibf)
     target_compile_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
     target_link_options (hibf PUBLIC ${HIBF_CXX_FLAGS})
     target_link_libraries (hibf PUBLIC "${HIBF_LIBRARIES}")
-    target_link_libraries (hibf PUBLIC cereal::cereal simde::simde)
+    target_link_libraries (hibf PUBLIC cereal::cereal simde::simde OpenMP::OpenMP_CXX)
 
     target_include_directories (hibf PUBLIC "$<BUILD_INTERFACE:${HIBF_HEADER_PATH}>"
                                             "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>")

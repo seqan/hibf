@@ -1,0 +1,110 @@
+# SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: Sanitizer
+
+on:
+  schedule:
+    - cron: "0 4 * * SAT"
+  workflow_dispatch:
+
+concurrency:
+  group: sanitizer-actions
+  cancel-in-progress: true
+
+env:
+  TZ: Europe/Berlin
+  ASAN_OPTIONS: strict_string_checks=1:detect_stack_use_after_return=1:check_initialization_order=1:strict_init_order=1:detect_leaks=1
+  TSAN_OPTIONS: ignore_noninstrumented_modules=1
+  UBSAN_OPTIONS: print_stacktrace=1
+
+defaults:
+  run:
+    shell: bash -Eeuxo pipefail {0}
+
+jobs:
+  build:
+    name: ${{ matrix.name }} ${{ matrix.build_type }} ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 240
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    strategy:
+      fail-fast: false
+      matrix:
+        name: [ASan, TSan, UBSan]
+        os: [ubuntu-22.04, macos-12]
+        build_type: [Release, RelWithDebInfo, Debug]
+        exclude:
+          - name: "TSan"
+            os: macos-12
+
+        include:
+          - name: "ASan"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=address"
+
+          - name: "TSan"
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=thread"
+
+          - name: "UBSan"
+            os: macos-12
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
+
+          - name: "UBSan"
+            os: ubuntu-22.04
+            cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
+
+          - os: macos-12
+            compiler: clang-17
+            threads: 3
+
+          - os: ubuntu-22.04
+            compiler: gcc-13
+            threads: 2
+
+          - name: "TSan"
+            os: ubuntu-22.04
+            compiler: clang-17
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+          submodules: false
+
+      - name: Setup compiler
+        uses: seqan/actions/setup-compiler@main
+        with:
+          compiler: ${{ matrix.compiler }}
+
+      - name: Configure OS
+        if: contains(matrix.os, 'ubuntu')
+        run: |
+          sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
+          sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
+
+      - name: Install CMake
+        uses: seqan/actions/setup-cmake@main
+        with:
+          cmake: 3.18.6
+
+      - name: Configure tests
+        run: |
+          mkdir build
+          cd build
+          cmake ../test/all -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
+                            -DHIBF_VERBOSE_TESTS=OFF \
+                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
+          make -j${{ matrix.threads }} gtest_main benchmark_main
+
+      - name: Build tests
+        run: |
+          cd build
+          make -k -j${{ matrix.threads }}
+
+      - name: Run tests
+        run: |
+          cd build
+          ctest . -j${{ matrix.threads }} --output-on-failure
+

@@ -140,26 +140,13 @@ endif ()
 # Required: OpenMP
 # ----------------------------------------------------------------------------
 
-set (HIBF_OPENMP_FLAG_PREFIX "-fopenmp")
-if (CMAKE_CXX_COMPILER_ID STREQUAL "IntelLLVM")
-    set (HIBF_OPENMP_FLAG_PREFIX "-qopenmp")
-endif ()
+find_package (OpenMP QUIET)
 
-check_cxx_compiler_flag ("${HIBF_OPENMP_FLAG_PREFIX}" HIBF_HAS_OPENMP)
-if (HIBF_HAS_OPENMP)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_OPENMP_FLAG_PREFIX}")
-    hibf_config_print ("OpenMP support:             via ${HIBF_OPENMP_FLAG_PREFIX}")
+if (OpenMP_FOUND)
+    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DSIMDE_ENABLE_OPENMP")
+    hibf_config_print ("OpenMP support:             via ${OpenMP_CXX_FLAGS}")
 else ()
     hibf_config_error ("HIBF requires OpenMP, but your compiler does not support it.")
-endif ()
-
-check_cxx_compiler_flag ("${HIBF_OPENMP_FLAG_PREFIX}-simd" HIBF_HAS_OPENMP_SIMD)
-if (HIBF_HAS_OPENMP_SIMD)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_OPENMP_FLAG_PREFIX}-simd")
-    set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DSIMDE_ENABLE_OPENMP")
-    hibf_config_print ("SIMD-OpenMP support:        via ${HIBF_OPENMP_FLAG_PREFIX}-simd")
-else ()
-    hibf_config_print ("SIMD-OpenMP support:        not found")
 endif ()
 
 check_cxx_compiler_flag ("-Wno-psabi" HIBF_SUPPRESS_GCC4_ABI)
