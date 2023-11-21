@@ -59,8 +59,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../util -DCMAKE_BUILD_TYPE=Release \
-                        -DHIBF_NATIVE_BUILD=OFF
+          cmake ../util -DCMAKE_BUILD_TYPE=Release
 
       - name: Build util
         run: |
