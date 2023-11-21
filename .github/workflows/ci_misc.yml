@@ -109,7 +109,6 @@ jobs:
           cd build
           cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
-                                            -DHIBF_NATIVE_BUILD=OFF \
                                             -DHIBF_VERBOSE_TESTS=OFF \
                                             -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}"
           case "${{ matrix.build }}" in
