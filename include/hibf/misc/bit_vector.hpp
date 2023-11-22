@@ -918,15 +918,56 @@ public:
     //!\endcond
 
 private:
+// If nothing else works: Just use `resize`.
+#ifndef HIBF_UNINITIALISED_RESIZE
     HIBF_CONSTEXPR_VECTOR inline void resize_for_overwrite(size_t const size)
     {
-#ifdef HIBF_UNINITIALISED_RESIZE
-        this->_M_create_storage(size);
-        this->_M_impl._M_finish = this->_M_impl._M_end_of_storage;
-#else
         base_t::resize(size);
-#endif
     }
+#else
+// libc++: reinterpret_cast to a struct that has the same layout as std::vector.
+// All internal members are private.
+#    if defined(_LIBCPP_VERSION)
+    inline void resize_for_overwrite(size_t const size)
+    {
+        struct fake_vector
+        {
+            using allocator_t = typename base_t::allocator_type;
+            using pointer = typename std::allocator_traits<allocator_t>::pointer;
+
+            pointer begin;
+            pointer end;
+            std::__compressed_pair<pointer, allocator_t> end_cap;
+        };
+
+        static_assert(sizeof(fake_vector) == sizeof(base_t));
+        static_assert(alignof(fake_vector) == alignof(base_t));
+
+        if (size > base_t::capacity())
+            base_t::reserve(size);
+
+// Annotate the new memory as contiguous container for llvm's address sanitizer.
+#        ifndef _LIBCPP_HAS_NO_ASAN
+        __sanitizer_annotate_contiguous_container(base_t::data(),
+                                                  base_t::data() + base_t::capacity(),
+                                                  base_t::data() + base_t::size(),
+                                                  base_t::data() + size);
+#        endif
+
+        fake_vector & vec = reinterpret_cast<fake_vector &>(*this);
+        vec.end = vec.begin + size;
+    }
+// libstdc++: The internal members are protected, so we can access them.
+#    else
+    HIBF_CONSTEXPR_VECTOR inline void resize_for_overwrite(size_t const size)
+    {
+        if (size > base_t::capacity())
+            base_t::reserve(size);
+
+        this->_M_impl._M_finish = this->_M_impl._M_start + size;
+    }
+#    endif
+#endif
 
     //!\brief Performs the binary bitwise-operation on the underlying chunks.
     template <typename binary_operator_t>

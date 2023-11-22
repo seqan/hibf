@@ -161,15 +161,44 @@ endif ()
 
 set (HIBF_UNINITIALISED_RESIZE_TEST_SOURCE
      "#include <cstddef>
+      #include <cstdint>
       #include <vector>
 
-      struct my_vector : public std::vector<int>
+      struct my_vector : public std::vector<uint64_t>
       {
-          void resize_for_overwrite(size_t const size)
+          using base_t = std::vector<uint64_t>;
+
+      #ifdef _LIBCPP_VERSION
+          inline void resize_for_overwrite(size_t const size)
           {
-              this->_M_create_storage(size);
-              this->_M_impl._M_finish = this->_M_impl._M_end_of_storage;
+              struct fake_vector
+              {
+                  using allocator_t = typename base_t::allocator_type;
+                  using pointer = typename std::allocator_traits<allocator_t>::pointer;
+
+                  pointer begin;
+                  pointer end;
+                  std::__compressed_pair<pointer, allocator_t> end_cap;
+              };
+
+              static_assert(sizeof(fake_vector) == sizeof(base_t));
+              static_assert(alignof(fake_vector) == alignof(base_t));
+
+              if (size > base_t::capacity())
+                  base_t::reserve(size);
+
+              fake_vector & vec = reinterpret_cast<fake_vector &>(*this);
+              vec.end = vec.begin + size;
           }
+      #else
+          inline void resize_for_overwrite(size_t const size)
+          {
+              if (size > base_t::capacity())
+                  base_t::reserve(size);
+
+              this->_M_impl._M_finish = this->_M_impl._M_start + size;
+          }
+      #endif
       };
 
       int main()
@@ -222,7 +251,6 @@ else ()
     # CMake's check_ipo_supported uses hardcoded lto flags
     # macOS GCC supports -flto-auto, but not the hardcoded flag "-fno-fat-lto-objects"
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
-
         set (HIBF_LTO_FLAGS "-flto=auto -ffat-lto-objects")
     else ()
         set (HIBF_LTO_FLAGS "-flto=auto")
