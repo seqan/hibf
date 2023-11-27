@@ -2,11 +2,12 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Benchmark, Counter, ClobberMemory, BENCHMARK
+#include <benchmark/benchmark.h> // for State, DoNotOptimize, Benchmark, BENCHMARK, BENCHMARK_MAIN
 
-#include <random>
+#include <cinttypes> // for uint8_t
+#include <memory>    // for allocator
 
-#include <hibf/sketch/hyperloglog.hpp>
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 static void add(benchmark::State & state)
 {

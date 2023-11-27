@@ -3,23 +3,22 @@
 // SPDX-FileCopyrightText: 2013 Hideaki Ohno <hide.o.j55{at}gmail.com>
 // SPDX-License-Identifier: BSD-3-Clause AND MIT
 
-#include <algorithm>  // for max, __count_fn, __fill_fn, count, fill
-#include <array>      // for array
-#include <bit>        // for countl_zero
-#include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t, uint8_t, uint32_t
-#include <cmath>      // for log
-#include <cstddef>    // for size_t
-#include <functional> // for identity
-#include <iostream>   // for basic_ostream, basic_istream, basic_istream::read, basic_ostre...
-#include <stdexcept>  // for runtime_error, invalid_argument
-#include <utility>    // for addressof, swap
-#include <vector>     // for vector
+#include <algorithm> // for max, __fill_fn, fill
+#include <array>     // for array
+#include <bit>       // for countl_zero
+#include <cassert>   // for assert
+#include <cinttypes> // for uint64_t, uint8_t, uint32_t
+#include <cmath>     // for log
+#include <cstddef>   // for size_t
+#include <iostream>  // for basic_ostream, basic_istream, basic_istream::read, basic_ostre...
+#include <stdexcept> // for runtime_error, invalid_argument
+#include <utility>   // for addressof, swap
+#include <vector>    // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
 
-#include <simde/x86/avx.h>  // for simde__m256i
+#include <simde/x86/avx.h>  // for simde__m256i, simde_mm256_add_ps, simde_mm256_set1_ps, simde_m...
 #include <simde/x86/avx2.h> // for simde_mm256_max_epu8
 
 namespace seqan::hibf::sketch
