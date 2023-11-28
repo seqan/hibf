@@ -535,8 +535,25 @@ public:
     explicit counting_agent_type(interleaved_bloom_filter const & ibf) :
         ibf_ptr(std::addressof(ibf)),
         membership_agent(ibf),
+#if !HIBF_HAS_AVX512
         result_buffer(ibf.bin_count())
     {}
+#else
+        // AVX512 will access result_buffer's memory in chunks, so we need to make sure that we allocate enough memory
+        // such that the last chunk is not out of bounds.
+        result_buffer(next_multiple_of_64(ibf.bin_count())) // Ensure large enough capacity.
+    {
+        result_buffer.resize(ibf.bin_count()); // Resize to actual requested size.
+        // Silences llvm's ASAN container-overflow warning.
+#    if defined(_LIBCPP_VERSION) && !defined(_LIBCPP_HAS_NO_ASAN)
+        __sanitizer_annotate_contiguous_container(result_buffer.data(),
+                                                  result_buffer.data() + result_buffer.capacity(),
+                                                  result_buffer.data() + result_buffer.size(),
+                                                  result_buffer.data() + result_buffer.capacity());
+#    endif
+    }
+#endif
+
     //!\}
 
     /*!\name Counting
