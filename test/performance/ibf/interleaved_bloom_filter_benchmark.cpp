@@ -13,117 +13,135 @@
 #include <tuple>     // for make_tuple
 #include <vector>    // for vector, allocator
 
+#include <hibf/contrib/std/chunk_view.hpp>
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
 #include <hibf/contrib/std/pair.hpp>                // for operator==, pair
 #include <hibf/contrib/std/to.hpp>                  // for to
 #include <hibf/contrib/std/zip_view.hpp>            // for zip_view, operator==, zip, zip_fn
 #include <hibf/interleaved_bloom_filter.hpp>        // for bin_index, interleaved_bloom_filter, bin_count, bin_size
+#include <hibf/misc/divide_and_ceil.hpp>
+#include <hibf/test/bytes.hpp>
 
-inline benchmark::Counter hashes_per_second(size_t const count)
+using namespace seqan::hibf::test::literals;
+static constexpr size_t total_ibf_size_in_bytes{1_MiB};
+static constexpr size_t number_of_hash_functions{2u};
+static constexpr double false_positive_rate{0.05};
+// This computes how many elements need to be inserted into the IBF to achieve the desired false positive rate for the
+// given size.
+// The `number_of_elements` many generated values are used for both constructing and querying the IBF.
+static /* cmath not constexpr in libc++ */ size_t number_of_elements = []()
 {
-    return benchmark::Counter(count, benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1000);
-}
+    size_t const bits = 8u * total_ibf_size_in_bytes;
+    double const numerator = -std::log(1 - std::exp(std::log(false_positive_rate) / number_of_hash_functions)) * bits;
+    return std::ceil(numerator / number_of_hash_functions);
+}();
 
-#if 1
-static void arguments(benchmark::internal::Benchmark * b)
-{
-    // Total size: 1MiB
-    // bins, bin_size, hash_num, sequence_length
-    b->Args({64, 1LL << 17, 2, 1LL << 17});
-    // b->Args({128, 1LL << 16, 2, 1LL << 17});
-    // b->Args({192, 1LL << 16, 2, 1LL << 17});
-    // b->Args({256, 1LL << 15, 2, 1LL << 17});
-    // b->Args({320, 1LL << 15, 2, 1LL << 17});
-    // b->Args({384, 1LL << 14, 2, 1LL << 17});
-    // b->Args({448, 1LL << 14, 2, 1LL << 17});
-    // b->Args({512, 1LL << 13, 2, 1LL << 17});
-    b->Args({1024, 1LL << 10, 2, 1LL << 17});
-}
-#else
-static void arguments(benchmark::internal::Benchmark * b)
-{
-    // Total size: 1GiB
-    // bins, bin_size, hash_num, sequence_length
-    b->Args({64, 1LL << 27, 2, 1LL << 27});
-    b->Args({128, 1LL << 26, 2, 1LL << 27});
-    b->Args({192, 1LL << 26, 2, 1LL << 27});
-    b->Args({256, 1LL << 25, 2, 1LL << 27});
-    b->Args({1024, 1LL << 20, 2, 1LL << 27});
-}
-#endif
+// We cache the generated values and constructed IBFs such that they are reused for all benchmarks and multiple runs of
+// the same benchmark. Google benchmark may rerun the same benchmark multiple times in order to reach the requested
+// minimum benchmark time or when multiple runs are requested via the --benchmark_repetitions flag.
+// Caching also means that we access the values via `const &`: `auto const & [values, ibf] = set_up(state);`.
+// If a benchmark modifies the IBFs, it needs to make a copy of the IBF (clear_benchmark) or
+// construct a new one (emplace_benchmark).
+static robin_hood::unordered_map<size_t, std::tuple<std::vector<size_t>, seqan::hibf::interleaved_bloom_filter>>
+    cache{};
 
 auto set_up(::benchmark::State const & state)
 {
     size_t const bins = state.range(0);
-    size_t const bits = state.range(1);
-    size_t const hash_num = state.range(2);
-    size_t const sequence_length = state.range(3);
+    size_t const bits = 8u * total_ibf_size_in_bytes / bins;
 
-    auto generate = [sequence_length](size_t const max_value = std::numeric_limits<size_t>::max())
+    if (auto it = cache.find(bins); it != cache.end())
+        return it->second;
+
+    std::vector<size_t> const values = []()
     {
-        auto generator = [max_value]()
+        std::mt19937_64 engine{0ULL};
+        std::uniform_int_distribution<size_t> distribution{};
+
+        auto gen = [&]()
         {
-            std::uniform_int_distribution<size_t> distr{0u, max_value};
-            std::mt19937_64 engine{0ULL};
-            return distr(engine);
+            return distribution(engine);
         };
-        std::vector<size_t> result(sequence_length);
 
-        std::ranges::generate(result, generator);
+        std::vector<size_t> result(number_of_elements);
+        std::ranges::generate(result, gen);
+
         return result;
-    };
-
-    std::vector<size_t> const bin_indices{generate(bins - 1)};
-    std::vector<size_t> const hash_values{generate()};
+    }();
 
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{bins},
                                               seqan::hibf::bin_size{bits},
-                                              seqan::hibf::hash_function_count{hash_num}};
+                                              seqan::hibf::hash_function_count{number_of_hash_functions}};
 
-    return std::make_tuple(bin_indices, hash_values, ibf);
+    size_t const chunk_size = seqan::hibf::divide_and_ceil(number_of_elements, bins);
+    size_t bin_index = 0u;
+    for (auto && chunk : seqan::stl::views::chunk(values, chunk_size))
+    {
+        for (auto value : chunk)
+            ibf.emplace(value, seqan::hibf::bin_index{bin_index});
+        ++bin_index;
+    }
+
+    auto it = cache.emplace(bins, std::make_tuple(std::move(values), std::move(ibf)));
+    return it.first->second;
+}
+
+inline benchmark::Counter elements_per_second(size_t const count)
+{
+    return benchmark::Counter(count, benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1000);
 }
 
 void emplace_benchmark(::benchmark::State & state)
 {
-    auto && [bin_indices, hash_values, ibf] = set_up(state);
+    auto const & [values, original_ibf] = set_up(state);
+
+    size_t const bins = state.range(0);
+    size_t const chunk_size = seqan::hibf::divide_and_ceil(number_of_elements, bins);
+
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{original_ibf.bin_count()},
+                                              seqan::hibf::bin_size{original_ibf.bin_size()},
+                                              seqan::hibf::hash_function_count{original_ibf.hash_function_count()}};
 
     for (auto _ : state)
     {
-        for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
-            ibf.emplace(hash, seqan::hibf::bin_index{bin});
+        size_t bin_index = 0u;
+        for (auto && chunk : seqan::stl::views::chunk(values, chunk_size))
+        {
+            for (auto value : chunk)
+                ibf.emplace(value, seqan::hibf::bin_index{bin_index});
+            ++bin_index;
+        }
     }
 
-    state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(hash_values));
+    state.counters["elements"] = elements_per_second(number_of_elements);
 }
 
 void clear_benchmark(::benchmark::State & state)
 {
-    auto && [bin_indices, hash_values, ibf] = set_up(state);
-    (void)bin_indices;
-    (void)hash_values;
+    auto const & [values, original_ibf] = set_up(state);
+    (void)values;
 
-    std::vector<seqan::hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
-                                                  | std::views::transform(
-                                                        [](size_t i)
-                                                        {
-                                                            return seqan::hibf::bin_index{i};
-                                                        })
-                                                  | seqan::stl::ranges::to<std::vector>();
+    size_t const bins = state.range(0);
+
+    seqan::hibf::interleaved_bloom_filter ibf{original_ibf};
 
     for (auto _ : state)
     {
-        for (auto bin : bin_range)
-            ibf.clear(bin);
+        for (size_t i = 0; i < bins; ++i)
+            ibf.clear(seqan::hibf::bin_index{i});
     }
 
-    state.counters["bins/sec"] = hashes_per_second(std::ranges::size(bin_range));
+    state.counters["bins"] = elements_per_second(bins);
 }
 
 void clear_range_benchmark(::benchmark::State & state)
 {
-    auto && [bin_indices, hash_values, ibf] = set_up(state);
-    (void)bin_indices;
-    (void)hash_values;
+    auto const & [values, original_ibf] = set_up(state);
+    (void)values;
+
+    size_t const bins = state.range(0);
+
+    seqan::hibf::interleaved_bloom_filter ibf{original_ibf};
 
     std::vector<seqan::hibf::bin_index> bin_range = std::views::iota(0u, static_cast<size_t>(state.range(0)))
                                                   | std::views::transform(
@@ -138,50 +156,63 @@ void clear_range_benchmark(::benchmark::State & state)
         ibf.clear(bin_range);
     }
 
-    state.counters["bins/sec"] = hashes_per_second(std::ranges::size(bin_range));
+    state.counters["bins"] = elements_per_second(bins);
 }
 
 void bulk_contains_benchmark(::benchmark::State & state)
 {
-    auto && [bin_indices, hash_values, ibf] = set_up(state);
-
-    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
-        ibf.emplace(hash, seqan::hibf::bin_index{bin});
+    auto const & [values, ibf] = set_up(state);
 
     auto agent = ibf.membership_agent();
     for (auto _ : state)
     {
-        for (auto hash : hash_values)
+        for (auto hash : values)
         {
             [[maybe_unused]] auto & res = agent.bulk_contains(hash);
             benchmark::ClobberMemory();
         }
     }
 
-    state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(hash_values));
+    state.counters["elements"] = elements_per_second(number_of_elements);
 }
 
 void bulk_count_benchmark(::benchmark::State & state)
 {
-    auto && [bin_indices, hash_values, ibf] = set_up(state);
-
-    for (auto [hash, bin] : seqan::stl::views::zip(hash_values, bin_indices))
-        ibf.emplace(hash, seqan::hibf::bin_index{bin});
+    auto const & [values, ibf] = set_up(state);
 
     auto agent = ibf.counting_agent();
     for (auto _ : state)
     {
-        [[maybe_unused]] auto & res = agent.bulk_count(hash_values);
+        [[maybe_unused]] auto & res = agent.bulk_count(values);
         benchmark::ClobberMemory();
     }
 
-    state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(hash_values));
+    state.counters["elements"] = elements_per_second(number_of_elements);
 }
 
-BENCHMARK(emplace_benchmark)->Apply(arguments);
-BENCHMARK(clear_benchmark)->Apply(arguments);
-BENCHMARK(clear_range_benchmark)->Apply(arguments);
-BENCHMARK(bulk_contains_benchmark)->Apply(arguments);
-BENCHMARK(bulk_count_benchmark)->Apply(arguments);
+BENCHMARK(emplace_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(clear_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(clear_range_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(bulk_contains_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(bulk_count_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+
+// This is a hack to add custom context information to the benchmark output.
+// The alternative would be to do it in the main(). However, this would require
+// not using the BENCHMARK_MAIN macro.
+[[maybe_unused]] static bool foo = []()
+{
+    benchmark::AddCustomContext("IBF size in bytes", std::to_string(total_ibf_size_in_bytes));
+    benchmark::AddCustomContext("Number of hash functions", std::to_string(number_of_hash_functions));
+    benchmark::AddCustomContext("False positive rate", std::to_string(false_positive_rate));
+    benchmark::AddCustomContext("Number of elements", std::to_string(number_of_elements));
+    benchmark::AddCustomContext("HIBF_HAS_AVX512", HIBF_HAS_AVX512 ? "true" : "false");
+    benchmark::AddCustomContext("AVX512 support",
+#if __AVX512F__ && __AVX512BW__
+                                "true");
+#else
+                                "false");
+#endif
+    return true;
+}();
 
 BENCHMARK_MAIN();
