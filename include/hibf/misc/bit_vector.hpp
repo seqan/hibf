@@ -705,6 +705,13 @@ public:
             std::ranges::fill(begin() + old_size, end(), bit);
     }
 
+    //!\brief Erases all elements. After this call, size() returns zero. capacity() remains unchanged.
+    HIBF_CONSTEXPR_VECTOR void clear() noexcept
+    {
+        base_t::clear();
+        _size = 0u;
+    }
+
     //!\brief Performs binary AND between `this` and `rhs`.
     constexpr bit_vector & operator&=(bit_vector const & rhs) noexcept
     {
