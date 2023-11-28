@@ -142,4 +142,11 @@ void seqan::hibf::layout::layout::write_to(std::ostream & stream) const
         stream << user_bin << '\n';
 }
 
+void seqan::hibf::layout::layout::clear()
+{
+    top_level_max_bin_id = 0;
+    max_bins.clear();
+    user_bins.clear();
+}
+
 } // namespace seqan::hibf::layout
