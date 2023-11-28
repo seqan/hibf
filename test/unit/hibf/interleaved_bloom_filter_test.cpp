@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
+#ifndef HIBF_HAS_AVX512
+#    define HIBF_HAS_AVX512 0
+#endif
+
 #include <gtest/gtest.h> // for Test, Message, TestPartResult, AssertionResult, TestInfo, EXPEC...
 
 #include <algorithm>   // for __for_each_fn, for_each
