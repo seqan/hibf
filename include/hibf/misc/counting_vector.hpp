@@ -25,8 +25,6 @@
 #include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 
-#include <simde/x86/avx512/types.h> // for simde__m512i
-
 #if HIBF_HAS_AVX512
 #    include <simde/x86/avx512/add.h>   // for simde_mm512_add_epi16, simde_mm512_add_epi32, simde_mm512_add_...
 #    include <simde/x86/avx512/load.h>  // for simde_mm512_load_si512
@@ -34,6 +32,7 @@
 #    include <simde/x86/avx512/set1.h>  // for simde_mm512_set1_epi16, simde_mm512_set1_epi32, simde_mm512_se...
 #    include <simde/x86/avx512/store.h> // for simde_mm512_store_si512
 #    include <simde/x86/avx512/sub.h>   // for simde_mm512_sub_epi16, simde_mm512_sub_epi32, simde_mm512_sub_...
+#    include <simde/x86/avx512/types.h> // for simde__m512i
 #endif
 
 namespace seqan::hibf
