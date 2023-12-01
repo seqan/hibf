@@ -404,6 +404,24 @@ TEST(bit_vector_test, resize)
     EXPECT_TRUE(test_vector.none());
 }
 
+TEST(bit_vector_test, clear)
+{
+    seqan::hibf::bit_vector test_vector{};
+    size_t capacity = test_vector.capacity();
+
+    test_vector.clear();
+    EXPECT_EQ(test_vector.size(), 0u);
+    EXPECT_EQ(test_vector.capacity(), capacity);
+
+    test_vector.resize(128, true);
+    capacity = test_vector.capacity();
+    EXPECT_EQ(test_vector.size(), 128u);
+    EXPECT_GE(test_vector.capacity(), 128u);
+    test_vector.clear();
+    EXPECT_EQ(test_vector.size(), 0u);
+    EXPECT_EQ(test_vector.capacity(), capacity);
+}
+
 TEST(bit_vector_test, push_back)
 {
     seqan::hibf::bit_vector test_vector{};

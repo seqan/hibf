@@ -49,6 +49,18 @@
 #    define HIBF_DISABLE_COMPILER_CHECK
 #endif // HIBF_DOXYGEN_ONLY(1)0
 
+/*!\def HIBF_HAS_AVX512
+ * \brief Whether AVX512F and AVX512BW are available.
+ * \ingroup core
+ */
+#ifndef HIBF_HAS_AVX512
+#    if __AVX512F__ && __AVX512BW__
+#        define HIBF_HAS_AVX512 1
+#    else
+#        define HIBF_HAS_AVX512 0
+#    endif
+#endif
+
 // ============================================================================
 //  Compiler support GCC
 // ============================================================================

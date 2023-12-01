@@ -2,6 +2,10 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
+#ifndef HIBF_HAS_AVX512
+#    define HIBF_HAS_AVX512 0
+#endif
+
 #include <gtest/gtest.h> // for Test, Message, TestPartResult, AssertionResult, TestInfo, EXPEC...
 
 #include <algorithm>   // for __for_each_fn, for_each
@@ -238,23 +242,23 @@ TEST(ibf_test, counting)
         counting += agent.bulk_contains(hash);
     }
     std::vector<size_t> expected(128, 128);
-    EXPECT_EQ(counting, expected);
+    EXPECT_RANGE_EQ(counting, expected);
 
     // Counting vectors can be added together
     std::vector<size_t> expected2(128, 256);
     counting += counting;
-    EXPECT_EQ(counting, expected2);
+    EXPECT_RANGE_EQ(counting, expected2);
 
     // minus bit_vector
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting -= agent.bulk_contains(hash);
     }
-    EXPECT_EQ(counting, std::vector<size_t>(128, 128));
+    EXPECT_RANGE_EQ(counting, std::vector<size_t>(128, 128));
 
     // minus other counting vector
     counting -= seqan::hibf::counting_vector<size_t>(128, 128 - 42);
-    EXPECT_EQ(counting, std::vector<size_t>(128, 42));
+    EXPECT_RANGE_EQ(counting, std::vector<size_t>(128, 42));
 }
 
 TEST(ibf_test, counting_agent)
@@ -299,25 +303,26 @@ TEST(ibf_test, counting_no_ub)
     std::vector<size_t> expected(128, 0);
     expected[63] = 128;
     expected[127] = 128;
-    EXPECT_EQ(counting, expected);
+    EXPECT_RANGE_EQ(counting, expected);
 
     // Counting vectors can be added together
     std::vector<size_t> expected2(128, 0);
     expected2[63] = 256;
     expected2[127] = 256;
     counting += counting;
-    EXPECT_EQ(counting, expected2);
+    EXPECT_RANGE_EQ(counting, expected2);
 }
 
 // Check special case where there is only one `1` in the bitvector.
+// Also checks that counting with `b` bins and `b % 64 != 0` works.
 TEST(ibf_test, counting_agent_no_ub)
 {
     // 1. Construct and emplace
-    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{127u},
                                               seqan::hibf::bin_size{1024u},
                                               seqan::hibf::hash_function_count{2u}};
 
-    for (size_t bin_idx : std::array<size_t, 2>{63, 127})
+    for (size_t bin_idx : std::array<size_t, 2>{63, 126})
         for (size_t hash : std::views::iota(0, 128))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
@@ -325,9 +330,9 @@ TEST(ibf_test, counting_agent_no_ub)
     auto agent = ibf.counting_agent();
     auto agent2 = ibf.template counting_agent<size_t>();
 
-    std::vector<size_t> expected(128, 0);
+    std::vector<size_t> expected(127, 0);
     expected[63] = 128;
-    expected[127] = 128;
+    expected[126] = 128;
     EXPECT_RANGE_EQ(agent.bulk_count(std::views::iota(0u, 128u)), expected);
     EXPECT_RANGE_EQ(agent2.bulk_count(std::views::iota(0u, 128u)), expected);
 }
