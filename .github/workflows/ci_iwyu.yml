@@ -41,18 +41,13 @@ jobs:
           compiler: clang-17
           ccache_size: 75M
 
-      - name: Install Dependencies
-        run: |
-          install libomp-17-dev libclang-17-dev
-
       - name: Install CMake
         uses: seqan/actions/setup-cmake@main
         with:
-          cmake: 3.27.4
+          cmake: 3.27.9
 
       - name: Build IWYU
         run: |
-          clang-17 -print-resource-dir
           mkdir iwyu
           cd iwyu
           git clone https://github.com/include-what-you-use/include-what-you-use.git --branch 0.21
