@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <memory> // for allocator
-
 // macro cruft
 //!\cond
 #define HIBF_STR_HELPER(x) #x
@@ -98,7 +96,7 @@
 // ============================================================================
 
 #if __has_include(<version>)
-#    include <version> // for _GLIBCXX_USE_CXX11_ABI, __cpp_lib_constexpr_vector
+#    include <version> // for __cpp_lib_constexpr_vector
 #endif
 
 // C++ standard [required]

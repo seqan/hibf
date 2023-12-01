@@ -4,8 +4,7 @@
 
 #include <gtest/gtest.h> // for Test, TestInfo, TEST
 
-#include <filesystem> // for operator==, path
-#include <memory>     // for allocator
+#include <filesystem> // for path
 #include <utility>    // for move
 
 #include <hibf/cereal/path.hpp> // IWYU pragma: keep

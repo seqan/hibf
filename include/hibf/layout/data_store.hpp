@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <algorithm> // for copy, fill_n, max
 #include <cassert>   // for assert
 #include <cinttypes> // for uint64_t
 #include <cstddef>   // for size_t
@@ -13,7 +12,7 @@
 #include <vector>    // for vector
 
 #include <hibf/layout/layout.hpp>      // for layout
-#include <hibf/misc/timer.hpp>         // for concurrent, timer
+#include <hibf/misc/timer.hpp>         // for concurrent_timer
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::layout

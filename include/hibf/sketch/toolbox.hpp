@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <algorithm>  // for max
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
 #include <functional> // for greater

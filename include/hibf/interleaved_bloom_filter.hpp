@@ -15,9 +15,9 @@
 #include <cinttypes>   // for uint16_t, uint64_t
 #include <concepts>    // for integral, same_as, unsigned_integral
 #include <cstring>     // for size_t
-#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
+#include <memory>      // for addressof
+#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_va...
 #include <type_traits> // for remove_cvref_t
-#include <utility>     // for addressof
 #include <vector>      // for operator==, vector
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive

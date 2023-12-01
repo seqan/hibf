@@ -2,15 +2,14 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <algorithm>  // for copy
 #include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <iostream>   // for operator<<, basic_ostream, char_traits, cout
-#include <ranges>     // for _Iota, iota, views
+#include <iostream>   // for operator<<, basic_ostream, cout
+#include <ranges>     // for __fn, iota, views
 #include <vector>     // for vector
 
-#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 
 int main()

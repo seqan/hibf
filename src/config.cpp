@@ -3,13 +3,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>     // for assert
-#include <cmath>       // for ceil, sqrt
+#include <cmath>       // for sqrt, ceil
 #include <functional>  // for function
-#include <iostream>    // for basic_ostream, operator<<, basic_istream, stringstream, cerr, istream
-#include <sstream>     // for basic_stringstream
+#include <iostream>    // for operator<<, basic_ostream, basic_istream, getline, stringstream
 #include <stdexcept>   // for invalid_argument
-#include <string>      // for char_traits, getline, operator<<, string
-#include <string_view> // for operator<<, operator==, basic_string_view
+#include <string>      // for char_traits, string
+#include <string_view> // for operator==, basic_string_view
 
 #include <hibf/config.hpp>                   // for config
 #include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start

@@ -5,7 +5,6 @@
 #include <gtest/gtest.h> // for AssertionResult, Message, TestPartResult, CmpHelperGE, CmpHelperGT, EXPECT_TRUE
 
 #include <chrono> // for operator""ms
-#include <memory> // for allocator
 #include <thread> // for sleep_for
 
 #include <hibf/misc/timer.hpp> // for concurrent_timer, serial_timer

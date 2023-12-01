@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <algorithm> // for fill_n, max
-#include <cstddef>   // for size_t
-#include <vector>    // for vector
+#include <cstddef> // for size_t
+#include <vector>  // for vector
 
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 

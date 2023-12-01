@@ -6,7 +6,8 @@
 
 #include <cassert> // for assert
 #include <cstddef> // for size_t
-#include <utility> // for addressof, pair
+#include <memory>  // for addressof
+#include <utility> // for pair
 #include <vector>  // for vector
 
 #include <hibf/build/bin_size_in_bits.hpp> // for bin_size_in_bits

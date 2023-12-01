@@ -10,9 +10,12 @@
 
 #pragma once
 
-#include <limits>
-#include <memory>
-#include <type_traits>
+#include <algorithm>   // for max
+#include <cstddef>     // for size_t
+#include <limits>      // for numeric_limits
+#include <memory>      // for pointer_traits
+#include <new>         // for align_val_t, bad_alloc
+#include <type_traits> // for make_unsigned_t, true_type
 
 // __cpp_aligned_new is a C++17 feature that we use in this allocator and we require it.
 #if __cpp_aligned_new < 201606

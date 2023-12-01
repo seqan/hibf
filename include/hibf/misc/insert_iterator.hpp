@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <algorithm> // for max
 #include <cassert>   // for assert
 #include <cinttypes> // for uint64_t
 #include <cstddef>   // for ptrdiff_t
 #include <iterator>  // for output_iterator_tag
-#include <utility>   // for addressof, move
+#include <memory>    // for addressof
 #include <vector>    // for vector
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set

@@ -5,11 +5,11 @@
 #include <gtest/gtest-spi.h> // for EXPECT_NONFATAL_FAILURE
 #include <gtest/gtest.h>     // for Test, AssertionResult, Message, TestPartResult, TestInfo, TEST, EXP...
 
-#include <iosfwd>      // for ptrdiff_t
+#include <cstddef>     // for ptrdiff_t
 #include <ranges>      // for input_range
 #include <span>        // for span
 #include <string_view> // for string_view
-#include <vector>      // for vector, allocator
+#include <vector>      // for vector
 
 #include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
 

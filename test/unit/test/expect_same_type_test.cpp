@@ -5,10 +5,10 @@
 #include <gtest/gtest-spi.h> // for EXPECT_NONFATAL_FAILURE
 #include <gtest/gtest.h>     // for Test, AssertionResult, Message, TestPartResult, TestInfo, TEST
 
-#include <memory>      // for allocator
 #include <tuple>       // for tuple
 #include <type_traits> // for type_identity
 
+#include <hibf/platform.hpp>              // for _LIBCPP_VERSION
 #include <hibf/test/expect_same_type.hpp> // for expect_same_type, EXPECT_SAME_TYPE_VANEXPECT_SAME_TYPE_ISH, EXPECT...
 
 TEST(expect_same_type, braces_with_many_commas)

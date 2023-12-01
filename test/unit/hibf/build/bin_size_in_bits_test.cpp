@@ -4,8 +4,6 @@
 
 #include <gtest/gtest.h> // for Test, TestInfo, EXPECT_EQ, Message, TEST, TestPartResult
 
-#include <vector> // for allocator
-
 #include <hibf/build/bin_size_in_bits.hpp> // for bin_size_in_bits
 
 TEST(bin_size_in_bits_test, general)

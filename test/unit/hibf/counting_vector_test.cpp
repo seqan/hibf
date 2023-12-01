@@ -13,10 +13,11 @@
 #include <concepts>  // for signed_integral
 #include <cstddef>   // for size_t
 #include <limits>    // for numeric_limits
-#include <vector>    // for allocator
+#include <vector>    // for __sanitizer_annotate_contiguous_container
 
 #include <hibf/misc/bit_vector.hpp>      // for bit_vector
 #include <hibf/misc/counting_vector.hpp> // for counting_vector
+#include <hibf/platform.hpp>             // for _LIBCPP_VERSION
 
 template <typename TypeParam>
 class counting_vector_test : public ::testing::Test

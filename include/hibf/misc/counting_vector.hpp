@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <algorithm>   // for transform
 #include <bit>         // for countr_zero
 #include <cassert>     // for assert
 #include <cinttypes>   // for uint64_t
