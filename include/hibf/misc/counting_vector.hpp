@@ -9,36 +9,31 @@
 
 #pragma once
 
-#include <algorithm>   // for fill
-#include <array>       // for array
 #include <bit>         // for countr_zero
 #include <cassert>     // for assert
-#include <cinttypes>   // for uint64_t, uint16_t
-#include <concepts>    // for integral, same_as, unsigned_integral
+#include <cinttypes>   // for uint64_t
+#include <climits>     // for CHAR_BIT
+#include <concepts>    // for integral
 #include <cstring>     // for size_t
-#include <functional>  // for plus
-#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
-#include <type_traits> // for remove_cvref_t
-#include <utility>     // for addressof
+#include <functional>  // for minus, plus
+#include <type_traits> // for conditional_t
 #include <vector>      // for vector
 
-#include <hibf/cereal/concepts.hpp>           // for cereal_archive
-#include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
-#include <hibf/misc/divide_and_ceil.hpp>
-#include <hibf/misc/next_multiple_of_64.hpp>
+#include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
+#include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
+#include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 
-#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/types/base_class.hpp> // for base_class
+#include <simde/x86/avx512/types.h> // for simde__m512i
 
 #if HIBF_HAS_AVX512
-#    include <simde/x86/avx512/add.h>
-#    include <simde/x86/avx512/load.h>
-#    include <simde/x86/avx512/mov.h>
-#    include <simde/x86/avx512/set1.h>
-#    include <simde/x86/avx512/store.h>
-#    include <simde/x86/avx512/sub.h>
+#    include <simde/x86/avx512/add.h>   // for simde_mm512_add_epi16, simde_mm512_add_epi32, simde_mm512_add_...
+#    include <simde/x86/avx512/load.h>  // for simde_mm512_load_si512
+#    include <simde/x86/avx512/mov.h>   // for simde_mm512_maskz_mov_epi16, simde_mm512_maskz_mov_epi32, simd...
+#    include <simde/x86/avx512/set1.h>  // for simde_mm512_set1_epi16, simde_mm512_set1_epi32, simde_mm512_se...
+#    include <simde/x86/avx512/store.h> // for simde_mm512_store_si512
+#    include <simde/x86/avx512/sub.h>   // for simde_mm512_sub_epi16, simde_mm512_sub_epi32, simde_mm512_sub_...
 #endif
 
 namespace seqan::hibf

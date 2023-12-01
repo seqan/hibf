@@ -16,8 +16,9 @@
 
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config
-#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, counting_vector
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>            // for layout
+#include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/misc/timer.hpp>               // for concurrent_timer
 #include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
 

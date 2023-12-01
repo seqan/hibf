@@ -2,25 +2,26 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Benchmark, Counter, BENCHMARK, ClobberMemory, BEN...
+#include <benchmark/benchmark.h> // for State, Benchmark, AddCustomContext, Counter, BENCHMARK
 
 #include <algorithm> // for copy, fill_n, __generate_fn, generate
+#include <cmath>     // for log, ceil, exp
 #include <cstddef>   // for size_t
-#include <limits>    // for numeric_limits
 #include <random>    // for uniform_int_distribution, mt19937_64
-#include <ranges>    // for transform_view, all_t, iota_view, _Partial, _Transform
-#include <string>    // for basic_string
-#include <tuple>     // for make_tuple
-#include <vector>    // for vector, allocator
+#include <ranges>    // for all_t, transform_view, iterator_t, iota_view, _Partial
+#include <string>    // for allocator, to_string, basic_string
+#include <tuple>     // for tuple, make_tuple
+#include <utility>   // for move, pair
+#include <vector>    // for vector
 
-#include <hibf/contrib/std/chunk_view.hpp>
+#include <hibf/contrib/robin_hood.hpp>              // for pair, unordered_map
+#include <hibf/contrib/std/chunk_view.hpp>          // for chunk_view, operator==, chunk, chunk_fn
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
-#include <hibf/contrib/std/pair.hpp>                // for operator==, pair
 #include <hibf/contrib/std/to.hpp>                  // for to
-#include <hibf/contrib/std/zip_view.hpp>            // for zip_view, operator==, zip, zip_fn
-#include <hibf/interleaved_bloom_filter.hpp>        // for bin_index, interleaved_bloom_filter, bin_count, bin_size
-#include <hibf/misc/divide_and_ceil.hpp>
-#include <hibf/test/bytes.hpp>
+#include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index, bin_count, bin_size
+#include <hibf/misc/divide_and_ceil.hpp>            // for divide_and_ceil
+#include <hibf/platform.hpp>                        // for HIBF_HAS_AVX512
+#include <hibf/test/bytes.hpp>                      // for operator""_MiB
 
 using namespace seqan::hibf::test::literals;
 static constexpr size_t total_ibf_size_in_bytes{1_MiB};

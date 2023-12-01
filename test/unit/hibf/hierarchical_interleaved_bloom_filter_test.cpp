@@ -14,8 +14,8 @@
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
-#include <hibf/interleaved_bloom_filter.hpp>              // for counting_vector
 #include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/misc/counting_vector.hpp>                  // for counting_vector
 #include <hibf/test/cereal.hpp>                           // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 

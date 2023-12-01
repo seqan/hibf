@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for EXPECT_EQ, GetCapturedStderr, GetCapturedStdout, Message, TestP...
+#include <gtest/gtest.h> // for EXPECT_EQ, GetCapturedStderr, GetCapturedStdout, Message, TestPartR...
 
 #include <cinttypes> // for int64_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint64_t
 #include <concepts>  // for same_as, unsigned_integral
@@ -10,9 +10,9 @@
 #include <ranges>    // for range_value_t
 #include <vector>    // for allocator, vector
 
-#include <hibf/interleaved_bloom_filter.hpp> // for counting_vector
-#include <hibf/misc/bit_vector.hpp>          // for bit_vector
-#include <hibf/misc/print.hpp>               // for print
+#include <hibf/misc/bit_vector.hpp>      // for bit_vector
+#include <hibf/misc/counting_vector.hpp> // for counting_vector
+#include <hibf/misc/print.hpp>           // for print
 
 template <typename t>
 using print_test = ::testing::Test;

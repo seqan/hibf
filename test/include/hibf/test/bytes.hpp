@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <cstddef> // for size_t
+
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::test

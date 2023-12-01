@@ -22,6 +22,7 @@
 #include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
+#include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/test/cereal.hpp>              // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
