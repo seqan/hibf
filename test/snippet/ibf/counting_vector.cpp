@@ -4,7 +4,8 @@
 
 #include <cinttypes> // for uint16_t
 
-#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, counting_vector, bin_count
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size
+#include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/misc/print.hpp>               // for print, print_t
 
 int main()
