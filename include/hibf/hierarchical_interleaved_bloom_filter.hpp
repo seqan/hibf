@@ -4,15 +4,15 @@
 
 #pragma once
 
-#include <algorithm>  // for max, __sort_fn, fill, sort
+#include <algorithm>  // for __fn, fill, sort
 #include <cassert>    // for assert
 #include <cinttypes>  // for int64_t, uint16_t
 #include <concepts>   // for integral, unsigned_integral
 #include <cstddef>    // for size_t
-#include <functional> // for identity, less
+#include <functional> // for less, identity
+#include <memory>     // for addressof
 #include <ranges>     // for forward_range, range, range_value_t
-#include <utility>    // for addressof
-#include <vector>     // for vector
+#include <vector>     // for vector, operator==
 
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config

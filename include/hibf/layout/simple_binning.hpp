@@ -6,8 +6,8 @@
 
 #include <cassert>   // for assert
 #include <cstddef>   // for size_t
+#include <memory>    // for addressof
 #include <stdexcept> // for runtime_error
-#include <utility>   // for addressof
 #include <vector>    // for vector
 
 #include <hibf/layout/data_store.hpp>        // for data_store

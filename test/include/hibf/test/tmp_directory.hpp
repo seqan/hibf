@@ -21,10 +21,9 @@
 #endif
 
 #include <cassert>      // for assert
-#include <filesystem>   // for exists, is_empty, path, remove_all, temp_directory_path, filesystem_...
-#include <memory>       // for allocator
+#include <filesystem>   // for path, exists, is_empty, remove_all, temp_directory_path, filesystem_...
 #include <optional>     // for optional, nullopt
-#include <system_error> // for make_error_code, errc
+#include <system_error> // for errc, make_error_code
 #include <utility>      // for exchange
 
 #include <hibf/platform.hpp>

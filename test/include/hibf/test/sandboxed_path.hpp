@@ -10,8 +10,8 @@
 #pragma once
 
 #include <filesystem>   // for path, filesystem_error, operator/
-#include <memory>       // for allocator
-#include <system_error> // for make_error_code, errc
+#include <system_error> // for errc, make_error_code
+#include <type_traits>  // for __libcpp_remove_reference_t
 #include <utility>      // for move, forward
 
 #include <hibf/platform.hpp>

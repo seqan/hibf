@@ -4,13 +4,12 @@
 
 #pragma once
 
-#include <algorithm> // for copy
-#include <concepts>  // for derived_from
-#include <cstddef>   // for size_t
-#include <iosfwd>    // for ostream
-#include <vector>    // for vector, operator==
+#include <concepts> // for derived_from
+#include <cstddef>  // for size_t
+#include <iosfwd>   // for ostream, istream
+#include <vector>   // for operator==, vector
 
-#include <hibf/layout/prefixes.hpp> // for header, merged_bin
+#include <hibf/layout/prefixes.hpp> // for layout_fullest_technical_bin_idx, layout_header, layout_lower_level
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::layout

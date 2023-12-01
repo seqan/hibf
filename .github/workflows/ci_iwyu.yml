@@ -67,7 +67,7 @@ jobs:
           mkdir build
           cd build
           cmake ../hibf/test/iwyu -DCMAKE_BUILD_TYPE=Release \
-                                  -DHIBF_NATIVE_BUILD=OFF \
+                                  -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
                                   -DHIBF_VERBOSE_TESTS=OFF
 
       - name: Run Test

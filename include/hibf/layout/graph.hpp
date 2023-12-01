@@ -9,10 +9,9 @@
 
 #pragma once
 
-#include <algorithm> // for copy
-#include <cstddef>   // for size_t
-#include <optional>  // for nullopt, optional
-#include <vector>    // for vector
+#include <cstddef>  // for size_t
+#include <optional> // for nullopt, optional
+#include <vector>   // for vector
 
 #include <hibf/layout/layout.hpp> // for layout
 

@@ -5,7 +5,6 @@
 #include <benchmark/benchmark.h> // for State, DoNotOptimize, Benchmark, BENCHMARK, BENCHMARK_MAIN
 
 #include <cinttypes> // for uint8_t
-#include <memory>    // for allocator
 
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 

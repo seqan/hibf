@@ -11,9 +11,13 @@
   { ref: gcc.symbols.imp },
   { ref: gcc.stl.headers.imp },
   { ref: stl.c.headers.imp },
+  { ref: stl.public.imp },
   { ref: libcxx.imp },
   # Use <gtest/gtest.h>
   { include: ["\"gtest/gtest.h\"", private, "<gtest/gtest.h>", public ] },
   # using namespace fs = std::filesystem; would use <chrono> otherwise
   { symbol: [ "std::filesystem", private, "<filesystem>", public ] },
+  # Manual
+  { symbol: [ "_LIBCPP_VERSION", private, "<hibf/platform.hpp>", public ] },
+  { symbol: [ "__sanitizer_annotate_contiguous_container", private, "<vector>", public ] },
 ]

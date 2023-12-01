@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <algorithm> // for copy
 #include <array>     // for array
 #include <cinttypes> // for uint64_t, uint8_t
 #include <cstddef>   // for size_t

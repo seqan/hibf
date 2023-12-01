@@ -5,8 +5,7 @@
 #include <gtest/gtest.h> // for Test, AssertionResult, TestInfo, EXPECT_TRUE, Message, TEST, TestPar...
 
 #include <filesystem> // for remove
-#include <fstream>    // for char_traits, basic_ofstream, basic_ostream, operator<<, ofstream
-#include <memory>     // for allocator
+#include <fstream>    // for char_traits, operator<<, basic_ostream, ofstream
 
 #include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
 #include <hibf/test/tmp_directory.hpp>  // for tmp_directory
