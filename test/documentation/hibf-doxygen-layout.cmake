@@ -75,9 +75,9 @@ endfunction ()
 # Note: variable name DOXYGEN_LAYOUT must not be changed because it is directly used within `replace_in_doxygen_layout`
 file (READ "${HIBF_DOXYGEN_INPUT_DIR}/DoxygenLayout.xml" DOXYGEN_LAYOUT)
 
-replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/about/" "About")
-replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
-replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/tutorial/" "Tutorial")
-replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/howto/" "How-To")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/about/" "About")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/setup/" "Setup" HIDE_FROM_USER "setup_tests")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/tutorial/" "Tutorial")
+# replace_in_doxygen_layout ("${HIBF_HEADER_PATH}/../doc/howto/" "How-To")
 
 file (WRITE "${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in" ${DOXYGEN_LAYOUT})
