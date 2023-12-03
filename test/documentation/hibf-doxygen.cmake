@@ -48,8 +48,8 @@ set (HIBF_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.ta
 include (ExternalProject)
 ExternalProject_Add (
     download-cppreference-doxygen-web-tag
-    URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20220201/html-book-20220201.tar.xz"
-    URL_HASH SHA256=b41960e7ec9c5433b31b1b33db5854f97770ae49535c81e7647f618003102d1a
+    URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20230810/html-book-20230810.tar.xz"
+    URL_HASH SHA256=31c08e4d99e86c7f63f324d3ff5304eff2030131c4a0ac0d1e3c19c62c8ed684
     TLS_VERIFY ON
     DOWNLOAD_DIR "${PROJECT_BINARY_DIR}"
     DOWNLOAD_NAME "html-book.tar.xz"
