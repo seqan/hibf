@@ -21,7 +21,8 @@
 
 #pragma once
 
-#include <algorithm>        // for max, __for_each_fn, for_each, __all_of_fn, __any_of_fn, __fill_fn
+#include <__assert>         // for _LIBCPP_HAS_NO_ASAN
+#include <algorithm>        // for __fn, for_each, all_of, any_of, copy, fill
 #include <bit>              // for countr_zero
 #include <cassert>          // for assert
 #include <cinttypes>        // for uint64_t
@@ -31,21 +32,21 @@
 #include <cstddef>          // for size_t, ptrdiff_t
 #include <functional>       // for identity
 #include <initializer_list> // for initializer_list
-#include <iterator>         // for back_inserter, iter_reference_t, random_access_iterator_tag
-#include <memory>           // for allocator, assume_aligned, allocator_traits
-#include <ranges>           // for __next_fn, distance, next, _Begin, _End, __distance_fn, begin
+#include <iterator>         // for __fn, back_inserter, iter_reference_t, distance, next, random_...
+#include <memory>           // for allocator, assume_aligned, allocator_traits, __compressed_pair
+#include <ranges>           // for __fn, begin, end
 #include <stdexcept>        // for out_of_range
 #include <string>           // for operator+, char_traits, to_string, operator""s
-#include <type_traits>      // for conditional_t
+#include <type_traits>      // for __decay_t, conditional_t
 #include <utility>          // for swap
 #include <vector>           // for vector
 
-#include <hibf/cereal/concepts.hpp>           // for cereal_archive
+#include <hibf/cereal/concepts.hpp>           // for cereal_archive, cereal_text_archive
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR
+#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR, _LIBCPP_VERSION
 
-#include <cereal/cereal.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/macros.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/cereal.hpp>     // for binary_data
+#include <cereal/macros.hpp>     // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
 #include <cereal/specialize.hpp> // for specialization, specialize
 
 namespace seqan::hibf

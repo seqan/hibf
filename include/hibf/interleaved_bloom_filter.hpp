@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <__assert>    // for _LIBCPP_HAS_NO_ASAN
 #include <algorithm>   // for fill
 #include <array>       // for array
 #include <cassert>     // for assert
@@ -16,7 +17,7 @@
 #include <concepts>    // for integral, same_as, unsigned_integral
 #include <cstring>     // for size_t
 #include <memory>      // for addressof
-#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_va...
+#include <ranges>      // for range, forward_range, input_range, range_reference_t, range_value_t
 #include <type_traits> // for remove_cvref_t
 #include <vector>      // for operator==, vector
 
