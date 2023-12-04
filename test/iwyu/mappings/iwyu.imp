@@ -20,4 +20,5 @@
   # Manual
   { symbol: [ "_LIBCPP_VERSION", private, "<hibf/platform.hpp>", public ] },
   { symbol: [ "__sanitizer_annotate_contiguous_container", private, "<vector>", public ] },
+  { symbol: [ "_LIBCPP_HAS_NO_ASAN", private, "<vector>", public ] },
 ]
