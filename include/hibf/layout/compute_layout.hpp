@@ -20,6 +20,7 @@ namespace seqan::hibf::layout
  * \param[in] config The configuration to compute the layout with.
  * \param[in] kmer_counts The vector that will store the kmer counts (estimations).
  * \param[in] sketches The vector that will store the sketches.
+ * \param[in] positions The vector that will store the positions.
  * \param[in,out] union_estimation_timer The timer that measures the union estimation time.
  * \param[in,out] rearrangement_timer The timer that measures the rearrangement time.
  * \returns layout
