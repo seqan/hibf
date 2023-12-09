@@ -8,6 +8,8 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <hibf/platform.hpp>
+
 namespace seqan::hibf
 {
 
