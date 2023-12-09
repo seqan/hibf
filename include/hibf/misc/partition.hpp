@@ -8,6 +8,9 @@
 #include <cstddef>
 #include <cstdint>
 
+namespace seqan::hibf
+{
+
 struct partition_toolbox
 {
     partition_toolbox(partition_toolbox const &) = default;
@@ -52,3 +55,5 @@ struct partition_toolbox
         return 0b0100ULL << shift_amount;
     }
 };
+
+} // namespace seqan::hibf
