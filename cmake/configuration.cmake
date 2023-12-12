@@ -140,7 +140,7 @@ endif ()
 # Required: OpenMP
 # ----------------------------------------------------------------------------
 
-find_package (OpenMP QUIET)
+find_package (OpenMP QUIET COMPONENTS CXX)
 
 if (OpenMP_FOUND)
     set (HIBF_DEFINITIONS ${HIBF_DEFINITIONS} "-DSIMDE_ENABLE_OPENMP")
