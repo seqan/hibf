@@ -5,8 +5,13 @@
 @PACKAGE_INIT@
 
 include (CMakeFindDependencyMacro)
+
 find_dependency (cereal @HIBF_CEREAL_VERSION@ REQUIRED)
+
 find_dependency (OpenMP REQUIRED COMPONENTS CXX)
+
+set (THREADS_PREFER_PTHREAD_FLAG TRUE)
+find_dependency (Threads QUIET)
 
 find_package (PkgConfig QUIET)
 if (PKG_CONFIG_FOUND)
