@@ -268,9 +268,49 @@ TEST_F(toolbox_test, cluster_bins)
     }
 }
 
-// TEST_F(toolbox_test, rearrange_bins)
-// {
-//     seqan::hibf::sketch::toolbox::rearrange_bins(test_sketches, test_kmer_counts, test_positions, 0.9, 1);
+TEST_F(toolbox_test, rearrange_bins)
+{
+    {
+        // with the test data, from the fixture, the distance are all 0 and there is no rearrangement
+        seqan::hibf::sketch::toolbox::rearrange_bins(test_sketches, test_kmer_counts, test_positions, 0.9, 1);
 
-//     EXPECT_RANGE_EQ(test_positions, (std::vector<size_t>{3, 2, 0, 1}));
-// }
+// rearrange_bins -> cluster_bins -> random_shuffle; results for pseudorandom generators are implementation-defined
+#ifdef _LIBCPP_VERSION
+        EXPECT_RANGE_EQ(test_positions, (std::vector<size_t>{2, 3, 0, 1}));
+#else
+        EXPECT_RANGE_EQ(test_positions, (std::vector<size_t>{0, 1, 2, 3}));
+#endif
+    }
+
+    {
+        std::vector<size_t> kmer_counts{5000, 5000, 5000, 5000, 5000, 5000, 5000};
+        std::vector<size_t> positions{0, 1, 2, 3, 4, 5, 6};
+        std::vector<seqan::hibf::sketch::hyperloglog> sketches = [&]()
+        {
+            std::vector<seqan::hibf::sketch::hyperloglog> result(kmer_counts.size(),
+                                                                 seqan::hibf::sketch::hyperloglog(10));
+
+            for (size_t i = 0; i < 5000; ++i)
+            {
+                // 0 and 3 are the same
+                result[0].add(i);
+                result[3].add(i);
+
+                // 1 and 6 are the same and each shares 1000 kmers with 0 and 3
+                result[1].add(i + 4000);
+                result[6].add(i + 4000);
+
+                // 2 and 4 are the same and share no kmers with any other bin
+                result[2].add(i + 20000);
+                result[4].add(i + 20000);
+
+                result[5].add(i + 8000); // 5 shares 1000 kmers with 1 and 6
+            }
+
+            return result;
+        }();
+
+        seqan::hibf::sketch::toolbox::rearrange_bins(sketches, kmer_counts, positions, 0.9, 1);
+        EXPECT_RANGE_EQ(positions, (std::vector<size_t>{5, 1, 6, 0, 3, 2, 4}));
+    }
+}
