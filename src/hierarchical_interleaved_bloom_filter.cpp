@@ -85,7 +85,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
     // initialize lower level IBF
     size_t const max_bin_tbs = initialise_max_bin_kmers();
     ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
-    kmers.clear(); // reduce memory peak
+    kmers = robin_hood::unordered_flat_set<uint64_t>{}; // reduce memory peak
 
     // parse all other children (merged bins) of the current ibf
     auto loop_over_children = [&]()
@@ -123,16 +123,16 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             auto & child = children[index];
 
-            robin_hood::unordered_flat_set<uint64_t> kmers{};
-            size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
+            robin_hood::unordered_flat_set<uint64_t> local_kmers{};
+            size_t const ibf_pos = hierarchical_build(hibf, local_kmers, child, data, false);
             auto parent_bin_index = child.parent_bin_index;
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 technical_bin_to_ibf_id[parent_bin_index] = ibf_pos;
-                build::insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
+                build::insert_into_ibf(local_kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
                 if (!is_root)
-                    build::update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
+                    build::update_parent_kmers(parent_kmers, local_kmers, data.merge_kmers_timer);
             }
         }
     };
