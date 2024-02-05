@@ -113,7 +113,7 @@ jobs:
 
       - name: Open PR
         if: ${{ steps.changed_files.outputs.cpp_list }}
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
           path: ${{ github.workspace }}/hibf
