@@ -91,10 +91,14 @@ IncludeCategories:
     Priority:        2
   - Regex:           '(<[[:alnum:]._]+>|<hibf/std/.*>)'
     Priority:        3
-  - Regex:           '<hibf/'
+  - Regex:           '<sharg/'
     Priority:        4
-  - Regex:           '.*'
+  - Regex:           '<seqan3/'
     Priority:        5
+  - Regex:           '<hibf/'
+    Priority:        6
+  - Regex:           '.*'
+    Priority:        7
 IncludeIsMainRegex: '(Test)?$'
 IncludeIsMainSourceRegex: ''
 IndentAccessModifiers: false
