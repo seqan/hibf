@@ -116,3 +116,48 @@ TEST(layout_test, clear)
     EXPECT_TRUE(layout.max_bins.empty());
     EXPECT_TRUE(layout.user_bins.empty());
 }
+
+TEST(layout_test, read_from_partitioned_layout)
+{
+    // layout consists of three partitions, written one after the other
+    std::stringstream ss{R"layout_file(#TOP_LEVEL_IBF fullest_technical_bin_idx:111
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
+#LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
+#USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
+7	0	1
+4	1;0	1;22
+5	1;2;3;4;22	1;1;1;1;21
+#TOP_LEVEL_IBF fullest_technical_bin_idx:111
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
+#LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
+#USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
+7	0	1
+4	1;0	1;22
+5	1;2;3;4;22	1;1;1;1;21
+#TOP_LEVEL_IBF fullest_technical_bin_idx:111
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
+#LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
+#USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
+7	0	1
+4	1;0	1;22
+5	1;2;3;4;22	1;1;1;1;21
+)layout_file"};
+
+    for (size_t i = 0; i < 3; ++i)
+    {
+        seqan::hibf::layout::layout layout;
+        layout.read_from(ss);
+
+        EXPECT_EQ(layout.top_level_max_bin_id, 111);
+        EXPECT_EQ(layout.max_bins[0], (seqan::hibf::layout::layout::max_bin{{0}, 0}));
+        EXPECT_EQ(layout.max_bins[1], (seqan::hibf::layout::layout::max_bin{{2}, 2}));
+        EXPECT_EQ(layout.max_bins[2], (seqan::hibf::layout::layout::max_bin{{1, 2, 3, 4}, 22}));
+        EXPECT_EQ(layout.user_bins[0], (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{}, 0, 1, 7}));
+        EXPECT_EQ(layout.user_bins[1], (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1}, 0, 22, 4}));
+        EXPECT_EQ(layout.user_bins[2],
+                  (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1, 2, 3, 4}, 22, 21, 5}));
+    }
+}
