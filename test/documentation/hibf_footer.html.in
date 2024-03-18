@@ -4,14 +4,11 @@ SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 SPDX-License-Identifier: BSD-3-Clause
 -->
 
-<!-- HTML footer for doxygen 1.9.8-->
+<!-- HTML footer for doxygen 1.10.0-->
 <!-- start footer part -->
 <!--BEGIN GENERATE_TREEVIEW-->
-<!-- <script type="text/javascript" charset="utf-8" src="api-stability.js"></script> -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <!-- <div id="list_bottom_right" style="text-align:right; float:left; color:black; padding: 0px 0px 0px 10px"></div> div for version.js -->
-    <!-- <script type="text/javascript" charset="utf-8" src="version.js"></script> -->
     $navpath
     ${HIBF_FOOTER_HTML_OPTION_POWERED_BY_VERCEL}
     <li class="footer">$generatedby <a href="https://www.doxygen.org/index.html"><img class="footer" src="$relpath^doxygen.svg" width="104" height="31" alt="doxygen"/></a> $doxygenversion </li>
