@@ -36,3 +36,10 @@ CPMDeclarePackage (googletest
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF")
+# doxygen-awesome
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.2)
+CPMDeclarePackage (doxygen_awesome
+                   NAME doxygen_awesome
+                   VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
+                   GITHUB_REPOSITORY jothepro/doxygen-awesome-css
+                   DOWNLOAD_ONLY TRUE)

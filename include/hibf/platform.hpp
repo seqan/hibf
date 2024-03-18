@@ -31,7 +31,7 @@
 
 /*!\def HIBF_COMPILER_IS_GCC
  * \brief Whether the current compiler is GCC.
- * \ingroup core
+ * \private
  * \details
  * __GNUC__ is also used to indicate the support for GNU compiler extensions. To detect the presence of the GCC
  * compiler, one has to rule out other compilers.
@@ -51,7 +51,7 @@
 
 /*!\def HIBF_HAS_AVX512
  * \brief Whether AVX512F and AVX512BW are available.
- * \ingroup core
+ * \private
  */
 #ifndef HIBF_HAS_AVX512
 #    if __AVX512F__ && __AVX512BW__

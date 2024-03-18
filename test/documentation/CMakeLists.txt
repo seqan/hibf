@@ -24,6 +24,13 @@ else ()
     message (FATAL_ERROR "Could not find HIBF. Not building documentation.")
 endif ()
 
+set (CPM_INDENT "CMake Package Manager CPM: ")
+include (${HIBF_SOURCE_DIR}/../../cmake/CPM.cmake)
+CPMUsePackageLock (${HIBF_SOURCE_DIR}/../../cmake/package-lock.cmake)
+
+# Sets doxygen_awesome_SOURCE_DIR
+CPMGetPackage (doxygen_awesome)
+
 set (HIBF_DOXYGEN_INPUT_DIR "${CMAKE_SOURCE_DIR}")
 
 include (hibf-doxygen.cmake)
