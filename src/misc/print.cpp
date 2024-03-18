@@ -1,5 +1,5 @@
-// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <cinttypes> // for uint16_t, int16_t, int64_t, int8_t, uint8_t, int32_t, uint32_t, uin...
