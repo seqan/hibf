@@ -1,17 +1,17 @@
-// SPDX-FileCopyrightText: 2006-2023, Knut Reinert & Freie Universität Berlin
-// SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
+// SPDX-FileCopyrightText: 2006-2024, Knut Reinert & Freie Universität Berlin
+// SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <iostream>
 #include <random>
+
+#include <sharg/parser.hpp>
 
 #include <hibf/build/bin_size_in_bits.hpp>
 #include <hibf/contrib/robin_hood.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
 #include <hibf/layout/compute_fpr_correction.hpp>
 #include <hibf/misc/divide_and_ceil.hpp>
-
-#include <sharg/parser.hpp>
 
 struct config
 {
