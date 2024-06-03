@@ -84,11 +84,6 @@ jobs:
           sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
           sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
 
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.18.6
-
       - name: Configure tests
         run: |
           mkdir build
