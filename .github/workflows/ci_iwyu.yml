@@ -41,11 +41,6 @@ jobs:
           compiler: clang-17
           ccache_size: 75M
 
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.27.9
-
       - name: Build IWYU
         run: |
           mkdir iwyu
