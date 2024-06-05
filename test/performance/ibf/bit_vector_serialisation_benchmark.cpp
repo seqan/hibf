@@ -13,12 +13,12 @@
 #include <stdexcept>  // for logic_error
 #include <string>     // for allocator, to_string, basic_string
 
+#include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
+#include <cereal/cereal.hpp>          // for InputArchive, OutputArchive
+
 #include <hibf/misc/bit_vector.hpp>     // for bit_vector
 #include <hibf/test/sandboxed_path.hpp> // for sandboxed_path, operator/
 #include <hibf/test/tmp_directory.hpp>  // for tmp_directory
-
-#include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
-#include <cereal/cereal.hpp>          // for InputArchive, OutputArchive
 
 seqan::hibf::bit_vector generate_bit_vector(size_t const size_in_bits, size_t const seed = 0u)
 {

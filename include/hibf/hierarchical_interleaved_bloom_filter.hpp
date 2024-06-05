@@ -14,6 +14,9 @@
 #include <ranges>     // for forward_range, range, range_value_t
 #include <vector>     // for vector, operator==
 
+#include <cereal/macros.hpp>       // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/types/vector.hpp> // IWYU pragma: keep
+
 #include <hibf/cereal/concepts.hpp>          // for cereal_archive
 #include <hibf/config.hpp>                   // for config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
@@ -21,9 +24,6 @@
 #include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/misc/timer.hpp>               // for concurrent_timer
 #include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
-
-#include <cereal/macros.hpp>       // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/types/vector.hpp> // IWYU pragma: keep
 
 namespace seqan::hibf
 {

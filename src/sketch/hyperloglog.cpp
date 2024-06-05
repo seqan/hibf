@@ -16,11 +16,11 @@
 #include <utility>   // for swap
 #include <vector>    // for vector
 
-#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
-
 #include <simde/x86/avx.h>  // for simde__m256i, simde_mm256_add_ps, simde_mm256_set1_ps, simde_m...
 #include <simde/x86/avx2.h> // for simde_mm256_max_epu8
+
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
 
 namespace seqan::hibf::sketch
 {
