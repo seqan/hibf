@@ -24,7 +24,7 @@ defaults:
 jobs:
   readme-update:
     name: Update
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     timeout-minutes: 15
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     steps:

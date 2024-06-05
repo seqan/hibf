@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Util Linux
+name: Utility
 
 on:
   push:
@@ -26,46 +26,31 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    name: ${{ matrix.compiler }}
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        include:
-          - name: "gcc13"
-            compiler: "gcc-13"
-
+        compiler: ["clang-18", "gcc-14"]
+    container:
+      image: ghcr.io/seqan/${{ matrix.compiler }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          submodules: false
-
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: ${{ matrix.compiler }}
-          ccache_size: 75M
-
-      - name: Install CMake
-        uses: seqan/actions/setup-cmake@main
-        with:
-          cmake: 3.18.6
 
       - name: Configure util
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake ../util -DCMAKE_BUILD_TYPE=Release
 
       - name: Build util
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j2
+          make -k -j
           ccache -sv
 
 

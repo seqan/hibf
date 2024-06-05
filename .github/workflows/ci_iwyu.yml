@@ -23,77 +23,64 @@ defaults:
 jobs:
   build:
     name: IWYU
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    container:
+      image: ghcr.io/seqan/clang-18
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          fetch-depth: 1
-          submodules: false
           path: hibf
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
 
-      - name: Setup toolchain
-        uses: seqan/actions/setup-toolchain@main
-        with:
-          compiler: clang-17
-          ccache_size: 75M
-
       - name: Build IWYU
         run: |
-          mkdir iwyu
-          cd iwyu
-          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch 0.21
-          mkdir build
-          cd build
+          mkdir iwyu && cd iwyu
+          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch 0.22
+          mkdir build && cd build
           cmake ../include-what-you-use -G "Unix Makefiles" \
                                         -DCMAKE_BUILD_TYPE=Release \
                                         -DCMAKE_INSTALL_PREFIX=/usr \
-                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-17 \
-                                        -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \
-                                        -DCMAKE_C_COMPILER_LAUNCHER=ccache
-          make -j2
-          sudo make install
+                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18
+          make -j
+          make install
 
       - name: Configure Test
         run: |
-          mkdir build
-          cd build
-          cmake ../hibf/test/iwyu -DCMAKE_BUILD_TYPE=Release \
-                                  -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-                                  -DHIBF_VERBOSE_TESTS=OFF
+          mkdir build && cd build
+          cmake ../hibf/test/iwyu -DCMAKE_BUILD_TYPE=Release
 
       - name: Run Test
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -j2 2> out.txt
+          make -j 2> out.txt
           ccache -sv
 
       - name: Apply changes
+        working-directory: build
         run: |
           fix_includes.py --nosafe_headers \
                           --comments \
                           --noreorder \
-                          --ignore_re ".*/include/hibf/contrib/.*" < build/out.txt
+                          --ignore_re ".*/include/hibf/contrib/.*" < out.txt
 
       - name: Add changes
         id: changed_files
+        working-directory: hibf
         run: |
-          cd hibf
           git add .
           CPP_LIST=$(git diff --name-only HEAD | { grep -E "(\.cpp|\.hpp)$" || test $? = 1; } | xargs)
           echo "cpp_list=$CPP_LIST" >> $GITHUB_OUTPUT
 
       - name: Run clang-format
         if: ${{ steps.changed_files.outputs.cpp_list }}
+        working-directory: hibf
         run: |
-          sudo apt-get remove --yes libllvm15*
-          install clang-format-15
-          cd hibf
-          clang-format-15 --style=file -i ${{ steps.changed_files.outputs.cpp_list }}
+          clang-format-18 --style=file -i ${{ steps.changed_files.outputs.cpp_list }}
           git add .
 
       - name: Import GPG key
@@ -104,14 +91,14 @@ jobs:
           passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
           git_commit_gpgsign: true
-          workdir: ${{ github.workspace }}/hibf
+          workdir: hibf
 
       - name: Open PR
         if: ${{ steps.changed_files.outputs.cpp_list }}
         uses: peter-evans/create-pull-request@v6
         with:
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
-          path: ${{ github.workspace }}/hibf
+          path: hibf
           commit-message: "[MISC] IWYU"
           committer: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
           author: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"

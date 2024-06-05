@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: Unit macOS
+name: macOS
 
 on:
   push:
@@ -26,40 +26,16 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.compiler }}
     runs-on: macos-12
-    timeout-minutes: 120
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        include:
-          - name: "clang17"
-            compiler: "clang-17"
-            build: unit
-            build_type: Release
-
-          - name: "gcc13"
-            compiler: "gcc-13"
-            build: unit
-            build_type: Release
-
-          - name: "gcc12"
-            compiler: "gcc-12"
-            build: unit
-            build_type: Release
-
-          - name: "gcc11"
-            compiler: "gcc-11"
-            build: unit
-            build_type: Release
-
+        compiler: ["clang-18", "clang-17", "gcc-14", "gcc-13", "gcc-12", "gcc-11"]
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          submodules: false
 
       - name: Setup toolchain
         uses: seqan/actions/setup-toolchain@main
@@ -76,18 +52,16 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                            -DHIBF_VERBOSE_TESTS=OFF
-          make -j3 gtest_main
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release
+          make -j gtest_main
 
       - name: Build tests
+        working-directory: build
         run: |
           ccache -z
-          cd build
-          make -k -j3
+          make -k -j
           ccache -sv
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j3 --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
