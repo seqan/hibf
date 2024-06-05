@@ -23,4 +23,9 @@ void compute_sketches(config const & config,
                       std::vector<size_t> & kmer_counts,
                       std::vector<sketch::hyperloglog> & sketches);
 
+void compute_sketches(config const & config,
+                      std::vector<std::vector<size_t>> & kmer_counts,
+                      std::vector<std::vector<sketch::hyperloglog>> & sketches,
+                      size_t const number_of_partitions);
+
 } // namespace seqan::hibf::sketch
