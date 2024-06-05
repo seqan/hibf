@@ -9,11 +9,11 @@
 #include <functional> // for function
 #include <iosfwd>     // for istream, ostream
 
-#include <hibf/misc/insert_iterator.hpp> // for insert_iterator
-#include <hibf/platform.hpp>
-
 #include <cereal/access.hpp> // for access
 #include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
+
+#include <hibf/misc/insert_iterator.hpp> // for insert_iterator
+#include <hibf/platform.hpp>
 
 namespace seqan::hibf
 {

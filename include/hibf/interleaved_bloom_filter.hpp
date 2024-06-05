@@ -20,6 +20,9 @@
 #include <type_traits> // for remove_cvref_t
 #include <vector>      // for operator==, vector
 
+#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
+#include <cereal/types/base_class.hpp> // for base_class
+
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive
 #include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
@@ -27,9 +30,6 @@
 #include <hibf/misc/counting_vector.hpp>      // for counting_vector
 #include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
-
-#include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
-#include <cereal/types/base_class.hpp> // for base_class
 
 namespace seqan::hibf
 {
@@ -544,7 +544,7 @@ public:
         result_buffer(next_multiple_of_64(ibf.bin_count())) // Ensure large enough capacity.
     {
         result_buffer.resize(ibf.bin_count()); // Resize to actual requested size.
-        // Silences llvm's ASAN container-overflow warning.
+                                               // Silences llvm's ASAN container-overflow warning.
 #    if defined(_LIBCPP_VERSION) && !defined(_LIBCPP_HAS_NO_ASAN)
         __sanitizer_annotate_contiguous_container(result_buffer.data(),
                                                   result_buffer.data() + result_buffer.capacity(),

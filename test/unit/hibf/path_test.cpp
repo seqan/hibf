@@ -7,10 +7,10 @@
 #include <filesystem> // for path
 #include <utility>    // for move
 
+#include <cereal/specialize.hpp> // for specialization
+
 #include <hibf/cereal/path.hpp> // IWYU pragma: keep
 #include <hibf/test/cereal.hpp> // for test_serialisation
-
-#include <cereal/specialize.hpp> // for specialization
 
 TEST(path_test, serialisation)
 {

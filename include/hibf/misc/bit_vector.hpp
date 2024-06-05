@@ -40,13 +40,13 @@
 #include <utility>          // for swap
 #include <vector>           // for vector
 
-#include <hibf/cereal/concepts.hpp>           // for cereal_archive
-#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR
-
 #include <cereal/cereal.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/macros.hpp>     // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/specialize.hpp> // for specialization, specialize
+
+#include <hibf/cereal/concepts.hpp>           // for cereal_archive
+#include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
+#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR
 
 namespace seqan::hibf
 {

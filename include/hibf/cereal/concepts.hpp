@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include <hibf/platform.hpp>
-
 #include <cereal/details/helpers.hpp> // for InputArchiveBase, OutputArchiveBase
 #include <cereal/details/traits.hpp>  // for InputArchiveBase, OutputArchiveBase
+
+#include <hibf/platform.hpp>
 
 namespace seqan::hibf
 {
