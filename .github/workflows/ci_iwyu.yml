@@ -44,7 +44,9 @@ jobs:
           cmake ../include-what-you-use -G "Unix Makefiles" \
                                         -DCMAKE_BUILD_TYPE=Release \
                                         -DCMAKE_INSTALL_PREFIX=/usr \
-                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18
+                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18 \
+                                        -DCMAKE_C_COMPILER=clang-18 \
+                                        -DCMAKE_CXX_COMPILER=clang++-18
           make -j
           make install
 
