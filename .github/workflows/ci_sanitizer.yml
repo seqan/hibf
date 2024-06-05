@@ -27,13 +27,12 @@ jobs:
   build:
     name: ${{ matrix.name }} ${{ matrix.build_type }} ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 240
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     strategy:
       fail-fast: false
       matrix:
         name: [ASan, TSan, UBSan]
-        os: [ubuntu-22.04, macos-12]
+        os: [ubuntu-latest, macos-12]
         build_type: [Release, RelWithDebInfo, Debug]
         exclude:
           - name: "TSan"
@@ -51,55 +50,46 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
 
           - name: "UBSan"
-            os: ubuntu-22.04
+            os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
 
           - os: macos-12
-            compiler: clang-17
-            threads: 3
+            compiler: clang-18
 
-          - os: ubuntu-22.04
-            compiler: gcc-13
-            threads: 2
+          - os: ubuntu-latest
+            compiler: gcc-14
+            image: ghcr.io/seqan/gcc-14
 
           - name: "TSan"
-            os: ubuntu-22.04
-            compiler: clang-17
-
+            os: ubuntu-latest
+            compiler: clang-18
+            image: ghcr.io/seqan/clang-18
+    container:
+      image: ${{ matrix.image || '' }}
+      volumes:
+        - /home/runner:/home/runner
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-          submodules: false
 
       - name: Setup compiler
+        if: contains(matrix.os, 'macos')
         uses: seqan/actions/setup-compiler@main
         with:
           compiler: ${{ matrix.compiler }}
 
-      - name: Configure OS
-        if: contains(matrix.os, 'ubuntu')
-        run: |
-          sudo bash -c "echo 0 > /proc/sys/vm/overcommit_memory"
-          sudo bash -c "echo 2 >/proc/sys/kernel/randomize_va_space"
-
       - name: Configure tests
         run: |
-          mkdir build
-          cd build
+          mkdir build && cd build
           cmake ../test/all -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                            -DHIBF_VERBOSE_TESTS=OFF \
                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make -j${{ matrix.threads }} gtest_main benchmark_main
+          make -j gtest_main benchmark_main
 
       - name: Build tests
-        run: |
-          cd build
-          make -k -j${{ matrix.threads }}
+        working-directory: build
+        run: make -k -j
 
       - name: Run tests
-        run: |
-          cd build
-          ctest . -j${{ matrix.threads }} --output-on-failure
+        working-directory: build
+        run: ctest . -j --output-on-failure
 

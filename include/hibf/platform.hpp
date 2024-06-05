@@ -70,12 +70,12 @@
 #        error "At least GCC 11 is needed."
 #    endif // (__GNUC__ < 11)
 
-#    if (__GNUC__ == 11 && __GNUC_MINOR__ <= 2)
-#        pragma GCC warning "Be aware that GCC < 11.3 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 11 && __GNUC_MINOR__ <= 2)
+#    if (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
+#        pragma warning "Be aware that GCC < 11.4 might have bugs that cause compile failure."
+#    endif // (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
 
 #    if (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
-#        pragma GCC warning "Be aware that GCC < 12.3 might have bugs that cause compile failure."
+#        pragma warning "Be aware that GCC < 12.3 might have bugs that cause compile failure."
 #    endif // (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
 
 #    if HIBF_DOXYGEN_ONLY(1) 0
@@ -84,10 +84,10 @@
 #    endif // HIBF_DOXYGEN_ONLY(1)0
 
 #    ifndef HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
-#        if (__GNUC__ > 13)
+#        if (__GNUC__ > 14)
 #            pragma message                                                                                            \
-                "Your compiler is newer than the latest supported compiler version (gcc-13). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
-#        endif // (__GNUC__ > 13)
+                "Your compiler is newer than the latest supported compiler version (gcc-14). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
+#        endif // (__GNUC__ > 14)
 #    endif     // HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
 #endif
 

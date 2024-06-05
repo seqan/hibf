@@ -23,8 +23,7 @@ env:
 jobs:
   check:
     name: REUSE Compliance
-    runs-on: ubuntu-22.04
-    timeout-minutes: 120
+    runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     steps:
       - name: Checkout
