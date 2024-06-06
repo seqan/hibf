@@ -4,15 +4,16 @@
 
 #include <gtest/gtest.h> // for Message, TestPartResult, EXPECT_EQ, TestInfo, TEST_F, Test
 
-#include <cinttypes> // for uint64_t
-#include <cstddef>   // for size_t
-#include <limits>    // for numeric_limits
-#include <random>    // for uniform_int_distribution, mt19937_64
-#include <string>    // for basic_string, string
-#include <tuple>     // for tie, make_tuple
-#include <vector>    // for vector
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for size_t
+#include <functional> // for equal_to
+#include <limits>     // for numeric_limits
+#include <random>     // for uniform_int_distribution, mt19937_64
+#include <string>     // for basic_string, string
+#include <tuple>      // for tie, make_tuple
+#include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>   // for unordered_flat_map
+#include <hibf/contrib/robin_hood.hpp>   // for hash, pair, unordered_flat_map
 #include <hibf/platform.hpp>             // for _LIBCPP_VERSION
 #include <hibf/sketch/hyperloglog.hpp>   // for hyperloglog
 #include <hibf/sketch/toolbox.hpp>       // for clustering_node, entry, precompute_union_estimates_for, cluster_bins

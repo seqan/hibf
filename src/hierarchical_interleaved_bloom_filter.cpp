@@ -2,16 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for max, fill_n, shuffle
-#include <cassert>   // for assert
-#include <cinttypes> // for uint64_t, int64_t
-#include <cstddef>   // for size_t
-#include <mutex>     // for mutex, lock_guard
-#include <numeric>   // for iota
-#include <optional>  // for optional
-#include <random>    // for random_device, mt19937_64
-#include <utility>   // for move
-#include <vector>    // for vector, erase
+#include <algorithm>  // for shuffle, __fn, none_of
+#include <cassert>    // for assert
+#include <cinttypes>  // for uint64_t, int64_t
+#include <cstddef>    // for size_t
+#include <functional> // for equal_to
+#include <mutex>      // for mutex, lock_guard
+#include <numeric>    // for iota
+#include <optional>   // for optional
+#include <random>     // for random_device, mt19937_64
+#include <utility>    // for move
+#include <vector>     // for vector, erase
 
 #include <hibf/build/build_data.hpp>                      // for build_data
 #include <hibf/build/compute_kmers.hpp>                   // for compute_kmers
@@ -20,7 +21,7 @@
 #include <hibf/build/update_parent_kmers.hpp>             // for update_parent_kmers
 #include <hibf/build/update_user_bins.hpp>                // for update_user_bins
 #include <hibf/config.hpp>                                // for config
-#include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set, hash
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
@@ -28,7 +29,7 @@
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/misc/divide_and_ceil.hpp>                  // for divide_and_ceil
-#include <hibf/misc/timer.hpp>                            // for timer
+#include <hibf/misc/timer.hpp>                            // for concurrent_timer
 #include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
 #include <hibf/sketch/hyperloglog.hpp>                    // for hyperloglog
 

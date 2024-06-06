@@ -4,15 +4,14 @@
 
 #pragma once
 
-#include <algorithm>  // for __fn, fill, sort
-#include <cassert>    // for assert
-#include <cinttypes>  // for int64_t, uint16_t
-#include <concepts>   // for integral, unsigned_integral
-#include <cstddef>    // for size_t
-#include <functional> // for less, identity
-#include <memory>     // for addressof
-#include <ranges>     // for forward_range, range, range_value_t
-#include <vector>     // for vector, operator==
+#include <algorithm> // for __fn, fill, sort
+#include <cassert>   // for assert
+#include <cinttypes> // for int64_t, uint16_t
+#include <concepts>  // for integral, unsigned_integral
+#include <cstddef>   // for size_t
+#include <memory>    // for addressof
+#include <ranges>    // for forward_range, range_value_t, range
+#include <vector>    // for vector, operator==
 
 #include <cereal/macros.hpp>       // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/vector.hpp> // IWYU pragma: keep

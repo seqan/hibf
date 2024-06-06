@@ -2,11 +2,12 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <cinttypes> // for uint16_t, int16_t, int64_t, int8_t, uint8_t, int32_t, uint32_t, uin...
-#include <cstddef>   // for size_t
-#include <iostream>  // for basic_ostream::operator<<, ostream, operator<<, basic_ostream
-#include <ranges>    // for range_value_t, empty
-#include <vector>    // for vector
+#include <cinttypes>   // for uint16_t, int16_t, int64_t, int8_t, uint8_t, int32_t, uint32_t, uin...
+#include <cstddef>     // for size_t
+#include <iostream>    // for ostream, operator<<, basic_ostream
+#include <ranges>      // for range_value_t, empty
+#include <type_traits> // for conditional
+#include <vector>      // for vector
 
 #include <hibf/misc/bit_vector.hpp>      // for bit_vector
 #include <hibf/misc/counting_vector.hpp> // for counting_vector

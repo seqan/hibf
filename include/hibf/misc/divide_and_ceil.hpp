@@ -7,6 +7,7 @@
 #include <cassert>  // for assert
 #include <concepts> // for unsigned_integral
 #include <cstddef>  // for size_t
+#include <limits>   // for numeric_limits
 
 #include <hibf/platform.hpp>
 

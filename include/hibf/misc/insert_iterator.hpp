@@ -4,14 +4,15 @@
 
 #pragma once
 
-#include <cassert>   // for assert
-#include <cinttypes> // for uint64_t
-#include <cstddef>   // for ptrdiff_t
-#include <iterator>  // for output_iterator_tag
-#include <memory>    // for addressof
-#include <vector>    // for vector
+#include <cassert>    // for assert
+#include <cinttypes>  // for uint64_t
+#include <cstddef>    // for ptrdiff_t
+#include <functional> // for equal_to
+#include <iterator>   // for output_iterator_tag
+#include <memory>     // for addressof
+#include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash
 #include <hibf/platform.hpp>
 
 // IWYU pragma: private, include <hibf/config.hpp>
