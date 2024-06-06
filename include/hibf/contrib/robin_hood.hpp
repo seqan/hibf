@@ -2339,7 +2339,7 @@ private:
         mInfoHashShift = InitialInfoHashShift;
     }
 
-    enum class InsertionState { overflow_error, key_found, new_node, overwrite_node };
+    enum class InsertionState : uint8_t { overflow_error, key_found, new_node, overwrite_node };
 
     // Finds key, and if not already present prepares a spot where to pot the key & value.
     // This potentially shifts nodes out of the way, updates mInfo and number of inserted
