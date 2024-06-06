@@ -6,18 +6,17 @@
 #    define HIBF_HAS_AVX512 0
 #endif
 
-#include <gtest/gtest.h> // for TYPED_TEST, Message, TestPartResult, ASSERT_EQ, EXPECT_EQ, TYPED_TE...
+#include <gtest/gtest.h> // for Message, TYPED_TEST, TestPartResult, ASSERT_EQ, EXPECT_EQ, Types
 
 #include <algorithm> // for fill, fill_n
 #include <cinttypes> // for int16_t, int32_t, int64_t, int8_t, uint16_t, uint32_t, uint64_t
 #include <concepts>  // for signed_integral
 #include <cstddef>   // for size_t
 #include <limits>    // for numeric_limits
-#include <vector>    // for __sanitizer_annotate_contiguous_container
 
 #include <hibf/misc/bit_vector.hpp>      // for bit_vector
 #include <hibf/misc/counting_vector.hpp> // for counting_vector
-#include <hibf/platform.hpp>             // for _LIBCPP_VERSION
+#include <hibf/platform.hpp>             // for _LIBCPP_HAS_NO_ASAN, _LIBCPP_VERSION
 
 template <typename TypeParam>
 class counting_vector_test : public ::testing::Test
