@@ -222,7 +222,7 @@ public:
 
 private:
     //!\brief The operation to perform.
-    enum class operation
+    enum class operation : uint8_t
     {
         add,
         sub

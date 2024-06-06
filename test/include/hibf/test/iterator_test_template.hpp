@@ -233,7 +233,7 @@ inline void move_forward_pre_test(it_begin_t && it_begin, it_sentinel_t && it_en
     // pre-increment
     auto rng_it = std::ranges::begin(rng);
     auto rng_it_end = std::ranges::end(rng);
-    auto it = std::move(it_begin);
+    auto it = std::forward<it_begin_t>(it_begin);
 
     EXPECT_NE(rng_it, rng_it_end);
     EXPECT_NE(it, it_end);
@@ -261,7 +261,7 @@ inline void move_forward_post_test(it_begin_t && it_begin, it_sentinel_t && it_e
     // post-increment
     auto rng_it = std::ranges::begin(rng);
     auto rng_it_end = std::ranges::end(rng);
-    auto it = std::move(it_begin);
+    auto it = std::forward<it_begin_t>(it_begin);
 
     EXPECT_NE(rng_it, rng_it_end);
     EXPECT_NE(it, it_end);

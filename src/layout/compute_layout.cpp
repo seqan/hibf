@@ -29,11 +29,6 @@ layout compute_layout(config const & config,
 {
     layout resulting_layout{};
 
-    // The output streams facilitate writing the layout file in hierarchical structure.
-    // seqan::hibf::execute currently writes the filled buffers to the output file.
-    std::stringstream output_buffer;
-    std::stringstream header_buffer;
-
     data_store store{.false_positive_rate = config.maximum_fpr,
                      .hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),

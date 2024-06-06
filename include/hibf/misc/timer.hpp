@@ -156,10 +156,11 @@ class concurrent_timer
 private:
     using steady_clock_t = std::chrono::steady_clock;
 
+    alignas(64) std::atomic<steady_clock_t::rep> ticks{};
+
     steady_clock_t::time_point start_point{std::chrono::time_point<steady_clock_t>::max()};
     steady_clock_t::time_point stop_point{};
 
-    alignas(64) std::atomic<steady_clock_t::rep> ticks{};
     alignas(64) std::atomic<steady_clock_t::rep> max{};
     alignas(64) std::atomic<uint64_t> count{};
 
@@ -180,38 +181,38 @@ public:
     concurrent_timer() = default;
     //!\brief Defaulted.
     concurrent_timer(concurrent_timer const & other) :
+        ticks{other.ticks.load()},
         start_point{other.start_point},
         stop_point{other.stop_point},
-        ticks{other.ticks.load()},
         max{other.max.load()},
         count{other.count.load()}
     {}
     //!\brief Defaulted.
     concurrent_timer & operator=(concurrent_timer const & other)
     {
+        ticks = other.ticks.load();
         start_point = other.start_point;
         stop_point = other.stop_point;
-        ticks = other.ticks.load();
         max = other.max.load();
         count = other.count.load();
         return *this;
     }
     //!\brief Defaulted.
-    concurrent_timer(concurrent_timer && other) :
-        start_point{std::move(other.start_point)},
-        stop_point{std::move(other.stop_point)},
-        ticks{std::move(other.ticks.load())},
-        max{std::move(other.max.load())},
-        count{std::move(other.count.load())}
+    concurrent_timer(concurrent_timer && other) noexcept :
+        ticks{other.ticks.load()},
+        start_point{other.start_point},
+        stop_point{other.stop_point},
+        max{other.max.load()},
+        count{other.count.load()}
     {}
     //!\brief Defaulted.
-    concurrent_timer & operator=(concurrent_timer && other)
+    concurrent_timer & operator=(concurrent_timer && other) noexcept
     {
-        start_point = std::move(other.start_point);
-        stop_point = std::move(other.stop_point);
-        ticks = std::move(other.ticks.load());
-        max = std::move(other.max.load());
-        count = std::move(other.count.load());
+        ticks = other.ticks.load();
+        start_point = other.start_point;
+        stop_point = other.stop_point;
+        max = other.max.load();
+        count = other.count.load();
         return *this;
     }
     //!\brief Defaulted.

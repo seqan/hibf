@@ -6,7 +6,9 @@ cmake_minimum_required (VERSION 3.10)
 
 project (hibf_tidy NONE)
 
-find_program (CLANG_TIDY "clang-tidy-17" REQUIRED)
-set (CMAKE_CXX_CLANG_TIDY ${CLANG_TIDY})
+find_program (CLANG_TIDY "clang-tidy-18" REQUIRED)
+set (CMAKE_CXX_CLANG_TIDY
+     "${CLANG_TIDY};-checks=bugprone*,performance*,-bugprone-easily-swappable-parameters,-bugprone-exception-escape,-bugprone-narrowing-conversions"
+)
 
 add_subdirectory (../unit/ unit)
