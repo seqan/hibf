@@ -28,6 +28,7 @@ list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--keep=**hibf/platform.hpp")
 list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--keep=**hibf/version.hpp")
 list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--no_default_mappings")
 list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "-Xiwyu;--mapping_file=${CMAKE_CURRENT_LIST_DIR}/mappings/iwyu.imp")
+list (APPEND CMAKE_CXX_INCLUDE_WHAT_YOU_USE "--stdlib=libc++")
 
 option (INSTALL_HIBF "" OFF)
 add_subdirectory (../unit/ unit)
