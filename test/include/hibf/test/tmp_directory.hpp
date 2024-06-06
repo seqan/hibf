@@ -86,11 +86,11 @@ public:
      * \{
      */
     tmp_directory(tmp_directory const &) = delete; //!< Deleted.
-    tmp_directory(tmp_directory && other) : directory_path{std::exchange(other.directory_path, std::nullopt)}
+    tmp_directory(tmp_directory && other) noexcept : directory_path{std::exchange(other.directory_path, std::nullopt)}
     {}
 
     tmp_directory & operator=(tmp_directory const &) = delete; //!< Deleted.
-    tmp_directory & operator=(tmp_directory && other)
+    tmp_directory & operator=(tmp_directory && other) noexcept
     {
         /* The current hold directory is cleaned. A simple std::swap is not
          * performed to avoid prolonging the life of the temporary directory.

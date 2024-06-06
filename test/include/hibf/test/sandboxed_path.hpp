@@ -102,7 +102,7 @@ public:
      *
      * Basic exception guarantee
      */
-    sandboxed_path & operator=(sandboxed_path && new_path)
+    sandboxed_path & operator=(sandboxed_path && new_path) noexcept(false)
     {
         std::filesystem::path::operator=(std::move(new_path));
         check_invariant();
@@ -446,7 +446,7 @@ public:
     /**!\brief Swaps the current path
      * \param other Reference to a sandboxed_path.
      */
-    void swap(sandboxed_path & other)
+    void swap(sandboxed_path & other) noexcept(false)
     {
         std::filesystem::path::swap(other);
         check_invariant();

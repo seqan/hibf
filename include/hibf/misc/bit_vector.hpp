@@ -122,7 +122,7 @@ private:
         {
             return *this = bool(other);
         }
-        bit_reference & operator=(bit_reference && other)
+        bit_reference & operator=(bit_reference && other) noexcept
         {
             return *this = bool(other);
         }
