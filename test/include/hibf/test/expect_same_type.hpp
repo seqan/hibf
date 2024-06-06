@@ -43,7 +43,7 @@ struct expect_same_type
                                           std::type_identity<lhs_t>,
                                           std::type_identity<rhs_t>)
     {
-        auto remove_wrap_type_identity = [](std::string str)
+        auto remove_wrap_type_identity = [](std::string const & str)
         {
             // EXPECT_SAME_TYPE_DEPAREN adds a space after the prefix
             std::string prefix = "std::type_identity< ";
