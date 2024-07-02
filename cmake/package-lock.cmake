@@ -21,7 +21,7 @@ CPMDeclarePackage (simde
                    DOWNLOAD_ONLY YES
                    GITHUB_REPOSITORY simd-everywhere/simde)
 # benchmark
-set (HIBF_BENCHMARK_VERSION 1.8.2)
+set (HIBF_BENCHMARK_VERSION 1.8.4)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
@@ -35,7 +35,7 @@ CPMDeclarePackage (googletest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
-                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF")
+                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 20")
 # doxygen-awesome
 set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.2)
 CPMDeclarePackage (doxygen_awesome
