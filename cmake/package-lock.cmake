@@ -35,7 +35,7 @@ CPMDeclarePackage (googletest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
-                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF")
+                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 20")
 # doxygen-awesome
 set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.2)
 CPMDeclarePackage (doxygen_awesome
