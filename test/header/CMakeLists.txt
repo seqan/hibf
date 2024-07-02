@@ -125,6 +125,9 @@ macro (hibf_header_test component header_base_path exclude_regex)
 endmacro ()
 
 CPMGetPackage (benchmark)
+if (benchmark_ADDED)
+    set_target_properties (benchmark PROPERTIES CXX_STANDARD 20)
+endif ()
 CPMGetPackage (googletest)
 
 # note: hibf/version.hpp is one of the only header that is not required to have a hibf/platform.hpp include
