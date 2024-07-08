@@ -130,7 +130,7 @@ TEST(layout_test, read_from_partitioned_layout)
 4	1;0	1;22
 5	1;2;3;4;22	1;1;1;1;21
 #TOP_LEVEL_IBF fullest_technical_bin_idx:111
-#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:1
 #LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
 #LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
 #USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
@@ -138,7 +138,7 @@ TEST(layout_test, read_from_partitioned_layout)
 4	1;0	1;22
 5	1;2;3;4;22	1;1;1;1;21
 #TOP_LEVEL_IBF fullest_technical_bin_idx:111
-#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:0
+#LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:2
 #LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
 #LOWER_LEVEL_IBF_1;2;3;4 fullest_technical_bin_idx:22
 #USER_BIN_IDX	TECHNICAL_BIN_INDICES	NUMBER_OF_TECHNICAL_BINS
@@ -153,7 +153,7 @@ TEST(layout_test, read_from_partitioned_layout)
         layout.read_from(ss);
 
         EXPECT_EQ(layout.top_level_max_bin_id, 111);
-        EXPECT_EQ(layout.max_bins[0], (seqan::hibf::layout::layout::max_bin{{0}, 0}));
+        EXPECT_EQ(layout.max_bins[0], (seqan::hibf::layout::layout::max_bin{{0}, i}));
         EXPECT_EQ(layout.max_bins[1], (seqan::hibf::layout::layout::max_bin{{2}, 2}));
         EXPECT_EQ(layout.max_bins[2], (seqan::hibf::layout::layout::max_bin{{1, 2, 3, 4}, 22}));
         EXPECT_EQ(layout.user_bins[0], (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{}, 0, 1, 7}));
