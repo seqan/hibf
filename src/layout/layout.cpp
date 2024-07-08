@@ -121,8 +121,10 @@ void seqan::hibf::layout::layout::read_from(std::istream & stream)
 
     assert(line == prefix::layout_column_names);
 
-    // parse the rest of the file
-    while (std::getline(stream, line))
+    // parse the rest of the file until either
+    // 1) the end of the file is reached
+    // 2) Another header line starts, which indicates a partitioned layout
+    while (stream.good() && static_cast<char>(stream.peek()) != prefix::layout_header[0] && std::getline(stream, line))
         user_bins.emplace_back(parse_layout_line(line));
 }
 
