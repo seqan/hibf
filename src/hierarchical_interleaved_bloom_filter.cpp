@@ -29,9 +29,10 @@
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/misc/divide_and_ceil.hpp>                  // for divide_and_ceil
-#include <hibf/misc/timer.hpp>                            // for concurrent_timer
-#include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
-#include <hibf/sketch/hyperloglog.hpp>                    // for hyperloglog
+#include <hibf/misc/iota_vector.hpp>
+#include <hibf/misc/timer.hpp>              // for concurrent_timer
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 
 namespace seqan::hibf
 {
@@ -223,6 +224,7 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
     auto layout = layout::compute_layout(configuration,
                                          kmer_counts,
                                          sketches,
+                                         iota_vector(configuration.number_of_user_bins),
                                          layout_union_estimation_timer,
                                          layout_rearrangement_timer);
     layout_dp_algorithm_timer.stop();
