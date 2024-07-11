@@ -401,6 +401,38 @@ TEST(ibf_test, increase_bin_number_to)
     }
 }
 
+TEST(ibf_test, copy_agents)
+{
+    // 1. Construct and emplace
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
+                                              seqan::hibf::bin_size{1024u},
+                                              seqan::hibf::hash_function_count{2u}};
+
+    for (size_t bin_idx : std::views::iota(0, 64))
+        ibf.emplace(0u, seqan::hibf::bin_index{bin_idx});
+
+    {
+        auto membership_agent1 = ibf.membership_agent();
+        auto membership_agent2 = membership_agent1;
+
+        auto & result1 = membership_agent1.bulk_contains(0u);
+        auto & result2 = membership_agent2.bulk_contains(1u);
+        ASSERT_EQ(result1.size(), result2.size());
+
+        EXPECT_TRUE(result1.all());
+        EXPECT_TRUE(result2.none());
+    }
+    {
+        auto counting_agent1 = ibf.counting_agent();
+        auto counting_agent2 = counting_agent1;
+        auto & result1 = counting_agent1.bulk_count(std::vector<uint64_t>{0u});
+        auto & result2 = counting_agent2.bulk_count(std::vector<uint64_t>{1u});
+        ASSERT_EQ(result1.size(), result2.size());
+        EXPECT_RANGE_EQ(result1, std::vector<size_t>(64u, 1u));
+        EXPECT_RANGE_EQ(result2, std::vector<size_t>(64u, 0u));
+    }
+}
+
 TEST(ibf_test, serialisation)
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},

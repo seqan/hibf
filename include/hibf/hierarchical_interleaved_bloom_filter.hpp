@@ -265,7 +265,7 @@ class hierarchical_interleaved_bloom_filter::membership_agent_type
 {
 private:
     //!\brief A pointer to the augmented hierarchical_interleaved_bloom_filter.
-    hierarchical_interleaved_bloom_filter const * const hibf_ptr{nullptr};
+    hierarchical_interleaved_bloom_filter const * hibf_ptr{nullptr};
 
     //!\brief Helper for recursive membership querying.
     template <std::ranges::forward_range value_range_t>
@@ -305,12 +305,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    membership_agent_type() = default;                                         //!< Defaulted.
-    membership_agent_type(membership_agent_type const &) = default;            //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
-    membership_agent_type(membership_agent_type &&) = default;                 //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type &&) = delete;      //!< Deleted. hibf_ptr is const.
-    ~membership_agent_type() = default;                                        //!< Defaulted.
+    membership_agent_type() = default;                                          //!< Defaulted.
+    membership_agent_type(membership_agent_type const &) = default;             //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type const &) = default; //!< Defaulted.
+    membership_agent_type(membership_agent_type &&) = default;                  //!< Defaulted.
+    membership_agent_type & operator=(membership_agent_type &&) = default;      //!< Defaulted.
+    ~membership_agent_type() = default;                                         //!< Defaulted.
 
     /*!\brief Construct a membership_agent_type for an existing hierarchical_interleaved_bloom_filter.
      * \private
@@ -401,7 +401,7 @@ class hierarchical_interleaved_bloom_filter::counting_agent_type
 {
 private:
     //!\brief A pointer to the augmented hierarchical_interleaved_bloom_filter.
-    hierarchical_interleaved_bloom_filter const * const hibf_ptr{nullptr};
+    hierarchical_interleaved_bloom_filter const * hibf_ptr{nullptr};
 
     //!\brief Helper for recursive bulk counting.
     template <std::ranges::forward_range value_range_t>
@@ -440,12 +440,12 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    counting_agent_type() = default;                                       //!< Defaulted.
-    counting_agent_type(counting_agent_type const &) = default;            //!< Defaulted.
-    counting_agent_type & operator=(counting_agent_type const &) = delete; //!< Deleted. hibf_ptr is const.
-    counting_agent_type(counting_agent_type &&) = default;                 //!< Defaulted.
-    counting_agent_type & operator=(counting_agent_type &&) = delete;      //!< Deleted. hibf_ptr is const.
-    ~counting_agent_type() = default;                                      //!< Defaulted.
+    counting_agent_type() = default;                                        //!< Defaulted.
+    counting_agent_type(counting_agent_type const &) = default;             //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type const &) = default; //!< Defaulted.
+    counting_agent_type(counting_agent_type &&) = default;                  //!< Defaulted.
+    counting_agent_type & operator=(counting_agent_type &&) = default;      //!< Defaulted.
+    ~counting_agent_type() = default;                                       //!< Defaulted.
 
     /*!\brief Construct a counting_agent_type for an existing hierarchical_interleaved_bloom_filter.
      * \private
