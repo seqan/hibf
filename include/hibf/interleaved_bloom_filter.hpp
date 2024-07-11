@@ -188,6 +188,10 @@ private:
         return h;
     }
 
+    //!\brief Helper function to reduce code-duplication between emplace and emplace_exists.
+    template <bool check_exists>
+    inline auto emplace_impl(size_t const value, bin_index const bin) noexcept;
+
 public:
     class membership_agent_type; // documented upon definition below
     template <std::integral value_t>
@@ -231,8 +235,6 @@ public:
      * \param[in] value The raw numeric value to process.
      * \param[in] bin The bin index to insert into.
      *
-     * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
-     *
      * \details
      *
      * ### Example
@@ -241,10 +243,16 @@ public:
      */
     void emplace(size_t const value, bin_index const bin) noexcept;
 
+    /*!\brief Inserts a value into a specific bin and returns whether the value already existed.
+     * \param[in] value The raw numeric value to process.
+     * \param[in] bin The bin index to insert into.
+     * \returns `true` if the value already existed, `false` otherwise.
+     * \sa seqan::hibf::interleaved_bloom_filter::emplace
+    */
+    [[nodiscard]] bool emplace_exists(size_t const value, bin_index const bin) noexcept;
+
     /*!\brief Clears a specific bin.
      * \param[in] bin The bin index to clear.
-     *
-     * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
      *
      * \details
      *
@@ -258,8 +266,6 @@ public:
      * \tparam rng_t The type of the range. Must model std::ranges::forward_range and the reference type must be
      *               seqan::hibf::bin_index.
      * \param[in] bin_range The range of bins to clear.
-     *
-     * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
      *
      * \details
      *
@@ -287,7 +293,6 @@ public:
      * \param[in] new_bins_ The new number of bins.
      * \throws std::invalid_argument If passed number of bins is smaller than current number of bins.
      *
-     * \attention This function is only available for **uncompressed** Interleaved Bloom Filters.
      * \attention The new number of bins must be greater or equal to the current number of bins.
      * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::membership_agent_type constructed for
      * this Interleaved Bloom Filter.

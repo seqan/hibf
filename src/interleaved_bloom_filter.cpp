@@ -85,16 +85,39 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     }
 }
 
-void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
+template <bool check_exists>
+inline auto interleaved_bloom_filter::emplace_impl(size_t const value, bin_index const bin) noexcept
 {
     assert(bin.value < bins);
+
+    [[maybe_unused]] bool exists{true};
+
     for (size_t i = 0; i < hash_funs; ++i)
     {
         size_t idx = hash_and_fit(value, hash_seeds[i]);
         idx += bin.value;
         assert(idx < size());
-        (*this)[idx] = 1;
+
+        // Constructing the reference twice for emplace_exists would impact performance.
+        // No difference for emplace.
+        seqan::hibf::bit_vector::reference bit_reference{(*this)[idx]};
+        if constexpr (check_exists)
+            exists &= bit_reference;
+        bit_reference = 1;
     };
+
+    if constexpr (check_exists)
+        return exists;
+};
+
+void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
+{
+    return emplace_impl<false>(value, bin);
+}
+
+bool interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
+{
+    return emplace_impl<true>(value, bin);
 }
 
 void interleaved_bloom_filter::clear(bin_index const bin) noexcept

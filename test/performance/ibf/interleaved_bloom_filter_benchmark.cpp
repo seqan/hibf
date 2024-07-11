@@ -93,7 +93,8 @@ inline benchmark::Counter elements_per_second(size_t const count)
     return benchmark::Counter(count, benchmark::Counter::kIsIterationInvariantRate, benchmark::Counter::OneK::kIs1000);
 }
 
-void emplace_benchmark(::benchmark::State & state)
+template <bool check_exists>
+inline void emplace_benchmark_impl(::benchmark::State & state)
 {
     auto const & [values, original_ibf] = set_up(state);
 
@@ -107,15 +108,31 @@ void emplace_benchmark(::benchmark::State & state)
     for (auto _ : state)
     {
         size_t bin_index = 0u;
+        [[maybe_unused]] size_t result{};
         for (auto && chunk : seqan::stl::views::chunk(values, chunk_size))
         {
             for (auto value : chunk)
-                ibf.emplace(value, seqan::hibf::bin_index{bin_index});
+                if constexpr (check_exists)
+                    result += ibf.emplace_exists(value, seqan::hibf::bin_index{bin_index});
+                else
+                    ibf.emplace(value, seqan::hibf::bin_index{bin_index});
             ++bin_index;
         }
+        if constexpr (check_exists)
+            benchmark::DoNotOptimize(result);
     }
 
     state.counters["elements"] = elements_per_second(number_of_elements);
+}
+
+void emplace_benchmark(::benchmark::State & state)
+{
+    emplace_benchmark_impl<false>(state);
+}
+
+void emplace_exists_benchmark(::benchmark::State & state)
+{
+    emplace_benchmark_impl<true>(state);
 }
 
 void clear_benchmark(::benchmark::State & state)
@@ -193,6 +210,7 @@ void bulk_count_benchmark(::benchmark::State & state)
 }
 
 BENCHMARK(emplace_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(emplace_exists_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(clear_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(clear_range_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(bulk_contains_benchmark)->RangeMultiplier(2)->Range(64, 1024);
