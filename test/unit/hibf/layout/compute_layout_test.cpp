@@ -8,9 +8,10 @@
 #include <functional> // for function
 #include <vector>     // for vector, allocator
 
-#include <hibf/config.hpp>                  // for insert_iterator, config
-#include <hibf/layout/compute_layout.hpp>   // for compute_layout
-#include <hibf/layout/layout.hpp>           // for layout
+#include <hibf/config.hpp>                // for insert_iterator, config
+#include <hibf/layout/compute_layout.hpp> // for compute_layout
+#include <hibf/layout/layout.hpp>         // for layout
+#include <hibf/misc/iota_vector.hpp>
 #include <hibf/misc/timer.hpp>              // for concurrent_timer
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
 #include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
@@ -39,8 +40,12 @@ TEST(compute_layout, dispatch)
     seqan::hibf::concurrent_timer union_estimation_timer{};
     seqan::hibf::concurrent_timer rearrangement_timer{};
 
-    auto layout2 =
-        seqan::hibf::layout::compute_layout(config, kmer_counts, sketches, union_estimation_timer, rearrangement_timer);
+    auto layout2 = seqan::hibf::layout::compute_layout(config,
+                                                       kmer_counts,
+                                                       sketches,
+                                                       seqan::hibf::iota_vector(config.number_of_user_bins),
+                                                       union_estimation_timer,
+                                                       rearrangement_timer);
 
     EXPECT_TRUE(layout1 == layout2);
 }
