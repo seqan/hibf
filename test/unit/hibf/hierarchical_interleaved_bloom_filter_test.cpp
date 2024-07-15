@@ -293,6 +293,43 @@ TEST(hibf_test, counting_agent_different_bins)
     }
 }
 
+TEST(hibf_test, copy_agents)
+{
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
+
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const num, seqan::hibf::insert_iterator it)
+                               {
+                                   for (auto const hash : hashes[num])
+                                       it = hash;
+                               },
+                               .number_of_user_bins = 2};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
+
+    {
+        auto membership_agent1 = hibf.membership_agent();
+        auto membership_agent2 = membership_agent1;
+
+        auto & result1 = membership_agent1.membership_for(query, 2u);
+        membership_agent1.sort_results();
+        auto & result2 = membership_agent2.membership_for(query, 6u);
+        membership_agent2.sort_results();
+        EXPECT_RANGE_EQ(result1, (std::vector<size_t>{0u, 1u}));
+        EXPECT_RANGE_EQ(result2, (std::vector<size_t>{}));
+    }
+    {
+        auto counting_agent1 = hibf.counting_agent();
+        auto counting_agent2 = counting_agent1;
+        auto & result1 = counting_agent1.bulk_count(query, 1u);
+        auto & result2 = counting_agent2.bulk_count(query, 6u);
+        ASSERT_EQ(result1.size(), result2.size());
+        EXPECT_RANGE_EQ(result1, (std::vector<size_t>{5u, 5u}));
+        EXPECT_RANGE_EQ(result2, (std::vector<size_t>{0u, 0u}));
+    }
+}
+
 TEST(hibf_test, serialisation)
 {
     // range of range of sequences
