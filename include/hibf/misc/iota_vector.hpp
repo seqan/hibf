@@ -9,12 +9,14 @@
 
 #pragma once
 
-#include <cassert>
-#include <limits>
-#include <numeric>
-#include <vector>
+#include <cassert>  // for assert
+#include <concepts> // for unsigned_integral
+#include <cstddef>  // for size_t
+#include <limits>   // for numeric_limits
+#include <numeric>  // for iota
+#include <vector>   // for vector
 
-#include <hibf/platform.hpp>
+#include <hibf/platform.hpp> // for HIBF_CONSTEXPR_VECTOR
 
 namespace seqan::hibf
 {
