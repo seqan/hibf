@@ -16,6 +16,7 @@ set (HIBF_SOURCE_FILES
      misc/print.cpp
      sketch/toolbox.cpp
      sketch/hyperloglog.cpp
+     sketch/minhashes.cpp
      build/insert_into_ibf.cpp
      build/compute_kmers.cpp
      build/construct_ibf.cpp)
