@@ -9,6 +9,7 @@
 
 #include <hibf/config.hpp>             // for config
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/sketch/minhashes.hpp>   // for minhash
 
 namespace seqan::hibf::sketch
 {
@@ -17,10 +18,21 @@ namespace seqan::hibf::sketch
  * \ingroup hibf_layout
  * \param[in] config The configuration to compute the layout with.
  * \param[in,out] kmer_counts The vector that will store the kmer counts (estimations).
- * \param[in,out] sketches The vector that will store the sketches.
+ * \param[in,out] hll_sketches The vector that will store the sketches.
  */
 void compute_sketches(config const & config,
                       std::vector<size_t> & kmer_counts,
-                      std::vector<sketch::hyperloglog> & sketches);
+                      std::vector<sketch::hyperloglog> & hll_sketches);
+
+//!\overload
+void compute_sketches(config const & config,
+                      std::vector<sketch::hyperloglog> & hll_sketches,
+                      std::vector<sketch::minhashes> & minhash_sketches);
+
+//!\overload
+void compute_sketches(config const & config,
+                      std::vector<size_t> & kmer_counts,
+                      std::vector<sketch::hyperloglog> & hll_sketches,
+                      std::vector<sketch::minhashes> & minhash_sketches);
 
 } // namespace seqan::hibf::sketch

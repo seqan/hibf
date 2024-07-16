@@ -42,7 +42,7 @@ void PrintTo(t const & value, std::ostream * out)
 namespace seqan::hibf::test
 {
 
-#define EXPECT_RANGE_EQ(val1, val2) EXPECT_PRED_FORMAT2(::seqan::hibf::test::expect_range_eq{}, val1, val2);
+#define EXPECT_RANGE_EQ(val1, val2) EXPECT_PRED_FORMAT2(::seqan::hibf::test::expect_range_eq{}, val1, val2)
 
 struct expect_range_eq
 {
