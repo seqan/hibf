@@ -2,9 +2,16 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h>
+#include <benchmark/benchmark.h> // for BENCHMARK_TEMPLATE, Benchmark, State
 
-#include <hibf/sketch/compute_sketches.hpp>
+#include <cinttypes> // for uint8_t
+#include <cstddef>   // for size_t
+#include <vector>    // for vector
+
+#include <hibf/config.hpp>                  // for config, insert_iterator
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/sketch/minhashes.hpp>        // for minhashes
 
 enum class sketch : uint8_t
 {

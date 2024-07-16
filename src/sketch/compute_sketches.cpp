@@ -2,18 +2,25 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <atomic>
+#include <algorithm>  // for __fn, sort_heap, fill, make_heap
+#include <atomic>     // for atomic_flag
+#include <cassert>    // for assert
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
-#include <functional> // for function
-#include <span>       // for vector
-#include <vector>     // for vector
+#include <functional> // for equal_to, function
+#include <limits>     // for numeric_limits
+#include <span>       // for span
+#include <stdexcept>  // for runtime_error
+#include <string>     // for char_traits, operator+, to_string
+#include <utility>    // for move
+#include <vector>     // for vector, allocator
 
 #include <hibf/config.hpp>                      // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>          // for unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>          // for hash, unordered_flat_set
 #include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
 #include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 #include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
+#include <hibf/sketch/minhashes.hpp>            // for minhashes
 
 namespace seqan::hibf::sketch
 {

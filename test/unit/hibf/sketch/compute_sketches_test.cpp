@@ -2,16 +2,19 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest-spi.h>
-#include <gtest/gtest.h> // for Test, Message, TestPartResult, EXPECT_EQ, TestInfo, ASSERT_EQ
+#include <gtest/gtest.h> // for Message, TestPartResult, TestInfo, AssertionResult, ASSERT_EQ
 
-#include <cinttypes> // for uint64_t
-#include <cstddef>   // for size_t
-#include <random>    // for uniform_int_distribution, mt19937_64
-#include <vector>    // for allocator, vector
+#include <cstddef>    // for size_t
+#include <functional> // for function
+#include <ranges>     // for __fn, iota, views
+#include <stdexcept>  // for runtime_error
+#include <vector>     // for vector
 
-#include <hibf/sketch/compute_sketches.hpp>
-#include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/config.hpp>                  // for config, insert_iterator
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/sketch/minhashes.hpp>        // for minhashes
+#include <hibf/test/expect_range_eq.hpp>    // for expect_range_eq, EXPECT_RANGE_EQ
 
 class compute_sketches_test : public ::testing::Test
 {

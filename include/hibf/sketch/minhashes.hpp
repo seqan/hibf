@@ -9,9 +9,10 @@
 
 #pragma once
 
-#include <cstdint>
-#include <span>
-#include <vector>
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t
+#include <span>    // for span
+#include <vector>  // for vector
 
 #include <hibf/platform.hpp>
 

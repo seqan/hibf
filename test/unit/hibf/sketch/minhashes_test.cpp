@@ -2,10 +2,18 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, Message, TestInfo, TestPartResult, TEST, EXPECT_EQ
+#include <gtest/gtest.h> // for AssertionResult, Message, Test, TestPartResult, EXPECT_FALSE, TestInfo
+
+#include <algorithm> // for __fn, equal, make_heap
+#include <cinttypes> // for uint64_t
+#include <cstddef>   // for size_t
+#include <ranges>    // for __fn, iota, views
+#include <span>      // for span
+#include <utility>   // for move
+#include <vector>    // for vector
 
 #include <hibf/misc/iota_vector.hpp>     // for iota_vector
-#include <hibf/sketch/minhashes.hpp>     // for minhash
+#include <hibf/sketch/minhashes.hpp>     // for minhashes
 #include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(minhashes_test, ctor)
