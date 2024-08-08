@@ -14,6 +14,7 @@
 #include <hibf/misc/iota_vector.hpp>
 #include <hibf/misc/timer.hpp>              // for concurrent_timer
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/estimate_kmer_counts.hpp>
 #include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 
 TEST(compute_layout, dispatch)
@@ -33,7 +34,9 @@ TEST(compute_layout, dispatch)
     std::vector<seqan::hibf::sketch::hyperloglog> sketches;
     std::vector<size_t> kmer_counts;
 
-    seqan::hibf::sketch::compute_sketches(config, kmer_counts, sketches);
+    seqan::hibf::sketch::compute_sketches(config, sketches);
+    kmer_counts.resize(sketches.size());
+    seqan::hibf::sketch::estimate_kmer_counts(sketches, kmer_counts);
 
     auto layout1 = seqan::hibf::layout::compute_layout(config, kmer_counts, sketches);
 
