@@ -18,6 +18,7 @@
 #include <vector>    // for vector
 
 #include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/platform.hpp>
