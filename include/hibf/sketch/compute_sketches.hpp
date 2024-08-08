@@ -20,8 +20,7 @@ namespace seqan::hibf::sketch
  * \param[in,out] kmer_counts The vector that will store the kmer counts (estimations).
  * \param[in,out] hll_sketches The vector that will store the sketches.
  */
-void compute_sketches(config const & config,
-                      std::vector<sketch::hyperloglog> & hll_sketches);
+void compute_sketches(config const & config, std::vector<sketch::hyperloglog> & hll_sketches);
 
 //!\overload
 void compute_sketches(config const & config,

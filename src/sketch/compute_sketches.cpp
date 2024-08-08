@@ -25,8 +25,7 @@
 namespace seqan::hibf::sketch
 {
 
-void compute_sketches(config const & config,
-                      std::vector<sketch::hyperloglog> & hll_sketches)
+void compute_sketches(config const & config, std::vector<sketch::hyperloglog> & hll_sketches)
 {
     // compute hll_sketches
     hll_sketches.resize(config.number_of_user_bins);
