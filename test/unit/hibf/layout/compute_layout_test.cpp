@@ -15,7 +15,7 @@
 #include <hibf/misc/timer.hpp>              // for concurrent_timer
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
 #include <hibf/sketch/estimate_kmer_counts.hpp>
-#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 TEST(compute_layout, dispatch)
 {
