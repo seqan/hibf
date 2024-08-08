@@ -80,9 +80,8 @@ public:
 
 TEST_F(compute_sketches_test, hyperloglog_and_kmer_counts)
 {
-    seqan::hibf::sketch::compute_sketches(this->config, this->kmer_counts, this->hyperloglog_sketches);
+    seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches);
 
-    this->check_kmer_counts();
     this->check_hyperloglog_sketches();
 }
 

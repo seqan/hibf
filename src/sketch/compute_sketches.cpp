@@ -26,12 +26,10 @@ namespace seqan::hibf::sketch
 {
 
 void compute_sketches(config const & config,
-                      std::vector<size_t> & kmer_counts,
                       std::vector<sketch::hyperloglog> & hll_sketches)
 {
     // compute hll_sketches
     hll_sketches.resize(config.number_of_user_bins);
-    kmer_counts.resize(config.number_of_user_bins);
 
     robin_hood::unordered_flat_set<uint64_t> kmers;
 #pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers)
@@ -47,8 +45,6 @@ void compute_sketches(config const & config,
 
         hll_sketches[i] = std::move(hll_sketch);
     }
-
-    sketch::estimate_kmer_counts(hll_sketches, kmer_counts);
 }
 
 /*!\brief Encapsulates handling of too few kmers to compute minHash sketches.
