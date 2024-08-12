@@ -32,7 +32,8 @@
 #include <hibf/misc/iota_vector.hpp>
 #include <hibf/misc/timer.hpp>              // for concurrent_timer
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
-#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/sketch/estimate_kmer_counts.hpp>
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf
 {
@@ -204,10 +205,12 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
 {
     configuration.validate_and_set_defaults();
 
-    std::vector<size_t> kmer_counts{};
     std::vector<sketch::hyperloglog> sketches{};
+    std::vector<size_t> kmer_counts{};
+
     layout_compute_sketches_timer.start();
-    sketch::compute_sketches(configuration, kmer_counts, sketches);
+    sketch::compute_sketches(configuration, sketches);
+    hibf::sketch::estimate_kmer_counts(sketches, kmer_counts);
     layout_compute_sketches_timer.stop();
 
     // If rearrangement is enabled, i.e. seqan::hibf::config::disable_rearrangement is false:

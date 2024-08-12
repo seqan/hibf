@@ -31,7 +31,6 @@ void compute_sketches(benchmark::State & state)
             it = i;
     };
 
-    std::vector<size_t> kmer_counts;
     [[maybe_unused]] std::vector<seqan::hibf::sketch::minhashes> minhash_sketches;
     std::vector<seqan::hibf::sketch::hyperloglog> hyperloglog_sketches;
 
@@ -43,9 +42,9 @@ void compute_sketches(benchmark::State & state)
     for (auto _ : state)
     {
         if constexpr (sketch_t == sketch::MinHashes)
-            seqan::hibf::sketch::compute_sketches(config, kmer_counts, hyperloglog_sketches, minhash_sketches);
+            seqan::hibf::sketch::compute_sketches(config, hyperloglog_sketches, minhash_sketches);
         else
-            seqan::hibf::sketch::compute_sketches(config, kmer_counts, hyperloglog_sketches);
+            seqan::hibf::sketch::compute_sketches(config, hyperloglog_sketches);
     }
 }
 
