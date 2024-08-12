@@ -159,14 +159,4 @@ void compute_sketches(config const & config,
     too_few_kmers.check_and_throw();
 }
 
-void compute_sketches(config const & config,
-                      std::vector<size_t> & kmer_counts,
-                      std::vector<sketch::hyperloglog> & hll_sketches,
-                      std::vector<sketch::minhashes> & minhash_sketches)
-{
-    compute_sketches(config, hll_sketches, minhash_sketches);
-    kmer_counts.resize(config.number_of_user_bins);
-    sketch::estimate_kmer_counts(hll_sketches, kmer_counts);
-}
-
 } // namespace seqan::hibf::sketch

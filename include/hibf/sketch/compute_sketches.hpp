@@ -26,10 +26,4 @@ void compute_sketches(config const & config,
                       std::vector<sketch::hyperloglog> & hll_sketches,
                       std::vector<sketch::minhashes> & minhash_sketches);
 
-//!\overload
-void compute_sketches(config const & config,
-                      std::vector<size_t> & kmer_counts,
-                      std::vector<sketch::hyperloglog> & hll_sketches,
-                      std::vector<sketch::minhashes> & minhash_sketches);
-
 } // namespace seqan::hibf::sketch
