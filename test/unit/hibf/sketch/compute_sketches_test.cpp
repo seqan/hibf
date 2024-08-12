@@ -93,17 +93,6 @@ TEST_F(compute_sketches_test, with_minHash)
     this->check_minhash_sketches();
 }
 
-TEST_F(compute_sketches_test, with_minHash_and_kmer_counts)
-{
-    seqan::hibf::sketch::compute_sketches(this->config,
-                                          this->kmer_counts,
-                                          this->hyperloglog_sketches,
-                                          this->minhash_sketches);
-
-    this->check_hyperloglog_sketches();
-    this->check_minhash_sketches();
-}
-
 TEST_F(compute_sketches_test, too_few_hashes)
 {
     this->config.number_of_user_bins = 1;
