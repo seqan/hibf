@@ -12,13 +12,13 @@
 #pragma once
 
 #include <array>     // for array
-#include <cinttypes> // for uint64_t, uint8_t
+#include <cinttypes> // for uint64_t, uint8_t, uint32_t
 #include <cstddef>   // for size_t
 #include <iosfwd>    // for istream, ostream
 #include <vector>    // for vector
 
-#include <cereal/cereal.hpp>
-#include <cereal/types/vector.hpp>
+#include <cereal/access.hpp> // for access
+#include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/platform.hpp>

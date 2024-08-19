@@ -10,11 +10,12 @@
 #pragma once
 
 #include <cstddef> // for size_t
-#include <cstdint> // for uint64_t
+#include <cstdint> // for uint64_t, uint32_t
 #include <span>    // for span
 #include <vector>  // for vector
 
-#include <cereal/cereal.hpp>
+#include <cereal/access.hpp> // for access
+#include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
 #include <hibf/platform.hpp>
 
