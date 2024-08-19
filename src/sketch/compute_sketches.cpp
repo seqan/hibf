@@ -11,16 +11,15 @@
 #include <limits>     // for numeric_limits
 #include <span>       // for span
 #include <stdexcept>  // for runtime_error
-#include <string>     // for char_traits, operator+, to_string
+#include <string>     // for allocator, char_traits, operator+, to_string
 #include <utility>    // for move
-#include <vector>     // for vector, allocator
+#include <vector>     // for vector
 
-#include <hibf/config.hpp>                      // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>          // for hash, unordered_flat_set
-#include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
-#include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
-#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
-#include <hibf/sketch/minhashes.hpp>            // for minhashes
+#include <hibf/config.hpp>                  // for config, insert_iterator
+#include <hibf/contrib/robin_hood.hpp>      // for hash, unordered_flat_set
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/sketch/minhashes.hpp>        // for minhashes
 
 namespace seqan::hibf::sketch
 {
