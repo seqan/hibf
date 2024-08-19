@@ -134,7 +134,7 @@ private:
     template <typename archive_t>
     void serialize(archive_t & archive)
     {
-        uint32_t version{2};
+        uint32_t version{1};
         archive(CEREAL_NVP(version));
 
         archive(CEREAL_NVP(bits));
