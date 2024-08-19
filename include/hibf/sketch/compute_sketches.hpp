@@ -4,12 +4,11 @@
 
 #pragma once
 
-#include <cstddef> // for size_t
-#include <vector>  // for vector
+#include <vector> // for vector
 
 #include <hibf/config.hpp>             // for config
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
-#include <hibf/sketch/minhashes.hpp>   // for minhash
+#include <hibf/sketch/minhashes.hpp>   // for minhashes
 
 namespace seqan::hibf::sketch
 {
