@@ -10,7 +10,6 @@ SPDX-License-Identifier: BSD-3-Clause
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     $navpath
-    ${HIBF_FOOTER_HTML_OPTION_POWERED_BY_VERCEL}
     <li class="footer">$generatedby <a href="https://www.doxygen.org/index.html"><img class="footer" src="$relpath^doxygen.svg" width="104" height="31" alt="doxygen"/></a> $doxygenversion </li>
   </ul>
 </div>

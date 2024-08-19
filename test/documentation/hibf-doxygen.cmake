@@ -29,20 +29,6 @@ set (HIBF_FOOTER_HTML_IN ${HIBF_DOXYGEN_INPUT_DIR}/hibf_footer.html.in)
 # DoxygenLayout.xml.in is created by hibf-doxygen-layout.cmake
 set (HIBF_LAYOUT_IN ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in)
 
-option (HIBF_VERCEL_PREVIEW_DOC "Is this a preview build by vercel.com?" OFF)
-
-set (HIBF_DOXYGEN_EXTERNAL_SEARCH "NO")
-
-if (HIBF_VERCEL_PREVIEW_DOC)
-    set (HIBF_DOXYGEN_EXTERNAL_SEARCH "YES")
-    set (HIBF_DOXYGEN_DOT_NUM_THREADS "2")
-    set (HIBF_DOXYFILE_OPTION_POWERED_BY_VERCEL
-         "HTML_EXTRA_FILES       += ${HIBF_DOXYGEN_SOURCE_DIR}/test/documentation/.vercel/powered-by-vercel.svg")
-    set (HIBF_FOOTER_HTML_OPTION_POWERED_BY_VERCEL
-         "<li class='footer'><a href='https://vercel.com/?utm_source=seqan&utm_campaign=oss'><img class='footer' src='$relpath^powered-by-vercel.svg' height='31' alt='Powered by Vercel' style='width:unset;'/></a></li>"
-    )
-endif ()
-
 ### Download and extract cppreference-doxygen-web.tag.xml for std:: documentation links
 set (HIBF_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.tag.xml")
 include (ExternalProject)

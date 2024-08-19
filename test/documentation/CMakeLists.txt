@@ -69,8 +69,11 @@ install (DIRECTORY "${HIBF_DOXYGEN_OUTPUT_DIR}/html"
 enable_testing ()
 
 message (STATUS "Adding docs test.")
+add_test (NAME cppreference-doxygen-web-tag COMMAND ${CMAKE_COMMAND} --build ${CMAKE_BINARY_DIR} --target
+                                                    download-cppreference-doxygen-web-tag)
 add_test (NAME docs_no_warnings_test
           COMMAND bash -c "${HIBF_TEST_DOXYGEN_FAIL_ON_WARNINGS}"
           WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
+set_tests_properties (docs_no_warnings_test PROPERTIES DEPENDS cppreference-doxygen-web-tag)
 
 include (hibf-doxygen-package.cmake)

@@ -162,8 +162,3 @@ int main()
 <!-- The below code snippet is automatically added from ./test/snippet/readme.cpp -->
 <!-- MARKDOWN-AUTO-DOCS:END -->
 
-## Sponsorships
-
-[![Vercel](https://raw.githubusercontent.com/seqan/hibf/main/test/documentation/.vercel/powered-by-vercel.svg)](https://vercel.com/?utm_source=seqan&utm_campaign=oss)
-
-Vercel is kind enough to sponsor our documentation preview-builds within our pull requests. Check them out!
