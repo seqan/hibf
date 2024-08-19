@@ -17,6 +17,9 @@
 #include <iosfwd>    // for istream, ostream
 #include <vector>    // for vector
 
+#include <cereal/cereal.hpp>
+#include <cereal/types/vector.hpp>
+
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/platform.hpp>
 
@@ -125,6 +128,21 @@ private:
     double normalization_factor{};
     //!\brief Internal data. Also called register in publications.
     std::vector<uint8_t, seqan::hibf::contrib::aligned_allocator<uint8_t, 32u>> data{};
+
+    friend class cereal::access;
+
+    template <typename archive_t>
+    void serialize(archive_t & archive)
+    {
+        uint32_t version{1};
+        archive(CEREAL_NVP(version));
+
+        archive(CEREAL_NVP(bits));
+        archive(CEREAL_NVP(size));
+        archive(CEREAL_NVP(rank_mask));
+        archive(CEREAL_NVP(normalization_factor));
+        archive(CEREAL_NVP(data));
+    }
 };
 
 } // namespace seqan::hibf::sketch

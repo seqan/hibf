@@ -14,6 +14,8 @@
 #include <span>    // for span
 #include <vector>  // for vector
 
+#include <cereal/cereal.hpp>
+
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::sketch
@@ -59,6 +61,19 @@ struct minhashes
 
     //!\brief Pushes `value` to the heap if it is smaller than the current largest element.
     static void push_to_heap_if_smaller(uint64_t const value, std::vector<uint64_t> & heap);
+
+private:
+    friend class cereal::access;
+
+    template <typename archive_t>
+    void serialize(archive_t & archive)
+    {
+        uint32_t version{1};
+        archive(CEREAL_NVP(version));
+
+        // other members are const static currently
+        archive(CEREAL_NVP(table));
+    }
 };
 
 } // namespace seqan::hibf::sketch
