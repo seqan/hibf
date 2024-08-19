@@ -14,9 +14,10 @@
 #include <cereal/archives/json.hpp> // for JSONInputArchive, JSONOutputArchive
 #include <cereal/cereal.hpp>        // for make_nvp, InputArchive, OutputArchive
 
-#include <hibf/config.hpp>                   // for config
-#include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start
-#include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
+#include <hibf/config.hpp>                      // for config
+#include <hibf/layout/prefixes.hpp>             // for meta_header, meta_hibf_config_end, meta_hibf_config_start
+#include <hibf/misc/empty_bins_by_fraction.hpp> // for empty_bins_by_fraction
+#include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
 
 namespace seqan::hibf
 {
@@ -63,6 +64,9 @@ void config::write_to(std::ostream & stream) const
 
 void config::validate_and_set_defaults()
 {
+    if (validated)
+        return;
+
     if (!input_fn)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::input_fn."};
 
@@ -111,6 +115,11 @@ void config::validate_and_set_defaults()
                   << "anyway, so we increased your number of technical bins to " << tmax << ".\n";
     }
 
+    if (empty_bin_fraction < 0.0 || empty_bin_fraction >= 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0)."};
+
+    tmax -= empty_bins_by_fraction(tmax, empty_bin_fraction);
+
     if (alpha < 0.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};
 
@@ -119,6 +128,8 @@ void config::validate_and_set_defaults()
 
     if (disable_estimate_union || max_rearrangement_ratio == 0.0)
         disable_rearrangement = true;
+
+    validated = true;
 }
 
 } // namespace seqan::hibf

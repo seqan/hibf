@@ -41,7 +41,7 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
         seqan::hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
         for (size_t const value : chunk)
-            ibf.emplace(value, bin_idx);
+            ibf.emplace_exists(value, bin_idx);
     }
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
@@ -63,7 +63,7 @@ void insert_into_ibf(build_data const & data,
     serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     for (auto && value : values)
-        ibf.emplace(value, bin_index);
+        ibf.emplace_exists(value, bin_index);
     local_fill_ibf_timer.stop();
     data.fill_ibf_timer += local_fill_ibf_timer;
 }

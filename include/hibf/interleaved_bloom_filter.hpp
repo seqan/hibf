@@ -22,6 +22,7 @@
 
 #include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/base_class.hpp> // for base_class
+#include <cereal/types/vector.hpp>     // for vector
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive
 #include <hibf/config.hpp>                    // for config
@@ -190,7 +191,7 @@ private:
 
     //!\brief Helper function to reduce code-duplication between emplace and emplace_exists.
     template <bool check_exists>
-    inline auto emplace_impl(size_t const value, bin_index const bin) noexcept;
+    inline void emplace_impl(size_t const value, bin_index const bin) noexcept;
 
 public:
     class membership_agent_type; // documented upon definition below
@@ -246,10 +247,9 @@ public:
     /*!\brief Inserts a value into a specific bin and returns whether the value already existed.
      * \param[in] value The raw numeric value to process.
      * \param[in] bin The bin index to insert into.
-     * \returns `true` if the value already existed, `false` otherwise.
      * \sa seqan::hibf::interleaved_bloom_filter::emplace
     */
-    [[nodiscard]] bool emplace_exists(size_t const value, bin_index const bin) noexcept;
+    void emplace_exists(size_t const value, bin_index const bin) noexcept;
 
     /*!\brief Clears a specific bin.
      * \param[in] bin The bin index to clear.
@@ -281,7 +281,7 @@ public:
                       "The reference type of the range to clear must be seqan::hibf::bin_index.");
 #ifndef NDEBUG
         for (auto && bin : bin_range)
-            assert(bin.value < bins);
+            assert(bin.value < technical_bins);
 #endif // NDEBUG
 
         for (size_t offset = 0, i = 0; i < bin_size_; offset += technical_bins, ++i)
@@ -289,8 +289,14 @@ public:
                 (*this)[bin.value + offset] = 0;
     }
 
+    /*!\brief Sets the number of bins stored in the Interleaved Bloom Filter.
+     * \param[in] new_bin_count The new number of bins.
+     * \returns `true` if the number of bins was set, `false` if the number of bins was not set.
+     */
+    bool set_bin_count(bin_count const new_bin_count);
+
     /*!\brief Increases the number of bins stored in the Interleaved Bloom Filter.
-     * \param[in] new_bins_ The new number of bins.
+     * \param[in] new_bin_count The new number of bins.
      * \throws std::invalid_argument If passed number of bins is smaller than current number of bins.
      *
      * \attention The new number of bins must be greater or equal to the current number of bins.
@@ -311,7 +317,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
-    void increase_bin_number_to(bin_count const new_bins_);
+    void increase_bin_number_to(bin_count const new_bin_count);
     //!\}
 
     /*!\name Lookup
@@ -367,6 +373,12 @@ public:
         return bins;
     }
 
+    //!\brief Sets the number of bins to a new value.
+    void overwrite_bin_count(size_t const new_count) noexcept
+    {
+        bins = new_count;
+    }
+
     /*!\brief Returns the size of a single bin that the Interleaved Bloom Filter manages.
      * \returns The size in bits of a single bin.
      */
@@ -387,7 +399,7 @@ public:
     /*!\name Comparison operators
      * \{
      */
-    constexpr bool operator==(interleaved_bloom_filter const &) const = default;
+    HIBF_CONSTEXPR_VECTOR bool operator==(interleaved_bloom_filter const &) const = default;
     //!\}
 
     /*!\name Access
@@ -402,6 +414,9 @@ public:
      */
     using base_t::data;
     //!\}
+
+    std::vector<size_t> occupancy{};
+    bit_vector occupied_bins{};
 
     /*!\cond DEV
      * \brief Serialisation support function.
@@ -420,6 +435,8 @@ public:
         archive(bin_words);
         archive(hash_funs);
         archive(cereal::base_class<base_t>(this));
+        archive(occupancy);
+        archive(occupied_bins);
     }
     //!\endcond
 };
