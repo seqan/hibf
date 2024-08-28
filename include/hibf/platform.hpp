@@ -66,13 +66,9 @@
 // ============================================================================
 
 #if HIBF_COMPILER_IS_GCC
-#    if (__GNUC__ < 11)
-#        error "At least GCC 11 is needed."
-#    endif // (__GNUC__ < 11)
-
-#    if (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
-#        pragma warning "Be aware that GCC < 11.4 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
+#    if (__GNUC__ < 12)
+#        error "At least GCC 12 is needed."
+#    endif // (__GNUC__ < 12)
 
 #    if (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
 #        pragma warning "Be aware that GCC < 12.3 might have bugs that cause compile failure."
@@ -100,10 +96,9 @@
 #endif
 
 // C++ standard [required]
-// Note: gcc10 -std=c++20 still defines __cplusplus=201709
 #ifdef __cplusplus
-#    if (__cplusplus < 201709)
-#        error "C++20 is required, make sure that you have set -std=c++20."
+#    if (__cplusplus < 202100)
+#        error "C++23 is required, make sure that you have set -std=c++23."
 #    endif
 #else
 #    error "This is not a C++ compiler."
