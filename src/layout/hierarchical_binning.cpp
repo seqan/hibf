@@ -54,13 +54,13 @@ size_t hierarchical_binning::execute()
     }
 
     // technical bins (outer) = rows; user bins (inner) = columns
-    std::vector<std::vector<size_t>> matrix(num_technical_bins, std::vector<size_t>(num_user_bins, max_size_t));
+    md_vector<size_t> matrix(num_technical_bins, std::vector<size_t>(num_user_bins, max_size_t));
 
     // technical bins (outer) = rows; user bins (inner) = columns
-    std::vector<std::vector<size_t>> ll_matrix(num_technical_bins, std::vector<size_t>(num_user_bins, 0u));
+    md_vector<size_t> ll_matrix(num_technical_bins, std::vector<size_t>(num_user_bins, 0u));
 
     // technical bins (outer) = rows; user bins (inner) = columns
-    std::vector<std::vector<std::pair<size_t, size_t>>> trace(
+    md_vector<std::pair<size_t, size_t>> trace(
         num_technical_bins,
         std::vector<std::pair<size_t, size_t>>(num_user_bins, {max_size_t, max_size_t}));
 
@@ -87,9 +87,9 @@ size_t hierarchical_binning::execute()
     return static_cast<size_t>(std::ceil(levels));
 }
 
-void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & matrix,
-                                          std::vector<std::vector<size_t>> & ll_matrix,
-                                          std::vector<std::vector<std::pair<size_t, size_t>>> & trace)
+void hierarchical_binning::initialization(md_vector<size_t> & matrix,
+                                          md_vector<size_t> & ll_matrix,
+                                          md_vector<std::pair<size_t, size_t>> & trace)
 {
     assert(data != nullptr);
 
@@ -99,8 +99,8 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
     for (size_t i = 0; i < num_technical_bins; ++i)
     {
         size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
-        matrix[i][0] = divide_and_ceil(corrected_ub_cardinality, i + 1u);
-        trace[i][0] = {0u, 0u}; // unnecessary?
+        matrix[i, 0] = divide_and_ceil(corrected_ub_cardinality, i + 1u);
+        trace[i, 0] = {0u, 0u}; // unnecessary?
     }
 
     // initialize first row
@@ -118,9 +118,9 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
         for (size_t j = 1; j < num_user_bins; ++j)
         {
             sum += (*data->kmer_counts)[data->positions[j]];
-            matrix[0][j] = data->union_estimates[j];
-            ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
-            trace[0][j] = {0u, j - 1}; // unnecessary?
+            matrix[0, j] = data->union_estimates[j];
+            ll_matrix[0, j] = max_merge_levels(j + 1) * sum;
+            trace[0, j] = {0u, j - 1}; // unnecessary?
         }
     }
     else
@@ -130,16 +130,16 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
             assert(j < data->positions.size());
             assert(data->positions[j] < data->kmer_counts->size());
             sum += (*data->kmer_counts)[data->positions[j]];
-            matrix[0][j] = sum;
-            ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
-            trace[0][j] = {0u, j - 1}; // unnecessary?
+            matrix[0, j] = sum;
+            ll_matrix[0, j] = max_merge_levels(j + 1) * sum;
+            trace[0, j] = {0u, j - 1}; // unnecessary?
         }
     }
 }
 
-void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
-                                     std::vector<std::vector<size_t>> & ll_matrix,
-                                     std::vector<std::vector<std::pair<size_t, size_t>>> & trace)
+void hierarchical_binning::recursion(md_vector<size_t> & matrix,
+                                     md_vector<size_t> & ll_matrix,
+                                     md_vector<std::pair<size_t, size_t>> & trace)
 {
     assert(data != nullptr);
 
@@ -182,8 +182,8 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 size_t const corrected_ub_cardinality =
                     static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
                 size_t score =
-                    std::max<size_t>(divide_and_ceil(corrected_ub_cardinality, i - i_prime), matrix[i_prime][j - 1]);
-                size_t full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_matrix[i_prime][j - 1];
+                    std::max<size_t>(divide_and_ceil(corrected_ub_cardinality, i - i_prime), matrix[i_prime, j - 1]);
+                size_t full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_matrix[i_prime, j - 1];
 
                 // std::cout << " ++ j:" << j << " i:" << i << " i':" << i_prime << " score:" << score << std::endl;
 
@@ -191,14 +191,14 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 {
                     minimum = score;
                     full_minimum = full_score;
-                    trace[i][j] = {i_prime, j - 1};
-                    ll_matrix[i][j] = ll_matrix[i_prime][j - 1];
+                    trace[i, j] = {i_prime, j - 1};
+                    ll_matrix[i, j] = ll_matrix[i_prime, j - 1];
                 }
             }
 
             // seqan3::debug_stream << "current vertical minimum of " << "j:" << j << " i:" << i
             //                      << " -> score:" << full_minimum << " (M_ij=" << minimum << ")"
-            //                      << " trace:" << trace[i][j]
+            //                      << " trace:" << trace[i, j]
             //                      << std::endl;
 
             // check horizontal cells
@@ -216,7 +216,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
 
             // if the user bin j-1 was not split into multiple technical bins!
             // I may merge the current user bin j into the former
-            while (j_prime != 0 && ((i - trace[i][j_prime].first) < 2) && get_weight() < minimum)
+            while (j_prime != 0 && ((i - trace[i, j_prime].first) < 2) && get_weight() < minimum)
             {
                 weight += (*data->kmer_counts)[data->positions[j_prime]];
                 --j_prime;
@@ -224,8 +224,8 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 // score: The current maximum technical bin size for the high-level IBF (score for the matrix M)
                 // ll_kmers: estimate for the number of k-mers that have to be resolved on lower levels
                 // full_score: The score to minimize -> score * #TB-high_level + low_level_memory footprint
-                size_t const score = std::max<size_t>(matrix[i - 1][j_prime], get_weight());
-                size_t const ll_kmers = ll_matrix[i - 1][j_prime] + max_merge_levels(j - j_prime) * weight;
+                size_t const score = std::max<size_t>(matrix[i - 1, j_prime], get_weight());
+                size_t const ll_kmers = ll_matrix[i - 1, j_prime] + max_merge_levels(j - j_prime) * weight;
                 size_t const full_score = score * (i + 1) /*#TBs*/ + config.alpha * ll_kmers;
 
                 // seqan3::debug_stream << " -- " << "j_prime:" << j_prime
@@ -236,12 +236,12 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 {
                     minimum = score;
                     full_minimum = full_score;
-                    trace[i][j] = {i - 1, j_prime};
-                    ll_matrix[i][j] = ll_kmers;
+                    trace[i, j] = {i - 1, j_prime};
+                    ll_matrix[i, j] = ll_kmers;
                 }
             }
 
-            matrix[i][j] = minimum;
+            matrix[i, j] = minimum;
         }
     }
 }
@@ -307,7 +307,7 @@ void hierarchical_binning::backtrack_split_bin(size_t trace_j,
     // std::cout << "split " << trace_j << " into " << number_of_bins << ": " << cardinality_per_bin << std::endl;
 }
 
-size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace)
+size_t hierarchical_binning::backtracking(md_vector<std::pair<size_t, size_t>> const & trace)
 {
     assert(data != nullptr);
 
@@ -323,8 +323,8 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
     while (trace_j > 0u && trace_i > 0u)
     {
         // std::cout << "\t I am now at " << trace_i << "," << trace_j << std::endl;
-        size_t next_i = trace[trace_i][trace_j].first;
-        size_t next_j = trace[trace_i][trace_j].second;
+        size_t next_i = trace[trace_i, trace_j].first;
+        size_t next_j = trace[trace_i, trace_j].second;
 
         size_t number_of_bins = (trace_i - next_i);
 
@@ -339,7 +339,7 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         {
             backtrack_split_bin(trace_j, number_of_bins, bin_id, max_tracker);
 
-            trace_i = trace[trace_i][trace_j].first;
+            trace_i = trace[trace_i, trace_j].first;
             --trace_j;
         }
 

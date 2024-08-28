@@ -13,7 +13,8 @@
 #include <hibf/build/bin_size_in_bits.hpp> // for bin_size_in_bits
 #include <hibf/config.hpp>                 // for config
 #include <hibf/layout/data_store.hpp>      // for data_store
-#include <hibf/platform.hpp>               // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/misc/md_vector.hpp>
+#include <hibf/platform.hpp> // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace seqan::hibf::layout
 {
@@ -140,9 +141,9 @@ private:
      *
      * \image html hierarchical_dp_init.png
      */
-    void initialization(std::vector<std::vector<size_t>> & matrix,
-                        std::vector<std::vector<size_t>> & ll_matrix,
-                        std::vector<std::vector<std::pair<size_t, size_t>>> & trace);
+    void initialization(md_vector<size_t> & matrix,
+                        md_vector<size_t> & ll_matrix,
+                        md_vector<std::pair<size_t, size_t>> & trace);
 
     /*!\brief Performs the recursion.
      *
@@ -182,9 +183,8 @@ private:
      * this algorithm. It would be too computational intensive to compute the splitting for every possibility.
      *
      */
-    void recursion(std::vector<std::vector<size_t>> & matrix,
-                   std::vector<std::vector<size_t>> & ll_matrix,
-                   std::vector<std::vector<std::pair<size_t, size_t>>> & trace);
+    void
+    recursion(md_vector<size_t> & matrix, md_vector<size_t> & ll_matrix, md_vector<std::pair<size_t, size_t>> & trace);
 
     void backtrack_merged_bin(size_t trace_j,
                               size_t const next_j,
@@ -198,7 +198,7 @@ private:
                              maximum_bin_tracker & max_tracker);
 
     //!\brief Backtracks the trace matrix and writes the resulting binning into the output file.
-    size_t backtracking(std::vector<std::vector<std::pair<size_t, size_t>>> const & trace);
+    size_t backtracking(md_vector<std::pair<size_t, size_t>> const & trace);
 
     data_store initialise_libf_data(size_t const trace_j) const;
 

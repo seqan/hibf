@@ -79,43 +79,42 @@ include ("${HIBF_SOURCE_DIR}/test/cmake/hibf_require_ccache.cmake")
 hibf_require_ccache ()
 
 # ----------------------------------------------------------------------------
-# Require C++20
+# Require C++23
 # ----------------------------------------------------------------------------
 
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
 
 set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 202002)
-      #error NOCXX20
+     "#if !defined (__cplusplus) || (__cplusplus < 202100)
+      #error NOCXX23
       #endif
       int main() {}")
 
-set (HIBF_FEATURE_CPP20_FLAG_BUILTIN "")
-set (HIBF_FEATURE_CPP20_FLAG_STD20 "-std=c++20")
-set (HIBF_FEATURE_CPP20_FLAG_STD2a "-std=c++2a")
+set (HIBF_FEATURE_CPP23_FLAG_BUILTIN "")
+set (HIBF_FEATURE_CPP23_FLAG_STD23 "-std=c++23")
 
-set (HIBF_CPP20_FLAG "")
+set (HIBF_CPP23_FLAG "")
 
-foreach (_FLAG BUILTIN STD20 STD2a)
-    set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} ${HIBF_FEATURE_CPP20_FLAG_${_FLAG}}")
+foreach (_FLAG BUILTIN STD23)
+    set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} ${HIBF_FEATURE_CPP23_FLAG_${_FLAG}}")
 
-    check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CPP20_FLAG_${_FLAG})
+    check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CPP23_FLAG_${_FLAG})
 
-    if (CPP20_FLAG_${_FLAG})
-        set (HIBF_CPP20_FLAG ${_FLAG})
+    if (CPP23_FLAG_${_FLAG})
+        set (HIBF_CPP23_FLAG ${_FLAG})
         break ()
     endif ()
 endforeach ()
 
 set (CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
 
-if (HIBF_CPP20_FLAG STREQUAL "BUILTIN")
-    hibf_config_print ("C++ Standard-20 support:    builtin")
-elseif (HIBF_CPP20_FLAG)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
-    hibf_config_print ("C++ Standard-20 support:    via ${HIBF_FEATURE_CPP20_FLAG_${HIBF_CPP20_FLAG}}")
+if (HIBF_CPP23_FLAG STREQUAL "BUILTIN")
+    hibf_config_print ("C++ Standard-23 support:    builtin")
+elseif (HIBF_CPP23_FLAG)
+    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
+    hibf_config_print ("C++ Standard-23 support:    via ${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
 else ()
-    hibf_config_error ("HIBF requires C++20, but your compiler does not support it.")
+    hibf_config_error ("HIBF requires C++23, but your compiler does not support it.")
 endif ()
 
 # ----------------------------------------------------------------------------

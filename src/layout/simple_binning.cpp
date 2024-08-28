@@ -12,6 +12,7 @@
 #include <hibf/layout/layout.hpp>         // for layout
 #include <hibf/layout/simple_binning.hpp> // for simple_binning
 #include <hibf/misc/divide_and_ceil.hpp>  // for divide_and_ceil
+#include <hibf/misc/md_vector.hpp>
 
 namespace seqan::hibf::layout
 {
@@ -22,11 +23,11 @@ size_t simple_binning::execute()
     assert(num_technical_bins > 0u);
     assert(num_user_bins > 0u);
 
-    std::vector<std::vector<size_t>> matrix(num_technical_bins); // rows
+    md_vector<size_t> matrix(num_technical_bins); // rows
     for (auto & v : matrix)
         v.resize(num_user_bins, std::numeric_limits<size_t>::max()); // columns
 
-    std::vector<std::vector<size_t>> trace(num_technical_bins); // rows
+    md_vector<size_t> trace(num_technical_bins); // rows
     for (auto & v : trace)
         v.resize(num_user_bins, std::numeric_limits<size_t>::max()); // columns
 
@@ -37,7 +38,7 @@ size_t simple_binning::execute()
     for (size_t i = 0; i < extra_bins; ++i)
     {
         size_t const corrected_ub_cardinality = static_cast<size_t>(ub_cardinality * data->fpr_correction[i + 1]);
-        matrix[i][0] = divide_and_ceil(corrected_ub_cardinality, i + 1u);
+        matrix[i, 0] = divide_and_ceil(corrected_ub_cardinality, i + 1u);
     }
 
     // we must iterate column wise
@@ -54,14 +55,14 @@ size_t simple_binning::execute()
                 size_t const corrected_ub_cardinality =
                     static_cast<size_t>(ub_cardinality * data->fpr_correction[(i - i_prime)]);
                 size_t score =
-                    std::max<size_t>(divide_and_ceil(corrected_ub_cardinality, i - i_prime), matrix[i_prime][j - 1]);
+                    std::max<size_t>(divide_and_ceil(corrected_ub_cardinality, i - i_prime), matrix[i_prime, j - 1]);
 
                 // std::cout << "j:" << j << " i:" << i << " i':" << i_prime << " score:" << score << std::endl;
 
-                minimum = (score < minimum) ? (trace[i][j] = i_prime, score) : minimum;
+                minimum = (score < minimum) ? (trace[i, j] = i_prime, score) : minimum;
             }
 
-            matrix[i][j] = minimum;
+            matrix[i, j] = minimum;
         }
     }
 
@@ -79,7 +80,7 @@ size_t simple_binning::execute()
 
     while (trace_j > 0)
     {
-        size_t next_i = trace[trace_i][trace_j];
+        size_t next_i = trace[trace_i, trace_j];
         size_t const number_of_bins = (trace_i - next_i);
         size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
         size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
@@ -98,7 +99,7 @@ size_t simple_binning::execute()
 
         bin_id += number_of_bins;
 
-        trace_i = trace[trace_i][trace_j];
+        trace_i = trace[trace_i, trace_j];
         --trace_j;
     }
     ++trace_i; // because we want the length not the index. Now trace_i == number_of_bins

@@ -17,6 +17,7 @@
 #include <cereal/access.hpp> // for access
 #include <cereal/cereal.hpp> // for make_nvp, CEREAL_NVP
 
+#include <hibf/misc/md_vector.hpp>
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::sketch
@@ -39,7 +40,7 @@ struct minhashes
     static constexpr size_t sketch_size{40};
 
     //!\brief A table of sketches. For LSH we need multiple sketches, stored in a table.
-    std::vector<std::vector<uint64_t>> table{}; // Each element (vector<uint64_t>) is a minhash.
+    md_vector<uint64_t> table{}; // Each element (vector<uint64_t>) is a minhash.
 
     /*!\name Constructors, destructor and assignment
      * \{
