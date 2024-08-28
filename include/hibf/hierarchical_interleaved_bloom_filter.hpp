@@ -21,8 +21,9 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>            // for layout
 #include <hibf/misc/counting_vector.hpp>     // for counting_vector
-#include <hibf/misc/timer.hpp>               // for concurrent_timer
-#include <hibf/platform.hpp>                 // for HIBF_CONSTEXPR_VECTOR
+#include <hibf/misc/md_vector.hpp>
+#include <hibf/misc/timer.hpp> // for concurrent_timer
+#include <hibf/platform.hpp>   // for HIBF_CONSTEXPR_VECTOR
 
 namespace seqan::hibf
 {
@@ -202,7 +203,7 @@ public:
      * If `j != i` is returned, there is a lower level IBF, bin `b` is a merged bin, and `j` is the ID of the lower
      * level IBF in ibf_vector.
      */
-    std::vector<std::vector<int64_t>> next_ibf_id;
+    md_vector<int64_t> next_ibf_id;
 
     /*!\brief Stores for each bin in each IBF of the HIBF the user bin ID.
     * \details
@@ -211,7 +212,7 @@ public:
     * lower level IBF.
     * Otherwise, the returned value `j` is the corresponding user bin ID.
     */
-    std::vector<std::vector<int64_t>> ibf_bin_to_user_bin_id{};
+    md_vector<int64_t> ibf_bin_to_user_bin_id{};
 
     //!\brief Returns a membership_agent to be used for counting.
     membership_agent_type membership_agent() const;
@@ -280,16 +281,16 @@ private:
         {
             sum += result[bin];
 
-            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
+            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx, bin];
 
             if (current_filename_index < 0) // merged bin
             {
                 if (sum >= threshold)
-                    membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                    membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx, bin], threshold);
                 sum = 0u;
             }
             else if (bin + 1u == result.size() ||                                                  // last bin
-                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
+                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx, bin + 1]) // end of split bin
             {
                 if (sum >= threshold)
                     result_buffer.emplace_back(current_filename_index);
@@ -415,16 +416,16 @@ private:
         for (size_t bin{}; bin < result.size(); ++bin)
         {
             sum += result[bin];
-            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
+            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx, bin];
 
             if (current_filename_index < 0) // merged bin
             {
                 if (sum >= threshold)
-                    bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
+                    bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx, bin], threshold);
                 sum = 0u;
             }
             else if (bin + 1u == result.size() ||                                                  // last bin
-                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
+                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx, bin + 1]) // end of split bin
             {
                 if (sum >= threshold)
                     result_buffer[current_filename_index] = sum;
