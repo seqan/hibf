@@ -113,6 +113,8 @@ struct config
      * Since the data to construct the (H)IBF is given by a function object `seqan::hibf::config::input_fn`,
      * the number of user bins to consider must be given via this option.
      *
+     * Value must be neither `0` nor `std::numeric_limits<uint64_t>::max()`.
+     *
      * \include test/snippet/hibf/config_number_of_user_bins.cpp
      *
      * In this example, `12` user bins would be inserted into the (H)IBF, each only storing the hash `42`.
@@ -288,7 +290,7 @@ struct config
     /*!\brief Checks several variables of seqan::hibf::config and sets default values if necessary.
      *
      * Required options:
-     *   * seqan::hibf::config::number_of_user_bins must be set to a value other than `0`.
+     *   * seqan::hibf::config::number_of_user_bins must be neither `0` nor `std::numeric_limits<uint64_t>::max()`.
      *   * seqan::hibf::config::input_fn must be set.
      *
      * Constrains:

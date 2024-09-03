@@ -162,11 +162,16 @@ TEST(config_test, validate_and_set_defaults)
         check_error_message(configuration, "[HIBF CONFIG ERROR] You did not set the required config::input_fn.");
     }
 
-    // number_of_user_bins cannot be 0
+    // number_of_user_bins cannot be 0 or bin_kind::merged (18'446'744'073'709'551'615ULL)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn};
         check_error_message(configuration,
                             "[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins.");
+
+        configuration.number_of_user_bins = 18'446'744'073'709'551'615ULL;
+        check_error_message(configuration,
+                            "[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
+                            "is 18446744073709551614.");
     }
 
     // number_of_hash_functions must be in [1,5]
@@ -255,7 +260,9 @@ TEST(config_test, validate_and_set_defaults)
                                           .number_of_user_bins = 1u,
                                           .tmax = 18'446'744'073'709'551'553ULL};
 
-        check_error_message(configuration, "[HIBF CONFIG ERROR] The maximum possible tmax is 18446744073709551552.");
+        check_error_message(configuration,
+                            "[HIBF CONFIG ERROR] The maximum possible config::tmax "
+                            "is 18446744073709551552.");
     }
 
     // Given tmax is not a multiple of 64

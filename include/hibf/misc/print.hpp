@@ -30,7 +30,7 @@ struct print_t
     void operator()(seqan::hibf::counting_vector<int16_t> const & vector, std::ostream & stream = std::cout) const;
     void operator()(seqan::hibf::counting_vector<int32_t> const & vector, std::ostream & stream = std::cout) const;
     void operator()(seqan::hibf::counting_vector<int64_t> const & vector, std::ostream & stream = std::cout) const;
-    void operator()(std::vector<int64_t> const & vector, std::ostream & stream = std::cout) const;
+    void operator()(std::vector<uint64_t> const & vector, std::ostream & stream = std::cout) const;
 };
 
 static inline constexpr auto print = print_t{};

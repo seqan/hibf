@@ -46,8 +46,8 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 {
     size_t const ibf_pos{data.request_ibf_idx()};
 
-    std::vector<int64_t> ibf_positions(current_node.number_of_technical_bins, ibf_pos);
-    std::vector<int64_t> filename_indices(current_node.number_of_technical_bins, -1);
+    std::vector<uint64_t> ibf_positions(current_node.number_of_technical_bins, ibf_pos);
+    std::vector<uint64_t> filename_indices(current_node.number_of_technical_bins, bin_kind::merged);
     robin_hood::unordered_flat_set<uint64_t> kmers{};
 
     auto initialise_max_bin_kmers = [&]() -> size_t
