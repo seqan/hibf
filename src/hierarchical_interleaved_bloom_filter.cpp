@@ -46,8 +46,16 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 {
     size_t const ibf_pos{data.request_ibf_idx()};
 
-    std::vector<uint64_t> ibf_positions(current_node.number_of_technical_bins, ibf_pos);
-    std::vector<uint64_t> filename_indices(current_node.number_of_technical_bins, bin_kind::merged);
+    auto & technical_bin_to_ibf_id = hibf.next_ibf_id[ibf_pos];
+    assert(technical_bin_to_ibf_id.empty());
+    technical_bin_to_ibf_id.resize(current_node.number_of_technical_bins, ibf_pos);
+
+    auto & technical_bin_to_user_bin_id = hibf.ibf_bin_to_user_bin_id[ibf_pos];
+    assert(technical_bin_to_user_bin_id.empty());
+    technical_bin_to_user_bin_id.resize(current_node.number_of_technical_bins, bin_kind::merged);
+
+    auto & ibf = hibf.ibf_vector[ibf_pos];
+
     robin_hood::unordered_flat_set<uint64_t> kmers{};
 
     auto initialise_max_bin_kmers = [&]() -> size_t
@@ -55,7 +63,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         if (current_node.max_bin_is_merged())
         {
             // recursively initialize favourite child first
-            ibf_positions[current_node.max_bin_index] =
+            technical_bin_to_ibf_id[current_node.max_bin_index] =
                 hierarchical_build(hibf,
                                    kmers,
                                    current_node.children[current_node.favourite_child_idx.value()],
@@ -68,7 +76,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
             // we assume that the max record is at the beginning of the list of remaining records.
             auto const & record = current_node.remaining_records[0];
             build::compute_kmers(kmers, data, record);
-            build::update_user_bins(filename_indices, record);
+            build::update_user_bins(technical_bin_to_user_bin_id, record);
 
             return record.number_of_technical_bins;
         }
@@ -76,7 +84,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
 
     // initialize lower level IBF
     size_t const max_bin_tbs = initialise_max_bin_kmers();
-    auto && ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
+    ibf = construct_ibf(parent_kmers, kmers, max_bin_tbs, current_node, data, is_root);
     kmers.clear(); // reduce memory peak
 
     // parse all other children (merged bins) of the current ibf
@@ -121,7 +129,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
-                ibf_positions[parent_bin_index] = ibf_pos;
+                technical_bin_to_ibf_id[parent_bin_index] = ibf_pos;
                 build::insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
                 if (!is_root)
                     build::update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
@@ -153,13 +161,9 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                 build::update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
         }
 
-        build::update_user_bins(filename_indices, record);
+        build::update_user_bins(technical_bin_to_user_bin_id, record);
         kmers.clear();
     }
-
-    hibf.ibf_vector[ibf_pos] = std::move(ibf);
-    hibf.next_ibf_id[ibf_pos] = std::move(ibf_positions);
-    hibf.ibf_bin_to_user_bin_id[ibf_pos] = std::move(filename_indices);
 
     return ibf_pos;
 }

@@ -142,7 +142,6 @@ public:
     size_t number_of_user_bins{};
 
     /*!\brief Manages membership queries for the seqan::hibf::hierarchical_interleaved_bloom_filter.
-    * \see seqan::hibf::hierarchical_interleaved_bloom_filter::user_bins::filename_of_user_bin
     * \details
     * In contrast to the seqan::hibf::interleaved_bloom_filter, the result will consist of indices of user bins.
     */
@@ -289,19 +288,19 @@ private:
         {
             sum += result[bin];
 
-            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
+            auto const user_bin_id = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (current_filename_index == bin_kind::merged) // merged bin
+            if (user_bin_id == bin_kind::merged) // merged bin
             {
                 if (sum >= threshold)
                     membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
-            else if (bin + 1u == result.size() ||                                                  // last bin
-                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
+            else if (bin + 1u == result.size() ||                                       // last bin
+                     user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
             {
                 if (sum >= threshold)
-                    result_buffer.emplace_back(current_filename_index);
+                    result_buffer.emplace_back(user_bin_id);
                 sum = 0u;
             }
         }
@@ -424,19 +423,19 @@ private:
         for (size_t bin{}; bin < result.size(); ++bin)
         {
             sum += result[bin];
-            auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
+            auto const user_bin_id = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (current_filename_index == bin_kind::merged) // merged bin
+            if (user_bin_id == bin_kind::merged) // merged bin
             {
                 if (sum >= threshold)
                     bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
             }
-            else if (bin + 1u == result.size() ||                                                  // last bin
-                     current_filename_index != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
+            else if (bin + 1u == result.size() ||                                       // last bin
+                     user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
             {
                 if (sum >= threshold)
-                    result_buffer[current_filename_index] = sum;
+                    result_buffer[user_bin_id] = sum;
                 sum = 0u;
             }
         }
