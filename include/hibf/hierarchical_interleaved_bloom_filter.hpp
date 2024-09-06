@@ -27,6 +27,14 @@
 namespace seqan::hibf
 {
 
+namespace bin_kind
+{
+
+//!\brief The value that indicates a merged bin.
+static constexpr uint64_t merged{std::numeric_limits<uint64_t>::max()};
+
+} // namespace bin_kind
+
 /*!\brief The Hierarchical Interleaved Bloom Filter (HIBF) - Fast answers to set-membership queries for multiple bins.
  * \ingroup hibf
  * \details
@@ -202,16 +210,16 @@ public:
      * If `j != i` is returned, there is a lower level IBF, bin `b` is a merged bin, and `j` is the ID of the lower
      * level IBF in ibf_vector.
      */
-    std::vector<std::vector<int64_t>> next_ibf_id;
+    std::vector<std::vector<uint64_t>> next_ibf_id;
 
     /*!\brief Stores for each bin in each IBF of the HIBF the user bin ID.
     * \details
     * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_user_bin_id[i][b]`.
-    * If `-1` is returned, bin `b` is a merged bin, there is no single user bin, we need to look into the
-    * lower level IBF.
+    * If `seqan::hibf::bin_kind::merged` is returned, bin `b` is a merged bin, there is no single user bin, we need
+    * to look into the lower level IBF.
     * Otherwise, the returned value `j` is the corresponding user bin ID.
     */
-    std::vector<std::vector<int64_t>> ibf_bin_to_user_bin_id{};
+    std::vector<std::vector<uint64_t>> ibf_bin_to_user_bin_id{};
 
     //!\brief Returns a membership_agent to be used for counting.
     membership_agent_type membership_agent() const;
@@ -269,7 +277,7 @@ private:
 
     //!\brief Helper for recursive membership querying.
     template <std::ranges::forward_range value_range_t>
-    void membership_for_impl(value_range_t && values, int64_t const ibf_idx, uint16_t const threshold)
+    void membership_for_impl(value_range_t && values, size_t const ibf_idx, uint16_t const threshold)
     {
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
         auto & result = agent.bulk_count(values);
@@ -282,7 +290,7 @@ private:
 
             auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (current_filename_index < 0) // merged bin
+            if (current_filename_index == bin_kind::merged) // merged bin
             {
                 if (sum >= threshold)
                     membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
@@ -299,7 +307,7 @@ private:
     }
 
     //!\brief Stores the result of membership_for().
-    std::vector<int64_t> result_buffer;
+    std::vector<uint64_t> result_buffer;
 
 public:
     /*!\name Constructors, destructor and assignment
@@ -366,8 +374,8 @@ public:
      * seqan::hibf::hierarchical_interleaved_bloom_filter::membership_agent for each thread.
      */
     template <std::ranges::forward_range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              uint16_t const threshold) & noexcept
+    [[nodiscard]] std::vector<uint64_t> const & membership_for(value_range_t && values,
+                                                               uint16_t const threshold) & noexcept
     {
         assert(hibf_ptr != nullptr);
 
@@ -377,7 +385,7 @@ public:
 
         result_buffer.clear();
 
-        membership_for_impl(values, 0, threshold);
+        membership_for_impl(values, 0u, threshold);
 
         return result_buffer;
     }
@@ -385,8 +393,8 @@ public:
     // `membership_for` cannot be called on a temporary, since the object the returned reference points to
     // is immediately destroyed.
     template <std::ranges::range value_range_t>
-    [[nodiscard]] std::vector<int64_t> const & membership_for(value_range_t && values,
-                                                              uint16_t const threshold) && noexcept = delete;
+    [[nodiscard]] std::vector<uint64_t> const & membership_for(value_range_t && values,
+                                                               uint16_t const threshold) && noexcept = delete;
     //!\}
 };
 
@@ -405,7 +413,7 @@ private:
 
     //!\brief Helper for recursive bulk counting.
     template <std::ranges::forward_range value_range_t>
-    void bulk_count_impl(value_range_t && values, int64_t const ibf_idx, size_t const threshold)
+    void bulk_count_impl(value_range_t && values, size_t const ibf_idx, size_t const threshold)
     {
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<value_t>();
         auto & result = agent.bulk_count(values);
@@ -417,7 +425,7 @@ private:
             sum += result[bin];
             auto const current_filename_index = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (current_filename_index < 0) // merged bin
+            if (current_filename_index == bin_kind::merged) // merged bin
             {
                 if (sum >= threshold)
                     bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
@@ -498,7 +506,7 @@ public:
 
         std::ranges::fill(result_buffer, static_cast<value_t>(0));
 
-        bulk_count_impl(values, 0, threshold);
+        bulk_count_impl(values, 0u, threshold);
 
         return result_buffer;
     }

@@ -77,7 +77,7 @@ int main()
     auto & result1 = agent.membership_for(query1, 2u);
 
     // query1 hits in user_bin_1 and user_bin_3, which have the IDs 0 and 2, respectively.
-    for (int64_t hit_user_bin : result1)
+    for (uint64_t hit_user_bin : result1)
         std::cout << hit_user_bin << ' '; // The results are not sorted: 2 0
     std::cout << '\n';
 
@@ -88,7 +88,7 @@ int main()
     agent.sort_results(); // Sort the results.
 
     // query2 hits in user_bin_1 and user_bin_2, which have the IDs 0 and 1, respectively.
-    for (int64_t hit_user_bin : result2)
+    for (uint64_t hit_user_bin : result2)
         std::cout << hit_user_bin << ' '; // The results are sorted: 0 1
     std::cout << '\n';
 }

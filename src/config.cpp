@@ -69,6 +69,10 @@ void config::validate_and_set_defaults()
     if (number_of_user_bins == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
 
+    if (number_of_user_bins == 18'446'744'073'709'551'615ULL) // std::numeric_limits<uint64_t>::max() = bin_kind::merged
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
+                                    "is 18446744073709551614."};
+
     if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
 
@@ -97,7 +101,7 @@ void config::validate_and_set_defaults()
     }
     else if (tmax > 18'446'744'073'709'551'552ULL) // next_multiple_of_64 would not fit in size_t. Underflowed by user?
     {
-        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible tmax is 18446744073709551552."};
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible config::tmax is 18446744073709551552."};
     }
     else if (tmax % 64 != 0)
     {

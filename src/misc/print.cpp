@@ -102,7 +102,7 @@ void print_t::operator()(seqan::hibf::counting_vector<int64_t> const & vector, s
     print_impl(vector, stream);
 }
 
-void print_t::operator()(std::vector<int64_t> const & vector, std::ostream & stream) const
+void print_t::operator()(std::vector<uint64_t> const & vector, std::ostream & stream) const
 {
     print_impl(vector, stream);
 }

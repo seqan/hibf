@@ -26,7 +26,7 @@ using test_types = ::testing::Types<seqan::hibf::bit_vector,
                                     seqan::hibf::counting_vector<int16_t>,
                                     seqan::hibf::counting_vector<int32_t>,
                                     seqan::hibf::counting_vector<int64_t>,
-                                    std::vector<int64_t>>;
+                                    std::vector<uint64_t>>;
 
 TYPED_TEST_SUITE(print_test, test_types);
 
