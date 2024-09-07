@@ -26,6 +26,8 @@ class hierarchical_binning
 private:
     //!\brief The user config passed down from the command line.
     seqan::hibf::config config{};
+    //!\brief The correction factor for merged bins which are allowed to have a relaxed FPR
+    double relaxed_fpr_correction_factor{};
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
     data_store * data{nullptr};
 
@@ -37,10 +39,8 @@ private:
     //!\brief Simplifies passing the parameters needed for tracking the maximum technical bin.
     struct maximum_bin_tracker
     {
-        size_t max_id{};         //!< The ID of the technical bin with maximal size.
-        size_t max_size{};       //!< The maximum technical bin size seen so far.
-        size_t max_split_id{};   //!< The ID of the split bin with maximal size (if any).
-        size_t max_split_size{}; //!< The maximum split bin size seen so far.
+        size_t max_id{};   //!< The ID of the technical bin with maximal size.
+        size_t max_size{}; //!< The maximum technical bin size seen so far.
 
         void update_max(size_t const new_id, size_t const new_size)
         {
@@ -51,49 +51,15 @@ private:
             }
         }
 
-        //!\brief Split cardinality `new_size` must already account for fpr-correction.
-        void update_split_max(size_t const new_id, size_t const new_size)
-        {
-            if (new_size > max_split_size)
-            {
-                max_split_id = new_id;
-                max_split_size = new_size;
-            }
-        }
-
-        /*!\brief Decides which bin is reported as the maximum bin.
+        /*!\brief Returns 'max_id'.
          *\param config The HIBF configuration.
          *\return The chosen max bin id.
          *
-         * As a HIBF feature, the merged bin FPR can differ from the overall maximum FPR. Merged bins in an HIBF layout
-         * will always be followed by one or more lower-level IBFs that will have split bins or single bins (split = 1)
-         * to recover the original user bins.
-         *
-         * We need to make sure, though, that downsizing merged bins does not affect split bins.
-         * Therefore, we check if choosing a merged bin as the max bin violates the minimum_bits needed for split bins.
-         * If so, we can report the largest split bin as the max bin as it will choose the correct size and downsize
-         * larger merged bins only a little.
+         * White updating the max tracker, the sizes should have been already corrected
+         * for split bins or merged bins.
          */
-        size_t choose_max_bin(seqan::hibf::config const & config)
+        size_t choose_max_bin()
         {
-            if (max_id == max_split_id) // Overall max bin is a split bin.
-                return max_id;
-
-            // Split cardinality `max_split_size` already accounts for fpr correction.
-            // The minimum size of the TBs of this IBF to ensure the maximum_false_positive_rate for split bins.
-            size_t const minimum_bits{build::bin_size_in_bits({.fpr = config.maximum_fpr,
-                                                               .hash_count = config.number_of_hash_functions,
-                                                               .elements = max_split_size})};
-
-            // The potential size of the TBs of this IBF given the allowed merged bin FPR.
-            size_t const merged_bits{build::bin_size_in_bits({.fpr = config.relaxed_fpr, //
-                                                              .hash_count = config.number_of_hash_functions,
-                                                              .elements = max_size})};
-
-            // If split and merged bits are the same, we prefer merged bins. Better for build parallelisation.
-            if ((minimum_bits > merged_bits))
-                return max_split_id;
-
             return max_id;
         }
     };
@@ -119,6 +85,12 @@ public:
         num_user_bins{data->positions.size()},
         num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
     {
+        double const numerator =
+            std::log1p(-std::exp(std::log(config_.maximum_fpr) / config_.number_of_hash_functions));
+        double const denominator =
+            std::log1p(-std::exp(std::log(config_.relaxed_fpr) / config_.number_of_hash_functions));
+        relaxed_fpr_correction_factor = numerator / denominator;
+        assert(relaxed_fpr_correction_factor <= 1.0);
         assert(data != nullptr);
     }
 

@@ -30,16 +30,16 @@ TEST(hierarchical_binning_test, small_example)
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 3u); // #HIGH_LEVEL_IBF max_bin_id:3
 
-    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{1}, 22}, {{2}, 22}};
+    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{2}, 22}, {{3}, 0}};
 
     std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{}, 0, 1, 7},
-                                                                          {{1}, 0, 22, 4},
-                                                                          {{1}, 22, 21, 5},
-                                                                          {{1}, 43, 21, 6},
-                                                                          {{2}, 0, 22, 0},
-                                                                          {{2}, 22, 21, 2},
-                                                                          {{2}, 43, 21, 3},
-                                                                          {{}, 3, 1, 1}};
+                                                                          {{}, 1, 1, 6},
+                                                                          {{2}, 0, 22, 3},
+                                                                          {{2}, 22, 21, 4},
+                                                                          {{2}, 43, 21, 5},
+                                                                          {{3}, 0, 42, 1},
+                                                                          {{3}, 42, 11, 0},
+                                                                          {{3}, 53, 11, 2}};
 
     EXPECT_RANGE_EQ(hibf_layout.max_bins, expected_max_bins);
     EXPECT_RANGE_EQ(hibf_layout.user_bins, expected_user_bins);
@@ -145,17 +145,14 @@ TEST(hierarchical_binning_test, four_level_hibf)
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
 
-    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0, 0, 0, 0}, 33},
-                                                                        {{0, 0, 0}, 1},
-                                                                        {{0, 0}, 1},
-                                                                        {{0}, 1}};
+    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0, 0}, 33}, {{0, 1}, 0}, {{0}, 1}, {{1}, 0}};
 
-    std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{0, 0, 0, 0}, 0, 33, 4},
-                                                                          {{0, 0, 0, 0}, 33, 31, 5},
-                                                                          {{0, 0, 0}, 1, 1, 3},
-                                                                          {{0, 0}, 1, 1, 2},
-                                                                          {{0}, 1, 1, 1},
-                                                                          {{}, 1, 1, 0}};
+    std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{0, 0}, 0, 33, 4},
+                                                                          {{0, 0}, 33, 31, 5},
+                                                                          {{0, 1}, 0, 57, 2},
+                                                                          {{0, 1}, 57, 7, 3},
+                                                                          {{1}, 0, 53, 0},
+                                                                          {{1}, 53, 11, 1}};
 
     EXPECT_RANGE_EQ(hibf_layout.max_bins, expected_max_bins);
     EXPECT_RANGE_EQ(hibf_layout.user_bins, expected_user_bins);
