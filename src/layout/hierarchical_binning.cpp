@@ -359,7 +359,7 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
         backtrack_split_bin(trace_j, trace_i + 1, bin_id, max_tracker);
     }
 
-    return max_tracker.choose_max_bin();
+    return max_tracker.max_id;
 }
 
 data_store hierarchical_binning::initialise_libf_data(size_t const trace_j) const

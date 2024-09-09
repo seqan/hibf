@@ -48,18 +48,6 @@ private:
                 max_size = new_size;
             }
         }
-
-        /*!\brief Returns 'max_id'.
-         *\param config The HIBF configuration.
-         *\return The chosen max bin id.
-         *
-         * White updating the max tracker, the sizes should have been already corrected
-         * for split bins or merged bins.
-         */
-        size_t choose_max_bin()
-        {
-            return max_id;
-        }
     };
 
 public:
