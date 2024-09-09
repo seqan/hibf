@@ -26,8 +26,6 @@ class hierarchical_binning
 private:
     //!\brief The user config passed down from the command line.
     seqan::hibf::config config{};
-    //!\brief The correction factor for merged bins which are allowed to have a relaxed FPR
-    double relaxed_fpr_correction_factor{};
     //!\brief Stores all data that is needed to compute the layout, e.g. the counts, sketches and the layout::layout.
     data_store * data{nullptr};
 
@@ -85,12 +83,6 @@ public:
         num_user_bins{data->positions.size()},
         num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
     {
-        double const numerator =
-            std::log1p(-std::exp(std::log(config_.maximum_fpr) / config_.number_of_hash_functions));
-        double const denominator =
-            std::log1p(-std::exp(std::log(config_.relaxed_fpr) / config_.number_of_hash_functions));
-        relaxed_fpr_correction_factor = numerator / denominator;
-        assert(relaxed_fpr_correction_factor <= 1.0);
         assert(data != nullptr);
     }
 

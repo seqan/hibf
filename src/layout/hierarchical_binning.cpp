@@ -118,7 +118,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
         for (size_t j = 1; j < num_user_bins; ++j)
         {
             sum += (*data->kmer_counts)[data->positions[j]];
-            matrix[0][j] = data->union_estimates[j] * relaxed_fpr_correction_factor;
+            matrix[0][j] = data->union_estimates[j] * data->relaxed_fpr_correction;
             ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
             trace[0][j] = {0u, j - 1}; // unnecessary?
         }
@@ -130,7 +130,7 @@ void hierarchical_binning::initialization(std::vector<std::vector<size_t>> & mat
             assert(j < data->positions.size());
             assert(data->positions[j] < data->kmer_counts->size());
             sum += (*data->kmer_counts)[data->positions[j]];
-            matrix[0][j] = sum * relaxed_fpr_correction_factor;
+            matrix[0][j] = sum * data->relaxed_fpr_correction;
             ll_matrix[0][j] = max_merge_levels(j + 1) * sum;
             trace[0][j] = {0u, j - 1}; // unnecessary?
         }
@@ -212,7 +212,7 @@ void hierarchical_binning::recursion(std::vector<std::vector<size_t>> & matrix,
                 // union_estimates[j_prime] is the union of {j_prime, ..., j}
                 // the + 1 is necessary because j_prime is decremented directly after weight is updated
                 size_t const uncorrected = config.disable_estimate_union ? weight : data->union_estimates[j_prime + 1];
-                return relaxed_fpr_correction_factor * uncorrected;
+                return data->relaxed_fpr_correction * uncorrected;
             };
 
             // if the user bin j-1 was not split into multiple technical bins!
@@ -279,7 +279,7 @@ void hierarchical_binning::backtrack_merged_bin(size_t trace_j,
     if (!config.disable_estimate_union)
         kmer_count = sketch.estimate(); // overwrite kmer_count high_level_max_id/size bin
 
-    max_tracker.update_max(bin_id, kmer_count * relaxed_fpr_correction_factor);
+    max_tracker.update_max(bin_id, kmer_count * data->relaxed_fpr_correction);
     // std::cout << "]: " << kmer_count << std::endl;
 }
 
@@ -369,7 +369,8 @@ data_store hierarchical_binning::initialise_libf_data(size_t const trace_j) cons
                          .kmer_counts = data->kmer_counts,
                          .sketches = data->sketches,
                          .positions = {data->positions[trace_j]},
-                         .fpr_correction = data->fpr_correction};
+                         .fpr_correction = data->fpr_correction,
+                         .relaxed_fpr_correction = data->relaxed_fpr_correction};
 
     return libf_data;
 }

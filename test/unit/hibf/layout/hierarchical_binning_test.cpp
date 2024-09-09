@@ -7,12 +7,13 @@
 #include <cstddef> // for size_t
 #include <vector>  // for vector, allocator
 
-#include <hibf/config.hpp>                        // for config
-#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
-#include <hibf/layout/data_store.hpp>             // for data_store
-#include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
-#include <hibf/layout/layout.hpp>                 // for layout
-#include <hibf/test/expect_range_eq.hpp>          // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/config.hpp>                                // for config
+#include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
+#include <hibf/layout/compute_relaxed_fpr_correction.hpp> // for compute_relaxed_fpr_correction
+#include <hibf/layout/data_store.hpp>                     // for data_store
+#include <hibf/layout/hierarchical_binning.hpp>           // for hierarchical_binning
+#include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(hierarchical_binning_test, small_example)
 {
@@ -27,6 +28,9 @@ TEST(hierarchical_binning_test, small_example)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
+
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 3u); // #HIGH_LEVEL_IBF max_bin_id:3
 
@@ -57,6 +61,8 @@ TEST(hierarchical_binning_test, another_example)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -88,6 +94,8 @@ TEST(hierarchical_binning_test, high_level_max_bin_id_is_0)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -113,6 +121,8 @@ TEST(hierarchical_binning_test, knuts_example)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u);
@@ -141,6 +151,8 @@ TEST(hierarchical_binning_test, four_level_hibf)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 1u); // #HIGH_LEVEL_IBF max_bin_id:1
@@ -171,6 +183,8 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u);
@@ -199,6 +213,8 @@ TEST(hierarchical_binning_test, tb0_is_a_merged_bin_and_leads_to_recursive_call)
 
     data.fpr_correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
 
     seqan::hibf::layout::hierarchical_binning algo{data, config};
     EXPECT_EQ(algo.execute(), 0u);

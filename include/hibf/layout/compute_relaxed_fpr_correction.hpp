@@ -5,28 +5,26 @@
 #pragma once
 
 #include <cstddef> // for size_t
-#include <vector>  // for vector
 
 #include <hibf/platform.hpp>
 
 namespace seqan::hibf::layout
 {
 
-/*!\brief Contains parameters for compute_fpr_correction.
+/*!\brief Contains parameters for compute_relaxed_fpr_correction.
  * \ingroup hibf_layout
  * \qualifier strong
  */
-struct fpr_correction_parameters
+struct relaxed_fpr_correction_parameters
 {
     double fpr{};
+    double relaxed_fpr{};
     size_t hash_count{};
-    size_t t_max{};
 };
 
-/*!\brief Precompute f_h factors that adjust the split bin size to prevent FPR inflation due to multiple testing.
+/*!\brief Precompute size correction factor for merged bins which are allowed to have a relaxed FPR.
  * \ingroup hibf_layout
- * \sa https://godbolt.org/z/zTj1v9W94
  */
-[[nodiscard]] std::vector<double> compute_fpr_correction(fpr_correction_parameters const & params);
+[[nodiscard]] double compute_relaxed_fpr_correction(relaxed_fpr_correction_parameters const & params);
 
 } // namespace seqan::hibf::layout
