@@ -29,8 +29,7 @@ namespace seqan::hibf::layout
 size_t hierarchical_binning::execute()
 {
     assert(data != nullptr);
-    assert(data->kmer_counts != nullptr);
-    assert(data->positions.size() <= data->kmer_counts->size());
+    data->validate();
 
     static constexpr size_t max_size_t{std::numeric_limits<size_t>::max()};
 
@@ -40,7 +39,9 @@ size_t hierarchical_binning::execute()
 
         if (!config.disable_estimate_union && !config.disable_rearrangement)
         {
-            assert(data->sketches != nullptr);
+            if (data->sketches == nullptr)
+                throw std::invalid_argument{"[HIBF ERROR] data_store::sketches must not be nullptr if union estimation "
+                                            "or rearrangement is enabled."};
             data->rearrangement_timer.start();
             sketch::toolbox::rearrange_bins(*data->sketches,
                                             *data->kmer_counts,

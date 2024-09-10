@@ -65,6 +65,8 @@ struct data_store
     std::vector<size_t> positions = [this]()
     {
         std::vector<size_t> ps;
+        if (this->kmer_counts == nullptr)
+            return ps; // GCOVR_EXCL_LINE
         ps.resize(this->kmer_counts->size());
         std::iota(ps.begin(), ps.end(), 0);
         return ps;
@@ -90,6 +92,8 @@ struct data_store
     //!\brief Tracks the time the algorithm spends on rearranging user bins (merged bins).
     concurrent_timer rearrangement_timer{};
     //!\}
+
+    void validate() const;
 };
 
 } // namespace seqan::hibf::layout

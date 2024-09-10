@@ -19,6 +19,7 @@ namespace seqan::hibf::layout
 size_t simple_binning::execute()
 {
     assert(data != nullptr);
+    data->validate();
     assert(num_technical_bins > 0u);
     assert(num_user_bins > 0u);
 
