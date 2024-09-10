@@ -58,12 +58,15 @@ inline std::string const type_name_as_string = []()
     // itself, since the type is directly given by the compiler.
     // LCOV_EXCL_START
     if (status != 0)
-        return std::string{typeid(type).name()} + " (abi::__cxa_demangle error status (" + std::to_string(status)
-             + "): "
-             + (status == -1 ? "A memory allocation failure occurred."
-                             : (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules."
-                                             : (status == -3 ? "One of the arguments is invalid." : "Unknown Error")))
-             + ")";
+    {
+        demangled_name =
+            std::string{typeid(type).name()} + " (abi::__cxa_demangle error status (" + std::to_string(status) + "): "
+            + (status == -1 ? "A memory allocation failure occurred."
+                            : (status == -2 ? "mangled_name is not a valid name under the C++ ABI mangling rules."
+                                            : (status == -3 ? "One of the arguments is invalid." : "Unknown Error")))
+            + ")";
+        return demangled_name;
+    }
     // LCOV_EXCL_STOP
 
     demangled_name = std::string{std::addressof(*demangled_name_ptr)};

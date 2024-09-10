@@ -43,10 +43,14 @@ enable_testing ()
 if (NOT TARGET hibf::test)
     add_library (hibf_test INTERFACE)
 
-    # GCC12 and above: Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
         if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
             target_compile_options (hibf_test INTERFACE "-Wno-interference-size")
+        endif ()
+        # Warn about failed return value optimization.
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+            target_compile_options (hibf_test INTERFACE "-Wnrvo")
         endif ()
     endif ()
 
@@ -72,15 +76,6 @@ endif ()
 # needed for unit test cases in hibf/test/unit
 if (NOT TARGET hibf::test::unit)
     add_library (hibf_test_unit INTERFACE)
-
-    # GCC12 has some bogus warnings. They will not be fixed in googletest.
-    # https://github.com/google/googletest/issues/4232
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12 AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
-            target_compile_options (hibf_test INTERFACE "-Wno-restrict")
-        endif ()
-    endif ()
-
     target_link_libraries (hibf_test_unit INTERFACE "hibf::test" "GTest::gtest_main")
     add_library (hibf::test::unit ALIAS hibf_test_unit)
 endif ()
