@@ -14,14 +14,14 @@ CPMDeclarePackage (cereal
                    SYSTEM TRUE
                    OPTIONS "JUST_INSTALL_CEREAL ON")
 # simde
-set (HIBF_SIMDE_VERSION 0.7.6)
+set (HIBF_SIMDE_VERSION 0.8.2)
 CPMDeclarePackage (simde
                    NAME simde
                    VERSION ${HIBF_SIMDE_VERSION}
                    DOWNLOAD_ONLY YES
                    GITHUB_REPOSITORY simd-everywhere/simde)
 # benchmark
-set (HIBF_BENCHMARK_VERSION 1.8.4)
+set (HIBF_BENCHMARK_VERSION 1.9.0)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
@@ -29,15 +29,15 @@ CPMDeclarePackage (benchmark
                    SYSTEM TRUE
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF")
 # googletest
-set (HIBF_GOOGLETEST_VERSION 1.14.0)
+set (HIBF_GOOGLETEST_VERSION 1.15.1)
 CPMDeclarePackage (googletest
-                   NAME GTest
+                   NAME googletest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 20")
 # doxygen-awesome
-set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.2)
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.3)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
