@@ -10,6 +10,7 @@ set (HIBF_SOURCE_FILES
      layout/layout.cpp
      layout/compute_fpr_correction.cpp
      layout/compute_layout.cpp
+     layout/compute_relaxed_fpr_correction.cpp
      sketch/compute_sketches.cpp
      layout/graph.cpp
      layout/hierarchical_binning.cpp

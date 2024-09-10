@@ -9,15 +9,16 @@
 #include <utility>   // for move
 #include <vector>    // for vector
 
-#include <hibf/config.hpp>                        // for config
-#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
-#include <hibf/layout/compute_layout.hpp>         // for compute_layout
-#include <hibf/layout/data_store.hpp>             // for data_store
-#include <hibf/layout/hierarchical_binning.hpp>   // for hierarchical_binning
-#include <hibf/layout/layout.hpp>                 // for layout
-#include <hibf/misc/iota_vector.hpp>              // for iota_vector
-#include <hibf/misc/timer.hpp>                    // for concurrent_timer
-#include <hibf/sketch/hyperloglog.hpp>            // for hyperloglog
+#include <hibf/config.hpp>                                // for config
+#include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
+#include <hibf/layout/compute_layout.hpp>                 // for compute_layout
+#include <hibf/layout/compute_relaxed_fpr_correction.hpp> // for compute_relaxed_fpr_correction
+#include <hibf/layout/data_store.hpp>                     // for data_store
+#include <hibf/layout/hierarchical_binning.hpp>           // for hierarchical_binning
+#include <hibf/layout/layout.hpp>                         // for layout
+#include <hibf/misc/iota_vector.hpp>                      // for iota_vector
+#include <hibf/misc/timer.hpp>                            // for concurrent_timer
+#include <hibf/sketch/hyperloglog.hpp>                    // for hyperloglog
 
 namespace seqan::hibf::layout
 {
@@ -45,6 +46,10 @@ layout compute_layout(config const & config,
     store.fpr_correction = compute_fpr_correction({.fpr = config.maximum_fpr, //
                                                    .hash_count = config.number_of_hash_functions,
                                                    .t_max = config.tmax});
+
+    store.relaxed_fpr_correction = compute_relaxed_fpr_correction({.fpr = config.maximum_fpr, //
+                                                                   .relaxed_fpr = config.relaxed_fpr,
+                                                                   .hash_count = config.number_of_hash_functions});
 
     store.hibf_layout->top_level_max_bin_id = seqan::hibf::layout::hierarchical_binning{store, config}.execute();
     union_estimation_timer = store.union_estimation_timer;
