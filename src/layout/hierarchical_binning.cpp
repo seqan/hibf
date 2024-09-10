@@ -364,8 +364,7 @@ size_t hierarchical_binning::backtracking(std::vector<std::vector<std::pair<size
 
 data_store hierarchical_binning::initialise_libf_data(size_t const trace_j) const
 {
-    data_store libf_data{.false_positive_rate = data->false_positive_rate,
-                         .hibf_layout = data->hibf_layout,
+    data_store libf_data{.hibf_layout = data->hibf_layout,
                          .kmer_counts = data->kmer_counts,
                          .sketches = data->sketches,
                          .positions = {data->positions[trace_j]},

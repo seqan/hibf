@@ -44,9 +44,6 @@ struct data_store
     /*!\name References to global instances of the HIBF.
      * \{
      */
-    //!\brief The desired maximum false positive rate of the resulting index.
-    double false_positive_rate{};
-
     //!\brief The layout that is built by layout::hierarchical_binning.
     layout * hibf_layout; // Will be modified by {simple,hierarchical}_binning.
 
