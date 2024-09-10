@@ -17,6 +17,13 @@ get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
 target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
 
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    # Warn about failed return value optimization.
+    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+        target_compile_options (hibf PUBLIC "-Wnrvo")
+    endif ()
+endif ()
+
 set (CPM_INDENT "  CMake Package Manager CPM: ")
 CPMUsePackageLock ("${HIBF_ROOT_DIR}/cmake/package-lock.cmake")
 
@@ -42,17 +49,6 @@ enable_testing ()
 # libraries which are in common for **all** hibf tests
 if (NOT TARGET hibf::test)
     add_library (hibf_test INTERFACE)
-
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-        # Disable warning about std::hardware_destructive_interference_size not being ABI-stable.
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 12)
-            target_compile_options (hibf_test INTERFACE "-Wno-interference-size")
-        endif ()
-        # Warn about failed return value optimization.
-        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
-            target_compile_options (hibf_test INTERFACE "-Wnrvo")
-        endif ()
-    endif ()
 
     target_link_libraries (hibf_test INTERFACE "seqan::hibf")
     target_include_directories (hibf_test INTERFACE "${HIBF_TEST_INCLUDE_DIR}")
