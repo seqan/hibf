@@ -14,6 +14,7 @@
 
 #include <hibf/config.hpp>      // for config, insert_iterator
 #include <hibf/test/cereal.hpp> // for test_serialisation
+#include <hibf/test/expect_throw_msg.hpp>
 
 TEST(config_test, write_to)
 {
@@ -139,39 +140,26 @@ TEST(config_test, validate_and_set_defaults)
 {
     auto dummy_input_fn = [](size_t const, seqan::hibf::insert_iterator) {};
 
-    auto check_error_message = [](seqan::hibf::config & configuration, std::string_view const expected_message)
-    {
-        try
-        {
-            configuration.validate_and_set_defaults();
-            FAIL();
-        }
-        catch (std::invalid_argument const & exception)
-        {
-            EXPECT_STREQ(expected_message.data(), exception.what());
-        }
-        catch (...)
-        {
-            FAIL();
-        }
-    };
-
     // input_fn is not set
     {
         seqan::hibf::config configuration{};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] You did not set the required config::input_fn.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] You did not set the required config::input_fn.");
     }
 
     // number_of_user_bins cannot be 0 or bin_kind::merged (18'446'744'073'709'551'615ULL)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn};
-        check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins.");
 
         configuration.number_of_user_bins = 18'446'744'073'709'551'615ULL;
-        check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
-                            "is 18446744073709551614.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
+                         "is 18446744073709551614.");
     }
 
     // number_of_hash_functions must be in [1,5]
@@ -179,28 +167,40 @@ TEST(config_test, validate_and_set_defaults)
         seqan::hibf::config configuration{.input_fn = dummy_input_fn,
                                           .number_of_user_bins = 1u,
                                           .number_of_hash_functions = 0u};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5].");
 
         configuration.number_of_hash_functions = 6u;
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5].");
     }
 
     // maximum_fpr must be in (0.0,1.0)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .maximum_fpr = 0.0};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::maximum_fpr must be in (0.0,1.0).");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::maximum_fpr must be in (0.0,1.0).");
 
         configuration.maximum_fpr = 1.0;
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::maximum_fpr must be in (0.0,1.0).");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::maximum_fpr must be in (0.0,1.0).");
     }
 
     // relaxed_fpr must be in (0.0,1.0)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .relaxed_fpr = 0.0};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::relaxed_fpr must be in (0.0,1.0).");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::relaxed_fpr must be in (0.0,1.0).");
 
         configuration.relaxed_fpr = 1.0;
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::relaxed_fpr must be in (0.0,1.0).");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::relaxed_fpr must be in (0.0,1.0).");
     }
 
     // relaxed_fpr must equal to or greater than maximum_fpr
@@ -209,24 +209,31 @@ TEST(config_test, validate_and_set_defaults)
                                           .number_of_user_bins = 1u,
                                           .maximum_fpr = 0.3,
                                           .relaxed_fpr = 0.2};
-        check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] config::relaxed_fpr must be "
-                            "greater than or equal to config::maximum_fpr.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::relaxed_fpr must be "
+                         "greater than or equal to config::maximum_fpr.");
     }
 
     // threads cannot be 0
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .threads = 0u};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::threads must be greater than 0.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::threads must be greater than 0.");
     }
 
     // sketch_bits must be in [5,32]
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .sketch_bits = 4u};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32].");
 
         configuration.sketch_bits = 33u;
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::sketch_bits must be in [5,32].");
     }
 
     // Set default tmax
@@ -260,9 +267,10 @@ TEST(config_test, validate_and_set_defaults)
                                           .number_of_user_bins = 1u,
                                           .tmax = 18'446'744'073'709'551'553ULL};
 
-        check_error_message(configuration,
-                            "[HIBF CONFIG ERROR] The maximum possible config::tmax "
-                            "is 18446744073709551552.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] The maximum possible config::tmax "
+                         "is 18446744073709551552.");
     }
 
     // Given tmax is not a multiple of 64
@@ -282,7 +290,9 @@ TEST(config_test, validate_and_set_defaults)
     // alpha must be positive
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .alpha = -0.1};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::alpha must be positive.");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::alpha must be positive.");
     }
 
     // max_rearrangement_ratio must be in [0.0,1.0]
@@ -290,10 +300,14 @@ TEST(config_test, validate_and_set_defaults)
         seqan::hibf::config configuration{.input_fn = dummy_input_fn,
                                           .number_of_user_bins = 1u,
                                           .max_rearrangement_ratio = -0.1};
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0].");
 
         configuration.max_rearrangement_ratio = 1.1;
-        check_error_message(configuration, "[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0].");
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::max_rearrangement_ratio must be in [0.0,1.0].");
     }
 
     // Set disable_rearrangement if disable_estimate_union is set

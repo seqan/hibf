@@ -37,8 +37,7 @@ layout compute_layout(config const & config,
 
     layout resulting_layout{};
 
-    data_store store{.false_positive_rate = config.maximum_fpr,
-                     .hibf_layout = &resulting_layout,
+    data_store store{.hibf_layout = &resulting_layout,
                      .kmer_counts = std::addressof(kmer_counts),
                      .sketches = std::addressof(sketches),
                      .positions = std::move(positions)};

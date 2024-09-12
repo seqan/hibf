@@ -20,7 +20,8 @@ TEST(simple_binning_test, small_example)
 
     seqan::hibf::layout::data_store data{.hibf_layout = &hibf_layout,
                                          .kmer_counts = &kmer_counts,
-                                         .fpr_correction = std::vector<double>(65, 1.0)};
+                                         .fpr_correction = std::vector<double>(65, 1.0),
+                                         .relaxed_fpr_correction = 1.0};
 
     seqan::hibf::layout::simple_binning algo{data, 9};
     size_t max_bin = algo.execute();
@@ -41,7 +42,8 @@ TEST(simple_binning_test, uniform_distribution)
 
     seqan::hibf::layout::data_store data{.hibf_layout = &hibf_layout,
                                          .kmer_counts = &kmer_counts,
-                                         .fpr_correction = std::vector<double>(65, 1.0)};
+                                         .fpr_correction = std::vector<double>(65, 1.0),
+                                         .relaxed_fpr_correction = 1.0};
 
     seqan::hibf::layout::simple_binning algo{data, 4u};
     size_t max_bin = algo.execute();

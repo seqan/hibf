@@ -14,6 +14,24 @@
 #include <hibf/layout/hierarchical_binning.hpp>           // for hierarchical_binning
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/test/expect_throw_msg.hpp>
+
+TEST(hierarchical_binning_test, missing_sketches)
+{
+    seqan::hibf::config config;
+    seqan::hibf::layout::layout hibf_layout{};
+    std::vector<size_t> kmer_counts{500, 500, 500, 500};
+    seqan::hibf::layout::data_store data{.hibf_layout = &hibf_layout,
+                                         .kmer_counts = &kmer_counts,
+                                         .fpr_correction = {1.0},
+                                         .relaxed_fpr_correction = 1.0};
+
+    seqan::hibf::layout::hierarchical_binning algo{data, config};
+    EXPECT_THROW_MSG(algo.execute(),
+                     std::invalid_argument,
+                     "[HIBF ERROR] data_store::sketches must not be nullptr if union estimation or rearrangement is "
+                     "enabled.");
+}
 
 TEST(hierarchical_binning_test, small_example)
 {
