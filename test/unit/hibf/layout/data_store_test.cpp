@@ -2,10 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h>
+#include <gtest/gtest.h> // for Message, TestPartResult, Test, TestInfo, EXPECT_NO_THROW, TEST
 
-#include <hibf/layout/data_store.hpp>
-#include <hibf/test/expect_throw_msg.hpp>
+#include <cstddef>   // for size_t
+#include <stdexcept> // for invalid_argument
+#include <string>    // for basic_string
+#include <vector>    // for vector
+
+#include <hibf/layout/data_store.hpp>     // for data_store
+#include <hibf/layout/layout.hpp>         // for layout
+#include <hibf/sketch/hyperloglog.hpp>    // for hyperloglog
+#include <hibf/test/expect_throw_msg.hpp> // for EXPECT_THROW_MSG
 
 TEST(data_store_test, validate)
 {

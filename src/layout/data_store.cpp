@@ -2,7 +2,11 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <hibf/layout/data_store.hpp> // for data_store
+#include <stdexcept> // for invalid_argument
+#include <vector>    // for vector
+
+#include <hibf/layout/data_store.hpp>  // for data_store
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 namespace seqan::hibf::layout
 {
