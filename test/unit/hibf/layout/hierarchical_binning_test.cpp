@@ -2,10 +2,11 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, Message, TestPartResult, TestInfo, EXPECT_EQ
+#include <gtest/gtest.h> // for Test, Message, TestPartResult, TestInfo, TEST, EXP...
 
-#include <cstddef> // for size_t
-#include <vector>  // for vector, allocator
+#include <cstddef>   // for size_t
+#include <stdexcept> // for invalid_argument
+#include <vector>    // for vector
 
 #include <hibf/config.hpp>                                // for config
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
@@ -14,7 +15,7 @@
 #include <hibf/layout/hierarchical_binning.hpp>           // for hierarchical_binning
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
-#include <hibf/test/expect_throw_msg.hpp>
+#include <hibf/test/expect_throw_msg.hpp>                 // for EXPECT_THROW_MSG
 
 TEST(hierarchical_binning_test, missing_sketches)
 {

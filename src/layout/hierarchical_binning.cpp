@@ -2,12 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for copy, max, fill_n, min
+#include <algorithm> // for max, min
 #include <cassert>   // for assert
 #include <cmath>     // for log, ceil
 #include <cstddef>   // for size_t
 #include <limits>    // for numeric_limits
-#include <string>    // for allocator, operator+, string
+#include <stdexcept> // for invalid_argument
+#include <string>    // for operator+, string
 #include <utility>   // for pair
 #include <vector>    // for vector
 
