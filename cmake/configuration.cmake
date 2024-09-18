@@ -228,10 +228,10 @@ else ()
     set (HIBF_IS_DEBUG FALSE)
 endif ()
 
-# Apple M1 with GCC sets `march=apple-m1` when using `-march=native`. This option is only available with GCC >= 14.
+# Apple M1 with GCC sets `-march=apple-m1` when using `-march=native`. This option is only available with GCC >= 13.
 if ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm64"
     AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 14)
+    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
     set (HIBF_M1_NO_NATIVE TRUE)
 else ()
     set (HIBF_M1_NO_NATIVE FALSE)
@@ -239,7 +239,7 @@ endif ()
 
 option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON)
 if (HIBF_M1_NO_NATIVE)
-    hibf_config_print ("Optimize build:             disabled (Apple M1 with GCC < 14)")
+    hibf_config_print ("Optimize build:             disabled (Apple M1 with GCC < 13)")
 elseif (HIBF_IS_DEBUG)
     hibf_config_print ("Optimize build:             disabled")
 elseif (HIBF_NATIVE_BUILD)
