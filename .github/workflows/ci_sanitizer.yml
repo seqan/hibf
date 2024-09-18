@@ -32,11 +32,11 @@ jobs:
       fail-fast: false
       matrix:
         name: [ASan, TSan, UBSan]
-        os: [ubuntu-latest, macos-12]
+        os: [ubuntu-latest, macos-14]
         build_type: [Release, RelWithDebInfo, Debug]
         exclude:
           - name: "TSan"
-            os: macos-12
+            os: macos-14
 
         include:
           - name: "ASan"
@@ -46,14 +46,14 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=thread"
 
           - name: "UBSan"
-            os: macos-12
+            os: macos-14
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
 
           - name: "UBSan"
             os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
 
-          - os: macos-12
+          - os: macos-14
             compiler: clang-18
 
           - os: ubuntu-latest
