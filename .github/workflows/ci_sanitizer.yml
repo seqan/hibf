@@ -51,6 +51,16 @@ jobs:
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
 
           - name: "UBSan"
+            os: macos-14
+            build_type: Release
+            ctest_excludes: "-E tmp_directory_snippet_cmp_output"
+
+          - name: "UBSan"
+            os: macos-14
+            build_type: RelWithDebInfo
+            ctest_excludes: "-E tmp_directory_snippet_cmp_output"
+
+          - name: "UBSan"
             os: ubuntu-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero"
 
@@ -98,5 +108,5 @@ jobs:
 
       - name: Run tests
         working-directory: build
-        run: ctest . -j --output-on-failure
+        run: ctest . -j --output-on-failure ${{ matrix.ctest_excludes }}
 
