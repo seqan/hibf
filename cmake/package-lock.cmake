@@ -29,7 +29,7 @@ CPMDeclarePackage (benchmark
                    SYSTEM TRUE
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF")
 # googletest
-set (HIBF_GOOGLETEST_VERSION 1.15.1)
+set (HIBF_GOOGLETEST_VERSION 1.15.2)
 CPMDeclarePackage (googletest
                    NAME googletest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
