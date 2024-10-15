@@ -23,8 +23,25 @@
 namespace seqan::hibf::build
 {
 
+template <bool use_exists>
+inline void
+dispatch_emplace(seqan::hibf::interleaved_bloom_filter & ibf, auto && values, seqan::hibf::bin_index const bin_index)
+{
+    if constexpr (use_exists)
+    {
+        for (auto && value : values)
+            ibf.emplace_exists(value, bin_index);
+    }
+    else
+    {
+        for (auto && value : values)
+            ibf.emplace(value, bin_index);
+    }
+}
+
 // automatically does naive splitting if number_of_bins > 1
-void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
+void insert_into_ibf(build_data const & data,
+                     robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan::hibf::interleaved_bloom_filter & ibf,
@@ -40,8 +57,10 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
         assert(chunk_number < number_of_bins);
         seqan::hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
-        for (size_t const value : chunk)
-            ibf.emplace_exists(value, bin_idx);
+        if (data.config.empty_bin_fraction > 0.0)
+            dispatch_emplace<true>(ibf, std::move(chunk), bin_idx);
+        else
+            dispatch_emplace<false>(ibf, std::move(chunk), bin_idx);
     }
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
@@ -62,8 +81,10 @@ void insert_into_ibf(build_data const & data,
 
     serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
-    for (auto && value : values)
-        ibf.emplace_exists(value, bin_index);
+    if (data.config.empty_bin_fraction > 0.0)
+        dispatch_emplace<true>(ibf, std::move(values), bin_index);
+    else
+        dispatch_emplace<false>(ibf, std::move(values), bin_index);
     local_fill_ibf_timer.stop();
     data.fill_ibf_timer += local_fill_ibf_timer;
 }

@@ -133,7 +133,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
                 technical_bin_to_ibf_id[parent_bin_index] = new_ibf_pos;
-                build::insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
+                build::insert_into_ibf(data, kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
                 if (!is_root)
                     build::update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
             }
@@ -155,7 +155,8 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         else
         {
             compute_kmers(kmers, data, record);
-            build::insert_into_ibf(kmers,
+            build::insert_into_ibf(data,
+                                   kmers,
                                    record.number_of_technical_bins,
                                    record.storage_TB_id,
                                    ibf,
