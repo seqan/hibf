@@ -416,7 +416,6 @@ public:
     //!\}
 
     std::vector<size_t> occupancy{};
-    bit_vector occupied_bins{};
 
     /*!\cond DEV
      * \brief Serialisation support function.
@@ -436,7 +435,6 @@ public:
         archive(hash_funs);
         archive(cereal::base_class<base_t>(this));
         archive(occupancy);
-        archive(occupied_bins);
     }
     //!\endcond
 };

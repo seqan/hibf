@@ -42,8 +42,6 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     technical_bins = bin_words * 64u;
     resize(technical_bins * bin_size_);
     occupancy.resize(technical_bins, 0u);
-    occupied_bins.resize(bins, 1u);
-    occupied_bins.resize(technical_bins, 0u);
 }
 
 size_t max_bin_size(config & configuration)
@@ -205,7 +203,6 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
     technical_bins = new_technical_bins;
 
     occupancy.resize(technical_bins, 0u);
-    occupied_bins.resize(technical_bins, 0u);
 }
 
 #if HIBF_COMPILER_IS_GCC
