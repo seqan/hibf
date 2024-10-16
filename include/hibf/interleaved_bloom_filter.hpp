@@ -207,12 +207,10 @@ public:
     interleaved_bloom_filter & operator=(interleaved_bloom_filter &&) noexcept = default; //!< Defaulted.
     ~interleaved_bloom_filter() = default;                                                //!< Defaulted.
 
-    /*!\brief Construct an uncompressed Interleaved Bloom Filter.
+    /*!\brief Construct an Interleaved Bloom Filter.
      * \param bins_ The number of bins.
      * \param size The bitvector size.
      * \param funs The number of hash functions. Default 2. At least 1, at most 5.
-     *
-     * \attention This constructor can only be used to construct **uncompressed** Interleaved Bloom Filters.
      *
      * \details
      *
@@ -224,8 +222,18 @@ public:
                              seqan::hibf::bin_size size,
                              seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u});
 
-    //!\brief Construct from seqan::hibf::config.
-    interleaved_bloom_filter(config & configuration);
+    /*!\brief Construct an Interleaved Bloom Filter.
+     * \param configuration The seqan::hibf::config.
+     * \param max_bin_elements Optional, the maximum number of unique elements in any bin.
+     * \details
+     *
+     * If `max_bin_elements` is not passed, or `max_bin_elements` is 0, the maximum number of unique elements in any bin
+     * will be determined automatically.
+     *
+     * `max_bin_elements` must be the maximum number of unique elements for any bin as evaluated with
+     * `seqan::hibf::config::input_fn`.
+     */
+    interleaved_bloom_filter(config & configuration, size_t const max_bin_elements = 0u);
     //!\}
 
     /*!\name Modifiers
