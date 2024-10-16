@@ -47,15 +47,6 @@ void insert_into_ibf(build_data const & data,
                      seqan::hibf::interleaved_bloom_filter & ibf,
                      concurrent_timer & fill_ibf_timer)
 {
-    // TODO:
-    // 1) Some bins might have no element inserted.
-    //    Example: Split 378 k-mers into 31 bins
-    //             chunk_size will be 13.
-    //             Bin sizes will be: 13,13,...,13,13,5,0
-    // 2) It might not even be possible to just put 1 k-mer into each bin in extreme cases.
-    //
-    // We could get rid of the IBF's occupied_bins bit_vector, and just use the occupancy to determine empty bins if
-    // it's guaranteed that every non-empty bin has a non-zero occupancy.
     size_t const chunk_size = divide_and_ceil(kmers.size(), number_of_bins);
     size_t chunk_number{};
 
@@ -64,13 +55,6 @@ void insert_into_ibf(build_data const & data,
     serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     auto chunk_view = seqan::stl::views::chunk(kmers, chunk_size);
-    // For testing. Assert failes in `hibf_test.small_example_with_direct_hashes`.
-#if 0
-    assert(chunk_view.size() == number_of_bins
-           || ((std::cerr << "chunk_view.size() = " << chunk_view.size() << "\nnumber_of_bins = " << number_of_bins
-                          << '\n')
-               && false));
-#endif
     for (auto && chunk : chunk_view)
     {
         assert(chunk_number < number_of_bins);
@@ -81,6 +65,21 @@ void insert_into_ibf(build_data const & data,
         else
             dispatch_emplace<false>(ibf, std::move(chunk), bin_idx);
     }
+
+    assert(chunk_view.size() <= number_of_bins);
+    if (use_exists && chunk_view.size() < number_of_bins)
+    {
+        size_t const diff = number_of_bins - chunk_view.size();
+        auto it = ibf.occupancy.begin() + bin_index + chunk_view.size();
+        assert(std::ranges::all_of(it,
+                                   it + diff,
+                                   [](size_t value)
+                                   {
+                                       return value == 0u;
+                                   }));
+        std::ranges::fill_n(it, diff, 1u);
+    }
+
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
 }
