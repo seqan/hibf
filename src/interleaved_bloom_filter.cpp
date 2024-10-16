@@ -67,6 +67,22 @@ size_t max_bin_size(config & configuration)
                                     .elements = max_size});
 }
 
+template <bool use_exists>
+inline void
+dispatch_emplace(seqan::hibf::interleaved_bloom_filter & ibf, auto && values, seqan::hibf::bin_index const bin_index)
+{
+    if constexpr (use_exists)
+    {
+        for (auto && value : values)
+            ibf.emplace_exists(value, bin_index);
+    }
+    else
+    {
+        for (auto && value : values)
+            ibf.emplace(value, bin_index);
+    }
+}
+
 // config validation is done by max_bin_size
 interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
@@ -77,14 +93,18 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
     robin_hood::unordered_flat_set<uint64_t> kmers;
 
+    bool const use_exists = configuration.empty_bin_fraction > 0.0;
+
 #pragma omp parallel for schedule(dynamic, chunk_size) num_threads(configuration.threads) private(kmers)
     for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
     {
         kmers.clear();
         configuration.input_fn(i, insert_iterator{kmers});
 
-        for (uint64_t const hash : kmers)
-            emplace_exists(hash, seqan::hibf::bin_index{i});
+        if (use_exists)
+            dispatch_emplace<true>(*this, kmers, seqan::hibf::bin_index{i});
+        else
+            dispatch_emplace<false>(*this, kmers, seqan::hibf::bin_index{i});
     }
 }
 

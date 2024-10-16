@@ -59,6 +59,8 @@ void insert_into_ibf(build_data const & data,
     size_t const chunk_size = divide_and_ceil(kmers.size(), number_of_bins);
     size_t chunk_number{};
 
+    bool const use_exists = data.config.empty_bin_fraction > 0.0;
+
     serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
     auto chunk_view = seqan::stl::views::chunk(kmers, chunk_size);
@@ -74,7 +76,7 @@ void insert_into_ibf(build_data const & data,
         assert(chunk_number < number_of_bins);
         seqan::hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
-        if (data.config.empty_bin_fraction > 0.0)
+        if (use_exists)
             dispatch_emplace<true>(ibf, std::move(chunk), bin_idx);
         else
             dispatch_emplace<false>(ibf, std::move(chunk), bin_idx);
