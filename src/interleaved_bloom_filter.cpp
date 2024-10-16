@@ -41,6 +41,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     bin_words = divide_and_ceil(bins, 64u);
     technical_bins = bin_words * 64u;
     resize(technical_bins * bin_size_);
+    occupancy.resize(technical_bins, 0u);
 }
 
 size_t max_bin_size(config & configuration)
@@ -64,6 +65,22 @@ size_t max_bin_size(config & configuration)
                                     .elements = max_size});
 }
 
+template <bool use_exists>
+inline void
+dispatch_emplace(seqan::hibf::interleaved_bloom_filter & ibf, auto && values, seqan::hibf::bin_index const bin_index)
+{
+    if constexpr (use_exists)
+    {
+        for (auto && value : values)
+            ibf.emplace_exists(value, bin_index);
+    }
+    else
+    {
+        for (auto && value : values)
+            ibf.emplace(value, bin_index);
+    }
+}
+
 // config validation is done by max_bin_size
 interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
@@ -74,19 +91,23 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
     robin_hood::unordered_flat_set<uint64_t> kmers;
 
+    bool const use_exists = configuration.empty_bin_fraction > 0.0;
+
 #pragma omp parallel for schedule(dynamic, chunk_size) num_threads(configuration.threads) private(kmers)
     for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
     {
         kmers.clear();
         configuration.input_fn(i, insert_iterator{kmers});
 
-        for (uint64_t const hash : kmers)
-            emplace(hash, seqan::hibf::bin_index{i});
+        if (use_exists)
+            dispatch_emplace<true>(*this, kmers, seqan::hibf::bin_index{i});
+        else
+            dispatch_emplace<false>(*this, kmers, seqan::hibf::bin_index{i});
     }
 }
 
 template <bool check_exists>
-inline auto interleaved_bloom_filter::emplace_impl(size_t const value, bin_index const bin) noexcept
+inline void interleaved_bloom_filter::emplace_impl(size_t const value, bin_index const bin) noexcept
 {
     assert(bin.value < bins);
 
@@ -103,11 +124,11 @@ inline auto interleaved_bloom_filter::emplace_impl(size_t const value, bin_index
         seqan::hibf::bit_vector::reference bit_reference{(*this)[idx]};
         if constexpr (check_exists)
             exists &= bit_reference;
-        bit_reference = 1;
+        bit_reference = true;
     };
 
     if constexpr (check_exists)
-        return exists;
+        occupancy[bin.value] += !exists;
 };
 
 void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
@@ -115,36 +136,48 @@ void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) 
     return emplace_impl<false>(value, bin);
 }
 
-bool interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
+void interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
 {
     return emplace_impl<true>(value, bin);
 }
 
 void interleaved_bloom_filter::clear(bin_index const bin) noexcept
 {
-    assert(bin.value < bins);
+    assert(bin.value < technical_bins);
     for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
         (*this)[idx] = 0;
 }
 
-void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bins_)
+bool interleaved_bloom_filter::set_bin_count(seqan::hibf::bin_count const new_bin_count)
 {
-    size_t const new_bins = new_bins_.value;
-
-    if (new_bins < bins)
-        throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
-
+    size_t const new_bins = new_bin_count.value;
     size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
 
-    bins = new_bins;
+    if (new_bin_words > bin_words)
+        return false;
 
-    if (new_bin_words == bin_words) // No need for internal resize if bin_words does not change.
+    bins = new_bins;
+    return true;
+}
+
+void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bin_count)
+{
+    if (new_bin_count.value < bins)
+        throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
+
+    if (set_bin_count(new_bin_count))
         return;
+
+    size_t const new_bins = new_bin_count.value;
+    size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
+
+    assert(new_bins > bins);
+    bins = new_bins;
 
     size_t const new_technical_bins = new_bin_words * 64u;
     size_t const new_bit_size = bin_size_ * new_technical_bins;
     size_t const old_bit_size = size();
-    size_t const delta = new_technical_bins - technical_bins + 64;
+    size_t const delta = new_technical_bins - technical_bins + 64u;
 
     resize(new_bit_size);
     uint64_t * const ptr = data();
@@ -152,7 +185,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
     //               old       new
     // |-------------|---------|
     // Backwards copy blocks of size (old_)technical_bins such that the new blocks are of size new_technical_bins.
-    for (size_t new_block_end = new_bit_size, old_block_end = old_bit_size; old_block_end > 0;
+    for (size_t new_block_end = new_bit_size, old_block_end = old_bit_size; old_block_end > 0u;
          new_block_end -= new_technical_bins, old_block_end -= technical_bins)
     {
         size_t const stop = new_block_end - new_technical_bins;
@@ -168,6 +201,8 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
 
     bin_words = new_bin_words;
     technical_bins = new_technical_bins;
+
+    occupancy.resize(technical_bins, 0u);
 }
 
 #if HIBF_COMPILER_IS_GCC
