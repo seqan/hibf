@@ -96,6 +96,34 @@ TEST(ibf_test, construction_from_config)
     EXPECT_RANGE_EQ(agent.bulk_contains(0), expected_v0);
 }
 
+TEST(ibf_test, construction_from_config_with_max_bin_elements)
+{
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {0u, 2u, 3u, 4u, 5u}};
+    size_t const number_of_ub{hashes.size()};
+
+    seqan::hibf::config ibf_config{.input_fn =
+                                       [&](size_t const num, seqan::hibf::insert_iterator it)
+                                   {
+                                       for (auto const hash : hashes[num])
+                                           it = hash;
+                                   },
+                                   .number_of_user_bins = number_of_ub};
+
+    seqan::hibf::interleaved_bloom_filter only_config{ibf_config};
+    seqan::hibf::interleaved_bloom_filter default_num_elements{ibf_config, 0u};
+    seqan::hibf::interleaved_bloom_filter appropriate_num_elements{ibf_config, 10u};
+    seqan::hibf::interleaved_bloom_filter larger_num_elements{ibf_config, 20u};
+
+    EXPECT_EQ(only_config, default_num_elements);
+    EXPECT_EQ(only_config, appropriate_num_elements);
+    EXPECT_NE(only_config, larger_num_elements);
+
+    EXPECT_EQ(default_num_elements, appropriate_num_elements);
+    EXPECT_NE(default_num_elements, larger_num_elements);
+
+    EXPECT_NE(appropriate_num_elements, larger_num_elements);
+}
+
 TEST(ibf_test, member_getter)
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};

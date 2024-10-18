@@ -43,20 +43,28 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     resize(technical_bins * bin_size_);
 }
 
-size_t max_bin_size(config & configuration)
+size_t max_bin_size(config & configuration, size_t const max_bin_elements)
 {
     configuration.validate_and_set_defaults();
 
     size_t max_size{};
-    robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(kmers)
-    for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
+
+    if (max_bin_elements == 0u)
     {
-        kmers.clear();
-        configuration.input_fn(i, insert_iterator{kmers});
+        robin_hood::unordered_flat_set<uint64_t> kmers;
+#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(kmers)
+        for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
+        {
+            kmers.clear();
+            configuration.input_fn(i, insert_iterator{kmers});
 
 #pragma omp critical
-        max_size = std::max(max_size, kmers.size());
+            max_size = std::max(max_size, kmers.size());
+        }
+    }
+    else
+    {
+        max_size = max_bin_elements;
     }
 
     return build::bin_size_in_bits({.fpr = configuration.maximum_fpr, //
@@ -65,9 +73,9 @@ size_t max_bin_size(config & configuration)
 }
 
 // config validation is done by max_bin_size
-interleaved_bloom_filter::interleaved_bloom_filter(config & configuration) :
+interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_t const max_bin_elements) :
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
-                             seqan::hibf::bin_size{max_bin_size(configuration)},
+                             seqan::hibf::bin_size{max_bin_size(configuration, max_bin_elements)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions}}
 {
     // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
