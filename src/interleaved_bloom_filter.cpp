@@ -13,11 +13,11 @@
 
 #include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
 #include <hibf/config.hpp>                   // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
+#include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 
 namespace seqan::hibf
 {
@@ -51,15 +51,16 @@ size_t max_bin_size(config & configuration, size_t const max_bin_elements)
 
     if (max_bin_elements == 0u)
     {
-        robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(kmers)
+        seqan::hibf::sketch::hyperloglog sketch{15u};
+#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(sketch)
         for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
         {
-            kmers.clear();
-            configuration.input_fn(i, insert_iterator{kmers});
+            sketch.reset();
+            configuration.input_fn(i, insert_iterator{sketch});
 
+            size_t const estimate = sketch.estimate();
 #pragma omp critical
-            max_size = std::max(max_size, kmers.size());
+            max_size = std::max(max_size, estimate);
         }
     }
     else

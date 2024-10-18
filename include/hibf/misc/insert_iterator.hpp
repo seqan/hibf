@@ -14,6 +14,7 @@
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash
 #include <hibf/platform.hpp>
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 // IWYU pragma: private, include <hibf/config.hpp>
 
@@ -38,23 +39,39 @@ public:
 
     explicit constexpr insert_iterator(robin_hood::unordered_flat_set<uint64_t> & set) :
         set{std::addressof(set)},
-        is_set{true}
+        type{data_type::unordered_set}
     {}
 
-    explicit constexpr insert_iterator(std::vector<uint64_t> & vec) : vec{std::addressof(vec)}, is_set{false}
+    explicit constexpr insert_iterator(std::vector<uint64_t> & vec) : vec{std::addressof(vec)}, type{data_type::vector}
+    {}
+
+    explicit constexpr insert_iterator(sketch::hyperloglog & sketch) :
+        sketch{std::addressof(sketch)},
+        type{data_type::sketch}
     {}
 
     insert_iterator & operator=(uint64_t const value) noexcept
     {
-        if (is_set)
+        switch (type)
         {
+        case data_type::unordered_set:
             assert(set != nullptr);
             set->emplace(value);
-        }
-        else
-        {
+            break;
+        case data_type::vector:
             assert(vec != nullptr);
             vec->emplace_back(value);
+            break;
+        case data_type::sketch:
+            assert(sketch != nullptr);
+            sketch->add(value);
+            break;
+        default:
+#ifndef NDEBUG
+            assert(false);
+#else
+            __builtin_unreachable();
+#endif
         }
         return *this;
     }
@@ -77,7 +94,16 @@ public:
 private:
     robin_hood::unordered_flat_set<uint64_t> * set{nullptr};
     std::vector<uint64_t> * vec{nullptr};
-    bool is_set{false};
+    sketch::hyperloglog * sketch{nullptr};
+
+    enum class data_type : uint8_t
+    {
+        unordered_set,
+        vector,
+        sketch
+    };
+
+    data_type type{};
 };
 
 } // namespace seqan::hibf
