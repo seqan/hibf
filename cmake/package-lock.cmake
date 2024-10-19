@@ -37,7 +37,7 @@ CPMDeclarePackage (googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 20")
 # doxygen-awesome
-set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.3)
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.4)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
