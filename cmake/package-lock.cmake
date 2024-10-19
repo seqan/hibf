@@ -18,8 +18,8 @@ set (HIBF_SIMDE_VERSION 0.8.2)
 CPMDeclarePackage (simde
                    NAME simde
                    VERSION ${HIBF_SIMDE_VERSION}
-                   DOWNLOAD_ONLY YES
-                   GITHUB_REPOSITORY simd-everywhere/simde)
+                   GITHUB_REPOSITORY simd-everywhere/simde
+                   DOWNLOAD_ONLY YES)
 # benchmark
 set (HIBF_BENCHMARK_VERSION 1.9.0)
 CPMDeclarePackage (benchmark
