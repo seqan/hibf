@@ -111,7 +111,7 @@ TEST(ibf_test, construction_from_config_with_max_bin_elements)
 
     seqan::hibf::interleaved_bloom_filter only_config{ibf_config};
     seqan::hibf::interleaved_bloom_filter default_num_elements{ibf_config, 0u};
-    seqan::hibf::interleaved_bloom_filter appropriate_num_elements{ibf_config, 10u};
+    seqan::hibf::interleaved_bloom_filter appropriate_num_elements{ibf_config, 11u}; // hll sketch estimate is 11
     seqan::hibf::interleaved_bloom_filter larger_num_elements{ibf_config, 20u};
 
     EXPECT_EQ(only_config, default_num_elements);
