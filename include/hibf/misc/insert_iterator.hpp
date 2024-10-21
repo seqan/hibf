@@ -14,12 +14,20 @@
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash
 #include <hibf/platform.hpp>
-#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 // IWYU pragma: private, include <hibf/config.hpp>
 
 namespace seqan::hibf
 {
+
+class interleaved_bloom_filter;
+
+namespace sketch
+{
+
+class hyperloglog;
+
+}
 
 class insert_iterator
 {
@@ -30,51 +38,34 @@ public:
     using pointer = void;
     using reference = void;
 
-    insert_iterator() = delete;
-    insert_iterator(insert_iterator const &) = default;
-    insert_iterator(insert_iterator &&) = default;
-    insert_iterator & operator=(insert_iterator const &) = default;
-    insert_iterator & operator=(insert_iterator &&) = default;
-    ~insert_iterator() = default;
+    constexpr insert_iterator() = default;
+    constexpr insert_iterator(insert_iterator const &) = default;
+    constexpr insert_iterator(insert_iterator &&) = default;
+    constexpr insert_iterator & operator=(insert_iterator const &) = default;
+    constexpr insert_iterator & operator=(insert_iterator &&) = default;
+    constexpr ~insert_iterator() = default;
 
-    explicit constexpr insert_iterator(robin_hood::unordered_flat_set<uint64_t> & set) :
-        set{std::addressof(set)},
-        type{data_type::unordered_set}
+    using set_t = robin_hood::unordered_flat_set<uint64_t>;
+    using sketch_t = sketch::hyperloglog;
+    using ibf_t = interleaved_bloom_filter;
+    // using function_t = std::function<void(uint64_t const)>;
+
+    explicit constexpr insert_iterator(set_t & set) : ptr{std::addressof(set)}, type{data_type::unordered_set}
     {}
 
-    explicit constexpr insert_iterator(std::vector<uint64_t> & vec) : vec{std::addressof(vec)}, type{data_type::vector}
+    explicit constexpr insert_iterator(sketch_t & sketch) : ptr{std::addressof(sketch)}, type{data_type::sketch}
     {}
 
-    explicit constexpr insert_iterator(sketch::hyperloglog & sketch) :
-        sketch{std::addressof(sketch)},
-        type{data_type::sketch}
+    explicit constexpr insert_iterator(ibf_t & ibf, size_t ibf_bin_index) :
+        ptr{std::addressof(ibf)},
+        ibf_bin_index{ibf_bin_index},
+        type{data_type::ibf}
     {}
 
-    insert_iterator & operator=(uint64_t const value) noexcept
-    {
-        switch (type)
-        {
-        case data_type::unordered_set:
-            assert(set != nullptr);
-            set->emplace(value);
-            break;
-        case data_type::vector:
-            assert(vec != nullptr);
-            vec->emplace_back(value);
-            break;
-        case data_type::sketch:
-            assert(sketch != nullptr);
-            sketch->add(value);
-            break;
-        default:
-#ifndef NDEBUG
-            assert(false);
-#else
-            __builtin_unreachable();
-#endif
-        }
-        return *this;
-    }
+    // constexpr insert_iterator(function_t & fun) : ptr{std::addressof(fun)}, type{data_type::function}
+    // {}
+
+    insert_iterator & operator=(uint64_t const value) noexcept;
 
     [[nodiscard]] constexpr insert_iterator & operator*() noexcept
     {
@@ -92,17 +83,17 @@ public:
     }
 
 private:
-    robin_hood::unordered_flat_set<uint64_t> * set{nullptr};
-    std::vector<uint64_t> * vec{nullptr};
-    sketch::hyperloglog * sketch{nullptr};
+    void * ptr{nullptr};
 
     enum class data_type : uint8_t
     {
         unordered_set,
-        vector,
-        sketch
+        sketch,
+        ibf
+        // function
     };
 
+    size_t ibf_bin_index{};
     data_type type{};
 };
 

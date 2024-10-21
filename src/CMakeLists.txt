@@ -15,6 +15,7 @@ set (HIBF_SOURCE_FILES
      sketch/compute_sketches.cpp
      layout/graph.cpp
      layout/hierarchical_binning.cpp
+     misc/insert_iterator.cpp
      misc/print.cpp
      sketch/toolbox.cpp
      sketch/hyperloglog.cpp
