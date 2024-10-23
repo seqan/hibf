@@ -22,6 +22,11 @@
 namespace seqan::hibf
 {
 
+#if HIBF_COMPILER_IS_GCC
+#    pragma GCC diagnostic push
+#    pragma GCC diagnostic ignored "-Wattributes"
+#endif // HIBF_COMPILER_IS_GCC
+
 interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
                                                    seqan::hibf::bin_size size,
                                                    seqan::hibf::hash_function_count funs)
@@ -118,12 +123,12 @@ inline auto interleaved_bloom_filter::emplace_impl(size_t const value, bin_index
         return exists;
 };
 
-void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
+[[gnu::always_inline]] void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
 {
     return emplace_impl<false>(value, bin);
 }
 
-bool interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
+[[gnu::always_inline]] bool interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
 {
     return emplace_impl<true>(value, bin);
 }
@@ -178,16 +183,9 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
     technical_bins = new_technical_bins;
 }
 
-#if HIBF_COMPILER_IS_GCC
-#    pragma GCC diagnostic push
-#    pragma GCC diagnostic ignored "-Wattributes"
-#endif // HIBF_COMPILER_IS_GCC
 [[gnu::always_inline]] bit_vector const &
 interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const value) & noexcept
 {
-#if HIBF_COMPILER_IS_GCC
-#    pragma GCC diagnostic pop
-#endif // HIBF_COMPILER_IS_GCC
     assert(ibf_ptr != nullptr);
     assert(result_buffer.size() == ibf_ptr->bin_count());
 
@@ -275,5 +273,9 @@ interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const valu
 
     return result_buffer;
 }
+
+#if HIBF_COMPILER_IS_GCC
+#    pragma GCC diagnostic pop
+#endif // HIBF_COMPILER_IS_GCC
 
 } // namespace seqan::hibf

@@ -24,7 +24,6 @@
 #include <cereal/types/base_class.hpp> // for base_class
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive
-#include <hibf/config.hpp>                    // for config
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
 #include <hibf/misc/counting_vector.hpp>      // for counting_vector
@@ -33,6 +32,10 @@
 
 namespace seqan::hibf
 {
+
+// config.hpp -> misc/insert_iterator.hpp (Needs interleaved_bloom_filter to be a complete class)
+struct config;
+
 /*!\brief A strong type that represents the number of bins for the seqan::hibf::interleaved_bloom_filter.
  * \ingroup ibf
  * \qualifier strong
