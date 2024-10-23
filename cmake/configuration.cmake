@@ -63,8 +63,8 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_CXX_FLAGS})
 # Check supported compilers
 # ----------------------------------------------------------------------------
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 11)
-    hibf_config_error ("GCC < 11 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 12)
+    hibf_config_error ("GCC < 12 is not supported. The detected compiler version is ${CMAKE_CXX_COMPILER_VERSION}.")
 endif ()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 17)
