@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include <version> // for __cpp_lib_constexpr_vector
+
 // macro cruft
 //!\cond
 #define HIBF_STR_HELPER(x) #x
@@ -38,7 +40,7 @@
  *
  * \sa https://sourceforge.net/p/predef/wiki/Compilers
  */
-#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER)
+#if defined(__GNUC__) && !defined(__llvm__) && !defined(__INTEL_COMPILER) && !defined(__INTEL_LLVM_COMPILER)
 #    define HIBF_COMPILER_IS_GCC 1
 #else
 #    define HIBF_COMPILER_IS_GCC 0
@@ -66,44 +68,29 @@
 // ============================================================================
 
 #if HIBF_COMPILER_IS_GCC
-#    if (__GNUC__ < 11)
-#        error "At least GCC 11 is needed."
-#    endif // (__GNUC__ < 11)
-
-#    if (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
-#        pragma warning "Be aware that GCC < 11.4 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 11 && __GNUC_MINOR__ <= 3)
-
-#    if (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
-#        pragma warning "Be aware that GCC < 12.3 might have bugs that cause compile failure."
-#    endif // (__GNUC__ == 12 && __GNUC_MINOR__ <= 2)
-
-#    if HIBF_DOXYGEN_ONLY(1) 0
-//!\brief This disables the warning you would get if your compiler is newer than the latest supported version.
-#        define HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
-#    endif // HIBF_DOXYGEN_ONLY(1)0
-
-#    ifndef HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
-#        if (__GNUC__ > 14)
-#            pragma message                                                                                            \
-                "Your compiler is newer than the latest supported compiler version (gcc-14). It might be that compiling fails. You can disable this warning by setting -DHIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC."
-#        endif // (__GNUC__ > 14)
-#    endif     // HIBF_DISABLE_NEWER_COMPILER_DIAGNOSTIC
+#    if (__GNUC__ < 12)
+#        error "At least GCC 12 is needed."
+#    endif
+#else
+#    ifdef __INTEL_LLVM_COMPILER
+#        if __INTEL_LLVM_COMPILER < 20240000
+#            error "At least Intel OneAPI 2024 is needed."
+#        endif
+#    else
+#        if (_LIBCPP_VERSION < 170000)
+#            error "At least Clang 17 is needed."
+#        endif
+#    endif
 #endif
 
 // ============================================================================
 //  C++ standard and features
 // ============================================================================
 
-#if __has_include(<version>)
-#    include <version> // for __cpp_lib_constexpr_vector
-#endif
-
 // C++ standard [required]
-// Note: gcc10 -std=c++20 still defines __cplusplus=201709
 #ifdef __cplusplus
-#    if (__cplusplus < 201709)
-#        error "C++20 is required, make sure that you have set -std=c++20."
+#    if (__cplusplus < 202100)
+#        error "C++23 is required, make sure that you have set -std=c++23."
 #    endif
 #else
 #    error "This is not a C++ compiler."
@@ -172,24 +159,6 @@
 #    endif
 #endif
 
-/*!\brief This is needed to support CentOS 7 or RHEL 7; Newer CentOS's include a more modern default-gcc version making
- *        this macro obsolete.
- *
- * In GCC 5 there was a bigger ABI change and modern systems compile with dual ABI, but some enterprise systems (those
- * where gcc 4 is the standard compiler) don't support dual ABI. This has the effect that even community builds of gcc
- * are build with --disable-libstdcxx-dual-abi. Only building the compiler yourself would solve this problem.
- *
- * \see https://github.com/seqan/hibf/issues/2244
- * \see https://gcc.gnu.org/onlinedocs/libstdc++/manual/using_dual_abi.html
- */
-#ifndef HIBF_WORKAROUND_GCC_NO_CXX11_ABI
-#    if defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI == 0
-#        define HIBF_WORKAROUND_GCC_NO_CXX11_ABI 1
-#    else
-#        define HIBF_WORKAROUND_GCC_NO_CXX11_ABI 0
-#    endif
-#endif
-
 //!\brief Our char literals returning std::vector should be constexpr if constexpr std::vector is supported.
 #if defined(__cpp_lib_constexpr_vector) && __cpp_lib_constexpr_vector >= 201907L
 #    define HIBF_WORKAROUND_LITERAL constexpr
@@ -197,17 +166,9 @@
 #    define HIBF_WORKAROUND_LITERAL inline
 #endif
 
-#if HIBF_DOXYGEN_ONLY(1) 0
-//!\brief This disables the warning you would get if -D_GLIBCXX_USE_CXX11_ABI=0 is set.
-#    define HIBF_DISABLE_LEGACY_STD_DIAGNOSTIC
-#endif // HIBF_DOXYGEN_ONLY(1)0
-
 #if defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI == 0
-#    ifndef HIBF_DISABLE_LEGACY_STD_DIAGNOSTIC
-#        pragma message                                                                                                \
-            "We do not actively support compiler that have -D_GLIBCXX_USE_CXX11_ABI=0 set, and it might be that compiling fails. It is known that all compilers of CentOS 7 / RHEL 7 set this flag by default (and that it cannot be overridden!). Note that these versions of the OSes are community-supported. You can disable this warning by setting -DHIBF_DISABLE_LEGACY_STD_DIAGNOSTIC."
-#    endif // HIBF_DISABLE_LEGACY_STD_DIAGNOSTIC
-#endif     // _GLIBCXX_USE_CXX11_ABI == 0
+#    pragma message "We do not actively support compiler that have -D_GLIBCXX_USE_CXX11_ABI=0 set."
+#endif // _GLIBCXX_USE_CXX11_ABI == 0
 
 // ============================================================================
 //  Backmatter

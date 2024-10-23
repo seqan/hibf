@@ -38,10 +38,9 @@ jobs:
             build: snippet
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
-          - name: "Snippet gcc11"
-            compiler: "gcc-11"
+          - name: "Snippet gcc12"
+            compiler: "gcc-12"
             build: snippet
             build_type: Release
             use_include_dependencies: "OFF"
@@ -51,10 +50,9 @@ jobs:
             build: performance
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
-          - name: "Performance gcc11"
-            compiler: "gcc-11"
+          - name: "Performance gcc12"
+            compiler: "gcc-12"
             build: performance
             build_type: Release
             use_include_dependencies: "OFF"
@@ -64,7 +62,6 @@ jobs:
             build: header
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
           - name: "Header gcc13"
             compiler: "gcc-13"
@@ -72,8 +69,8 @@ jobs:
             build_type: Release
             use_include_dependencies: "OFF"
 
-          - name: "Header gcc11"
-            compiler: "gcc-11"
+          - name: "Header gcc12"
+            compiler: "gcc-12"
             build: header
             build_type: Release
             use_include_dependencies: "OFF"
@@ -85,7 +82,7 @@ jobs:
             use_include_dependencies: "ON"
 
           - name: "Tutorial"
-            compiler: "gcc-11"
+            compiler: "gcc-12"
             build: tutorial
             build_type: Debug
             use_include_dependencies: "OFF"
