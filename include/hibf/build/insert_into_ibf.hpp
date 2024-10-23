@@ -21,7 +21,8 @@ namespace seqan::hibf::build
  * \details
  * Automatically does naive splitting if number_of_bins > 1.
  */
-void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
+void insert_into_ibf(build_data const & data,
+                     robin_hood::unordered_flat_set<uint64_t> const & kmers,
                      size_t const number_of_bins,
                      size_t const bin_index,
                      seqan::hibf::interleaved_bloom_filter & ibf,

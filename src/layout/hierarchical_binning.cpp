@@ -18,6 +18,7 @@
 #include <hibf/layout/layout.hpp>               // for layout
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/misc/divide_and_ceil.hpp>        // for divide_and_ceil
+#include <hibf/misc/empty_bins_by_fraction.hpp> // for empty_bins_by_fraction
 #include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
 #include <hibf/misc/timer.hpp>                  // for concurrent_timer
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
@@ -79,12 +80,13 @@ size_t hierarchical_binning::execute()
 
 [[nodiscard]] size_t hierarchical_binning::needed_technical_bins(size_t const requested_num_ub) const
 {
-    return std::min<size_t>(next_multiple_of_64(requested_num_ub), config.tmax);
+    size_t const next_multiple = next_multiple_of_64(requested_num_ub);
+    return next_multiple - empty_bins_by_fraction(next_multiple, config.empty_bin_fraction);
 }
 
 [[nodiscard]] size_t hierarchical_binning::max_merge_levels(size_t const num_ubs_in_merge) const
 {
-    size_t const lower_lvl_tbs = needed_technical_bins(num_ubs_in_merge);
+    size_t const lower_lvl_tbs = std::min<size_t>(needed_technical_bins(num_ubs_in_merge), config.tmax);
     double const levels = std::log(num_ubs_in_merge) / std::log(lower_lvl_tbs);
     return static_cast<size_t>(std::ceil(levels));
 }
@@ -407,8 +409,10 @@ void hierarchical_binning::update_libf_data(data_store & libf_data, size_t const
 
 size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
 {
+    size_t const number_of_user_bins = libf_data.positions.size();
+
     // now do the binning for the low-level IBF:
-    if (libf_data.positions.size() > config.tmax)
+    if (number_of_user_bins > config.tmax)
     {
         // recursively call hierarchical binning if there are still too many UBs
         return hierarchical_binning{libf_data, config}.execute(); // return id of maximum technical bin
@@ -416,7 +420,8 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     else
     {
         // use simple binning to distribute remaining UBs
-        return simple_binning{libf_data, 0}.execute(); // return id of maximum technical bin
+        size_t const number_of_technical_bins = needed_technical_bins(number_of_user_bins);
+        return simple_binning{libf_data, number_of_technical_bins}.execute(); // return id of maximum technical bin
     }
 }
 

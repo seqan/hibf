@@ -40,6 +40,7 @@ namespace seqan::hibf
  * | General | seqan::hibf::config::threads                  | 1       | [RECOMMENDED_TO_ADAPT] |
  * | Layout  | seqan::hibf::config::sketch_bits              | 12      |                        |
  * | Layout  | seqan::hibf::config::tmax                     | 0       | 0 indicates unset      |
+ * | Layout  | seqan::hibf::config::empty_bin_fraction       | 0.0     | Dynamic Layout         |
  * | Layout  | seqan::hibf::config::max_rearrangement_ratio  | 0.5     |                        |
  * | Layout  | seqan::hibf::config::alpha                    | 1.2     |                        |
  * | Layout  | seqan::hibf::config::disable_estimate_union   | false   |                        |
@@ -230,6 +231,9 @@ struct config
      */
     size_t tmax{};
 
+    //!\brief The percentage of empty bins in the layout.
+    double empty_bin_fraction{};
+
     /*!\brief A scaling factor to influence the amount of merged bins produced by the layout algorithm.
      *
      * The layout algorithm optimizes the space consumption of the resulting HIBF, but currently has no means of
@@ -302,6 +306,7 @@ struct config
      *   * seqan::hibf::config::threads must be greater than `0`.
      *   * seqan::hibf::config::sketch_bits must be in `[5,32]`.
      *   * seqan::hibf::config::tmax must be at most `18446744073709551552`.
+     *   * seqan::hibf::config::empty_bin_fraction must be in `[0.0,1.0)`.
      *   * seqan::hibf::config::alpha must be positive.
      *   * seqan::hibf::config::max_rearrangement_ratio must be in `[0.0,1.0]`.
      *
@@ -324,6 +329,7 @@ struct config
                threads == other.threads &&
                sketch_bits == other.sketch_bits &&
                tmax == other.tmax &&
+               empty_bin_fraction == other.empty_bin_fraction &&
                alpha == other.alpha &&
                max_rearrangement_ratio == other.max_rearrangement_ratio &&
                disable_estimate_union == other.disable_estimate_union &&
@@ -331,14 +337,18 @@ struct config
         // clang-format on
     }
 
+    bool validated{false};
+
 private:
     friend class cereal::access;
+
+    static constexpr uint32_t version{2};
 
     template <typename archive_t>
     void serialize(archive_t & archive)
     {
-        uint32_t version{1};
-        archive(CEREAL_NVP(version));
+        uint32_t parsed_version{version};
+        archive(cereal::make_nvp("version", parsed_version));
 
         archive(CEREAL_NVP(number_of_user_bins));
         archive(CEREAL_NVP(number_of_hash_functions));
@@ -348,10 +358,16 @@ private:
 
         archive(CEREAL_NVP(sketch_bits));
         archive(CEREAL_NVP(tmax));
+
+        if (parsed_version > 1u)
+            archive(CEREAL_NVP(empty_bin_fraction));
+
         archive(CEREAL_NVP(alpha));
         archive(CEREAL_NVP(max_rearrangement_ratio));
         archive(CEREAL_NVP(disable_estimate_union));
         archive(CEREAL_NVP(disable_rearrangement));
+        if (parsed_version > 1u)
+            archive(CEREAL_NVP(validated));
     }
 };
 
