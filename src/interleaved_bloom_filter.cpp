@@ -13,11 +13,13 @@
 
 #include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
 #include <hibf/config.hpp>                   // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
-#include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
+#include <hibf/misc/insert_iterator.hpp>
+#include <hibf/platform.hpp>                // for HIBF_COMPILER_IS_GCC
+#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
+#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 
 namespace seqan::hibf
 {
@@ -48,29 +50,48 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     resize(technical_bins * bin_size_);
 }
 
+size_t find_biggest_bin(config const & configuration)
+{
+    size_t bin_id{};
+    size_t max_size{};
+    seqan::hibf::sketch::hyperloglog sketch{configuration.sketch_bits};
+
+#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) firstprivate(sketch)
+    for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
+    {
+        sketch.reset();
+        configuration.input_fn(i, insert_iterator{sketch});
+
+        size_t const estimate = sketch.estimate();
+#pragma omp critical
+        {
+            if (estimate > max_size)
+            {
+                max_size = estimate;
+                bin_id = i;
+            }
+        }
+    }
+
+    return bin_id;
+}
+
 size_t max_bin_size(config & configuration, size_t const max_bin_elements)
 {
     configuration.validate_and_set_defaults();
 
-    size_t max_size{};
-
-    if (max_bin_elements == 0u)
+    size_t const max_size = [&]()
     {
-        robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(dynamic) num_threads(configuration.threads) private(kmers)
-        for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
-        {
-            kmers.clear();
-            configuration.input_fn(i, insert_iterator{kmers});
+        if (max_bin_elements != 0u)
+            return max_bin_elements;
 
-#pragma omp critical
-            max_size = std::max(max_size, kmers.size());
-        }
-    }
-    else
-    {
-        max_size = max_bin_elements;
-    }
+        // Use sketches to determine biggest bin.
+        size_t const max_bin_id = find_biggest_bin(configuration);
+        // Get exact count for biggest bin. Sketch estimate's accuracy depends on configuration.sketch_bits
+        robin_hood::unordered_flat_set<uint64_t> kmers{};
+        configuration.input_fn(max_bin_id, insert_iterator{kmers});
+        return kmers.size();
+    }();
 
     return build::bin_size_in_bits({.fpr = configuration.maximum_fpr, //
                                     .hash_count = configuration.number_of_hash_functions,
