@@ -38,7 +38,6 @@ jobs:
             build: snippet
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
           - name: "Snippet gcc12"
             compiler: "gcc-12"
@@ -51,7 +50,6 @@ jobs:
             build: performance
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
           - name: "Performance gcc12"
             compiler: "gcc-12"
@@ -64,7 +62,6 @@ jobs:
             build: header
             build_type: Release
             use_include_dependencies: "OFF"
-            cxx_flags: "-stdlib=libc++"
 
           - name: "Header gcc13"
             compiler: "gcc-13"

@@ -12,7 +12,7 @@ CPMDeclarePackage (cereal
                    VERSION ${HIBF_CEREAL_VERSION}
                    GITHUB_REPOSITORY USCiLab/cereal
                    SYSTEM TRUE
-                   OPTIONS "JUST_INSTALL_CEREAL ON")
+                   OPTIONS "JUST_INSTALL_CEREAL ON" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # simde
 set (HIBF_SIMDE_VERSION 0.8.2)
 CPMDeclarePackage (simde
@@ -27,7 +27,8 @@ CPMDeclarePackage (benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
                    GITHUB_REPOSITORY google/benchmark
                    SYSTEM TRUE
-                   OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF")
+                   OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
+                           "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
 set (HIBF_GOOGLETEST_VERSION 1.15.2)
 CPMDeclarePackage (googletest
@@ -35,7 +36,8 @@ CPMDeclarePackage (googletest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
-                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 20")
+                   OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 23"
+                           "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
 set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.4)
 CPMDeclarePackage (doxygen_awesome
