@@ -27,21 +27,18 @@ namespace seqan::hibf::sketch
 void compute_sketches(config const & config, std::vector<sketch::hyperloglog> & hll_sketches)
 {
     // compute hll_sketches
-    hll_sketches.resize(config.number_of_user_bins);
+    hll_sketches.resize(config.number_of_user_bins, config.sketch_bits);
 
-    robin_hood::unordered_flat_set<uint64_t> kmers;
-#pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers)
+    assert(std::ranges::all_of(hll_sketches,
+                               [bits = config.sketch_bits](hyperloglog const & sketch)
+                               {
+                                   return sketch.data_size() == (1ULL << bits);
+                               }));
+
+#pragma omp parallel for schedule(dynamic) num_threads(config.threads)
     for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
-        seqan::hibf::sketch::hyperloglog hll_sketch(config.sketch_bits);
-
-        kmers.clear();
-        config.input_fn(i, insert_iterator{kmers});
-
-        for (auto k_hash : kmers)
-            hll_sketch.add(k_hash);
-
-        hll_sketches[i] = std::move(hll_sketch);
+        config.input_fn(i, insert_iterator{hll_sketches[i]});
     }
 }
 

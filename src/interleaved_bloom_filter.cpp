@@ -85,16 +85,11 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
 {
     // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
-    robin_hood::unordered_flat_set<uint64_t> kmers;
 
-#pragma omp parallel for schedule(dynamic, chunk_size) num_threads(configuration.threads) private(kmers)
+#pragma omp parallel for schedule(dynamic, chunk_size) num_threads(configuration.threads)
     for (size_t i = 0u; i < configuration.number_of_user_bins; ++i)
     {
-        kmers.clear();
-        configuration.input_fn(i, insert_iterator{kmers});
-
-        for (uint64_t const hash : kmers)
-            emplace(hash, seqan::hibf::bin_index{i});
+        configuration.input_fn(i, insert_iterator{*this, i});
     }
 }
 
