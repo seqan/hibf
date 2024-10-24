@@ -5,3 +5,4 @@
 hibf_benchmark (bit_vector_benchmark.cpp)
 hibf_benchmark (bit_vector_serialisation_benchmark.cpp)
 hibf_benchmark (interleaved_bloom_filter_benchmark.cpp)
+hibf_benchmark (interleaved_bloom_filter_construction_benchmark.cpp)
