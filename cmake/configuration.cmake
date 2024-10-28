@@ -231,8 +231,7 @@ else ()
 endif ()
 
 check_cxx_compiler_flag ("-march=native" HIBF_HAS_MARCH_NATIVE)
-cmake_dependent_option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON
-                        "HIBF_HAS_MARCH_NATIVE;NOT HIBF_IS_DEBUG" OFF)
+cmake_dependent_option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON "HIBF_HAS_MARCH_NATIVE" OFF)
 
 if (HIBF_NATIVE_BUILD)
     list (APPEND HIBF_CXX_FLAGS "-march=native")
@@ -248,21 +247,31 @@ else ()
 endif ()
 
 check_ipo_supported (RESULT HIBF_HAS_LTO OUTPUT HIBF_HAS_LTO_OUTPUT)
-cmake_dependent_option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON "HIBF_HAS_LTO;NOT HIBF_IS_DEBUG" OFF)
+cmake_dependent_option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON "HIBF_HAS_LTO" OFF)
+cmake_dependent_option (HIBF_DEV_CHECK_LTO "LTO check." ON
+                        "HIBF_LTO_BUILD;NOT HIBF_IS_TOP_LEVEL;NOT CMAKE_INTERPROCEDURAL_OPTIMIZATION" OFF)
 
-if (HIBF_LTO_BUILD)
+if (HIBF_DEV_CHECK_LTO)
+    message (FATAL_ERROR " HIBF heavily benefits from Link Time Optimisation (LTO).\n"
+                         " Your compiler supports LTO, but is has not been enabled for your project.\n \n"
+                         " Add the following at the beginning of your CMakeLists.txt:\n"
+                         " ```\n"
+                         " include (CheckIPOSupported)\n"
+                         " check_ipo_supported (RESULT result OUTPUT output)\n"
+                         " if (result)\n"
+                         "     set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)\n"
+                         " endif ()\n"
+                         " ```"
+                         " \n \n"
+                         " For development purposes, this error can be disabled via `HIBF_DEV_CHECK_LTO=OFF`.")
+elseif (HIBF_LTO_BUILD)
     set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-    list (APPEND HIBF_CXX_FLAGS ${CMAKE_CXX_COMPILE_OPTIONS_IPO})
     hibf_config_print ("Link Time Optimisation:     enabled")
 else ()
-    if (HIBF_IS_DEBUG)
-        hibf_config_print ("Link Time Optimisation:     disabled")
-    else ()
-        set (HIBF_LTO_LOG "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hibf.lto.log")
-        file (WRITE "${HIBF_LTO_LOG}" "${HIBF_HAS_LTO_OUTPUT}")
-        hibf_config_print ("Link Time Optimisation:     not supported")
-        hibf_config_print ("  See ${HIBF_LTO_LOG}")
-    endif ()
+    set (HIBF_LTO_LOG "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hibf.lto.log")
+    file (WRITE "${HIBF_LTO_LOG}" "${HIBF_HAS_LTO_OUTPUT}")
+    hibf_config_print ("Link Time Optimisation:     not supported")
+    hibf_config_print ("  See ${HIBF_LTO_LOG}")
 endif ()
 
 # ----------------------------------------------------------------------------
