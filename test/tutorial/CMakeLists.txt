@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
-cmake_minimum_required (VERSION 3.16)
+cmake_minimum_required (VERSION 3.16...3.30)
 project (hibf_test_tutorial CXX)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
@@ -26,7 +26,7 @@ FetchContent_Declare (
     download_data
     URL https://ftp.seqan.de/tutorial/hibf/tutorial_files.tar.gz
     URL_HASH SHA256=e07dd741196cffdc66ae4b0430ca64bdefd50c2af2aff652466585cbb56dceec)
-FetchContent_Populate (download_data)
+FetchContent_MakeAvailable (download_data)
 
 file (REMOVE "${download_data_SOURCE_DIR}/filenames.txt")
 execute_process (COMMAND "${download_data_SOURCE_DIR}/get_filenames.sh"
