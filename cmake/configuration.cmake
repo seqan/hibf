@@ -22,6 +22,8 @@ include (CheckIncludeFileCXX)
 include (CheckCXXSourceCompiles)
 include (CheckCXXSourceRuns)
 include (CheckCXXCompilerFlag)
+include (CMakeDependentOption)
+include (CheckIPOSupported)
 
 # ----------------------------------------------------------------------------
 # Find or add dependencies
@@ -83,6 +85,7 @@ hibf_require_ccache ()
 # ----------------------------------------------------------------------------
 
 set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
+set (HIBF_CXX_FLAGS "")
 
 set (CXXSTD_TEST_SOURCE
      "#if !defined (__cplusplus) || (__cplusplus < 202100)
@@ -111,7 +114,7 @@ set (CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
 if (HIBF_CPP23_FLAG STREQUAL "BUILTIN")
     hibf_config_print ("C++ Standard-23 support:    builtin")
 elseif (HIBF_CPP23_FLAG)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
+    list (APPEND HIBF_CXX_FLAGS "${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
     hibf_config_print ("C++ Standard-23 support:    via ${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
 else ()
     hibf_config_error ("HIBF requires C++23, but your compiler does not support it.")
@@ -150,7 +153,7 @@ endif ()
 
 check_cxx_compiler_flag ("-Wno-psabi" HIBF_SUPPRESS_GCC4_ABI)
 if (HIBF_SUPPRESS_GCC4_ABI)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -Wno-psabi")
+    list (APPEND HIBF_CXX_FLAGS "-Wno-psabi")
     hibf_config_print ("Suppressing GCC 4 warnings: via -Wno-psabi")
 endif ()
 
@@ -227,68 +230,38 @@ else ()
     set (HIBF_IS_DEBUG FALSE)
 endif ()
 
-# Apple M1 with GCC sets `-march=apple-m1` when using `-march=native`. This option is only available with GCC >= 13.
-if ("${CMAKE_SYSTEM_PROCESSOR}" MATCHES "arm64"
-    AND "${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU"
-    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS 13)
-    set (HIBF_M1_NO_NATIVE TRUE)
-else ()
-    set (HIBF_M1_NO_NATIVE FALSE)
-endif ()
+check_cxx_compiler_flag ("-march=native" HIBF_HAS_MARCH_NATIVE)
+cmake_dependent_option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON
+                        "HIBF_HAS_MARCH_NATIVE;NOT HIBF_IS_DEBUG" OFF)
 
-option (HIBF_NATIVE_BUILD "Optimize build for current architecture." ON)
-if (HIBF_M1_NO_NATIVE)
-    hibf_config_print ("Optimize build:             disabled (Apple M1 with GCC < 13)")
-elseif (HIBF_IS_DEBUG)
-    hibf_config_print ("Optimize build:             disabled")
-elseif (HIBF_NATIVE_BUILD)
-    set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -march=native")
+if (HIBF_NATIVE_BUILD)
+    list (APPEND HIBF_CXX_FLAGS "-march=native")
     hibf_config_print ("Optimize build:             via -march=native")
 else ()
     check_cxx_compiler_flag ("-mpopcnt" HIBF_HAS_POPCNT)
     if (HIBF_HAS_POPCNT)
-        set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} -mpopcnt")
+        list (APPEND HIBF_CXX_FLAGS "-mpopcnt")
         hibf_config_print ("Optimize build:             via -mpopcnt")
     else ()
         hibf_config_print ("Optimize build:             disabled")
     endif ()
 endif ()
 
-option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON)
-if (HIBF_IS_DEBUG OR NOT HIBF_LTO_BUILD)
-    hibf_config_print ("Link Time Optimisation:     disabled")
-else ()
-    # CMake's check_ipo_supported uses hardcoded lto flags
-    # macOS GCC supports -flto-auto, but not the hardcoded flag "-fno-fat-lto-objects"
-    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" AND NOT "${CMAKE_SYSTEM_NAME}" MATCHES "Darwin")
-        set (HIBF_LTO_FLAGS "-flto=auto -ffat-lto-objects")
-    else ()
-        set (HIBF_LTO_FLAGS "-flto=auto")
-    endif ()
+check_ipo_supported (RESULT HIBF_HAS_LTO OUTPUT HIBF_HAS_LTO_OUTPUT)
+cmake_dependent_option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON "HIBF_HAS_LTO;NOT HIBF_IS_DEBUG" OFF)
 
-    set (LTO_CMAKE_SOURCE
-         "cmake_minimum_required(VERSION ${CMAKE_VERSION})\nproject(lto-test LANGUAGES CXX)
-          cmake_policy(SET CMP0069 NEW)\nadd_library(foo foo.cpp)\nadd_executable(boo main.cpp)
-          target_link_libraries(boo PUBLIC foo)")
-    set (LTO_FOO_CPP "int foo(){return 0x42;}")
-    set (LTO_MAIN_CPP "int foo();int main(){return foo();}")
-    set (testdir "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/lto-test")
-    set (bindir "${testdir}/bin")
-    set (srcdir "${testdir}/src")
-    file (MAKE_DIRECTORY "${bindir}")
-    file (MAKE_DIRECTORY "${srcdir}")
-    file (WRITE "${srcdir}/foo.cpp" "${LTO_FOO_CPP}")
-    file (WRITE "${srcdir}/main.cpp" "${LTO_MAIN_CPP}")
-    file (WRITE "${srcdir}/CMakeLists.txt" "${LTO_CMAKE_SOURCE}")
-    try_compile (HIBF_HAS_LTO "${bindir}"
-                 "${srcdir}" "lto-test"
-                 CMAKE_FLAGS "-DCMAKE_VERBOSE_MAKEFILE=ON" "-DCMAKE_CXX_FLAGS:STRING=${HIBF_LTO_FLAGS}"
-                 OUTPUT_VARIABLE output)
-    if (HIBF_HAS_LTO)
-        hibf_config_print ("Link Time Optimisation:     enabled")
-        set (HIBF_CXX_FLAGS "${HIBF_CXX_FLAGS} ${HIBF_LTO_FLAGS}")
+if (HIBF_LTO_BUILD)
+    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+    list (APPEND HIBF_CXX_FLAGS ${CMAKE_CXX_COMPILE_OPTIONS_IPO})
+    hibf_config_print ("Link Time Optimisation:     enabled")
+else ()
+    if (HIBF_IS_DEBUG)
+        hibf_config_print ("Link Time Optimisation:     disabled")
     else ()
-        hibf_config_print ("Link Time Optimisation:     not available")
+        set (HIBF_LTO_LOG "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hibf.lto.log")
+        file (WRITE "${HIBF_LTO_LOG}" "${HIBF_HAS_LTO_OUTPUT}")
+        hibf_config_print ("Link Time Optimisation:     not supported")
+        hibf_config_print ("  See ${HIBF_LTO_LOG}")
     endif ()
 endif ()
 
@@ -357,21 +330,20 @@ set (CXXSTD_TEST_SOURCE "#include <hibf/platform.hpp>
                          int main() {}")
 
 # using try_compile instead of check_cxx_source_compiles to capture output in case of failure
-file (WRITE "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx" "${CXXSTD_TEST_SOURCE}\n")
-
-try_compile (HIBF_PLATFORM_TEST #
-             ${CMAKE_BINARY_DIR}
-             ${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/src.cxx
-             CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${HIBF_CXX_FLAGS}"
+list (JOIN HIBF_CXX_FLAGS " " HIBF_TRY_COMPILE_CXX_FLAGS)
+# cmake-format: off
+try_compile (HIBF_PLATFORM_TEST
+             SOURCE_FROM_CONTENT src.cxx "#include <hibf/platform.hpp>\nint main() {}"
+             CMAKE_FLAGS "-DCOMPILE_DEFINITIONS:STRING=${CMAKE_CXX_FLAGS} ${HIBF_TRY_COMPILE_CXX_FLAGS}"
                          "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH}"
              COMPILE_DEFINITIONS ${HIBF_DEFINITIONS}
              LINK_LIBRARIES ${HIBF_LIBRARIES}
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)
-
+# cmake-format: on
 if (HIBF_PLATFORM_TEST)
     hibf_config_print ("HIBF platform.hpp build:    passed")
 else ()
-    hibf_config_error ("HIBF platform.hpp build:    failed\n${HIBF_PLATFORM_TEST_OUTPUT}")
+    set (HIBF_PLATFORM_TEST_LOG "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/hibf.platform.compile.log")
+    file (WRITE "${HIBF_PLATFORM_TEST_LOG}" "${HIBF_PLATFORM_TEST_OUTPUT}")
+    hibf_config_error ("HIBF platform.hpp build:    failed\n    See ${HIBF_PLATFORM_TEST_LOG}")
 endif ()
-
-separate_arguments (HIBF_CXX_FLAGS UNIX_COMMAND "${HIBF_CXX_FLAGS}")
