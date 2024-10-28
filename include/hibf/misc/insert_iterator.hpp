@@ -5,17 +5,16 @@
 #pragma once
 
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t
-#include <cstddef>    // for ptrdiff_t
-#include <functional> // for equal_to
+#include <cinttypes>  // for uint64_t, uint8_t
+#include <cstddef>    // for size_t, ptrdiff_t
+#include <functional> // for function, equal_to
 #include <iterator>   // for output_iterator_tag
 #include <memory>     // for addressof
-#include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash
-#include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set, hash
+#include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter
 #include <hibf/platform.hpp>
-#include <hibf/sketch/hyperloglog.hpp>
+#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 
 // IWYU pragma: private, include <hibf/config.hpp>
 

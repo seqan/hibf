@@ -2,12 +2,20 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, Test, EXPECT_EQ, Capture...
+#include <gtest/gtest.h> // for Test, Message, TestInfo, TEST, TestPartResult, EXPECT_EQ, EXPEC...
 
-#include <hibf/interleaved_bloom_filter.hpp>
-#include <hibf/misc/insert_iterator.hpp>
-#include <hibf/sketch/hyperloglog.hpp>
-#include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
+#include <algorithm>  // for __fn, copy
+#include <array>      // for array
+#include <cinttypes>  // for uint64_t, uint8_t
+#include <cstddef>    // for size_t
+#include <functional> // for equal_to, function
+#include <vector>     // for vector
+
+#include <hibf/config.hpp>                   // for insert_iterator
+#include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_flat_set
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_size, hash_function_count
+#include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
+#include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ
 
 static constexpr std::array<size_t, 10> values{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
 

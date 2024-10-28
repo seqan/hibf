@@ -2,24 +2,23 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>  // for clamp, max
+#include <algorithm>  // for clamp
 #include <array>      // for array
 #include <bit>        // for bit_ceil, countl_zero
 #include <cassert>    // for assert
 #include <cinttypes>  // for uint64_t
 #include <cstring>    // for size_t, memcpy
-#include <functional> // for function
+#include <functional> // for equal_to, function
 #include <stdexcept>  // for logic_error, invalid_argument
 
 #include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
 #include <hibf/config.hpp>                   // for config, insert_iterator
-#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
+#include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_flat_set
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
-#include <hibf/misc/insert_iterator.hpp>
-#include <hibf/platform.hpp>                // for HIBF_COMPILER_IS_GCC
-#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
-#include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
+#include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
+#include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 
 namespace seqan::hibf
 {
