@@ -2,6 +2,8 @@
 # SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
+cmake_minimum_required (VERSION 3.10...3.30)
+
 set (HIBF_SOURCE_FILES
      hierarchical_interleaved_bloom_filter.cpp
      interleaved_bloom_filter.cpp
