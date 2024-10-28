@@ -4,6 +4,8 @@
 
 @PACKAGE_INIT@
 
+include (CheckIPOSupported)
+include (CMakeDependentOption)
 include (CMakeFindDependencyMacro)
 
 find_dependency (cereal @HIBF_CEREAL_VERSION@ REQUIRED)
@@ -24,6 +26,24 @@ if (simde_FOUND)
     target_include_directories (simde INTERFACE ${simde_INCLUDEDIR})
 else ()
     find_dependency (simde @HIBF_SIMDE_VERSION@ REQUIRED)
+endif ()
+
+check_ipo_supported (RESULT HIBF_HAS_LTO OUTPUT HIBF_HAS_LTO_OUTPUT)
+cmake_dependent_option (HIBF_DEV_CHECK_LTO "LTO check." ON "HIBF_HAS_LTO;NOT CMAKE_INTERPROCEDURAL_OPTIMIZATION" OFF)
+
+if (HIBF_DEV_CHECK_LTO)
+    message (FATAL_ERROR " HIBF heavily benefits from Link Time Optimisation (LTO).\n"
+                         " Your compiler supports LTO, but is has not been enabled for your project.\n \n"
+                         " Add the following at the beginning of your CMakeLists.txt:\n"
+                         " ```\n"
+                         " include (CheckIPOSupported)\n"
+                         " check_ipo_supported (RESULT result OUTPUT output)\n"
+                         " if (result)\n"
+                         "     set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)\n"
+                         " endif ()\n"
+                         " ```"
+                         " \n \n"
+                         " For development purposes, this error can be disabled via `HIBF_DEV_CHECK_LTO=OFF`.")
 endif ()
 
 include ("${CMAKE_CURRENT_LIST_DIR}/hibf-targets.cmake")

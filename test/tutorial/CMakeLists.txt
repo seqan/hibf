@@ -5,6 +5,12 @@
 cmake_minimum_required (VERSION 3.16...3.30)
 project (hibf_test_tutorial CXX)
 
+include (CheckIPOSupported)
+check_ipo_supported (RESULT HIBF_TEST_HAS_LTO OUTPUT HIBF_TEST_HAS_LTO_OUTPUT)
+if (HIBF_TEST_HAS_LTO)
+    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 list (APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 

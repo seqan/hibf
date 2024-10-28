@@ -13,6 +13,12 @@ cmake_minimum_required (VERSION 3.10...3.30)
 # have to be adapted or the option deactivated.
 option (HIBF_BENCHMARK_ALIGN_LOOPS "Pass -falign-loops=32 to the benchmark builds." ON)
 
+include (CheckIPOSupported)
+check_ipo_supported (RESULT HIBF_TEST_HAS_LTO OUTPUT HIBF_TEST_HAS_LTO_OUTPUT)
+if (HIBF_TEST_HAS_LTO)
+    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif ()
+
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
 target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")

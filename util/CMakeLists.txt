@@ -5,9 +5,10 @@
 cmake_minimum_required (VERSION 3.10...3.30)
 project (hibf_util CXX)
 
-# https://cmake.org/cmake/help/latest/policy/CMP0135.html
-if (CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
-    cmake_policy (SET CMP0135 NEW)
+include (CheckIPOSupported)
+check_ipo_supported (RESULT HIBF_TEST_HAS_LTO OUTPUT HIBF_TEST_HAS_LTO_OUTPUT)
+if (HIBF_TEST_HAS_LTO)
+    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()
 
 # Dependency: seqan::hibf
