@@ -68,7 +68,8 @@ public:
         config{config_},
         data{std::addressof(data_)},
         num_user_bins{data->positions.size()},
-        num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
+        num_technical_bins{data->previous.empty() ? config.tmax
+                                                  : std::min<size_t>(needed_technical_bins(num_user_bins), config.tmax)}
     {
         assert(data != nullptr);
     }

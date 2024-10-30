@@ -33,6 +33,8 @@ namespace bin_kind
 
 //!\brief The value that indicates a merged bin.
 static constexpr uint64_t merged{std::numeric_limits<uint64_t>::max()};
+//!\brief The value that indicates a deleted bin.
+static constexpr uint64_t deleted{std::numeric_limits<uint64_t>::max() - 1u};
 
 } // namespace bin_kind
 
@@ -212,6 +214,23 @@ public:
      */
     std::vector<std::vector<uint64_t>> next_ibf_id;
 
+    struct previous_ibf_id_pair
+    {
+        size_t ibf_idx{};
+        size_t bin_idx{};
+
+        friend constexpr auto operator<=>(previous_ibf_id_pair const &, previous_ibf_id_pair const &) = default;
+
+        template <seqan::hibf::cereal_archive archive_t>
+        void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
+        {
+            archive(ibf_idx);
+            archive(bin_idx);
+        }
+    };
+
+    std::vector<previous_ibf_id_pair> prev_ibf_id;
+
     /*!\brief Stores for each bin in each IBF of the HIBF the user bin ID.
     * \details
     * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_user_bin_id[i][b]`.
@@ -251,6 +270,7 @@ public:
         archive(ibf_vector);
         archive(next_ibf_id);
         archive(ibf_bin_to_user_bin_id);
+        archive(prev_ibf_id);
     }
 
     /*!\name Timer

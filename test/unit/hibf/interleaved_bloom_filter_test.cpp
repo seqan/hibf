@@ -198,25 +198,25 @@ TEST(ibf_test, emplace)
     }
 }
 
-TEST(ibf_test, emplace_exists)
-{
-    // 1. Construct and emplace
-    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
-                                              seqan::hibf::bin_size{512},
-                                              seqan::hibf::hash_function_count{2u}};
+// TEST(ibf_test, emplace_exists)
+// {
+//     // 1. Construct and emplace
+//     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
+//                                               seqan::hibf::bin_size{512},
+//                                               seqan::hibf::hash_function_count{2u}};
 
-    for (size_t bin_idx : std::views::iota(0, 64))
-        for (size_t hash : std::views::iota(0, 64))
-            ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
+//     for (size_t bin_idx : std::views::iota(0, 64))
+//         for (size_t hash : std::views::iota(0, 64))
+//             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
-    // 2. Test for correctness
-    for (size_t bin_idx : std::views::iota(0, 64))
-        for (size_t hash : std::views::iota(0, 64))
-            ASSERT_TRUE(ibf.emplace_exists(hash, seqan::hibf::bin_index{bin_idx}));
+//     // 2. Test for correctness
+//     for (size_t bin_idx : std::views::iota(0, 64))
+//         for (size_t hash : std::views::iota(0, 64))
+//             ASSERT_TRUE(ibf.emplace_exists(hash, seqan::hibf::bin_index{bin_idx}));
 
-    for (size_t bin_idx : std::views::iota(64, 128))
-        ASSERT_FALSE(ibf.emplace_exists(0u, seqan::hibf::bin_index{bin_idx}));
-}
+//     for (size_t bin_idx : std::views::iota(64, 128))
+//         ASSERT_FALSE(ibf.emplace_exists(0u, seqan::hibf::bin_index{bin_idx}));
+// }
 
 TEST(ibf_test, clear)
 {

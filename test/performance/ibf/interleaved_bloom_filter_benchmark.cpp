@@ -107,18 +107,15 @@ inline void emplace_benchmark_impl(::benchmark::State & state)
     for (auto _ : state)
     {
         size_t bin_index = 0u;
-        [[maybe_unused]] size_t result{};
         for (auto && chunk : seqan::stl::views::chunk(values, chunk_size))
         {
             for (auto value : chunk)
                 if constexpr (check_exists)
-                    result += ibf.emplace_exists(value, seqan::hibf::bin_index{bin_index});
+                    ibf.emplace_exists(value, seqan::hibf::bin_index{bin_index});
                 else
                     ibf.emplace(value, seqan::hibf::bin_index{bin_index});
             ++bin_index;
         }
-        if constexpr (check_exists)
-            benchmark::DoNotOptimize(result);
     }
 
     state.counters["elements"] = elements_per_second(number_of_elements);

@@ -55,7 +55,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
     local_index_allocation_timer.stop();
     data.index_allocation_timer += local_index_allocation_timer;
 
-    insert_into_ibf(kmers, number_of_bins, ibf_node.max_bin_index, ibf, data.fill_ibf_timer);
+    insert_into_ibf(data, kmers, number_of_bins, ibf_node.max_bin_index, ibf, data.fill_ibf_timer);
     if (!is_root)
         update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
 
