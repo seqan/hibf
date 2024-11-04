@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
+#include <cassert>    // for assert
 #include <filesystem> // for remove
-#include <fstream>    // for char_traits, operator<<, basic_ostream, ofstream
+#include <fstream>    // for char_traits, basic_ofstream, basic_ostream, operator<<, ofstream
 
 #include <hibf/test/sandboxed_path.hpp> // for operator/, sandboxed_path
 #include <hibf/test/tmp_directory.hpp>  // for tmp_directory
