@@ -25,7 +25,7 @@
 namespace seqan::hibf::sketch
 {
 
-hyperloglog::hyperloglog(uint8_t const bits) : bits{bits}, size{1ULL << bits}, data(size, 0u)
+hyperloglog::hyperloglog(uint8_t const num_bits) : bits{num_bits}, size{1ULL << bits}, data(size, 0u)
 {
     if (bits < 5u || bits > 32u)
         throw std::invalid_argument("[HyperLogLog] bit width must be in the range [5,32].");
@@ -110,7 +110,7 @@ double hyperloglog::estimate() const
         sum += *(sum_it + i);
     }
 
-    double estimate = normalization_factor / sum;
+    double estimate = normalization_factor / static_cast<double>(sum);
 
     // Small value correction: linear counting of zeros
     if (estimate <= 2.5 * size)

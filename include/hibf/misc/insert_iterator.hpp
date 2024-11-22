@@ -50,7 +50,7 @@ public:
 
     explicit constexpr insert_iterator(ibf_t & ibf, size_t ibf_bin_index) :
         ptr{std::addressof(ibf)},
-        ibf_bin_index{ibf_bin_index},
+        ibf_bin_idx{ibf_bin_index},
         type{data_type::ibf}
     {}
 
@@ -61,6 +61,7 @@ public:
     {
         assert(ptr != nullptr);
 
+        // NOLINTNEXTLINE(clang-diagnostic-switch-enum)
         switch (type)
         {
         case data_type::unordered_set:
@@ -70,7 +71,7 @@ public:
             static_cast<sketch_t *>(ptr)->add(value);
             break;
         case data_type::ibf:
-            static_cast<ibf_t *>(ptr)->emplace(value, static_cast<bin_index>(ibf_bin_index));
+            static_cast<ibf_t *>(ptr)->emplace(value, static_cast<bin_index>(ibf_bin_idx));
             break;
         default:
             assert(type == data_type::function);
@@ -105,7 +106,7 @@ private:
         function
     };
 
-    size_t ibf_bin_index{};
+    size_t ibf_bin_idx{};
     data_type type{};
 };
 

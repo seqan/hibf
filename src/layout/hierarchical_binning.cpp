@@ -301,7 +301,6 @@ void hierarchical_binning::backtrack_split_bin(size_t trace_j,
     // update max bin
     size_t const cardinality = (*data->kmer_counts)[data->positions[trace_j]];
     size_t const corrected_cardinality = static_cast<size_t>(cardinality * data->fpr_correction[number_of_bins]);
-    // NOLINTNEXTLINE(clang-analyzer-core.DivideZero)
     size_t const cardinality_per_bin = divide_and_ceil(corrected_cardinality, number_of_bins);
 
     max_tracker.update_max(bin_id, cardinality_per_bin);

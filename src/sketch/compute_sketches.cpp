@@ -59,13 +59,13 @@ struct too_few_kmers_handler
         return flag.test();
     }
 
-    inline void set(size_t const available) noexcept
+    inline void set(size_t const new_available) noexcept
     {
         // Sets the flag to true and returns previous value.
         // If the flag was already set, another thread encountered this block at the same time.
         // This basically acts as a mutex for setting available.
         if (!flag.test_and_set())
-            this->available = available;
+            this->available = new_available;
     }
 
     inline void check_and_throw()

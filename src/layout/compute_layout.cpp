@@ -54,6 +54,8 @@ layout compute_layout(config const & config,
     union_estimation_timer = store.union_estimation_timer;
     rearrangement_timer = store.rearrangement_timer;
 
+// Silence clangsa cplusplus.Move warning.
+#ifndef __clang_analyzer__
     // sort records ascending by the number of bin indices (corresponds to the IBF levels)
     // GCOVR_EXCL_START
     std::ranges::sort(store.hibf_layout->max_bins,
@@ -62,6 +64,7 @@ layout compute_layout(config const & config,
                           return r.previous_TB_indices.size() < l.previous_TB_indices.size();
                       });
     // GCOVR_EXCL_STOP
+#endif
 
     return *store.hibf_layout;
 }
