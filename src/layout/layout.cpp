@@ -64,7 +64,7 @@ void seqan::hibf::layout::layout::read_from(std::istream & stream)
     {
         std::vector<size_t> result;
 
-        auto buffer_start = &buffer[0];
+        auto buffer_start = buffer.data();
         auto const buffer_end = buffer_start + buffer.size();
 
         size_t tmp{};
@@ -82,7 +82,7 @@ void seqan::hibf::layout::layout::read_from(std::istream & stream)
     auto parse_first_bin = [](std::string_view const & buffer)
     {
         size_t tmp{};
-        std::from_chars(&buffer[0], &buffer[0] + buffer.size(), tmp);
+        std::from_chars(buffer.data(), buffer.data() + buffer.size(), tmp);
         return tmp;
     };
 

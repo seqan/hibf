@@ -257,7 +257,7 @@ void cluster_bins(std::vector<hyperloglog> const & sketches,
 
                 // compute the final min_id from the min_ids of the worker threads
                 size_t min_id = min_ids[0];
-                double min_dist = std::numeric_limits<double>::max();
+                double min_id_dist = std::numeric_limits<double>::max();
                 for (auto candidate_id : min_ids)
                 {
                     // check if the thread saw any id
@@ -266,9 +266,9 @@ void cluster_bins(std::vector<hyperloglog> const & sketches,
 
                     size_t const dist_index = remaining_ids.at(candidate_id);
                     neighbor const & curr = dist[dist_index].pq.top();
-                    if (curr.dist < min_dist)
+                    if (curr.dist < min_id_dist)
                     {
-                        min_dist = curr.dist;
+                        min_id_dist = curr.dist;
                         min_id = candidate_id;
                     }
                 }

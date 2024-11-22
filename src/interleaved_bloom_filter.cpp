@@ -103,7 +103,6 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
                              seqan::hibf::bin_size{max_bin_size(configuration, max_bin_elements)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions}}
 {
-    // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
 
 #pragma omp parallel for schedule(dynamic, chunk_size) num_threads(configuration.threads)
@@ -205,57 +204,59 @@ interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const valu
     assert(result_buffer.size() == ibf_ptr->bin_count());
 
     // Needed for auto-vectorization of loop. ibf_ptr->bin_words could change bewtween loops.
-    size_t const bin_words = ibf_ptr->bin_words;
-    size_t const hash_funs = ibf_ptr->hash_funs;
+    size_t const bin_words_ = ibf_ptr->bin_words;
+    size_t const hash_funs_ = ibf_ptr->hash_funs;
 
 #ifndef NDEBUG
-    assert(bin_words != 0u);
-    assert(hash_funs != 0u);
+    assert(bin_words_ != 0u);
+    assert(hash_funs_ != 0u);
 #else
-    // Removes case for bin_words == 0u. The same statment inside the switch-case wouldn't have that effect.
-    if (bin_words == 0u)
+    // Removes case for bin_words_ == 0u. The same statment inside the switch-case wouldn't have that effect.
+    if (bin_words_ == 0u)
         __builtin_unreachable();
-    if (hash_funs == 0u)
+    if (hash_funs_ == 0u)
         __builtin_unreachable();
 #endif
 
-    for (size_t i = 0; i < hash_funs; ++i)
+    for (size_t i = 0; i < hash_funs_; ++i)
         bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) / 64u;
 
     uint64_t * const raw = result_buffer.data();
     uint64_t const * const ibf_data = ibf_ptr->data();
-    std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words);
+    std::memcpy(raw, ibf_data + bloom_filter_indices[0], sizeof(uint64_t) * bin_words_);
 
     // GCOVR_EXCL_START
+    // NOLINTBEGIN(bugprone-branch-clone)
     auto impl = [&]<size_t extent = 0u>()
     {
-        for (size_t i = 1; i < hash_funs; ++i)
+        for (size_t i = 1; i < hash_funs_; ++i)
         {
             uint64_t const * const ibf_raw = ibf_data + bloom_filter_indices[i];
 
             if constexpr (extent == 0u)
             {
 #pragma omp simd
-                for (size_t i = 0; i < bin_words; ++i)
-                    raw[i] &= ibf_raw[i];
+                for (size_t j = 0; j < bin_words_; ++j)
+                    raw[j] &= ibf_raw[j];
             }
             else if constexpr (extent == 2u || extent == 4u || extent == 8u)
             {
 #pragma omp simd
-                for (size_t i = 0; i < extent; ++i)
-                    raw[i] &= ibf_raw[i];
+                for (size_t j = 0; j < extent; ++j)
+                    raw[j] &= ibf_raw[j];
             }
             else
             {
-                for (size_t i = 0; i < extent; ++i)
-                    raw[i] &= ibf_raw[i];
+                for (size_t j = 0; j < extent; ++j)
+                    raw[j] &= ibf_raw[j];
             }
         }
     };
+    // NOLINTEND(bugprone-branch-clone)
 
     // https://godbolt.org/z/rqaeWGGer
     // Having the loop inside impl instead of around the switch/case is faster.
-    switch (bin_words)
+    switch (bin_words_)
     {
     case 1u: // 1 AND (64 bit)
         impl.operator()<1u>();

@@ -39,13 +39,13 @@ public:
      * \{
      */
     /*!\brief Default constructor.
-     * \param[in] bits The bit width in [5,32].
+     * \param[in] num_bits The bit width in [5,32].
      *
-     * Allocates 2^`bits` bytes of memory.
+     * Allocates 2^`num_bits` bytes of memory.
      *
-     * \throws std::invalid_argument if bits is not in [5,32].
+     * \throws std::invalid_argument if num_bits is not in [5,32].
      */
-    hyperloglog(uint8_t const bits = 5u);
+    hyperloglog(uint8_t const num_bits = 5u);
     hyperloglog(hyperloglog const &) = default;             //!< Defaulted.
     hyperloglog & operator=(hyperloglog const &) = default; //!< Defaulted.
     hyperloglog(hyperloglog &&) = default;                  //!< Defaulted.

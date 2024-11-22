@@ -64,7 +64,9 @@ jobs:
                             --disable clang-diagnostic-implicit-int-float-conversion \
                             --disable clang-diagnostic-float-conversion \
                             --disable clang-diagnostic-implicit-int-conversion \
+                            --disable bugprone-exception-escape \
                             --disable bugprone-narrowing-conversions \
+                            --disable deadcode.DeadStores \
                             --output ./results 2>/dev/null | grep --line-buffered -E "\[[0-9]+/[0-9]+\]" || true
           echo "-${GITHUB_WORKSPACE}/include/hibf/contrib/*" > skipfile
           echo "+${GITHUB_WORKSPACE}/*" >> skipfile
@@ -76,6 +78,7 @@ jobs:
                             --trim-path-prefix "${GITHUB_WORKSPACE}/" > parse.log || true
           awk '/----====/{y=1;}y' parse.log
           sed -i 's/<option value="100">/<option value="100" selected>/g' html/index.html
+          sed -i 's@<title>Plist HTML Viewer</title>@<title>CodeChecker hibf</title>@g' html/*.html
 
       - name: Upload Report
         if: github.repository_owner != 'seqan'

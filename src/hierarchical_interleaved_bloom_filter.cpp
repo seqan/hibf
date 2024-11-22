@@ -123,16 +123,16 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         {
             auto & child = children[index];
 
-            robin_hood::unordered_flat_set<uint64_t> kmers{};
-            size_t const ibf_pos = hierarchical_build(hibf, kmers, child, data, false);
+            robin_hood::unordered_flat_set<uint64_t> local_kmers{};
+            size_t const local_ibf_pos = hierarchical_build(hibf, local_kmers, child, data, false);
             auto parent_bin_index = child.parent_bin_index;
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
-                technical_bin_to_ibf_id[parent_bin_index] = ibf_pos;
-                build::insert_into_ibf(kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
+                technical_bin_to_ibf_id[parent_bin_index] = local_ibf_pos;
+                build::insert_into_ibf(local_kmers, 1, parent_bin_index, ibf, data.fill_ibf_timer);
                 if (!is_root)
-                    build::update_parent_kmers(parent_kmers, kmers, data.merge_kmers_timer);
+                    build::update_parent_kmers(parent_kmers, local_kmers, data.merge_kmers_timer);
             }
         }
     };

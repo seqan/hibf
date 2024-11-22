@@ -119,11 +119,13 @@ private:
         bit_reference(bit_reference && other) = default;
         bit_reference & operator=(bit_reference const & other)
         {
-            return *this = bool(other);
+            *this = bool(other);
+            return *this;
         }
         bit_reference & operator=(bit_reference && other) noexcept
         {
-            return *this = bool(other);
+            *this = bool(other);
+            return *this;
         }
 
         /*!\brief Assigns a bit to the referenced bit.
@@ -139,6 +141,7 @@ private:
         //!\overload
         // Needed to model std::output_iterator<bit_iterator, bool>, which requires the assignment to an const && version
         // of the proxy.
+        // NOLINTNEXTLINE(misc-unconventional-assign-operator)
         constexpr bit_reference const & operator=(bool const bit) const noexcept
             requires (!is_const)
         {
