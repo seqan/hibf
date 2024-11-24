@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2023, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-name: CoderChecker
+name: CodeChecker
 
 on:
   schedule:
@@ -22,7 +22,7 @@ defaults:
 
 jobs:
   build:
-    name: CoderChecker
+    name: CodeChecker
     runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     container:
@@ -30,69 +30,10 @@ jobs:
       volumes:
         - /home/runner:/home/runner
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup
-        run: |
-          apt-get update
-          apt-get install --yes python3-venv python3-dev g++-14 cppcheck
-          apt-get remove --yes ccache
-          python3 -m venv /venv
-          { set +x; source /venv/bin/activate; set -x; }
-          pip install codechecker
-          echo "CC_ANALYZER_BIN=clangsa:$(which clang-19);clang-tidy:$(which clang-tidy-19);gcc:$(which g++-14)" >> $GITHUB_ENV
-          wget -O codechecker.patch https://github.com/eseiler/codechecker/commit/2cbb867eb305f7cec93a6a7dbbd64b1ff131e8b2.patch
-          patch_me=$(find /venv/ -path '*/codechecker_report_converter/report/output/html/html.py')
-          patch --batch --forward --quiet --reject-file=- ${patch_me} codechecker.patch || true
-          rm codechecker.patch
-
       - name: Run CodeChecker
-        run: |
-          { set +x; source /venv/bin/activate; set -x; }
-          cmake . -DCMAKE_CXX_COMPILER=clang++-19 \
-                  -DCMAKE_CXX_FLAGS="-stdlib=libc++" \
-                  -DCMAKE_BUILD_TYPE=Debug \
-                  -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
-          CodeChecker analyzers -o table
-          CodeChecker check --logfile compile_commands.json \
-                            --jobs $(nproc) \
-                            --enable performance \
-                            --enable bugprone \
-                            --enable clang-diagnostic-shadow \
-                            --disable bugprone-easily-swappable-parameters \
-                            --disable clang-diagnostic-implicit-int-float-conversion \
-                            --disable clang-diagnostic-float-conversion \
-                            --disable clang-diagnostic-implicit-int-conversion \
-                            --disable bugprone-exception-escape \
-                            --disable bugprone-narrowing-conversions \
-                            --disable deadcode.DeadStores \
-                            --output ./results 2>/dev/null | grep --line-buffered -E "\[[0-9]+/[0-9]+\]" || true
-          echo "-${GITHUB_WORKSPACE}/include/hibf/contrib/*" > skipfile
-          echo "+${GITHUB_WORKSPACE}/*" >> skipfile
-          echo "-*" >> skipfile
-          CodeChecker parse ./results \
-                            --export html \
-                            --output ./html \
-                            --skip skipfile \
-                            --trim-path-prefix "${GITHUB_WORKSPACE}/" > parse.log || true
-          awk '/----====/{y=1;}y' parse.log
-          sed -i 's/<option value="100">/<option value="100" selected>/g' html/index.html
-          sed -i 's@<title>Plist HTML Viewer</title>@<title>CodeChecker hibf</title>@g' html/*.html
-
-      - name: Upload Report
-        if: github.repository_owner != 'seqan'
-        uses: actions/upload-artifact@v4
-        with:
-          name: codechecker-report
-          path: html
-
-      - name: Deploy Report
-        if: github.repository_owner == 'seqan'
-        uses: seqan/actions/documentation_deploy_production@main
+        uses: seqan/actions/codechecker@main
         with:
           deploy_host: ${{ secrets.DEPLOY_HOST }}
           deploy_user: ${{ secrets.DEPLOY_USER }}
           deploy_ssh_key: ${{ secrets.DEPLOY_SSH_KEY }}
-          source_path_user_doc: html/
-          deploy_path_user_doc: ${{ secrets.DEPLOY_CODECHECKER_PATH }}
+          deploy_path: ${{ secrets.DEPLOY_CODECHECKER_PATH }}
