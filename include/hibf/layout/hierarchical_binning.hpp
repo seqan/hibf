@@ -10,9 +10,10 @@
 #include <utility> // for pair
 #include <vector>  // for vector
 
-#include <hibf/config.hpp>            // for config
-#include <hibf/layout/data_store.hpp> // for data_store
-#include <hibf/platform.hpp>          // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
+#include <hibf/config.hpp>                       // for config
+#include <hibf/layout/data_store.hpp>            // for data_store
+#include <hibf/misc/tmax_without_empty_bins.hpp> // for tmax_without_empty_bins
+#include <hibf/platform.hpp>                     // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 
 namespace seqan::hibf::layout
 {
@@ -68,7 +69,8 @@ public:
         config{config_},
         data{std::addressof(data_)},
         num_user_bins{data->positions.size()},
-        num_technical_bins{data->previous.empty() ? config.tmax : needed_technical_bins(num_user_bins)}
+        num_technical_bins{data->previous.empty() ? tmax_without_empty_bins(config.tmax, config.empty_bin_fraction)
+                                                  : needed_technical_bins(num_user_bins)}
     {
         assert(data != nullptr);
     }

@@ -14,9 +14,10 @@
 #include <cereal/archives/json.hpp> // for JSONInputArchive, JSONOutputArchive
 #include <cereal/cereal.hpp>        // for make_nvp, InputArchive, OutputArchive
 
-#include <hibf/config.hpp>                   // for config
-#include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start
-#include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
+#include <hibf/config.hpp>                       // for config
+#include <hibf/layout/prefixes.hpp>              // for meta_header, meta_hibf_config_end, meta_hibf_config_start
+#include <hibf/misc/next_multiple_of_64.hpp>     // for next_multiple_of_64
+#include <hibf/misc/tmax_without_empty_bins.hpp> // for tmax_without_empty_bins
 
 namespace seqan::hibf
 {
@@ -69,9 +70,11 @@ void config::validate_and_set_defaults()
     if (number_of_user_bins == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
 
-    if (number_of_user_bins == 18'446'744'073'709'551'615ULL) // std::numeric_limits<uint64_t>::max() = bin_kind::merged
+    // std::numeric_limits<uint64_t>::max() = bin_kind::merged
+    // std::numeric_limits<uint64_t>::max() - 1 = bin_kind::deleted
+    if (number_of_user_bins >= 18'446'744'073'709'551'614ULL)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
-                                    "is 18446744073709551614."};
+                                    "is 18446744073709551613."};
 
     if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
@@ -110,6 +113,9 @@ void config::validate_and_set_defaults()
                   << "Due to the architecture of the HIBF, it will use up space equal to the next multiple of 64 "
                   << "anyway, so we increased your number of technical bins to " << tmax << ".\n";
     }
+
+    if (empty_bin_fraction < 0.0 || empty_bin_fraction >= 1.0)
+        throw std::invalid_argument{"[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0)."};
 
     if (alpha < 0.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};
