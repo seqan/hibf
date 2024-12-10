@@ -34,14 +34,34 @@ void insert_into_ibf(robin_hood::unordered_flat_set<uint64_t> const & kmers,
 
     serial_timer local_fill_ibf_timer{};
     local_fill_ibf_timer.start();
-    for (auto chunk : kmers | seqan::stl::views::chunk(chunk_size))
+    auto chunk_view = seqan::stl::views::chunk(kmers, chunk_size);
+    for (auto && chunk : chunk_view)
     {
         assert(chunk_number < number_of_bins);
         seqan::hibf::bin_index const bin_idx{bin_index + chunk_number};
         ++chunk_number;
-        for (size_t const value : chunk)
+        for (auto && value : chunk)
             ibf.emplace(value, bin_idx);
     }
+
+    assert(chunk_view.size() <= number_of_bins);
+    // Edge case: If there are not enough k-mers to emplace at least one value into each bin, set the occupancy of
+    // the left over bins to 1.
+    // GCOVR_EXCL_START
+    if (ibf.track_occupancy && chunk_view.size() < number_of_bins)
+    {
+        size_t const diff = number_of_bins - chunk_view.size();
+        auto it = ibf.occupancy.begin() + bin_index + chunk_view.size();
+        assert(std::ranges::all_of(it,
+                                   it + diff,
+                                   [](size_t value)
+                                   {
+                                       return value == 0u;
+                                   }));
+        std::ranges::fill_n(it, diff, 1u);
+    }
+    // GCOVR_EXCL_STOP
+
     local_fill_ibf_timer.stop();
     fill_ibf_timer += local_fill_ibf_timer;
 }

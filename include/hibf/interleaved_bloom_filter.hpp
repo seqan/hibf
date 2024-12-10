@@ -23,6 +23,7 @@
 #include <cereal/cereal.hpp>           // for make_nvp
 #include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/base_class.hpp> // for base_class
+#include <cereal/types/vector.hpp>     // for vector
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
@@ -192,10 +193,6 @@ private:
         return h;
     }
 
-    //!\brief Helper function to reduce code-duplication between emplace and emplace_exists.
-    template <bool check_exists>
-    inline auto emplace_impl(size_t const value, bin_index const bin) noexcept;
-
 public:
     class membership_agent_type; // documented upon definition below
     template <std::integral value_t>
@@ -215,6 +212,7 @@ public:
      * \param bins_ The number of bins.
      * \param size The bitvector size.
      * \param funs The number of hash functions. Default 2. At least 1, at most 5.
+     * \param track_occupancy_ Whether to track the occupancy of the bins.
      *
      * \details
      *
@@ -222,9 +220,10 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_constructor.cpp
      */
-    interleaved_bloom_filter(seqan::hibf::bin_count bins_,
-                             seqan::hibf::bin_size size,
-                             seqan::hibf::hash_function_count funs = seqan::hibf::hash_function_count{2u});
+    interleaved_bloom_filter(seqan::hibf::bin_count const bins_,
+                             seqan::hibf::bin_size const size,
+                             seqan::hibf::hash_function_count const funs = seqan::hibf::hash_function_count{2u},
+                             bool const track_occupancy_ = false);
 
     /*!\brief Construct an Interleaved Bloom Filter.
      * \param configuration The seqan::hibf::config.
@@ -249,19 +248,13 @@ public:
      *
      * \details
      *
+     * If `track_occupancy` is set to `true`, the occupancy of the bin is tracked.
+     *
      * ### Example
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_emplace.cpp
      */
     void emplace(size_t const value, bin_index const bin) noexcept;
-
-    /*!\brief Inserts a value into a specific bin and returns whether the value already existed.
-     * \param[in] value The raw numeric value to process.
-     * \param[in] bin The bin index to insert into.
-     * \returns `true` if the value already existed, `false` otherwise.
-     * \sa seqan::hibf::interleaved_bloom_filter::emplace
-    */
-    [[nodiscard]] bool emplace_exists(size_t const value, bin_index const bin) noexcept;
 
     /*!\brief Clears a specific bin.
      * \param[in] bin The bin index to clear.
@@ -293,7 +286,7 @@ public:
                       "The reference type of the range to clear must be seqan::hibf::bin_index.");
 #ifndef NDEBUG
         for (auto && bin : bin_range)
-            assert(bin.value < bins);
+            assert(bin.value < technical_bins);
 #endif // NDEBUG
 
         for (size_t offset = 0, i = 0; i < bin_size_; offset += technical_bins, ++i)
@@ -438,6 +431,17 @@ public:
     using base_t::data;
     //!\}
 
+    /*!\brief Contains the number of unique values inserted into each bin.
+     * \details
+     * Only contains non-zero values if `track_occupancy` is true.
+     *
+     * A value is unique if inserting it into the IBF would set at least one previously unset bit.
+     */
+    std::vector<size_t> occupancy{};
+
+    //!\brief Whether to track the occupancy of the bins.
+    bool track_occupancy{false};
+
     /*!\cond DEV
      * \brief The version of the HIBF.
      */
@@ -461,6 +465,8 @@ public:
         archive(bin_words);
         archive(hash_funs);
         archive(cereal::base_class<base_t>(this));
+        archive(occupancy);
+        archive(track_occupancy);
     }
     //!\endcond
 };
