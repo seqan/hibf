@@ -300,8 +300,20 @@ public:
                 (*this)[bin.value + offset] = 0;
     }
 
+    /*!\brief Tries increasing the number of bins stored in the Interleaved Bloom Filter.
+     * \param[in] new_bin_count The new number of bins.
+     * \returns `true` if the number of bins was set, `false` if the number of bins was not set.
+     * \sa seqan::hibf::interleaved_bloom_filter::increase_bin_number_to
+     *
+     * If increasing the number of bins would require a resize, the function returns `false` and
+     * does not increase the number of bins.
+     * If old and new bin count are the same, `true` is returned.
+     * If the new bin count is smaller than the old bin count, `false` is returned.
+     */
+    bool try_increase_bin_number_to(bin_count const new_bin_count) noexcept;
+
     /*!\brief Increases the number of bins stored in the Interleaved Bloom Filter.
-     * \param[in] new_bins_ The new number of bins.
+     * \param[in] new_bin_count The new number of bins.
      * \throws std::invalid_argument If passed number of bins is smaller than current number of bins.
      *
      * \attention The new number of bins must be greater or equal to the current number of bins.
@@ -322,7 +334,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
-    void increase_bin_number_to(bin_count const new_bins_);
+    void increase_bin_number_to(bin_count const new_bin_count);
     //!\}
 
     /*!\name Lookup
