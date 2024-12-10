@@ -149,6 +149,8 @@ public:
     //!\brief Manages counting ranges of values for the seqan::hibf::hierarchical_interleaved_bloom_filter.
     template <std::integral value_t>
     class counting_agent_type;
+    //!\brief Contains information about the parent IBF and bin index.
+    struct previous_ibf_id_pair;
 
     /*!\name Constructors, destructor and assignment
      * \{
@@ -212,6 +214,17 @@ public:
      */
     std::vector<std::vector<uint64_t>> next_ibf_id;
 
+    /*!\brief Stores for each IBF of the HIBF the ID of the parent IBF and the bin index of the parent IBF.
+     * \details
+     * Assume we look up an IBF `i`, i.e. `prev_ibf_id[i]`.
+     * The reurned value contains two members:
+     *   * `ibf_idx` is the index of the parent IBF in `ibf_vector`.
+     *   * `bin_idx` is the index of the bin in the parent IBF of which IBF `i` is the child of.
+     *
+     * The root/top-level IBF has no parent and `ibf_idx == bin_idx == 0`.
+     */
+    std::vector<previous_ibf_id_pair> prev_ibf_id;
+
     /*!\brief Stores for each bin in each IBF of the HIBF the user bin ID.
     * \details
     * Assume we look up a bin `b` in IBF `i`, i.e. `ibf_bin_to_user_bin_id[i][b]`.
@@ -233,11 +246,15 @@ public:
     /*!\name Comparison operators
      * \{
      */
-    HIBF_CONSTEXPR_VECTOR bool operator==(hierarchical_interleaved_bloom_filter const &) const = default;
+    HIBF_CONSTEXPR_VECTOR bool operator==(hierarchical_interleaved_bloom_filter const &) const;
     //!\}
 
     /*!\cond DEV
-     * \brief Serialisation support function.
+     * \brief The version of the HIBF.
+     */
+    static constexpr uint32_t version{1};
+
+    /*!\brief Serialisation support function.
      * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
@@ -247,9 +264,12 @@ public:
     template <seqan::hibf::cereal_archive archive_t>
     void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
     {
+        uint32_t parsed_version{version};
+        archive(cereal::make_nvp("version", parsed_version));
         archive(number_of_user_bins);
         archive(ibf_vector);
         archive(next_ibf_id);
+        archive(prev_ibf_id);
         archive(ibf_bin_to_user_bin_id);
     }
 
@@ -268,6 +288,25 @@ public:
     //!\}
     //!\endcond
 };
+
+//!\brief Contains information about the parent IBF and bin index.
+struct hierarchical_interleaved_bloom_filter::previous_ibf_id_pair
+{
+    size_t ibf_idx{}; //!< The index of the parent IBF in `ibf_vector`.
+    size_t bin_idx{}; //!< The index of the bin in the parent IBF of which an IBF is the child of.
+
+    friend constexpr auto operator<=>(previous_ibf_id_pair const &, previous_ibf_id_pair const &) = default;
+
+    template <seqan::hibf::cereal_archive archive_t>
+    void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
+    {
+        archive(ibf_idx);
+        archive(bin_idx);
+    }
+};
+
+HIBF_CONSTEXPR_VECTOR bool
+hierarchical_interleaved_bloom_filter::operator==(hierarchical_interleaved_bloom_filter const &) const = default;
 
 class hierarchical_interleaved_bloom_filter::membership_agent_type
 {
