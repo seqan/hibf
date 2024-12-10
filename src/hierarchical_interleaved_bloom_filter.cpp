@@ -42,7 +42,8 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                           robin_hood::unordered_flat_set<uint64_t> & parent_kmers,
                           layout::graph::node const & current_node,
                           build::build_data & data,
-                          bool is_root)
+                          bool is_root,
+                          size_t const parent_ibf_idx = 0u)
 {
     size_t const ibf_pos{data.request_ibf_idx()};
 
@@ -68,7 +69,8 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
                                    kmers,
                                    current_node.children[current_node.favourite_child_idx.value()],
                                    data,
-                                   false);
+                                   false,
+                                   ibf_pos);
             return 1;
         }
         else // max bin is not a merged bin
@@ -124,8 +126,9 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
             auto & child = children[index];
 
             robin_hood::unordered_flat_set<uint64_t> local_kmers{};
-            size_t const local_ibf_pos = hierarchical_build(hibf, local_kmers, child, data, false);
+            size_t const local_ibf_pos = hierarchical_build(hibf, local_kmers, child, data, false, ibf_pos);
             auto parent_bin_index = child.parent_bin_index;
+            hibf.prev_ibf_id[local_ibf_pos] = {.ibf_idx = parent_ibf_idx, .bin_idx = parent_bin_index};
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
@@ -184,6 +187,7 @@ void build_index(hierarchical_interleaved_bloom_filter & hibf,
 
     hibf.ibf_vector.resize(number_of_ibfs);
     hibf.ibf_bin_to_user_bin_id.resize(number_of_ibfs);
+    hibf.prev_ibf_id.resize(number_of_ibfs);
     hibf.next_ibf_id.resize(number_of_ibfs);
 
     build::build_data data{.config = config, .ibf_graph = {hibf_layout}};
