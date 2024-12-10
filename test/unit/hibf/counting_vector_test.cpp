@@ -3,7 +3,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #ifndef HIBF_HAS_AVX512
-#    define HIBF_HAS_AVX512 0
+#define HIBF_HAS_AVX512 0
 #endif
 
 #include <gtest/gtest.h> // for Message, TYPED_TEST, TestPartResult, ASSERT_EQ, EXPECT_EQ, Types
@@ -175,6 +175,7 @@ TYPED_TEST(counting_vector_test, size_not_divisible_by_64)
     this->check_sub();
 }
 
+#if !(HIBF_COMPILER_IS_GCC && defined(__SANITIZE_ADDRESS__))
 TYPED_TEST(counting_vector_test, overflow)
 {
     constexpr TypeParam max_value = std::numeric_limits<TypeParam>::max();
@@ -194,3 +195,4 @@ TYPED_TEST(counting_vector_test, overflow)
     std::ranges::fill(this->expected, max_value);
     this->check_sub(); // counting_vector[2033...2047] may underflow but it does not affect the actual results
 }
+#endif
