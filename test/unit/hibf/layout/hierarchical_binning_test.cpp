@@ -68,6 +68,81 @@ TEST(hierarchical_binning_test, small_example)
     EXPECT_RANGE_EQ(hibf_layout.user_bins, expected_user_bins);
 }
 
+TEST(hierarchical_binning_test, small_example_two)
+{
+    seqan::hibf::config config;
+    config.tmax = 3;
+    config.disable_estimate_union = true; // also disables rearrangement
+
+    seqan::hibf::layout::layout hibf_layout{};
+    std::vector<size_t> kmer_counts{500, 1000, 500, 500, 500, 500, 500, 500};
+
+    seqan::hibf::layout::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+
+    data.fpr_correction =
+        seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
+
+    seqan::hibf::layout::hierarchical_binning algo{data, config};
+    EXPECT_EQ(algo.execute(), 0u); // #HIGH_LEVEL_IBF max_bin_id:0
+
+    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0}, 22}, {{1}, 22}, {{2}, 0}};
+
+    std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{0}, 0, 22, 5},
+                                                                          {{0}, 22, 21, 6},
+                                                                          {{0}, 43, 21, 7},
+                                                                          {{1}, 0, 22, 2},
+                                                                          {{1}, 22, 21, 3},
+                                                                          {{1}, 43, 21, 4},
+                                                                          {{2}, 0, 51, 1},
+                                                                          {{2}, 51, 13, 0}};
+
+    EXPECT_RANGE_EQ(hibf_layout.max_bins, expected_max_bins);
+    EXPECT_RANGE_EQ(hibf_layout.user_bins, expected_user_bins);
+}
+
+TEST(hierarchical_binning_test, small_example_with_empty_bins)
+{
+    seqan::hibf::config config;
+    config.tmax = 4;
+    config.disable_estimate_union = true; // also disables rearrangement
+    config.empty_bin_fraction = 0.001;
+
+    seqan::hibf::layout::layout hibf_layout{};
+    std::vector<size_t> kmer_counts{500, 1000, 500, 500, 500, 500, 500, 500};
+
+    seqan::hibf::layout::data_store data{.hibf_layout = &hibf_layout, .kmer_counts = &kmer_counts};
+
+    data.fpr_correction =
+        seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2, .t_max = config.tmax});
+    data.relaxed_fpr_correction =
+        seqan::hibf::layout::compute_relaxed_fpr_correction({.fpr = 0.05, .relaxed_fpr = 0.3, .hash_count = 2});
+
+    seqan::hibf::layout::hierarchical_binning algo{data, config};
+    EXPECT_EQ(algo.execute(), 0u); // #HIGH_LEVEL_IBF max_bin_id:0
+
+    // The results should almost be the same as in small_example_two
+    // The max bins might differ because of the empty bin fraction
+    // The layout structure should be the same, except the first split bin gets a bin less
+
+    std::vector<seqan::hibf::layout::layout::max_bin> expected_max_bins{{{0}, 0}, {{1}, 0}, {{2}, 0}};
+
+    // clang-format off
+    std::vector<seqan::hibf::layout::layout::user_bin> expected_user_bins{{{0}, 0     , 22 - 1, 5},
+                                                                          {{0}, 22 - 1, 21    , 6},
+                                                                          {{0}, 43 - 1, 21    , 7},
+                                                                          {{1}, 0     , 22 - 1, 2},
+                                                                          {{1}, 22 - 1, 21    , 3},
+                                                                          {{1}, 43 - 1, 21    , 4},
+                                                                          {{2}, 0     , 51 - 1, 1},
+                                                                          {{2}, 51 - 1, 13    , 0}};
+    // clang-format on
+
+    EXPECT_RANGE_EQ(hibf_layout.max_bins, expected_max_bins);
+    EXPECT_RANGE_EQ(hibf_layout.user_bins, expected_user_bins);
+}
+
 TEST(hierarchical_binning_test, another_example)
 {
     seqan::hibf::config config;
