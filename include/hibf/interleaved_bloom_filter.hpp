@@ -398,7 +398,7 @@ public:
     /*!\name Comparison operators
      * \{
      */
-    constexpr bool operator==(interleaved_bloom_filter const &) const = default;
+    HIBF_CONSTEXPR_VECTOR bool operator==(interleaved_bloom_filter const &) const = default;
     //!\}
 
     /*!\name Access
