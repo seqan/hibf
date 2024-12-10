@@ -33,6 +33,8 @@ namespace bin_kind
 
 //!\brief The value that indicates a merged bin.
 static constexpr uint64_t merged{std::numeric_limits<uint64_t>::max()};
+//!\brief The value that indicates a deleted bin.
+static constexpr uint64_t deleted{std::numeric_limits<uint64_t>::max() - 1u};
 
 } // namespace bin_kind
 
@@ -329,18 +331,24 @@ private:
 
             auto const user_bin_id = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (user_bin_id == bin_kind::merged) // merged bin
+            // It does not seem to make a difference whether the following block is done via a switch or if-else.
+            // The switch is easier to read.
+            switch (user_bin_id)
             {
+            case bin_kind::deleted: // GCOVR_EXCL_LINE
+                break;              // GCOVR_EXCL_LINE
+            case bin_kind::merged:
                 if (sum >= threshold)
                     membership_for_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
-            }
-            else if (bin + 1u == result.size() ||                                       // last bin
-                     user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
-            {
-                if (sum >= threshold)
-                    result_buffer.emplace_back(user_bin_id);
-                sum = 0u;
+                break;
+            default:
+                if (bin + 1u == result.size() || user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1])
+                { //  last bin || end of split bin
+                    if (sum >= threshold)
+                        result_buffer.emplace_back(user_bin_id);
+                    sum = 0u;
+                }
             }
         }
     }
@@ -462,20 +470,27 @@ private:
         for (size_t bin{}; bin < result.size(); ++bin)
         {
             sum += result[bin];
+
             auto const user_bin_id = hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin];
 
-            if (user_bin_id == bin_kind::merged) // merged bin
+            // It does not seem to make a difference whether the following block is done via a switch or if-else.
+            // The switch is easier to read.
+            switch (user_bin_id)
             {
+            case bin_kind::deleted: // GCOVR_EXCL_LINE
+                break;              // GCOVR_EXCL_LINE
+            case bin_kind::merged:
                 if (sum >= threshold)
                     bulk_count_impl(values, hibf_ptr->next_ibf_id[ibf_idx][bin], threshold);
                 sum = 0u;
-            }
-            else if (bin + 1u == result.size() ||                                       // last bin
-                     user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1]) // end of split bin
-            {
-                if (sum >= threshold)
-                    result_buffer[user_bin_id] = sum;
-                sum = 0u;
+                break;
+            default:
+                if (bin + 1u == result.size() || user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1])
+                { //  last bin || end of split bin
+                    if (sum >= threshold)
+                        result_buffer[user_bin_id] = sum;
+                    sum = 0u;
+                }
             }
         }
     }
