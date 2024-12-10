@@ -28,14 +28,15 @@ namespace seqan::hibf
 #    pragma GCC diagnostic ignored "-Wattributes"
 #endif // HIBF_COMPILER_IS_GCC
 
-interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
-                                                   seqan::hibf::bin_size size,
-                                                   seqan::hibf::hash_function_count funs)
+interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count const bins_,
+                                                   seqan::hibf::bin_size const size,
+                                                   seqan::hibf::hash_function_count const funs,
+                                                   bool const track_occupancy_) :
+    bins{bins_.value},
+    bin_size_{size.value},
+    hash_funs{funs.value},
+    track_occupancy{track_occupancy_}
 {
-    bins = bins_.value;
-    bin_size_ = size.value;
-    hash_funs = funs.value;
-
     if (bins == 0)
         throw std::logic_error{"The number of bins must be > 0."};
     if (hash_funs == 0 || hash_funs > 5)
@@ -47,6 +48,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count bins_,
     bin_words = divide_and_ceil(bins, 64u);
     technical_bins = bin_words * 64u;
     resize(technical_bins * bin_size_);
+    occupancy.resize(technical_bins, 0u);
 }
 
 size_t find_biggest_bin(config const & configuration)
@@ -101,7 +103,8 @@ size_t max_bin_size(config & configuration, size_t const max_bin_elements)
 interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_t const max_bin_elements) :
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
                              seqan::hibf::bin_size{max_bin_size(configuration, max_bin_elements)},
-                             seqan::hibf::hash_function_count{configuration.number_of_hash_functions}}
+                             seqan::hibf::hash_function_count{configuration.number_of_hash_functions},
+                             configuration.empty_bin_fraction > 0.0}
 {
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
 
@@ -112,39 +115,27 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
     }
 }
 
-template <bool check_exists>
-inline auto interleaved_bloom_filter::emplace_impl(size_t const value, bin_index const bin) noexcept
+[[gnu::always_inline]] void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
 {
     assert(bin.value < bins);
 
-    [[maybe_unused]] bool exists{true};
+    bool exists{track_occupancy};
 
     for (size_t i = 0; i < hash_funs; ++i)
     {
-        size_t idx = hash_and_fit(value, hash_seeds[i]);
-        idx += bin.value;
+        size_t const idx = hash_and_fit(value, hash_seeds[i]) + bin.value;
         assert(idx < size());
 
-        // Constructing the reference twice for emplace_exists would impact performance.
+        // Constructing the reference twice for tracking occupancy would impact performance.
         // No difference for emplace.
         seqan::hibf::bit_vector::reference bit_reference{(*this)[idx]};
-        if constexpr (check_exists)
+        if (track_occupancy)
             exists &= bit_reference;
-        bit_reference = 1;
+        bit_reference = true;
     };
 
-    if constexpr (check_exists)
-        return exists;
-};
-
-[[gnu::always_inline]] void interleaved_bloom_filter::emplace(size_t const value, bin_index const bin) noexcept
-{
-    return emplace_impl<false>(value, bin);
-}
-
-[[gnu::always_inline]] bool interleaved_bloom_filter::emplace_exists(size_t const value, bin_index const bin) noexcept
-{
-    return emplace_impl<true>(value, bin);
+    if (track_occupancy && !exists)
+        ++occupancy[bin.value];
 }
 
 void interleaved_bloom_filter::clear(bin_index const bin) noexcept
@@ -205,6 +196,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
     bins = new_bins;
     bin_words = new_bin_words;
     technical_bins = new_technical_bins;
+    occupancy.resize(technical_bins, 0u);
 }
 
 [[gnu::always_inline]] bit_vector const &
