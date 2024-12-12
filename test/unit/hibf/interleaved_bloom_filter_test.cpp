@@ -387,6 +387,28 @@ TEST(ibf_test, counting_agent_no_ub)
     EXPECT_RANGE_EQ(agent2.bulk_count(std::views::iota(0u, 128u)), expected);
 }
 
+TEST(ibf_test, try_increase_bin_number_to)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};
+    size_t const original_bitsize{ibf.bit_size()};
+
+    EXPECT_TRUE(ibf.try_increase_bin_number_to({73u}));
+    EXPECT_EQ(ibf.bin_count(), 73u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_FALSE(ibf.try_increase_bin_number_to({50u}));
+    EXPECT_EQ(ibf.bin_count(), 73u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_TRUE(ibf.try_increase_bin_number_to({128u}));
+    EXPECT_EQ(ibf.bin_count(), 128u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_FALSE(ibf.try_increase_bin_number_to({129u}));
+    EXPECT_EQ(ibf.bin_count(), 128u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+}
+
 TEST(ibf_test, increase_bin_number_to)
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};

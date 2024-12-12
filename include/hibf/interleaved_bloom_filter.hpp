@@ -300,13 +300,36 @@ public:
                 (*this)[bin.value + offset] = 0;
     }
 
+    /*!\brief Tries increasing the number of bins stored in the Interleaved Bloom Filter without reallocating memory.
+     * \param[in] new_bin_count The new number of bins.
+     * \returns `true` if the number of bins was set, `false` if the number of bins was not set.
+     * \sa seqan::hibf::interleaved_bloom_filter::increase_bin_number_to
+     *
+     * \attention If the new bin count is greater than the old bin count and this function returns `true`, all
+     * seqan::hibf::interleaved_bloom_filter::membership_agent_type and
+     * seqan::hibf::interleaved_bloom_filter::counting_agent_type constructed for this Interleaved Bloom Filter are
+     * invalidated.
+     *
+     * | Condition                         | Internal Condition     | Effect                        | Return value |
+     * |-----------------------------------|------------------------|-------------------------------|--------------|
+     * | New bin count > current bin count | resize is not required | bin count is set to new value | `true`       |
+     * | New bin count > current bin count | resize is required     | none                          | `false`      |
+     * | New bin count = current bin count | none                   | none                          | `true`       |
+     * | New bin count < current bin count | none                   | none                          | `false`      |
+     *
+     * ### Example
+     *
+     * \include test/snippet/ibf/interleaved_bloom_filter_try_increase_bin_number_to.cpp
+     */
+    bool try_increase_bin_number_to(bin_count const new_bin_count) noexcept;
+
     /*!\brief Increases the number of bins stored in the Interleaved Bloom Filter.
-     * \param[in] new_bins_ The new number of bins.
+     * \param[in] new_bin_count The new number of bins.
      * \throws std::invalid_argument If passed number of bins is smaller than current number of bins.
      *
      * \attention The new number of bins must be greater or equal to the current number of bins.
-     * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::membership_agent_type constructed for
-     * this Interleaved Bloom Filter.
+     * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::membership_agent_type and
+     * seqan::hibf::interleaved_bloom_filter::counting_agent_type constructed for this Interleaved Bloom Filter.
      *
      * \details
      *
@@ -322,7 +345,7 @@ public:
      *
      * \include test/snippet/ibf/interleaved_bloom_filter_increase_bin_number_to.cpp
      */
-    void increase_bin_number_to(bin_count const new_bins_);
+    void increase_bin_number_to(bin_count const new_bin_count);
     //!\}
 
     /*!\name Lookup

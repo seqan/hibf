@@ -154,19 +154,28 @@ void interleaved_bloom_filter::clear(bin_index const bin) noexcept
         (*this)[idx] = 0;
 }
 
-void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bins_)
+bool interleaved_bloom_filter::try_increase_bin_number_to(seqan::hibf::bin_count const new_bin_count) noexcept
 {
-    size_t const new_bins = new_bins_.value;
-
-    if (new_bins < bins)
-        throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
-
+    size_t const new_bins = new_bin_count.value;
     size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
 
-    bins = new_bins;
+    if (new_bins < bins || new_bin_words > bin_words)
+        return false;
 
-    if (new_bin_words == bin_words) // No need for internal resize if bin_words does not change.
+    bins = new_bins;
+    return true;
+}
+
+void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count const new_bin_count)
+{
+    if (new_bin_count.value < bins)
+        throw std::invalid_argument{"The number of new bins must be >= the current number of bins."};
+
+    if (try_increase_bin_number_to(new_bin_count))
         return;
+
+    size_t const new_bins = new_bin_count.value;
+    size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
 
     size_t const new_technical_bins = new_bin_words * 64u;
     size_t const new_bit_size = bin_size_ * new_technical_bins;
@@ -193,6 +202,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
         }
     }
 
+    bins = new_bins;
     bin_words = new_bin_words;
     technical_bins = new_technical_bins;
 }
