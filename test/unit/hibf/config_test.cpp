@@ -147,7 +147,8 @@ TEST(config_test, validate_and_set_defaults)
                          "[HIBF CONFIG ERROR] You did not set the required config::input_fn.");
     }
 
-    // number_of_user_bins cannot be 0 or bin_kind::merged (18'446'744'073'709'551'615ULL)
+    // number_of_user_bins cannot be 0, bin_kind::merged (18'446'744'073'709'551'615ULL),
+    // or bin_kind::deleted (bin_kind::merged - 1)
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn};
         EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
@@ -158,7 +159,13 @@ TEST(config_test, validate_and_set_defaults)
         EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
                          std::invalid_argument,
                          "[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
-                         "is 18446744073709551614.");
+                         "is 18446744073709551613.");
+
+        configuration.number_of_user_bins = 18'446'744'073'709'551'614ULL;
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
+                         "is 18446744073709551613.");
     }
 
     // number_of_hash_functions must be in [1,5]

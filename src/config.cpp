@@ -69,9 +69,11 @@ void config::validate_and_set_defaults()
     if (number_of_user_bins == 0u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] You did not set the required config::number_of_user_bins."};
 
-    if (number_of_user_bins == 18'446'744'073'709'551'615ULL) // std::numeric_limits<uint64_t>::max() = bin_kind::merged
+    // std::numeric_limits<uint64_t>::max() = bin_kind::merged
+    // std::numeric_limits<uint64_t>::max() - 1 = bin_kind::deleted
+    if (number_of_user_bins >= 18'446'744'073'709'551'614ULL)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] The maximum possible config::number_of_user_bins "
-                                    "is 18446744073709551614."};
+                                    "is 18446744073709551613."};
 
     if (number_of_hash_functions == 0u || number_of_hash_functions > 5u)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::number_of_hash_functions must be in [1,5]."};
