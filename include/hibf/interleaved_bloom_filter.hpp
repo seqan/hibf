@@ -415,7 +415,11 @@ public:
     //!\}
 
     /*!\cond DEV
-     * \brief Serialisation support function.
+     * \brief The version of the HIBF.
+     */
+    static constexpr uint32_t version{1};
+
+    /*!\brief Serialisation support function.
      * \tparam archive_t Type of `archive`; must satisfy seqan::hibf::cereal_archive.
      * \param[in] archive The archive being serialised from/to.
      *
@@ -424,6 +428,8 @@ public:
     template <cereal_archive archive_t>
     void CEREAL_SERIALIZE_FUNCTION_NAME(archive_t & archive)
     {
+        uint32_t parsed_version{version};
+        archive(cereal::make_nvp("version", parsed_version));
         archive(bins);
         archive(technical_bins);
         archive(bin_size_);
