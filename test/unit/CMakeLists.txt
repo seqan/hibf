@@ -12,13 +12,12 @@ include (diagnostics/list_missing_unit_tests)
 include (diagnostics/list_unused_unit_tests)
 include (include_dependencies/add_include_dependencies)
 
-option (HIBF_VERBOSE_TESTS "Run each test case individually" OFF)
 option (HIBF_USE_INCLUDE_DEPENDENCIES
         "Build tests in an hierarchical order (by an include graph, i.e. tests with less dependencies are build first)"
         OFF)
 
 macro (hibf_test unit_test_cpp)
-    cmake_parse_arguments (HIBF_TEST "" "" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
+    cmake_parse_arguments (HIBF_TEST "" "SDE" "CYCLIC_DEPENDING_INCLUDES" ${ARGN})
 
     file (RELATIVE_PATH unit_test "${CMAKE_SOURCE_DIR}" "${CMAKE_CURRENT_LIST_DIR}/${unit_test_cpp}")
     hibf_test_component (target "${unit_test}" TARGET_NAME)
@@ -28,12 +27,10 @@ macro (hibf_test unit_test_cpp)
     target_link_libraries (${target} hibf::test::unit)
     add_include_dependencies (${target} "${HIBF_TEST_CYCLIC_DEPENDING_INCLUDES}")
     collect_used_test (${target})
-    if (HIBF_VERBOSE_TESTS)
-        gtest_discover_tests (
-            ${target}
-            TEST_PREFIX "${test_name}::"
-            PROPERTIES
-            TIMEOUT "30")
+
+    if (HIBF_TEST_SDE)
+        set (TARGET_WITH_SDE "${HIBF_TEST_SDE}" "-cnl" "--" "./${target}")
+        add_test (NAME "${test_name}_sde" COMMAND ${TARGET_WITH_SDE})
     else ()
         add_test (NAME "${test_name}" COMMAND ${target})
     endif ()
