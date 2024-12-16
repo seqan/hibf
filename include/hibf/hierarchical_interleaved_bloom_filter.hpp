@@ -6,7 +6,7 @@
 
 #include <algorithm> // for __fn, fill, sort
 #include <cassert>   // for assert
-#include <cinttypes> // for uint64_t, uint16_t
+#include <cinttypes> // for uint64_t, uint16_t, uint32_t
 #include <concepts>  // for integral, unsigned_integral
 #include <cstddef>   // for size_t
 #include <limits>    // for numeric_limits
@@ -14,6 +14,7 @@
 #include <ranges>    // for forward_range, range_value_t, range
 #include <vector>    // for vector, operator==
 
+#include <cereal/cereal.hpp>       // for make_nvp
 #include <cereal/macros.hpp>       // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/vector.hpp> // IWYU pragma: keep
 
