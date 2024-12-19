@@ -37,7 +37,7 @@ TEST(config_test, write_to)
     std::string const expected_file{"@HIBF_CONFIG\n"
                                     "@{\n"
                                     "@    \"hibf_config\": {\n"
-                                    "@        \"version\": 1,\n"
+                                    "@        \"version\": 2,\n"
                                     "@        \"number_of_user_bins\": 123456789,\n"
                                     "@        \"number_of_hash_functions\": 4,\n"
                                     "@        \"maximum_fpr\": 0.0001,\n"
@@ -45,6 +45,7 @@ TEST(config_test, write_to)
                                     "@        \"threads\": 31,\n"
                                     "@        \"sketch_bits\": 8,\n"
                                     "@        \"tmax\": 128,\n"
+                                    "@        \"empty_bin_fraction\": 0.0,\n"
                                     "@        \"alpha\": 1.0,\n"
                                     "@        \"max_rearrangement_ratio\": 0.333,\n"
                                     "@        \"disable_estimate_union\": true,\n"
@@ -57,6 +58,45 @@ TEST(config_test, write_to)
 }
 
 TEST(config_test, read_from)
+{
+    std::stringstream ss{"@HIBF_CONFIG\n"
+                         "@{\n"
+                         "@    \"hibf_config\": {\n"
+                         "@        \"version\": 2,\n"
+                         "@        \"number_of_user_bins\": 123456789,\n"
+                         "@        \"number_of_hash_functions\": 4,\n"
+                         "@        \"maximum_fpr\": 0.0001,\n"
+                         "@        \"relaxed_fpr\": 0.3,\n"
+                         "@        \"threads\": 31,\n"
+                         "@        \"sketch_bits\": 8,\n"
+                         "@        \"tmax\": 128,\n"
+                         "@        \"empty_bin_fraction\": 0.5,\n"
+                         "@        \"alpha\": 1.0,\n"
+                         "@        \"max_rearrangement_ratio\": 0.333,\n"
+                         "@        \"disable_estimate_union\": true,\n"
+                         "@        \"disable_rearrangement\": false\n"
+                         "@    }\n"
+                         "@}\n"
+                         "@HIBF_CONFIG_END\n"};
+
+    seqan::hibf::config configuration;
+    configuration.read_from(ss);
+
+    EXPECT_EQ(configuration.number_of_user_bins, 123456789);
+    EXPECT_EQ(configuration.number_of_hash_functions, 4);
+    EXPECT_EQ(configuration.maximum_fpr, 0.0001);
+    EXPECT_EQ(configuration.relaxed_fpr, 0.3);
+    EXPECT_EQ(configuration.threads, 31);
+    EXPECT_EQ(configuration.sketch_bits, 8);
+    EXPECT_EQ(configuration.tmax, 128);
+    EXPECT_EQ(configuration.empty_bin_fraction, 0.5);
+    EXPECT_EQ(configuration.alpha, 1.0);
+    EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
+    EXPECT_EQ(configuration.disable_estimate_union, true);
+    EXPECT_EQ(configuration.disable_rearrangement, false);
+}
+
+TEST(config_test, read_from_v1)
 {
     std::stringstream ss{"@HIBF_CONFIG\n"
                          "@{\n"
@@ -87,6 +127,7 @@ TEST(config_test, read_from)
     EXPECT_EQ(configuration.threads, 31);
     EXPECT_EQ(configuration.sketch_bits, 8);
     EXPECT_EQ(configuration.tmax, 128);
+    EXPECT_EQ(configuration.empty_bin_fraction, 0.0);
     EXPECT_EQ(configuration.alpha, 1.0);
     EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
     EXPECT_EQ(configuration.disable_estimate_union, true);
@@ -291,6 +332,21 @@ TEST(config_test, validate_and_set_defaults)
                   "[HIBF CONFIG WARNING]: Your requested number of technical bins was not a multiple of 64. Due to the "
                   "architecture of the HIBF, it will use up space equal to the next multiple of 64 anyway, so we "
                   "increased your number of technical bins to 64.\n");
+    }
+
+    // empty_bin_fraction must be in [0.0,1.0)
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .empty_bin_fraction = -0.1};
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0).");
+
+        configuration.empty_bin_fraction = 1.0;
+        EXPECT_THROW_MSG(configuration.validate_and_set_defaults(),
+                         std::invalid_argument,
+                         "[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0).");
     }
 
     // alpha must be positive
