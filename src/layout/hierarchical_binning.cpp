@@ -19,6 +19,7 @@
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
 #include <hibf/misc/divide_and_ceil.hpp>        // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
+#include <hibf/misc/subtract_empty_bins.hpp>    // for subtract_empty_bins
 #include <hibf/misc/timer.hpp>                  // for concurrent_timer
 #include <hibf/platform.hpp>                    // for HIBF_WORKAROUND_GCC_BOGUS_MEMCPY
 #include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
@@ -79,7 +80,8 @@ size_t hierarchical_binning::execute()
 
 [[nodiscard]] size_t hierarchical_binning::needed_technical_bins(size_t const requested_num_ub) const
 {
-    return std::min<size_t>(next_multiple_of_64(requested_num_ub), config.tmax);
+    size_t const needed = std::min<size_t>(next_multiple_of_64(requested_num_ub), config.tmax);
+    return subtract_empty_bins(needed, config.empty_bin_fraction);
 }
 
 [[nodiscard]] size_t hierarchical_binning::max_merge_levels(size_t const num_ubs_in_merge) const
@@ -406,8 +408,10 @@ void hierarchical_binning::update_libf_data(data_store & libf_data, size_t const
 
 size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
 {
+    size_t const number_of_user_bins = libf_data.positions.size();
+
     // now do the binning for the low-level IBF:
-    if (libf_data.positions.size() > config.tmax)
+    if (number_of_user_bins > config.tmax)
     {
         // recursively call hierarchical binning if there are still too many UBs
         return hierarchical_binning{libf_data, config}.execute(); // return id of maximum technical bin
@@ -415,7 +419,10 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     else
     {
         // use simple binning to distribute remaining UBs
-        return simple_binning{libf_data, 0}.execute(); // return id of maximum technical bin
+        // Simple binning is not bound by config.tmax
+        size_t const num_user_bins = next_multiple_of_64(number_of_user_bins);
+        size_t const number_of_technical_bins = subtract_empty_bins(num_user_bins, config.empty_bin_fraction);
+        return simple_binning{libf_data, number_of_technical_bins}.execute(); // return id of maximum technical bin
     }
 }
 
