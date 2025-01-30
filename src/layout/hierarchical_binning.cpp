@@ -420,8 +420,8 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     {
         // use simple binning to distribute remaining UBs
         // Simple binning is not bound by config.tmax
-        size_t const num_user_bins = next_multiple_of_64(number_of_user_bins);
-        size_t const number_of_technical_bins = subtract_empty_bins(num_user_bins, config.empty_bin_fraction);
+        size_t const num_user_bins_next_64 = next_multiple_of_64(number_of_user_bins);
+        size_t const number_of_technical_bins = subtract_empty_bins(num_user_bins_next_64, config.empty_bin_fraction);
         return simple_binning{libf_data, number_of_technical_bins}.execute(); // return id of maximum technical bin
     }
 }
