@@ -2,22 +2,23 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
+#include <algorithm>  // for __fn, all_of, fill_n
 #include <cassert>    // for assert
 #include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
 #include <functional> // for equal_to, function
 #include <iterator>   // for counted_iterator
+#include <vector>     // for vector
 
-#include <hibf/build/build_data.hpp>                // for build_data
-#include <hibf/build/insert_into_ibf.hpp>           // for insert_into_ibf
-#include <hibf/config.hpp>                          // for insert_iterator, config
-#include <hibf/contrib/robin_hood.hpp>              // for Table, hash, unordered_flat_set
-#include <hibf/contrib/std/chunk_view.hpp>          // for chunk, chunk_fn, chunk_view
-#include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
-#include <hibf/interleaved_bloom_filter.hpp>        // for interleaved_bloom_filter, bin_index
-#include <hibf/layout/layout.hpp>                   // for layout
-#include <hibf/misc/divide_and_ceil.hpp>            // for divide_and_ceil
-#include <hibf/misc/timer.hpp>                      // for serial_timer, concurrent_timer
+#include <hibf/build/build_data.hpp>         // for build_data
+#include <hibf/build/insert_into_ibf.hpp>    // for insert_into_ibf
+#include <hibf/config.hpp>                   // for insert_iterator, config
+#include <hibf/contrib/robin_hood.hpp>       // for Table, unordered_flat_set, hash
+#include <hibf/contrib/std/chunk_view.hpp>   // for chunk_view, chunk, chunk_fn
+#include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index
+#include <hibf/layout/layout.hpp>            // for layout
+#include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
+#include <hibf/misc/timer.hpp>               // for serial_timer, concurrent_timer
 
 namespace seqan::hibf::build
 {

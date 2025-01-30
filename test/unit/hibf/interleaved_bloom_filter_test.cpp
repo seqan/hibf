@@ -8,7 +8,7 @@
 
 #include <gtest/gtest.h> // for Message, Test, AssertionResult, TestPartResult, TestInfo, EXPEC...
 
-#include <algorithm>   // for __fn, for_each
+#include <algorithm>   // for __fn, all_of, for_each
 #include <array>       // for array
 #include <cinttypes>   // for uint64_t
 #include <compare>     // for operator<, strong_ordering

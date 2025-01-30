@@ -17,7 +17,6 @@
 #include <hibf/config.hpp>                   // for config
 #include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start
 #include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
-#include <hibf/misc/subtract_empty_bins.hpp> // for subtract_empty_bins
 
 namespace seqan::hibf
 {

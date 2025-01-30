@@ -4,7 +4,6 @@
 
 #pragma once
 
-#include <cassert> // for assert
 #include <cstddef> // for size_t
 #include <memory>  // for addressof
 #include <utility> // for pair
