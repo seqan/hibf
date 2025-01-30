@@ -6,7 +6,7 @@
 # HIBF. To build tests, run cmake on one of the sub-folders in this directory
 # which contain a CMakeLists.txt.
 
-cmake_minimum_required (VERSION 3.10...3.30)
+cmake_minimum_required (VERSION 3.20...3.31)
 
 # Force alignment of benchmarked loops so that numbers are reliable.
 # For large loops and erratic seeming bench results the value might
