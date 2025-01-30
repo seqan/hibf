@@ -4,9 +4,8 @@
 
 #pragma once
 
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
+#include <algorithm> // for clamp
+#include <cstddef>   // for size_t
 
 #include <hibf/platform.hpp>
 

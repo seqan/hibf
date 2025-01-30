@@ -18,12 +18,12 @@
 #include <memory>      // for addressof
 #include <ranges>      // for range, range_reference_t, range_value_t, forward_range, input_...
 #include <type_traits> // for remove_cvref_t
-#include <vector>      // for operator==, vector
+#include <vector>      // for vector, operator==
 
 #include <cereal/cereal.hpp>           // for make_nvp
 #include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/base_class.hpp> // for base_class
-#include <cereal/types/vector.hpp>     // for vector
+#include <cereal/types/vector.hpp>     // IWYU pragma: keep
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator

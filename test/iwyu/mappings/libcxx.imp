@@ -8,6 +8,8 @@
 # cd __fwd ; find -type f | sort | sed -e "s#./\(.*\)\(.h\)#  { include: [\"@<__fwd/\1\2>\", private, \"<\1>\", public ] },#"
 [
 # from llvm-XX/include/c++/v1/libcxx.imp
+  { include: [ "<__bit_reference>", private, "<bitset>", public ] },
+  { include: [ "<__bit_reference>", private, "<vector>", public ] },
   { include: ["<__hash_table>", private, "<unordered_map>", public ] },
   { include: ["<__hash_table>", private, "<unordered_set>", public ] },
   { include: ["<__locale>", private, "<locale>", public ] },
