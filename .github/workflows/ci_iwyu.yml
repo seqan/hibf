@@ -26,87 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
     container:
-      image: ghcr.io/seqan/clang-18
+      image: ghcr.io/seqan/clang-19
       volumes:
         - /home/runner:/home/runner
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Run IWYU
+        uses: seqan/actions/iwyu@main
         with:
-          path: hibf
+          configure_path: test/all
           token: ${{ secrets.SEQAN_ACTIONS_PAT }}
-
-      - name: Build IWYU
-        run: |
-          mkdir iwyu && cd iwyu
-          git clone https://github.com/include-what-you-use/include-what-you-use.git --branch 0.22
-          mkdir build && cd build
-          cmake ../include-what-you-use -G "Unix Makefiles" \
-                                        -DCMAKE_BUILD_TYPE=Release \
-                                        -DCMAKE_INSTALL_PREFIX=/usr \
-                                        -DCMAKE_PREFIX_PATH=/usr/lib/llvm-18 \
-                                        -DCMAKE_C_COMPILER=clang-18 \
-                                        -DCMAKE_CXX_COMPILER=clang++-18
-          make -j
-          make install
-
-      - name: Configure Test
-        run: |
-          mkdir build && cd build
-          cmake ../hibf/test/iwyu -DCMAKE_BUILD_TYPE=Debug
-
-      - name: Run Test
-        working-directory: build
-        run: |
-          ccache -z
-          make -j 2> out.txt
-          ccache -sv
-
-      - name: Apply changes
-        working-directory: build
-        run: |
-          fix_includes.py --nosafe_headers \
-                          --comments \
-                          --noreorder \
-                          --ignore_re ".*/include/hibf/contrib/.*" < out.txt
-
-      - name: Add changes
-        id: changed_files
-        working-directory: hibf
-        run: |
-          git add .
-          CPP_LIST=$(git diff --name-only HEAD | { grep -E "(\.cpp|\.hpp)$" || test $? = 1; } | xargs)
-          echo "cpp_list=$CPP_LIST" >> $GITHUB_OUTPUT
-
-      - name: Run clang-format
-        if: ${{ steps.changed_files.outputs.cpp_list }}
-        working-directory: hibf
-        run: |
-          clang-format-18 --style=file -i ${{ steps.changed_files.outputs.cpp_list }}
-          git add .
-
-      - name: Import GPG key
-        if: ${{ steps.changed_files.outputs.cpp_list }}
-        uses: crazy-max/ghaction-import-gpg@v6
-        with:
-          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
-          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_commit_gpgsign: true
-          workdir: hibf
-
-      - name: Open PR
-        if: ${{ steps.changed_files.outputs.cpp_list }}
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.SEQAN_ACTIONS_PAT }}
-          path: hibf
-          commit-message: "[MISC] IWYU"
-          committer: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
-          author: "seqan-actions[bot] <seqan-actions@users.noreply.github.com>"
-          branch: "actions/iwyu"
-          delete-branch: true
-          title: "[MISC] IWYU"
-          body: "Auto-generated include-what-you-use changes"
-
-
+          gpg_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+          gpg_passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}

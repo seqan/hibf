@@ -6,7 +6,10 @@ cmake_minimum_required (VERSION 3.20...3.31)
 project (hibf_util CXX)
 
 include (CheckIPOSupported)
-check_ipo_supported (RESULT HIBF_TEST_HAS_LTO OUTPUT HIBF_TEST_HAS_LTO_OUTPUT)
+check_ipo_supported (
+    RESULT HIBF_TEST_HAS_LTO
+    OUTPUT HIBF_TEST_HAS_LTO_OUTPUT
+    LANGUAGES CXX)
 if (HIBF_TEST_HAS_LTO)
     set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif ()

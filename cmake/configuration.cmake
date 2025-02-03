@@ -246,7 +246,10 @@ else ()
     endif ()
 endif ()
 
-check_ipo_supported (RESULT HIBF_HAS_LTO OUTPUT HIBF_HAS_LTO_OUTPUT)
+check_ipo_supported (
+    RESULT HIBF_HAS_LTO
+    OUTPUT HIBF_HAS_LTO_OUTPUT
+    LANGUAGES CXX)
 cmake_dependent_option (HIBF_LTO_BUILD "Use Link Time Optimisation." ON "HIBF_HAS_LTO" OFF)
 cmake_dependent_option (HIBF_DEV_CHECK_LTO "LTO check." ON
                         "HIBF_LTO_BUILD;NOT HIBF_IS_TOP_LEVEL;NOT CMAKE_INTERPROCEDURAL_OPTIMIZATION" OFF)
@@ -257,7 +260,7 @@ if (HIBF_DEV_CHECK_LTO)
                          " Add the following at the beginning of your CMakeLists.txt:\n"
                          " ```\n"
                          " include (CheckIPOSupported)\n"
-                         " check_ipo_supported (RESULT result OUTPUT output)\n"
+                         " check_ipo_supported (RESULT result OUTPUT output LANGUAGES CXX)\n"
                          " if (result)\n"
                          "     set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)\n"
                          " endif ()\n"
