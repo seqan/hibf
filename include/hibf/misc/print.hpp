@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include <cinttypes> // for int64_t, int16_t, int32_t, int8_t, uint16_t, uint32_t, uint64_t
-#include <iostream>  // for cout, ostream
-#include <vector>    // for vector
+#include <cstdint>  // for uint64_t, int16_t, int32_t, int64_t, int8_t, uint16_t, uint32_t
+#include <iostream> // for cout, ostream
+#include <vector>   // for vector
 
 #include <hibf/misc/bit_vector.hpp>      // for bit_vector
 #include <hibf/misc/counting_vector.hpp> // for counting_vector

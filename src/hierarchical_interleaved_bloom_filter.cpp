@@ -4,8 +4,8 @@
 
 #include <algorithm>  // for shuffle, __fn, none_of
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to
 #include <mutex>      // for mutex, lock_guard
 #include <numeric>    // for iota
@@ -22,18 +22,18 @@
 #include <hibf/build/update_user_bins.hpp>                // for update_user_bins
 #include <hibf/config.hpp>                                // for config
 #include <hibf/contrib/robin_hood.hpp>                    // for unordered_flat_set, hash
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter, merged
 #include <hibf/interleaved_bloom_filter.hpp>              // for interleaved_bloom_filter
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction
 #include <hibf/layout/compute_layout.hpp>                 // for compute_layout
 #include <hibf/layout/graph.hpp>                          // for graph
 #include <hibf/layout/layout.hpp>                         // for layout
 #include <hibf/misc/divide_and_ceil.hpp>                  // for divide_and_ceil
-#include <hibf/misc/iota_vector.hpp>
-#include <hibf/misc/timer.hpp>              // for concurrent_timer
-#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
-#include <hibf/sketch/estimate_kmer_counts.hpp>
-#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/misc/iota_vector.hpp>                      // for iota_vector
+#include <hibf/misc/timer.hpp>                            // for concurrent_timer
+#include <hibf/sketch/compute_sketches.hpp>               // for compute_sketches
+#include <hibf/sketch/estimate_kmer_counts.hpp>           // for estimate_kmer_counts
+#include <hibf/sketch/hyperloglog.hpp>                    // for hyperloglog
 
 namespace seqan::hibf
 {

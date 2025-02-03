@@ -10,11 +10,12 @@
 
 #include <concepts>    // for derived_from, same_as, copy_constructible, equality_comparable_with
 #include <cstddef>     // for size_t
-#include <iterator>    // for random_access_iterator_tag, forward_iterator_tag, bidirectional_iterator_tag, input...
-#include <memory>      // for to_address
-#include <ranges>      // for begin, cbegin, next, end, cend, distance, iterator_t, range_difference_t
+#include <iterator>    // for next, random_access_iterator_tag, forward_iterator_tag, distance, bidirectional_ite...
+#include <memory>      // for to_address, addressof
+#include <ranges>      // for begin, cbegin, end, cend, iterator_t, range_difference_t
+#include <string>      // for basic_string
 #include <type_traits> // for remove_reference_t, conditional_t
-#include <utility>     // for as_const, addressof, pair
+#include <utility>     // for as_const, forward, pair
 
 #include <hibf/platform.hpp>
 

@@ -4,10 +4,10 @@
 
 #include <benchmark/benchmark.h> // for Counter, State, BENCHMARK_TEMPLATE, Benchmark, ClobberMemory
 
-#include <cinttypes> // for uint64_t, uint8_t
-#include <cstddef>   // for size_t
-#include <string>    // for basic_string
-#include <vector>    // for vector
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t, uint8_t
+#include <string>  // for basic_string
+#include <vector>  // for vector
 
 #include <hibf/config.hpp>                  // for config, insert_iterator
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches

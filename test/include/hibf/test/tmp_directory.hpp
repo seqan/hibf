@@ -21,8 +21,9 @@
 #endif
 
 #include <cassert>      // for assert
-#include <filesystem>   // for path, exists, is_empty, remove_all, temp_directory_path, filesystem_...
-#include <optional>     // for optional, nullopt
+#include <filesystem>   // for path, exists, filesystem_error, is_empty, remove_all, temp_directory...
+#include <optional>     // for optional, nullopt, nullopt_t
+#include <string>       // for basic_string
 #include <system_error> // for errc, make_error_code
 #include <utility>      // for exchange
 

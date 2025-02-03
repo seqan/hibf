@@ -8,7 +8,8 @@
 #include <cstddef>     // for ptrdiff_t
 #include <ranges>      // for input_range
 #include <span>        // for span
-#include <string_view> // for string_view
+#include <string>      // for basic_string
+#include <string_view> // for basic_string_view, string_view
 #include <vector>      // for vector
 
 #include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ

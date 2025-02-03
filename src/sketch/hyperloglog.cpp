@@ -7,9 +7,9 @@
 #include <array>     // for array
 #include <bit>       // for countl_zero
 #include <cassert>   // for assert
-#include <cinttypes> // for uint64_t, uint8_t, uint32_t
 #include <cmath>     // for log
 #include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t, uint8_t, uint32_t
 #include <iostream>  // for basic_ostream, basic_istream, istream, ostream
 #include <memory>    // for addressof
 #include <stdexcept> // for runtime_error, invalid_argument

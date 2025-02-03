@@ -4,7 +4,7 @@
 
 #include <algorithm> // for __fn, is_sorted, all_of, find, pop_heap, push_heap
 #include <cassert>   // for assert
-#include <cinttypes> // for uint64_t
+#include <cstdint>   // for uint64_t
 #include <span>      // for span
 #include <vector>    // for vector
 

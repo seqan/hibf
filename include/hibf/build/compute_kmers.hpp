@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include <cinttypes> // for uint64_t
+#include <cstdint> // for uint64_t
 
 #include <hibf/build/build_data.hpp>   // for build_data
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set

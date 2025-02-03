@@ -2,11 +2,12 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Message, TestPartResult, EXPECT_EQ, Test, ASSERT_EQ, TestInfo, TEST
+#include <gtest/gtest.h> // for Message, TestPartResult, CmpHelperEQ, CmpHelperEQFailure, EXPECT_EQ, Test
 
 #include <cstddef>  // for size_t
 #include <optional> // for optional
-#include <vector>   // for vector, allocator
+#include <string>   // for basic_string
+#include <vector>   // for vector
 
 #include <hibf/layout/graph.hpp>  // for graph
 #include <hibf/layout/layout.hpp> // for layout

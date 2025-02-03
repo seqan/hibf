@@ -4,12 +4,12 @@
 
 #pragma once
 
-#include <cassert>   // for assert
-#include <cinttypes> // for uint64_t
-#include <cstddef>   // for size_t
-#include <numeric>   // for iota
-#include <string>    // for string
-#include <vector>    // for vector
+#include <cassert> // for assert
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t
+#include <numeric> // for iota
+#include <string>  // for basic_string, string
+#include <vector>  // for vector
 
 #include <hibf/layout/layout.hpp>      // for layout
 #include <hibf/misc/timer.hpp>         // for concurrent_timer

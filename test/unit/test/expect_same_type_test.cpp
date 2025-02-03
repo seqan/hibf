@@ -3,8 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <gtest/gtest-spi.h> // for EXPECT_NONFATAL_FAILURE
-#include <gtest/gtest.h>     // for Test, AssertionResult, Message, TestPartResult, TestInfo, TEST
+#include <gtest/gtest.h>     // for Test, Message, AssertionResult, TestPartResult, TestInfo, TEST
 
+#include <string>      // for basic_string
 #include <tuple>       // for tuple
 #include <type_traits> // for type_identity
 

@@ -5,8 +5,8 @@
 #pragma once
 
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t, uint8_t
 #include <cstddef>    // for size_t, ptrdiff_t
+#include <cstdint>    // for uint64_t, uint8_t
 #include <functional> // for function, equal_to
 #include <iterator>   // for output_iterator_tag
 #include <memory>     // for addressof

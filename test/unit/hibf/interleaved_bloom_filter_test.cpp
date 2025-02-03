@@ -6,19 +6,20 @@
 #    define HIBF_HAS_AVX512 0
 #endif
 
-#include <gtest/gtest.h> // for Message, Test, AssertionResult, TestPartResult, TestInfo, EXPEC...
+#include <gtest/gtest.h> // for Message, Test, AssertionResult, TestPartResult, CmpHelperEQ
 
-#include <algorithm>   // for __fn, all_of, for_each
+#include <algorithm>   // for __fn, fill, all_of, for_each
 #include <array>       // for array
-#include <cinttypes>   // for uint64_t
 #include <compare>     // for operator<, strong_ordering
 #include <cstddef>     // for size_t
+#include <cstdint>     // for uint64_t
 #include <functional>  // for function
 #include <ranges>      // for iota_view, __fn, iota, views, operator==
 #include <stdexcept>   // for logic_error, invalid_argument
+#include <string>      // for basic_string
 #include <type_traits> // for is_copy_assignable_v, is_copy_constructible_v, is_default_const...
 #include <utility>     // for move
-#include <vector>      // for vector
+#include <vector>      // for vector, __bit_iterator, operator-
 
 #include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...

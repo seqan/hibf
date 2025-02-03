@@ -7,12 +7,12 @@
  * \author Enrico Seiler <enrico.seiler AT fu-berlin.de>
  */
 
-#include <cinttypes>  // for uint64_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for function
 
 #include <hibf/build/build_data.hpp>    // for build_data
 #include <hibf/build/compute_kmers.hpp> // for compute_kmers
-#include <hibf/config.hpp>              // for config, insert_iterator
+#include <hibf/config.hpp>              // for insert_iterator, config
 #include <hibf/contrib/robin_hood.hpp>  // for unordered_flat_set
 #include <hibf/layout/layout.hpp>       // for layout
 #include <hibf/misc/timer.hpp>          // for serial_timer, concurrent_timer

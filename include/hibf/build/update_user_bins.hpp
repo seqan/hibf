@@ -5,7 +5,7 @@
 #pragma once
 
 #include <algorithm> // for fill_n
-#include <cinttypes> // for int64_t
+#include <cstdint>   // for uint64_t
 #include <vector>    // for vector
 
 #include <hibf/layout/layout.hpp> // for layout

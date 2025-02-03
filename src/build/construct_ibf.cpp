@@ -3,9 +3,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t
 #include <cmath>      // for ceil
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to
 #include <vector>     // for vector
 

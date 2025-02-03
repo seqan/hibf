@@ -5,6 +5,7 @@
 #include <gtest/gtest.h> // for Test, TestInfo, TEST
 
 #include <filesystem> // for path
+#include <string>     // for basic_string
 #include <utility>    // for move
 
 #include <cereal/specialize.hpp> // for specialization

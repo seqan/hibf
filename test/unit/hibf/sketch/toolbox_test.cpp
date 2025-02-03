@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Message, TestPartResult, EXPECT_EQ, TestInfo, TEST_F, Test
+#include <gtest/gtest.h> // for Message, TestPartResult, CmpHelperEQ, CmpHelperEQFailure, EXPECT_EQ
 
-#include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to
 #include <limits>     // for numeric_limits
 #include <random>     // for uniform_int_distribution, mt19937_64

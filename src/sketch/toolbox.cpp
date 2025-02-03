@@ -4,9 +4,9 @@
 
 #include <algorithm>  // for sort
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t, int64_t
 #include <cmath>      // for floor, sqrt
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t, int64_t
 #include <functional> // for equal_to
 #include <limits>     // for numeric_limits
 #include <omp.h>      // for omp_get_thread_num

@@ -4,10 +4,11 @@
 
 #include <algorithm>  // for __fn, all_of, fill_n
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to, function
 #include <iterator>   // for counted_iterator
+#include <ranges>     // for subrange
 #include <vector>     // for vector
 
 #include <hibf/build/build_data.hpp>         // for build_data

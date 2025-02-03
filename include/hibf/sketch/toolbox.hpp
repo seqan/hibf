@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t, int64_t
 #include <functional> // for greater
 #include <queue>      // for priority_queue
 #include <vector>     // for vector

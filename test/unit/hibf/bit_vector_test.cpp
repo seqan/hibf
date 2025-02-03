@@ -11,10 +11,11 @@
 #include <cstddef>          // for size_t
 #include <initializer_list> // for initializer_list
 #include <iterator>         // for output_iterator, random_access_iterator_tag
-#include <ranges>           // for _CBegin, _CEnd, cbegin, cend
+#include <ranges>           // for __fn, cbegin, cend
 #include <stdexcept>        // for out_of_range
+#include <string>           // for basic_string
 #include <utility>          // for as_const, move
-#include <vector>           // for allocator, vector
+#include <vector>           // for vector
 
 #include <hibf/misc/bit_vector.hpp>             // for bit_vector, operator&, operator^, operator|
 #include <hibf/test/cereal.hpp>                 // for test_serialisation
