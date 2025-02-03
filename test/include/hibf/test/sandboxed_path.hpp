@@ -10,6 +10,7 @@
 #pragma once
 
 #include <filesystem>   // for path, filesystem_error, operator/
+#include <string>       // for basic_string
 #include <system_error> // for errc, make_error_code
 #include <utility>      // for move, forward
 

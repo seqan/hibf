@@ -2,20 +2,21 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, AssertionResult, TestInfo, EXPECT_TRUE, Message, TEST, Tes...
+#include <gtest/gtest.h> // for Test, AssertionResult, Message, TestInfo, EXPECT_TRUE, TEST
 
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <vector>     // for vector, allocator
+#include <string>     // for basic_string
+#include <vector>     // for vector
 
-#include <hibf/config.hpp>                // for insert_iterator, config
-#include <hibf/layout/compute_layout.hpp> // for compute_layout
-#include <hibf/layout/layout.hpp>         // for layout
-#include <hibf/misc/iota_vector.hpp>
-#include <hibf/misc/timer.hpp>              // for concurrent_timer
-#include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
-#include <hibf/sketch/estimate_kmer_counts.hpp>
-#include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
+#include <hibf/config.hpp>                      // for insert_iterator, config
+#include <hibf/layout/compute_layout.hpp>       // for compute_layout
+#include <hibf/layout/layout.hpp>               // for layout
+#include <hibf/misc/iota_vector.hpp>            // for iota_vector
+#include <hibf/misc/timer.hpp>                  // for concurrent_timer
+#include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
+#include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
+#include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
 
 TEST(compute_layout, dispatch)
 {

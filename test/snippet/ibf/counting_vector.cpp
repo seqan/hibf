@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <cinttypes> // for uint16_t
+#include <cstdint> // for uint16_t
 
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size
 #include <hibf/misc/counting_vector.hpp>     // for counting_vector

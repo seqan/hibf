@@ -12,8 +12,8 @@
 #include <algorithm>   // for fill
 #include <array>       // for array
 #include <cassert>     // for assert
-#include <cinttypes>   // for uint32_t, uint16_t, uint64_t
 #include <concepts>    // for integral, same_as, unsigned_integral
+#include <cstdint>     // for uint32_t, uint16_t, uint64_t
 #include <cstring>     // for size_t
 #include <memory>      // for addressof
 #include <ranges>      // for range, range_reference_t, range_value_t, forward_range, input_...

@@ -8,7 +8,7 @@
  */
 #pragma once
 
-#include <cinttypes>  // for uint64_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash

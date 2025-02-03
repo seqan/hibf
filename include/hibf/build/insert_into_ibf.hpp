@@ -4,14 +4,14 @@
 
 #pragma once
 
-#include <cinttypes> // for uint64_t
-#include <cstddef>   // for size_t
+#include <cstddef> // for size_t
+#include <cstdint> // for uint64_t
 
 #include <hibf/build/build_data.hpp>         // for build_data
 #include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter
 #include <hibf/layout/layout.hpp>            // for layout
-#include <hibf/misc/timer.hpp>               // for concurrent, timer
+#include <hibf/misc/timer.hpp>               // for concurrent_timer
 
 namespace seqan::hibf::build
 {

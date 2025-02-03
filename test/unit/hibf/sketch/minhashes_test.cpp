@@ -5,10 +5,11 @@
 #include <gtest/gtest.h> // for AssertionResult, Message, Test, TestPartResult, EXPECT_FALSE, TestInfo
 
 #include <algorithm> // for __fn, equal, make_heap
-#include <cinttypes> // for uint64_t
 #include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t
 #include <ranges>    // for __fn, iota, views
 #include <span>      // for span
+#include <string>    // for basic_string
 #include <utility>   // for move
 #include <vector>    // for vector
 

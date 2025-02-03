@@ -2,12 +2,12 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <cinttypes>  // for uint64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for function
 #include <vector>     // for vector
 
-#include <hibf/config.hpp> // for config, insert_iterator
+#include <hibf/config.hpp> // for insert_iterator, config
 
 struct dna
 {

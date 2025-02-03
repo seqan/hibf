@@ -6,9 +6,9 @@
 
 #include <algorithm> // for __fn, fill, sort
 #include <cassert>   // for assert
-#include <cinttypes> // for uint64_t, uint16_t, uint32_t
 #include <concepts>  // for integral, unsigned_integral
 #include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t, uint16_t, uint32_t
 #include <limits>    // for numeric_limits
 #include <memory>    // for addressof
 #include <ranges>    // for forward_range, range_value_t, range

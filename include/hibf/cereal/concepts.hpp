@@ -4,8 +4,10 @@
 
 #pragma once
 
-#include <cereal/details/helpers.hpp> // for InputArchiveBase, OutputArchiveBase
-#include <cereal/details/traits.hpp>  // for InputArchiveBase, OutputArchiveBase
+#include <type_traits> // for is_base_of_v
+
+#include <cereal/details/helpers.hpp> // for OutputArchiveBase, InputArchiveBase, BinaryInputArchive, BinaryOutputA...
+#include <cereal/details/traits.hpp>  // for TextArchive
 
 #include <hibf/platform.hpp>
 

@@ -4,12 +4,13 @@
 
 // Authored by: Rene Rahn <rene.rahn AT fu-berlin.de>
 
-#include <benchmark/benchmark.h> // for Benchmark, State, BENCHMARK_CAPTURE, DoNotOptimize, BENCHMARK_MAIN
+#include <benchmark/benchmark.h> // for Benchmark, BENCHMARK_CAPTURE, DoNotOptimize, State, BENCHMARK_MAIN
 
 #include <algorithm>   // for __fn, generate
-#include <cinttypes>   // for int32_t, uint8_t
 #include <cstddef>     // for size_t
+#include <cstdint>     // for int32_t, uint8_t
 #include <random>      // for uniform_int_distribution, mt19937_64
+#include <string>      // for basic_string
 #include <type_traits> // for invoke_result_t
 #include <utility>     // for move, pair
 

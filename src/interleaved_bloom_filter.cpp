@@ -6,7 +6,7 @@
 #include <array>      // for array
 #include <bit>        // for bit_ceil, countl_zero
 #include <cassert>    // for assert
-#include <cinttypes>  // for uint64_t
+#include <cstdint>    // for uint64_t
 #include <cstring>    // for size_t, memcpy
 #include <functional> // for equal_to, function
 #include <stdexcept>  // for logic_error, invalid_argument

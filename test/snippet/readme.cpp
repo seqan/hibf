@@ -2,10 +2,10 @@
 // SPDX-FileCopyrightText: 2016-2024, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <cinttypes>  // for uint64_t, int64_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for function
-#include <iostream>   // for operator<<, basic_ostream, cout
+#include <iostream>   // for basic_ostream, operator<<, cout
 #include <ranges>     // for __fn, iota, views
 #include <vector>     // for vector
 

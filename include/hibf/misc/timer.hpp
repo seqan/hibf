@@ -13,9 +13,9 @@
 #include <atomic>    // for atomic, __atomic_base, memory_order_relaxed
 #include <cassert>   // for assert
 #include <chrono>    // for duration, time_point, operator-, operator<=>, steady_clock
-#include <cinttypes> // for uint64_t
 #include <compare>   // for operator>=, strong_ordering
 #include <concepts>  // for same_as
+#include <cstdint>   // for uint64_t
 
 #include <hibf/platform.hpp>
 

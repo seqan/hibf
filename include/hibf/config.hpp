@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <cinttypes>  // for uint32_t, uint8_t
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint32_t, uint8_t
 #include <functional> // for function
 #include <iosfwd>     // for istream, ostream
 
