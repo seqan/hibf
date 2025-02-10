@@ -32,7 +32,7 @@ CPMDeclarePackage (benchmark
 # googletest
 set (HIBF_GOOGLETEST_VERSION 1.16.0)
 CPMDeclarePackage (googletest
-                   NAME googletest
+                   NAME GTest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
