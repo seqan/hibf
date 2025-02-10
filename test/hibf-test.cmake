@@ -23,18 +23,25 @@ if (HIBF_TEST_HAS_LTO)
 endif ()
 
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
-target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # Warn about failed return value optimization.
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
-        target_compile_options (hibf PUBLIC "-Wnrvo")
+option (HIBF_POST_INSTALL_TEST "Tests should use installed library." OFF)
+if (HIBF_POST_INSTALL_TEST)
+    find_package (hibf CONFIG REQUIRED)
+else ()
+    add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
+    target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
+
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # Warn about failed return value optimization.
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+            target_compile_options (hibf PUBLIC "-Wnrvo")
+        endif ()
     endif ()
 endif ()
 
 set (CPM_INDENT "  CMake Package Manager CPM: ")
-CPMUsePackageLock ("${HIBF_ROOT_DIR}/cmake/package-lock.cmake")
+include (${HIBF_ROOT_DIR}/cmake/CPM.cmake)
+CPMUsePackageLock (${HIBF_ROOT_DIR}/cmake/package-lock.cmake)
 
 # ----------------------------------------------------------------------------
 # Paths to folders.
