@@ -1,0 +1,72 @@
+# SPDX-FileCopyrightText: 2006-2025, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+name: Install
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+    types:
+      - unlabeled
+  workflow_dispatch:
+
+concurrency:
+  group: install-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+env:
+  TZ: Europe/Berlin
+  CPM_USE_LOCAL_PACKAGES: ON
+  CPM_LOCAL_PACKAGES_ONLY: ON
+
+defaults:
+  run:
+    shell: bash -Eexuo pipefail {0}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: gcc-14
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
+    container:
+      image: ghcr.io/seqan/gcc-14
+      volumes:
+        - /home/runner:/home/runner
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install dependencies
+        run: |
+          apt-get update 1>/dev/null
+          apt-get install --yes --no-install-recommends \
+            libcereal-dev \
+            libgtest-dev \
+            libsimde-dev \
+            pkgconf \
+            1>/dev/null
+
+      - name: Install hibf
+        run: |
+          mkdir build_install && cd build_install
+          cmake .. -DCMAKE_BUILD_TYPE=Release
+          make install
+          make package_source
+          cpack
+
+      - name: Configure post-install tests
+        run: |
+          mkdir build && cd build
+          cmake ../test/unit -DCMAKE_BUILD_TYPE=Release -DHIBF_POST_INSTALL_TEST=ON
+
+      - name: Build tests
+        working-directory: build
+        run: make -k
+
+      - name: Run tests
+        working-directory: build
+        run: ctest .
+
