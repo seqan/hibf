@@ -50,7 +50,7 @@ jobs:
         working-directory: build
         run: |
           ccache -z
-          make -k -j
+          make -k
           ccache -sv
 
 

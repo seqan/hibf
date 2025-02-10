@@ -26,9 +26,6 @@ macro (hibf_snippet test_name_prefix snippet snippet_base_path)
     set (snippet_test_target "${test_name_prefix}/${snippet_test_name}_snippet")
     add_test (NAME "${snippet_test_target}" COMMAND ${target})
 
-    # disable version checker, as it interferes with comparing the snippet output
-    set_tests_properties ("${snippet_test_target}" PROPERTIES ENVIRONMENT HIBF_NO_VERSION_CHECK=0)
-
     set (snippet_compare_test_target "${test_name_prefix}/${snippet_test_name}_snippet_cmp_output")
 
     add_test (NAME "${snippet_compare_test_target}"

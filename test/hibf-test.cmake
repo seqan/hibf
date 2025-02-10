@@ -23,18 +23,25 @@ if (HIBF_TEST_HAS_LTO)
 endif ()
 
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
-add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
-target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    # Warn about failed return value optimization.
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
-        target_compile_options (hibf PUBLIC "-Wnrvo")
+option (HIBF_POST_INSTALL_TEST "Tests should use installed library." OFF)
+if (HIBF_POST_INSTALL_TEST)
+    find_package (hibf CONFIG REQUIRED)
+else ()
+    add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
+    target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
+
+    if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+        # Warn about failed return value optimization.
+        if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 14)
+            target_compile_options (hibf PUBLIC "-Wnrvo")
+        endif ()
     endif ()
 endif ()
 
 set (CPM_INDENT "  CMake Package Manager CPM: ")
-CPMUsePackageLock ("${HIBF_ROOT_DIR}/cmake/package-lock.cmake")
+include (${HIBF_ROOT_DIR}/cmake/CPM.cmake)
+CPMUsePackageLock (${HIBF_ROOT_DIR}/cmake/package-lock.cmake)
 
 # ----------------------------------------------------------------------------
 # Paths to folders.
@@ -68,7 +75,7 @@ endif ()
 # needed for performance test cases in hibf/test/performance
 if (NOT TARGET hibf::test::performance)
     add_library (hibf_test_performance INTERFACE)
-    target_link_libraries (hibf_test_performance INTERFACE "hibf::test" "benchmark::benchmark_main")
+    target_link_libraries (hibf_test_performance INTERFACE "benchmark::benchmark_main" "hibf::test")
 
     if (HIBF_BENCHMARK_ALIGN_LOOPS)
         target_compile_options (hibf_test_performance INTERFACE "-falign-loops=32")
@@ -81,7 +88,7 @@ endif ()
 # needed for unit test cases in hibf/test/unit
 if (NOT TARGET hibf::test::unit)
     add_library (hibf_test_unit INTERFACE)
-    target_link_libraries (hibf_test_unit INTERFACE "hibf::test" "GTest::gtest_main")
+    target_link_libraries (hibf_test_unit INTERFACE "GTest::gtest_main" "hibf::test")
     add_library (hibf::test::unit ALIAS hibf_test_unit)
 endif ()
 

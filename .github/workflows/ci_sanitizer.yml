@@ -100,13 +100,13 @@ jobs:
           mkdir build && cd build
           cmake ../test/all -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
-          make -j gtest_main benchmark_main
+          make gtest_main benchmark_main
 
       - name: Build tests
         working-directory: build
-        run: make -k -j
+        run: make -k
 
       - name: Run tests
         working-directory: build
-        run: ctest . -j --output-on-failure ${{ matrix.ctest_excludes }}
+        run: ctest . -j --output-on-failure --no-tests=error ${{ matrix.ctest_excludes }}
 

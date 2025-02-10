@@ -108,17 +108,17 @@ jobs:
                                             -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}" \
                                             -DCMAKE_DEPENDS_USE_COMPILER=OFF
           case "${{ matrix.build }}" in
-            unit) make -j gtest_main;;
-            snippet) make -j gtest_main;;
-            performance) make -j benchmark_main;;
-            header) make -j gtest_main benchmark_main;;
+            unit) make gtest_main;;
+            snippet) make gtest_main;;
+            performance) make benchmark_main;;
+            header) make gtest_main benchmark_main;;
           esac
 
       - name: Check cyclic includes
         if: matrix.use_include_dependencies == 'ON'
         working-directory: build
         run: |
-          make -k -j all_dependencies
+          make -k all_dependencies
           cmake .
 
       - name: Build tests
@@ -126,10 +126,10 @@ jobs:
         working-directory: build
         run: |
           ccache -z
-          make -k -j
+          make -k
           ccache -sv
 
       - name: Run tests
         if: matrix.use_include_dependencies == 'OFF'
         working-directory: build
-        run: ctest . -j --output-on-failure
+        run: ctest . -j --output-on-failure --no-tests=error

@@ -30,20 +30,45 @@ set (HIBF_FOOTER_HTML_IN ${HIBF_DOXYGEN_INPUT_DIR}/hibf_footer.html.in)
 set (HIBF_LAYOUT_IN ${CMAKE_CURRENT_BINARY_DIR}/DoxygenLayout.xml.in)
 
 ### Download and extract cppreference-doxygen-web.tag.xml for std:: documentation links
-set (HIBF_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.tag.xml")
-include (ExternalProject)
-ExternalProject_Add (
-    download-cppreference-doxygen-web-tag
-    URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20230810/html-book-20230810.tar.xz"
-    URL_HASH SHA256=31c08e4d99e86c7f63f324d3ff5304eff2030131c4a0ac0d1e3c19c62c8ed684
-    TLS_VERIFY ON
-    DOWNLOAD_DIR "${PROJECT_BINARY_DIR}"
-    DOWNLOAD_NAME "html-book.tar.xz"
-    DOWNLOAD_NO_EXTRACT YES
-    BINARY_DIR "${PROJECT_BINARY_DIR}"
-    CONFIGURE_COMMAND /bin/sh -c "xzcat html-book.tar.xz | tar -xf - cppreference-doxygen-web.tag.xml"
-    BUILD_COMMAND rm "html-book.tar.xz"
-    INSTALL_COMMAND "")
+# HIBF_DOXYGEN_STD_TAGFILE can be used to point to an existing tag file (cppreference-doxygen-web.tag.xml).
+# If HIBF_DOXYGEN_STD_TAGFILE is set by the user and the file exists, it will be copied.
+# If HIBF_DOXYGEN_STD_TAGFILE is not set by the user, or it is set by the user, but the file does not exist,
+# the tag file will be downloaded.
+set (HIBF_DEFAULT_DOXYGEN_STD_TAGFILE "${PROJECT_BINARY_DIR}/cppreference-doxygen-web.tag.xml")
+set (HIBF_DOXYGEN_STD_TAGFILE
+     "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}"
+     CACHE STRING "Path to cppreference-doxygen-web.tag.xml")
+if (NOT EXISTS "${HIBF_DOXYGEN_STD_TAGFILE}" OR HIBF_DOXYGEN_STD_TAGFILE STREQUAL "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}")
+    message (STATUS "Tag file will be fetched.")
+    # Reset path in case it was set from the outside, but does not exist.
+    set (HIBF_DOXYGEN_STD_TAGFILE "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}")
+    include (ExternalProject)
+    # When updating, check whether warnings in HIBF_TEST_DOXYGEN_FAIL_ON_WARNINGS are gone when removing sed filter.
+    ExternalProject_Add (
+        download-cppreference-doxygen-web-tag
+        URL "https://github.com/PeterFeicht/cppreference-doc/releases/download/v20230810/html-book-20230810.tar.xz"
+        URL_HASH SHA256=31c08e4d99e86c7f63f324d3ff5304eff2030131c4a0ac0d1e3c19c62c8ed684
+        TLS_VERIFY ON
+        DOWNLOAD_DIR "${PROJECT_BINARY_DIR}"
+        DOWNLOAD_NAME "html-book.tar.xz"
+        DOWNLOAD_NO_EXTRACT YES
+        BINARY_DIR "${PROJECT_BINARY_DIR}"
+        BUILD_BYPRODUCTS "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}"
+        CONFIGURE_COMMAND /bin/sh -c "xzcat html-book.tar.xz | tar -xf - cppreference-doxygen-web.tag.xml"
+        BUILD_COMMAND rm "html-book.tar.xz"
+        INSTALL_COMMAND "")
+else ()
+    message (STATUS "Copying existing tag file: ${HIBF_DOXYGEN_STD_TAGFILE}")
+    # Copy tag file such that it is present in the built documentation. This is useful if the documentation is
+    # subsequently deployed to a server.
+    add_custom_target (download-cppreference-doxygen-web-tag)
+    add_custom_command (TARGET download-cppreference-doxygen-web-tag
+                        POST_BUILD
+                        COMMAND ${CMAKE_COMMAND} -E copy "${HIBF_DOXYGEN_STD_TAGFILE}"
+                                "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}"
+                        BYPRODUCTS "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}")
+    set (HIBF_DOXYGEN_STD_TAGFILE "${HIBF_DEFAULT_DOXYGEN_STD_TAGFILE}")
+endif ()
 
 ### TEST HELPER
 

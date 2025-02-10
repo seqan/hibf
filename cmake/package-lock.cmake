@@ -5,8 +5,10 @@
 # CPM Package Lock
 # This file should be committed to version control
 
+# cmake-format: off
+
 # cereal
-set (HIBF_CEREAL_VERSION 1.3.2)
+set (HIBF_CEREAL_VERSION 1.3.2 CACHE STRING "" FORCE)
 CPMDeclarePackage (cereal
                    NAME cereal
                    VERSION ${HIBF_CEREAL_VERSION}
@@ -14,14 +16,14 @@ CPMDeclarePackage (cereal
                    SYSTEM TRUE
                    OPTIONS "JUST_INSTALL_CEREAL ON" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # simde
-set (HIBF_SIMDE_VERSION 0.8.2)
+set (HIBF_SIMDE_VERSION 0.8.2 CACHE STRING "" FORCE)
 CPMDeclarePackage (simde
                    NAME simde
                    VERSION ${HIBF_SIMDE_VERSION}
                    GITHUB_REPOSITORY simd-everywhere/simde
                    DOWNLOAD_ONLY YES QUIET YES)
 # benchmark
-set (HIBF_BENCHMARK_VERSION 1.9.1)
+set (HIBF_BENCHMARK_VERSION 1.9.1 CACHE STRING "" FORCE)
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
@@ -30,18 +32,20 @@ CPMDeclarePackage (benchmark
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
-set (HIBF_GOOGLETEST_VERSION 1.16.0)
+set (HIBF_GOOGLETEST_VERSION 1.16.0 CACHE STRING "" FORCE)
 CPMDeclarePackage (googletest
-                   NAME googletest
+                   NAME GTest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
                    GITHUB_REPOSITORY google/googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_CXX_STANDARD 23"
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
-set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.4)
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.4 CACHE STRING "" FORCE)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
                    GITHUB_REPOSITORY jothepro/doxygen-awesome-css
                    DOWNLOAD_ONLY TRUE)
+
+# cmake-format: on
