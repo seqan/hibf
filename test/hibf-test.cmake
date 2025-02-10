@@ -75,7 +75,7 @@ endif ()
 # needed for performance test cases in hibf/test/performance
 if (NOT TARGET hibf::test::performance)
     add_library (hibf_test_performance INTERFACE)
-    target_link_libraries (hibf_test_performance INTERFACE "hibf::test" "benchmark::benchmark_main")
+    target_link_libraries (hibf_test_performance INTERFACE "benchmark::benchmark_main" "hibf::test")
 
     if (HIBF_BENCHMARK_ALIGN_LOOPS)
         target_compile_options (hibf_test_performance INTERFACE "-falign-loops=32")
@@ -88,7 +88,7 @@ endif ()
 # needed for unit test cases in hibf/test/unit
 if (NOT TARGET hibf::test::unit)
     add_library (hibf_test_unit INTERFACE)
-    target_link_libraries (hibf_test_unit INTERFACE "hibf::test" "GTest::gtest_main")
+    target_link_libraries (hibf_test_unit INTERFACE "GTest::gtest_main" "hibf::test")
     add_library (hibf::test::unit ALIAS hibf_test_unit)
 endif ()
 
