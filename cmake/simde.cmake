@@ -13,7 +13,7 @@ macro (hibf_define_simde SIMDE_INCLUDE_DIRECTORY)
                                             $<TARGET_PROPERTY:simde,INTERFACE_INCLUDE_DIRECTORIES>)
 endmacro ()
 
-if (CPM_USE_LOCAL_PACKAGES)
+if (CPM_USE_LOCAL_PACKAGES OR CPM_LOCAL_PACKAGES_ONLY)
     find_package (PkgConfig QUIET)
     if (PKG_CONFIG_FOUND)
         pkg_check_modules (simde QUIET simde>=${HIBF_SIMDE_VERSION})
