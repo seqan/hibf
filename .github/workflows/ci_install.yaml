@@ -68,5 +68,5 @@ jobs:
 
       - name: Run tests
         working-directory: build
-        run: ctest .
+        run: ctest . -j
 
