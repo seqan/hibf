@@ -8,10 +8,10 @@ project (hibf_test_coverage CXX)
 # Add a custom build type: Coverage
 
 set (CMAKE_CXX_FLAGS_COVERAGE
-     "${CMAKE_CXX_FLAGS_DEBUG} --coverage -fprofile-arcs -ftest-coverage ${HIBF_FPROFILE_ABS_PATH}"
+     "${CMAKE_CXX_FLAGS_DEBUG} --coverage -fprofile-arcs -ftest-coverage -fprofile-abs-path"
      CACHE STRING "Flags used by the C++ compiler during coverage builds." FORCE)
 set (CMAKE_C_FLAGS_COVERAGE
-     "${CMAKE_C_FLAGS_DEBUG} --coverage -fprofile-arcs -ftest-coverage ${HIBF_FPROFILE_ABS_PATH}"
+     "${CMAKE_C_FLAGS_DEBUG} --coverage -fprofile-arcs -ftest-coverage -fprofile-abs-path"
      CACHE STRING "Flags used by the C compiler during coverage builds." FORCE)
 set (CMAKE_EXE_LINKER_FLAGS_COVERAGE
      "${CMAKE_EXE_LINKER_FLAGS_DEBUG} -Wl,-lgcov"

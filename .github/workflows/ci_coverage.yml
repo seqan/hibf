@@ -76,11 +76,10 @@ jobs:
                 --filter ${GITHUB_WORKSPACE}/src \
                 --exclude ${GITHUB_WORKSPACE}/include/hibf/contrib \
                 --exclude ${GITHUB_WORKSPACE}/test/include/hibf/test/iterator_test_template.hpp \
-                --exclude-lines-by-pattern '^\s*$' \
-                --exclude-lines-by-pattern '^\s*};$' \
-                --exclude-unreachable-branches \
-                --exclude-throw-branches \
+                --exclude-lines-by-pattern '^\s*}|^\s*};|^\s*HIBF_UNREACHABLE;' \
                 --exclude-noncode-lines \
+                --exclude-throw-branches \
+                --exclude-unreachable-branches \
                 --merge-mode-functions separate \
                 -j \
                 --cobertura \
