@@ -39,6 +39,7 @@ Search for keywords with `Strg + F`.
 \include test/snippet/ibf/interleaved_bloom_filter_try_increase_bin_number_to.cpp
 \include test/snippet/ibf/membership_agent_bulk_contains.cpp
 \include test/snippet/ibf/membership_agent_construction.cpp
+\include test/snippet/platform_unreachable.cpp
 \include test/snippet/readme.cpp
 \include test/snippet/snippet_main.cpp
 \include test/snippet/test/tmp_directory.cpp
