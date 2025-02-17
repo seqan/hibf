@@ -210,16 +210,11 @@ interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const valu
     size_t const bin_words_ = ibf_ptr->bin_words;
     size_t const hash_funs_ = ibf_ptr->hash_funs;
 
-#ifndef NDEBUG
-    assert(bin_words_ != 0u);
-    assert(hash_funs_ != 0u);
-#else
     // Removes case for bin_words_ == 0u. The same statment inside the switch-case wouldn't have that effect.
     if (bin_words_ == 0u)
-        __builtin_unreachable();
+        HIBF_UNREACHABLE;
     if (hash_funs_ == 0u)
-        __builtin_unreachable();
-#endif
+        HIBF_UNREACHABLE;
 
     for (size_t i = 0; i < hash_funs_; ++i)
         bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) / 64u;

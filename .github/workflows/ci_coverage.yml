@@ -78,6 +78,7 @@ jobs:
                 --exclude ${GITHUB_WORKSPACE}/test/include/hibf/test/iterator_test_template.hpp \
                 --exclude-lines-by-pattern '^\s*$' \
                 --exclude-lines-by-pattern '^\s*};$' \
+                --exclude-lines-by-pattern '^\s*HIBF_UNREACHABLE;' \
                 --exclude-unreachable-branches \
                 --exclude-throw-branches \
                 --exclude-noncode-lines \
