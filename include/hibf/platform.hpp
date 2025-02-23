@@ -101,23 +101,7 @@
 #    error "This is not a C++ compiler."
 #endif
 
-/*!\brief Macro to mark unreachable code paths.
- * \details
- * In debug mode, it triggers an assertion failure.
- * In release mode, it calls `std::unreachable`.
- * ### Example
- * \include test/snippet/platform_unreachable.cpp
- */
-#ifndef HIBF_UNREACHABLE
-// The do { ... } while (0) is a common pattern to enforce the semicolon after the macro.
-// clang-format off
-#    ifndef NDEBUG
-#        define HIBF_UNREACHABLE do { assert(false); } while (0) // GCOVR_EXCL_LINE
-#    else
-#        define HIBF_UNREACHABLE do { std::unreachable(); } while (0)
-#    endif
-#endif
-// clang-format on
+
 
 // ============================================================================
 //  Dependencies

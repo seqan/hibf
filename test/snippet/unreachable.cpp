@@ -2,9 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <utility> // for unreachable
-
-#include <hibf/platform.hpp> // for HIBF_UNREACHABLE
+#include <hibf/misc/unreachable.hpp> // for unreachable
 
 int foo(int const i)
 {
@@ -17,6 +15,6 @@ int foo(int const i)
     case 1:
         return 3;
     default:
-        HIBF_UNREACHABLE; // HIBF_UNREACHABLE must be followed by a semicolon.
+        seqan::hibf::unreachable();
     }
 }
