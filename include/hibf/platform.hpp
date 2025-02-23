@@ -16,12 +16,6 @@
 
 // IWYU pragma: end_exports
 
-// macro cruft
-//!\cond
-#define HIBF_STR_HELPER(x) #x
-#define HIBF_STR(x) HIBF_STR_HELPER(x)
-//!\endcond
-
 // ============================================================================
 //  Documentation
 // ============================================================================
@@ -51,11 +45,6 @@
 #    define HIBF_COMPILER_IS_GCC 0
 #endif
 
-#if HIBF_DOXYGEN_ONLY(1) 0
-//!\brief This disables the warning you would get if your compiler is not known to work.
-#    define HIBF_DISABLE_COMPILER_CHECK
-#endif // HIBF_DOXYGEN_ONLY(1)0
-
 /*!\def HIBF_HAS_AVX512
  * \brief Whether AVX512F and AVX512BW are available.
  * \private
@@ -69,23 +58,31 @@
 #endif
 
 // ============================================================================
-//  Compiler support GCC
+//  Compiler support
 // ============================================================================
 
-#if HIBF_COMPILER_IS_GCC
-#    if (__GNUC__ < 12)
-#        error "At least GCC 12 is needed."
-#    endif
-#else
-#    ifdef __INTEL_LLVM_COMPILER
-#        if __INTEL_LLVM_COMPILER < 20240000
-#            error "At least Intel OneAPI 2024 is needed."
-#        endif
-#    else
-#        if (_LIBCPP_VERSION < 170000)
-#            error "At least Clang 17 is needed."
-#        endif
-#    endif
+#if HIBF_COMPILER_IS_GCC && (__GNUC__ < 12)
+#    error "At least GCC 12 is needed."
+#endif
+
+#if defined(__INTEL_LLVM_COMPILER) && (__INTEL_LLVM_COMPILER < 20240000)
+#    error "At least Intel OneAPI 2024 is needed."
+#endif
+
+#if defined(__clang__) && defined(__clang_major__) && (__clang_major__ < 17)
+#    error "At least Clang 17 is needed."
+#endif
+
+// ============================================================================
+//  Standard library support
+// ============================================================================
+
+#if defined(_LIBCPP_VERSION) && (_LIBCPP_VERSION < 170000)
+#    error "At least libc++ 17 is required."
+#endif
+
+#if defined(_GLIBCXX_RELEASE) && (_GLIBCXX_RELEASE < 12)
+#    error "At least libstdc++ 12 is needed."
 #endif
 
 // ============================================================================
@@ -101,8 +98,6 @@
 #    error "This is not a C++ compiler."
 #endif
 
-
-
 // ============================================================================
 //  Dependencies
 // ============================================================================
@@ -112,36 +107,6 @@
 #    include <hibf/version.hpp>
 #else
 #    error "HIBF include directory not set correctly. Forgot to add -I ${INSTALLDIR}/include to your CXXFLAGS?"
-#endif
-
-// ============================================================================
-//  Deprecation Messages
-// ============================================================================
-
-//!\brief _Pragma requires a string-literal and # makes it a string
-#ifndef HIBF_PRAGMA
-#    define HIBF_PRAGMA(non_string_literal) _Pragma(#non_string_literal)
-#endif
-
-//!\brief Deprecation message for deprecated header.
-#ifndef HIBF_DEPRECATED_HEADER
-#    ifndef HIBF_DISABLE_DEPRECATED_WARNINGS
-#        define HIBF_DEPRECATED_HEADER(message) HIBF_PRAGMA(GCC warning message)
-#    else
-#        define HIBF_DEPRECATED_HEADER(message) /**/
-#    endif
-#endif
-
-//!\brief Deprecation message for release.
-#ifndef HIBF_REMOVE_DEPRECATED_100
-#    ifndef HIBF_DEPRECATED_100
-#        ifndef HIBF_DISABLE_DEPRECATED_WARNINGS
-#            define HIBF_DEPRECATED_100                                                                                \
-                [[deprecated("This will be removed in version 1.0.0; please see the documentation.")]]
-#        else
-#            define HIBF_DEPRECATED_100 /**/
-#        endif
-#    endif
 #endif
 
 // ============================================================================
@@ -166,21 +131,6 @@
 #    endif
 #endif
 
-//!\brief Our char literals returning std::vector should be constexpr if constexpr std::vector is supported.
-#if defined(__cpp_lib_constexpr_vector) && __cpp_lib_constexpr_vector >= 201907L
-#    define HIBF_WORKAROUND_LITERAL constexpr
-#else
-#    define HIBF_WORKAROUND_LITERAL inline
-#endif
-
 #if defined(_GLIBCXX_USE_CXX11_ABI) && _GLIBCXX_USE_CXX11_ABI == 0
 #    pragma message "We do not actively support compiler that have -D_GLIBCXX_USE_CXX11_ABI=0 set."
 #endif // _GLIBCXX_USE_CXX11_ABI == 0
-
-// ============================================================================
-//  Backmatter
-// ============================================================================
-
-// macro cruft undefine
-#undef HIBF_STR
-#undef HIBF_STR_HELPER
