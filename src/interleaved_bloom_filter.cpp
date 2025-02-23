@@ -18,6 +18,7 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
+#include <hibf/misc/unreachable.hpp>         // for unreachable
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 #include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 
@@ -212,9 +213,9 @@ interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const valu
 
     // Removes case for bin_words_ == 0u. The same statment inside the switch-case wouldn't have that effect.
     if (bin_words_ == 0u)
-        HIBF_UNREACHABLE;
+        seqan::hibf::unreachable();
     if (hash_funs_ == 0u)
-        HIBF_UNREACHABLE;
+        seqan::hibf::unreachable();
 
     for (size_t i = 0; i < hash_funs_; ++i)
         bloom_filter_indices[i] = ibf_ptr->hash_and_fit(value, ibf_ptr->hash_seeds[i]) / 64u;

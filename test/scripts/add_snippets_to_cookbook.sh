@@ -44,7 +44,7 @@ head -n ${LINE_NUMBER_OF_KEY_LINE} ${COOKBOOK} > ${TMP_FILE}
 # Iterate through all files in test/snippet/*
 # Order of results from find is not fixed, so we sort the results alphabetically.
 # Snippets of doc would be: find ./doc/ -type f -name "*.cpp" -and -not -path "./doc/cookbook/*"
-for snippet in $(find test/snippet/ -type f -name "*.cpp" | sort); do
+for snippet in $(find test/snippet -type f -name "*.cpp" | sort); do
     echo "\include ${snippet}" >> ${TMP_FILE}
 done
 
