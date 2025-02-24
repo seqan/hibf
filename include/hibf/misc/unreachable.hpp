@@ -24,13 +24,17 @@ namespace seqan::hibf
 /*!\fn inline void seqan::hibf::unreachable()
  * \brief Marks unreachable code paths.
  * \details
- * In debug mode, it triggers an assertion failure.
- * In release mode, it calls `std::unreachable`.
+ * | Mode (`NDEBUG` defined ?) | Behavior                             |
+ * |:-------------------------:|:------------------------------------:|
+ * | Debug (No)                | <code>[assert][1](false)</code>      |
+ * | Release (Yes)             | <code>[std::unreachable][2]()</code> |
+ * [1]: https://en.cppreference.com/w/cpp/error/assert
+ * [2]: https://en.cppreference.com/w/cpp/utility/unreachable
  * ### Example
  * \include test/snippet/unreachable.cpp
  */
 #ifndef NDEBUG
-inline void unreachable() // GCOVR_EXCL_LINE
+[[noreturn]] inline void unreachable() // GCOVR_EXCL_LINE
 {
     assert(false); // GCOVR_EXCL_LINE
 }
