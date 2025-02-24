@@ -5,7 +5,6 @@
 #include <algorithm>  // for clamp
 #include <array>      // for array
 #include <bit>        // for bit_ceil, countl_zero
-#include <cassert>    // for assert
 #include <cstdint>    // for uint64_t
 #include <cstring>    // for size_t, memcpy
 #include <functional> // for equal_to, function
@@ -18,7 +17,7 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
-#include <hibf/misc/unreachable.hpp>         // for unreachable
+#include <hibf/misc/unreachable.hpp>         // for assert, unreachable
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 #include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 
