@@ -5,31 +5,29 @@
 cmake_minimum_required (VERSION 3.20...3.31)
 project (hibf_test_tutorial CXX)
 
-include (CheckIPOSupported)
-check_ipo_supported (
-    RESULT HIBF_TEST_HAS_LTO
-    OUTPUT HIBF_TEST_HAS_LTO_OUTPUT
-    LANGUAGES CXX)
-if (HIBF_TEST_HAS_LTO)
-    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
+list (APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
+list (APPEND CMAKE_CTEST_ARGUMENTS "--no-tests=error")
+
+include (../hibf-test.cmake)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
-list (APPEND CMAKE_CTEST_ARGUMENTS "--output-on-failure")
 
-set (CPM_INDENT "CMake Package Manager CPM: ")
-include (${CMAKE_CURRENT_LIST_DIR}/../../cmake/CPM.cmake)
+CPMAddPackage (NAME seqan3
+               GIT_TAG 9a07fdb5283aad0b05301905bddb2d8253f5e067
+               GITHUB_REPOSITORY seqan/seqan3
+               SYSTEM TRUE
+               EXCLUDE_FROM_ALL TRUE
+               OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 
-# Tells CPM to use the version of hibf in the parent directory.
-set (CPM_hibf_SOURCE "${CMAKE_CURRENT_LIST_DIR}/../..")
-CPMAddPackage (NAME app_template
-               GITHUB_REPOSITORY seqan/app-template
-               GIT_TAG 718c88108bba2c04dc59855934feea9ac6f3a4a4
-               OPTIONS "CMAKE_MESSAGE_LOG_LEVEL WARNING" "app-template_TEST OFF"
-               EXCLUDE_FROM_ALL true)
+CPMAddPackage (NAME sharg
+               GIT_TAG da92d2314e9fedba0e1d9d317b5977360dae8ac9
+               GITHUB_REPOSITORY seqan/sharg-parser
+               SYSTEM TRUE
+               EXCLUDE_FROM_ALL TRUE
+               OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "SHARG_NO_TDL ON")
 
 add_executable ("hibf_tutorial" build.cpp count.cpp main.cpp search.cpp)
-target_link_libraries ("hibf_tutorial" PRIVATE "app-template_interface")
+target_link_libraries ("hibf_tutorial" PRIVATE seqan::hibf seqan3::seqan3 sharg::sharg)
 
 FetchContent_Declare (
     download_data
