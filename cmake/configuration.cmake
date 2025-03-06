@@ -81,46 +81,6 @@ include ("${HIBF_SOURCE_DIR}/test/cmake/hibf_require_ccache.cmake")
 hibf_require_ccache ()
 
 # ----------------------------------------------------------------------------
-# Require C++23
-# ----------------------------------------------------------------------------
-
-set (CMAKE_REQUIRED_FLAGS_SAVE ${CMAKE_REQUIRED_FLAGS})
-set (HIBF_CXX_FLAGS "")
-
-set (CXXSTD_TEST_SOURCE
-     "#if !defined (__cplusplus) || (__cplusplus < 202100)
-      #error NOCXX23
-      #endif
-      int main() {}")
-
-set (HIBF_FEATURE_CPP23_FLAG_BUILTIN "")
-set (HIBF_FEATURE_CPP23_FLAG_STD23 "-std=c++23")
-
-set (HIBF_CPP23_FLAG "")
-
-foreach (_FLAG BUILTIN STD23)
-    set (CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS_SAVE} ${HIBF_FEATURE_CPP23_FLAG_${_FLAG}}")
-
-    check_cxx_source_compiles ("${CXXSTD_TEST_SOURCE}" CPP23_FLAG_${_FLAG})
-
-    if (CPP23_FLAG_${_FLAG})
-        set (HIBF_CPP23_FLAG ${_FLAG})
-        break ()
-    endif ()
-endforeach ()
-
-set (CMAKE_REQUIRED_FLAGS ${CMAKE_REQUIRED_FLAGS_SAVE})
-
-if (HIBF_CPP23_FLAG STREQUAL "BUILTIN")
-    hibf_config_print ("C++ Standard-23 support:    builtin")
-elseif (HIBF_CPP23_FLAG)
-    list (APPEND HIBF_CXX_FLAGS "${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
-    hibf_config_print ("C++ Standard-23 support:    via ${HIBF_FEATURE_CPP23_FLAG_${HIBF_CPP23_FLAG}}")
-else ()
-    hibf_config_error ("HIBF requires C++23, but your compiler does not support it.")
-endif ()
-
-# ----------------------------------------------------------------------------
 # Required: 128 bit unsigned integer extension
 # ----------------------------------------------------------------------------
 
@@ -350,6 +310,9 @@ try_compile (HIBF_PLATFORM_TEST
                          "-DINCLUDE_DIRECTORIES:STRING=${CMAKE_INCLUDE_PATH};${HIBF_HEADER_PATH}"
              COMPILE_DEFINITIONS ${HIBF_DEFINITIONS}
              LINK_LIBRARIES ${HIBF_LIBRARIES}
+             CXX_STANDARD 23
+             CXX_STANDARD_REQUIRED ON
+             CXX_EXTENSIONS OFF
              OUTPUT_VARIABLE HIBF_PLATFORM_TEST_OUTPUT)
 # cmake-format: on
 if (HIBF_PLATFORM_TEST)

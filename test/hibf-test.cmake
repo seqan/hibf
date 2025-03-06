@@ -13,6 +13,18 @@ cmake_minimum_required (VERSION 3.20...3.31)
 # have to be adapted or the option deactivated.
 option (HIBF_BENCHMARK_ALIGN_LOOPS "Pass -falign-loops=32 to the benchmark builds." ON)
 
+if (NOT DEFINED CMAKE_CXX_STANDARD)
+    set (CMAKE_CXX_STANDARD 23)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
+    set (CMAKE_CXX_STANDARD_REQUIRED ON)
+endif ()
+
+if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
+    set (CMAKE_CXX_EXTENSIONS OFF)
+endif ()
+
 include (CheckIPOSupported)
 check_ipo_supported (
     RESULT HIBF_TEST_HAS_LTO
