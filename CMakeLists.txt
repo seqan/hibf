@@ -22,6 +22,8 @@ if (NOT CMAKE_BUILD_TYPE)
          CACHE STRING "Choose the type of build, options are: Debug Release RelWithDebInfo MinSizeRel." FORCE)
 endif ()
 
+include (cmake/cxx_config.cmake)
+
 set (HIBF_HEADER_PATH "${HIBF_SOURCE_DIR}/include")
 include (cmake/configuration.cmake)
 add_subdirectory (src)

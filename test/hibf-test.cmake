@@ -13,28 +13,9 @@ cmake_minimum_required (VERSION 3.20...3.31)
 # have to be adapted or the option deactivated.
 option (HIBF_BENCHMARK_ALIGN_LOOPS "Pass -falign-loops=32 to the benchmark builds." ON)
 
-if (NOT DEFINED CMAKE_CXX_STANDARD)
-    set (CMAKE_CXX_STANDARD 23)
-endif ()
-
-if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
-    set (CMAKE_CXX_STANDARD_REQUIRED ON)
-endif ()
-
-if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
-    set (CMAKE_CXX_EXTENSIONS OFF)
-endif ()
-
-include (CheckIPOSupported)
-check_ipo_supported (
-    RESULT HIBF_TEST_HAS_LTO
-    OUTPUT HIBF_TEST_HAS_LTO_OUTPUT
-    LANGUAGES CXX)
-if (HIBF_TEST_HAS_LTO)
-    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
-
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+
+include (${HIBF_ROOT_DIR}/cmake/cxx_config.cmake)
 
 option (HIBF_POST_INSTALL_TEST "Tests should use installed library." OFF)
 if (HIBF_POST_INSTALL_TEST)
