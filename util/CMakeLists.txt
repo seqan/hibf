@@ -5,29 +5,9 @@
 cmake_minimum_required (VERSION 3.20...3.31)
 project (hibf_util CXX)
 
-include (CheckIPOSupported)
-check_ipo_supported (
-    RESULT HIBF_TEST_HAS_LTO
-    OUTPUT HIBF_TEST_HAS_LTO_OUTPUT
-    LANGUAGES CXX)
-if (HIBF_TEST_HAS_LTO)
-    set (CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
-endif ()
-
-if (NOT DEFINED CMAKE_CXX_STANDARD)
-    set (CMAKE_CXX_STANDARD 23)
-endif ()
-
-if (NOT DEFINED CMAKE_CXX_STANDARD_REQUIRED)
-    set (CMAKE_CXX_STANDARD_REQUIRED ON)
-endif ()
-
-if (NOT DEFINED CMAKE_CXX_EXTENSIONS)
-    set (CMAKE_CXX_EXTENSIONS OFF)
-endif ()
-
 # Dependency: seqan::hibf
 get_filename_component (HIBF_ROOT_DIR "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
+include (${HIBF_ROOT_DIR}/cmake/cxx_config.cmake)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
 
 # Dependency: Sharg

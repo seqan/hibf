@@ -13,14 +13,14 @@ include (../hibf-test.cmake)
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
 CPMAddPackage (NAME seqan3
-               GIT_TAG 9a07fdb5283aad0b05301905bddb2d8253f5e067
+               GIT_TAG main
                GITHUB_REPOSITORY seqan/seqan3
                SYSTEM TRUE
                EXCLUDE_FROM_ALL TRUE
                OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 
 CPMAddPackage (NAME sharg
-               GIT_TAG da92d2314e9fedba0e1d9d317b5977360dae8ac9
+               GIT_TAG main
                GITHUB_REPOSITORY seqan/sharg-parser
                SYSTEM TRUE
                EXCLUDE_FROM_ALL TRUE
