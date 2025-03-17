@@ -602,11 +602,10 @@ public:
     //!\brief Checks if any bit is set to `true`.
     constexpr bool any() const noexcept
     {
-        constexpr chunk_type mask = static_cast<chunk_type>(0);
         return std::ranges::any_of(*as_base(),
                                    [](chunk_type const & chunk)
                                    {
-                                       return chunk | mask;
+                                       return chunk;
                                    });
     }
 
