@@ -121,8 +121,8 @@ struct bin_index
  * the binningvector, a bitvector of length `b` where the `i`'th bit indicates set membership in the `i`'th bin.
  *
  * ### Querying
- * To query the Interleaved Bloom Filter for a value, call seqan::hibf::interleaved_bloom_filter::membership_agent() and use
- * the returned seqan::hibf::interleaved_bloom_filter::membership_agent_type.
+ * To query the Interleaved Bloom Filter for a value, call seqan::hibf::interleaved_bloom_filter::containment_agent() and use
+ * the returned seqan::hibf::interleaved_bloom_filter::containment_agent_type.
  *
  * To count the occurrences of a range of values in the Interleaved Bloom Filter, call
  * seqan::hibf::interleaved_bloom_filter::counting_agent() and use
@@ -194,7 +194,7 @@ private:
     }
 
 public:
-    class membership_agent_type; // documented upon definition below
+    class containment_agent_type; // documented upon definition below
     template <std::integral value_t>
     class counting_agent_type; // documented upon definition below
 
@@ -300,7 +300,7 @@ public:
      * \sa seqan::hibf::interleaved_bloom_filter::increase_bin_number_to
      *
      * \attention If the new bin count is greater than the old bin count and this function returns `true`, all
-     * seqan::hibf::interleaved_bloom_filter::membership_agent_type and
+     * seqan::hibf::interleaved_bloom_filter::containment_agent_type and
      * seqan::hibf::interleaved_bloom_filter::counting_agent_type constructed for this Interleaved Bloom Filter are
      * invalidated.
      *
@@ -322,7 +322,7 @@ public:
      * \throws std::invalid_argument If passed number of bins is smaller than current number of bins.
      *
      * \attention The new number of bins must be greater or equal to the current number of bins.
-     * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::membership_agent_type and
+     * \attention This function invalidates all seqan::hibf::interleaved_bloom_filter::containment_agent_type and
      * seqan::hibf::interleaved_bloom_filter::counting_agent_type constructed for this Interleaved Bloom Filter.
      *
      * \details
@@ -345,18 +345,18 @@ public:
     /*!\name Lookup
      * \{
      */
-    /*!\brief Returns a seqan::hibf::interleaved_bloom_filter::membership_agent_type to be used for lookup.
+    /*!\brief Returns a seqan::hibf::interleaved_bloom_filter::containment_agent_type to be used for lookup.
      * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
-     * `seqan::hibf::interleaved_bloom_filter::membership_agent_type`s constructed for this Interleaved Bloom Filter.
+     * `seqan::hibf::interleaved_bloom_filter::containment_agent_type`s constructed for this Interleaved Bloom Filter.
      *
      * \details
      *
      * ### Example
      *
-     * \include test/snippet/ibf/membership_agent_construction.cpp
-     * \sa seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains
+     * \include test/snippet/ibf/containment_agent_construction.cpp
+     * \sa seqan::hibf::interleaved_bloom_filter::containment_agent_type::bulk_contains
      */
-    membership_agent_type membership_agent() const;
+    containment_agent_type containment_agent() const;
 
     /*!\brief Returns a seqan::hibf::interleaved_bloom_filter::counting_agent_type to be used for counting.
      * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to invalidates all
@@ -473,15 +473,15 @@ public:
 
 /*!\brief Manages membership queries for the seqan::hibf::interleaved_bloom_filter.
  * \attention Calling seqan::hibf::interleaved_bloom_filter::increase_bin_number_to on `ibf` invalidates the
- * membership_agent.
+ * containment_agent.
  *
  * \details
  *
  * ### Example
  *
- * \include test/snippet/ibf/membership_agent_construction.cpp
+ * \include test/snippet/ibf/containment_agent_construction.cpp
  */
-class interleaved_bloom_filter::membership_agent_type
+class interleaved_bloom_filter::containment_agent_type
 {
 private:
     //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
@@ -497,18 +497,18 @@ public:
     /*!\name Constructors, destructor and assignment
      * \{
      */
-    membership_agent_type() = default;                                              //!< Defaulted.
-    membership_agent_type(membership_agent_type const &) = default;                 //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type const &) = default;     //!< Defaulted.
-    membership_agent_type(membership_agent_type &&) noexcept = default;             //!< Defaulted.
-    membership_agent_type & operator=(membership_agent_type &&) noexcept = default; //!< Defaulted.
-    ~membership_agent_type() = default;                                             //!< Defaulted.
+    containment_agent_type() = default;                                               //!< Defaulted.
+    containment_agent_type(containment_agent_type const &) = default;                 //!< Defaulted.
+    containment_agent_type & operator=(containment_agent_type const &) = default;     //!< Defaulted.
+    containment_agent_type(containment_agent_type &&) noexcept = default;             //!< Defaulted.
+    containment_agent_type & operator=(containment_agent_type &&) noexcept = default; //!< Defaulted.
+    ~containment_agent_type() = default;                                              //!< Defaulted.
 
-    /*!\brief Construct a membership_agent_type from a seqan::hibf::interleaved_bloom_filter.
+    /*!\brief Construct a containment_agent_type from a seqan::hibf::interleaved_bloom_filter.
      * \private
      * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
-    explicit membership_agent_type(interleaved_bloom_filter const & ibf) :
+    explicit containment_agent_type(interleaved_bloom_filter const & ibf) :
         ibf_ptr(std::addressof(ibf)),
         result_buffer(ibf.bin_count())
     {}
@@ -527,12 +527,12 @@ public:
      *
      * ### Example
      *
-     * \include test/snippet/ibf/membership_agent_bulk_contains.cpp
+     * \include test/snippet/ibf/containment_agent_bulk_contains.cpp
      *
      * ### Thread safety
      *
      * Concurrent invocations of this function are not thread safe, please create a
-     * seqan::hibf::interleaved_bloom_filter::membership_agent_type for each thread.
+     * seqan::hibf::interleaved_bloom_filter::containment_agent_type for each thread.
      */
     [[nodiscard]] bit_vector const & bulk_contains(size_t const value) & noexcept;
 
@@ -542,9 +542,9 @@ public:
     //!\}
 };
 
-inline interleaved_bloom_filter::membership_agent_type interleaved_bloom_filter::membership_agent() const
+inline interleaved_bloom_filter::containment_agent_type interleaved_bloom_filter::containment_agent() const
 {
-    return interleaved_bloom_filter::membership_agent_type{*this};
+    return interleaved_bloom_filter::containment_agent_type{*this};
 }
 
 /*!\brief Manages counting ranges of values for the seqan::hibf::interleaved_bloom_filter.
@@ -563,8 +563,8 @@ private:
     //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
     interleaved_bloom_filter const * ibf_ptr{nullptr};
 
-    //!\brief Store a seqan::hibf::interleaved_bloom_filter::membership_agent to call `bulk_contains`.
-    membership_agent_type membership_agent;
+    //!\brief Store a seqan::hibf::interleaved_bloom_filter::containment_agent to call `bulk_contains`.
+    containment_agent_type containment_agent;
 
     //!\brief Stores the result of bulk_count().
     counting_vector<value_t> result_buffer;
@@ -586,7 +586,7 @@ public:
      */
     explicit counting_agent_type(interleaved_bloom_filter const & ibf) :
         ibf_ptr(std::addressof(ibf)),
-        membership_agent(ibf),
+        containment_agent(ibf),
 #if !HIBF_HAS_AVX512
         result_buffer(ibf.bin_count())
     {}
@@ -643,7 +643,7 @@ public:
         std::ranges::fill(result_buffer, 0);
 
         for (auto && value : values)
-            result_buffer += membership_agent.bulk_contains(value);
+            result_buffer += containment_agent.bulk_contains(value);
 
         return result_buffer;
     }

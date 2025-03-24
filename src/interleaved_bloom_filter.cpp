@@ -201,7 +201,7 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
 }
 
 [[gnu::always_inline]] bit_vector const &
-interleaved_bloom_filter::membership_agent_type::bulk_contains(size_t const value) & noexcept
+interleaved_bloom_filter::containment_agent_type::bulk_contains(size_t const value) & noexcept
 {
     assert(ibf_ptr != nullptr);
     assert(result_buffer.size() == ibf_ptr->bin_count());

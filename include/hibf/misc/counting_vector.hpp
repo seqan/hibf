@@ -119,13 +119,13 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
 #endif
 
 /*!\brief A data structure that behaves like a std::vector and can be used to consolidate the results of multiple calls
- *        to seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
+ *        to seqan::hibf::interleaved_bloom_filter::containment_agent_type::bulk_contains.
  * \ingroup ibf
  * \tparam value_t The type of the count. Must model std::integral.
  *
  * \details
  *
- * When using the seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains operation, a common use
+ * When using the seqan::hibf::interleaved_bloom_filter::containment_agent_type::bulk_contains operation, a common use
  * case is to add up, for example, the results for all k-mers in a query. This yields, for each bin, the number of
  * k-mers of a query that are in the respective bin. Such information can be used to apply further filtering or
  * abundance estimation based on the k-mer counts.

@@ -176,7 +176,7 @@ void bulk_contains_benchmark(::benchmark::State & state)
 {
     auto const & [values, ibf] = set_up(state);
 
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     for (auto _ : state)
     {
         for (auto hash : values)
