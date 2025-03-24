@@ -81,7 +81,10 @@ jobs:
                 --output ${GITHUB_WORKSPACE}/build/coverage_report.xml
 
       - name: Submit coverage build
-        uses: codecov/codecov-action@v3.1.5
+        uses: codecov/codecov-action@v5.4.0
         with:
-          files: build/coverage_report.xml
+          disable_search: true
           fail_ci_if_error: false
+          files: build/coverage_report.xml
+          plugins: noop
+          token: ${{ secrets.CODECOV_TOKEN }}
