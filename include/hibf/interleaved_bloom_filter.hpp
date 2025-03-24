@@ -569,9 +569,6 @@ template <std::integral value_t>
 class interleaved_bloom_filter::counting_agent_type
 {
 private:
-    //!\brief A pointer to the augmented seqan::hibf::interleaved_bloom_filter.
-    interleaved_bloom_filter const * ibf_ptr{nullptr};
-
     //!\brief Store a seqan::hibf::interleaved_bloom_filter::containment_agent to call `bulk_contains`.
     containment_agent_type containment_agent;
 
@@ -594,7 +591,6 @@ public:
      * \param ibf The seqan::hibf::interleaved_bloom_filter.
      */
     explicit counting_agent_type(interleaved_bloom_filter const & ibf) :
-        ibf_ptr(std::addressof(ibf)),
         containment_agent(ibf),
 #if !HIBF_HAS_AVX512
         result_buffer(ibf.bin_count())
@@ -642,9 +638,6 @@ public:
     template <std::ranges::range value_range_t>
     [[nodiscard]] counting_vector<value_t> const & bulk_count(value_range_t && values) & noexcept
     {
-        assert(ibf_ptr != nullptr);
-        assert(result_buffer.size() == ibf_ptr->bin_count());
-
         static_assert(std::ranges::input_range<value_range_t>, "The values must model input_range.");
         static_assert(std::unsigned_integral<std::ranges::range_value_t<value_range_t>>,
                       "An individual value must be an unsigned integral.");

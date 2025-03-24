@@ -204,7 +204,8 @@ void interleaved_bloom_filter::increase_bin_number_to(seqan::hibf::bin_count con
 interleaved_bloom_filter::containment_agent_type::bulk_contains(size_t const value) & noexcept
 {
     assert(ibf_ptr != nullptr);
-    assert(result_buffer.size() == ibf_ptr->bin_count());
+    if (result_buffer.size() != ibf_ptr->bin_count())
+        seqan::hibf::unreachable();
 
     // Needed for auto-vectorization of loop. ibf_ptr->bin_words could change bewtween loops.
     size_t const bin_words_ = ibf_ptr->bin_words;

@@ -24,6 +24,7 @@
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
+#include <hibf/misc/unreachable.hpp>          // for unreachable
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 
 #if HIBF_HAS_AVX512
@@ -232,7 +233,9 @@ private:
     template <operation op>
     inline void impl(bit_vector const & bit_vector)
     {
-        assert(this->size() >= bit_vector.size()); // The counting vector may be bigger than what we need.
+        // The counting vector may be bigger than what we need, but not smaller.
+        if (this->size() < bit_vector.size())
+            seqan::hibf::unreachable();
 #if HIBF_HAS_AVX512
         // AVX512BW: mm512_maskz_mov_epi, mm512_add_epi
         // AVX512F: mm512_set1_epi, _mm512_load_si512, _mm512_store_si512
