@@ -31,8 +31,8 @@ Search for keywords with `Strg + F`.
 \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
 \include test/snippet/ibf/containment_agent_bulk_contains.cpp
 \include test/snippet/ibf/containment_agent_construction.cpp
-\include test/snippet/ibf/counting_agent_construction.cpp
 \include test/snippet/ibf/counting_agent.cpp
+\include test/snippet/ibf/counting_agent_construction.cpp
 \include test/snippet/ibf/counting_vector.cpp
 \include test/snippet/ibf/interleaved_bloom_filter_clear.cpp
 \include test/snippet/ibf/interleaved_bloom_filter_constructor.cpp
