@@ -77,7 +77,7 @@ TEST(ibf_test, construction_from_config)
 
     seqan::hibf::interleaved_bloom_filter ibf{ibf_config};
 
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     std::vector<size_t> query{1, 2, 3, 4, 5};
 
@@ -146,7 +146,7 @@ TEST(ibf_test, bulk_contains)
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u}, seqan::hibf::bin_size{1024u}};
     std::vector<bool> expected(64); // empty bitvector is expected since we did not insert anything
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     for (size_t hash : std::views::iota(0, 64))
     {
@@ -190,7 +190,7 @@ TEST(ibf_test, emplace)
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
     // 2. Test for correctness
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     std::vector<bool> expected(64, 1);          // every hash value should be set for every bin
     for (size_t hash : std::views::iota(0, 64)) // test correct resize for each bin individually
     {
@@ -220,7 +220,7 @@ TEST(ibf_test, emplace_with_occupancy)
 
     // 2. Test for correctness
 
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     std::vector<bool> expected(128);
     std::fill(expected.begin(), expected.begin() + 64u, true);
     for (size_t hash : std::views::iota(0, 64))
@@ -253,7 +253,7 @@ TEST(ibf_test, clear)
     ibf.clear(seqan::hibf::bin_index{17u});
 
     // 3. Test for correctness
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     std::vector<bool> expected(64, 1); // every hash value should be set for every bin...
     expected[17] = 0;                  // ...except bin 17
     for (size_t hash : std::views::iota(0, 64))
@@ -281,7 +281,7 @@ TEST(ibf_test, clear_range)
     ibf.clear(bin_range);
 
     // 3. Test for correctness
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     std::vector<bool> expected(64, 1); // every hash value should be set for every bin...
     expected[8] = 0;                   // ...except bin 8
     expected[17] = 0;                  // ...except bin 17
@@ -306,7 +306,7 @@ TEST(ibf_test, counting)
 
     // 2. Test for correctness
     seqan::hibf::counting_vector<size_t> counting(128, 0);
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting += agent.bulk_contains(hash);
@@ -365,7 +365,7 @@ TEST(ibf_test, counting_no_ub)
 
     // 2. Test for correctness
     seqan::hibf::counting_vector<size_t> counting(128, 0);
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     for (size_t hash : std::views::iota(0, 128)) // test correct resize for each bin individually
     {
         counting += agent.bulk_contains(hash);
@@ -405,6 +405,29 @@ TEST(ibf_test, counting_agent_no_ub)
     expected[126] = 128;
     EXPECT_RANGE_EQ(agent.bulk_count(std::views::iota(0u, 128u)), expected);
     EXPECT_RANGE_EQ(agent2.bulk_count(std::views::iota(0u, 128u)), expected);
+}
+
+TEST(ibf_test, membership_for)
+{
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
+
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const num, seqan::hibf::insert_iterator it)
+                               {
+                                   for (auto const hash : hashes[num])
+                                       it = hash;
+                               },
+                               .number_of_user_bins = 2};
+
+    seqan::hibf::interleaved_bloom_filter ibf{config};
+
+    std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
+
+    auto agent = ibf.membership_agent();
+    auto & result = agent.membership_for(query, 2u);
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    agent.sort_results();
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
 }
 
 TEST(ibf_test, try_increase_bin_number_to)
@@ -463,7 +486,7 @@ TEST(ibf_test, increase_bin_number_to)
 
         std::vector<bool> expected(73, 0);
         expected[current_bin] = 1; // none of the bins except current_bin stores the hash values.
-        auto agent = ibf.membership_agent();
+        auto agent = ibf.containment_agent();
         for (size_t const h : hashes)
         {
             auto & res = agent.bulk_contains(h);
@@ -483,11 +506,11 @@ TEST(ibf_test, copy_agents)
         ibf.emplace(0u, seqan::hibf::bin_index{bin_idx});
 
     {
-        auto membership_agent1 = ibf.membership_agent();
-        auto membership_agent2 = membership_agent1;
+        auto containment_agent1 = ibf.containment_agent();
+        auto containment_agent2 = containment_agent1;
 
-        auto & result1 = membership_agent1.bulk_contains(0u);
-        auto & result2 = membership_agent2.bulk_contains(1u);
+        auto & result1 = containment_agent1.bulk_contains(0u);
+        auto & result2 = containment_agent2.bulk_contains(1u);
         ASSERT_EQ(result1.size(), result2.size());
 
         EXPECT_TRUE(result1.all());

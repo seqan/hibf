@@ -24,6 +24,7 @@
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
+#include <hibf/misc/unreachable.hpp>          // for unreachable
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 
 #if HIBF_HAS_AVX512
@@ -119,13 +120,13 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
 #endif
 
 /*!\brief A data structure that behaves like a std::vector and can be used to consolidate the results of multiple calls
- *        to seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains.
+ *        to seqan::hibf::interleaved_bloom_filter::containment_agent_type::bulk_contains.
  * \ingroup ibf
  * \tparam value_t The type of the count. Must model std::integral.
  *
  * \details
  *
- * When using the seqan::hibf::interleaved_bloom_filter::membership_agent_type::bulk_contains operation, a common use
+ * When using the seqan::hibf::interleaved_bloom_filter::containment_agent_type::bulk_contains operation, a common use
  * case is to add up, for example, the results for all k-mers in a query. This yields, for each bin, the number of
  * k-mers of a query that are in the respective bin. Such information can be used to apply further filtering or
  * abundance estimation based on the k-mer counts.
@@ -232,7 +233,9 @@ private:
     template <operation op>
     inline void impl(bit_vector const & bit_vector)
     {
-        assert(this->size() >= bit_vector.size()); // The counting vector may be bigger than what we need.
+        // The counting vector may be bigger than what we need, but not smaller.
+        if (this->size() < bit_vector.size())
+            seqan::hibf::unreachable();
 #if HIBF_HAS_AVX512
         // AVX512BW: mm512_maskz_mov_epi, mm512_add_epi
         // AVX512F: mm512_set1_epi, _mm512_load_si512, _mm512_store_si512

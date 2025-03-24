@@ -8,16 +8,23 @@
 int main()
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{12u}, seqan::hibf::bin_size{8192u}};
-    ibf.emplace(126, seqan::hibf::bin_index{0u});
-    ibf.emplace(712, seqan::hibf::bin_index{3u});
-    ibf.emplace(237, seqan::hibf::bin_index{9u});
+    std::vector<uint64_t> const query{126, 712, 237};
 
-    // Query the Interleaved Bloom Filter. Note that there may be false positive results!
-    // A `1` at position `i` indicates the (probable) presence of the query in bin `i`.
-    // Capture the result by reference to avoid copies.
+    ibf.emplace(165, seqan::hibf::bin_index{0u});
+    for (auto && value : query)
+    {
+        ibf.emplace(value, seqan::hibf::bin_index{3u});
+        ibf.emplace(value, seqan::hibf::bin_index{5u});
+    }
+    ibf.emplace(126, seqan::hibf::bin_index{7u});
+    ibf.emplace(712, seqan::hibf::bin_index{7u});
+    ibf.emplace(956, seqan::hibf::bin_index{9u});
+
     auto agent = ibf.membership_agent();
-    auto & result = agent.bulk_contains(712);
-    seqan::hibf::print(result); // [0,0,0,1,0,0,0,0,0,0,0,0]
+    // Returns all bin indices that contain at least 2 elements of the query.
+    // Capture the result by reference to avoid copies.
+    auto & result = agent.membership_for(query, 2u);
+    seqan::hibf::print(result); // [3, 5, 7]
 
     // Calling `increase_bin_number_to` invalidates the agent.
     ibf.increase_bin_number_to(seqan::hibf::bin_count{60u});

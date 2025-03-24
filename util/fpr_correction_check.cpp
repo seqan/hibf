@@ -110,7 +110,7 @@ void single_tb(config const & cfg)
                                               seqan::hibf::bin_size{seqan::hibf::build::bin_size_in_bits(
                                                   {.fpr = cfg.fpr, .hash_count = cfg.hash, .elements = cfg.elements})},
                                               seqan::hibf::hash_function_count{cfg.hash}};
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     // Generate elements many random kmer values.
     robin_hood::unordered_set<uint64_t> inserted_values{};
@@ -143,7 +143,7 @@ void multiple_tb(config const & cfg, size_t const bin_size)
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{cfg.splits},
                                               seqan::hibf::bin_size{bin_size},
                                               seqan::hibf::hash_function_count{cfg.hash}};
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     // Generate elements many random kmer values.
     robin_hood::unordered_set<uint64_t> all_values{};

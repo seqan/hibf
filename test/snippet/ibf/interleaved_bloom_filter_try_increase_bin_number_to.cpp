@@ -35,7 +35,7 @@ int main()
     std::cout << ibf.bin_count() << '\n';          // 128
 
     // Be sure to get the agent after `try_increase_bin_number_to` as it may invalidate all agents!
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     // The content of the bins which were already present before the resize does not change
     seqan::hibf::print(agent.bulk_contains(126)); // [1,0,0,0,0,0,0,0,0,0,0,...,0]

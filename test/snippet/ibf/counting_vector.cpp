@@ -20,7 +20,7 @@ int main()
     // The counting_vector must be at least as big as the number of bins.
     seqan::hibf::counting_vector<uint16_t> counts(12, 0);
 
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
 
     counts += agent.bulk_contains(712); // `counts` contains the number of occurrences of 712 in each bin.
     seqan::hibf::print(counts);         // prints [0,0,0,1,0,0,0,0,0,0,0,0]

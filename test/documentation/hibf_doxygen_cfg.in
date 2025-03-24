@@ -56,7 +56,7 @@ ALIASES                = "tutorial_head{4}=<table><tr><th>Difficulty</th><td>\1<
                          "hint=\htmlonly <div class=\"assignment\"> <details><summary><b>Hint</b></summary> \endhtmlonly" \
                          "endhint=\htmlonly </details> </div> \endhtmlonly" \
                          "strike{1}=\htmlonly<div style='color:red;text-decoration:line-through'>\1</div>\endhtmlonly" \
-                         "noapi{1}=\htmlonly<dl class=\"no-api\">This entity is not part of the SeqAn API. Do not rely on it in your applications. \1</dl>\endhtmlonly" \
+                         "noapi{1}=\htmlonly<dl class=\"no-api\">This entity is not part of the API. Do not rely on it in your applications. \1</dl>\endhtmlonly" \
                          "noapi=\noapi{ }" \
                          "experimentalapi{1}=\htmlonly<dl class=\"experimental-api\">This entity is experimental and subject to change in the future. \1</dl>\endhtmlonly" \
                          "experimentalapi=\experimentalapi{ }" \

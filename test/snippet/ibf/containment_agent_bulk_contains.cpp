@@ -12,12 +12,16 @@ int main()
     ibf.emplace(712, seqan::hibf::bin_index{3u});
     ibf.emplace(237, seqan::hibf::bin_index{9u});
 
-    ibf.increase_bin_number_to(seqan::hibf::bin_count{18u});
-    // Be sure to get the agent after `increase_bin_number_to` as it invalidates all agents!
+    // Query the Interleaved Bloom Filter. Note that there may be false positive results!
+    // A `1` at position `i` indicates the (probable) presence of the query in bin `i`.
+    // Capture the result by reference to avoid copies.
     auto agent = ibf.containment_agent();
+    auto & result = agent.bulk_contains(712);
+    seqan::hibf::print(result); // [0,0,0,1,0,0,0,0,0,0,0,0]
 
-    // The content of the bins which were already present before the resize does not change
-    seqan::hibf::print(agent.bulk_contains(126)); // [1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    seqan::hibf::print(agent.bulk_contains(712)); // [0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
-    seqan::hibf::print(agent.bulk_contains(237)); // [0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0]
+    // Calling `increase_bin_number_to` invalidates the agent.
+    ibf.increase_bin_number_to(seqan::hibf::bin_count{60u});
+
+    // So make sure to construct a new containment_agent.
+    agent = ibf.containment_agent();
 }

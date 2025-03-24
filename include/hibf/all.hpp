@@ -8,11 +8,11 @@
  */
 
 /*!\defgroup ibf IBF
- * \brief The Interleaved Bloom Filter.
+ * \brief The Interleaved Bloom Filter: seqan::hibf::interleaved_bloom_filter
  */
 
 /*!\defgroup hibf HIBF
- * \brief The HIBF: seqan::hibf::hierarchical_interleaved_bloom_filter
+ * \brief The Hierarchical Interleaved Bloom Filter: seqan::hibf::hierarchical_interleaved_bloom_filter
  *
  * The Hierarchical Interleaved Bloom Filter is a data structure that provides fast answers to set-membership queries
  * for multiple samples/set/user-bins.

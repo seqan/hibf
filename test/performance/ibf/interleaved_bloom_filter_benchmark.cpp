@@ -176,7 +176,7 @@ void bulk_contains_benchmark(::benchmark::State & state)
 {
     auto const & [values, ibf] = set_up(state);
 
-    auto agent = ibf.membership_agent();
+    auto agent = ibf.containment_agent();
     for (auto _ : state)
     {
         for (auto hash : values)
@@ -203,12 +203,50 @@ void bulk_count_benchmark(::benchmark::State & state)
     state.counters["elements"] = elements_per_second(number_of_elements);
 }
 
+void bulk_count_and_filter_benchmark(::benchmark::State & state)
+{
+    auto const & [values, ibf] = set_up(state);
+
+    auto agent = ibf.counting_agent();
+    std::vector<uint64_t> result(ibf.bin_count());
+
+    for (auto _ : state)
+    {
+        result.clear();
+        auto & res = agent.bulk_count(values);
+        for (size_t bin{}; bin < result.size(); ++bin)
+        {
+            if (res[bin] >= 1u)
+                result.emplace_back(bin);
+        }
+        benchmark::ClobberMemory();
+    }
+
+    state.counters["elements"] = elements_per_second(number_of_elements);
+}
+
+void membership_for_benchmark(::benchmark::State & state)
+{
+    auto const & [values, ibf] = set_up(state);
+
+    auto agent = ibf.membership_agent();
+    for (auto _ : state)
+    {
+        [[maybe_unused]] auto & res = agent.membership_for(values, 1u);
+        benchmark::ClobberMemory();
+    }
+
+    state.counters["elements"] = elements_per_second(number_of_elements);
+}
+
 BENCHMARK(emplace_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(emplace_with_occupancy_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(clear_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(clear_range_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(bulk_contains_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 BENCHMARK(bulk_count_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(bulk_count_and_filter_benchmark)->RangeMultiplier(2)->Range(64, 1024);
+BENCHMARK(membership_for_benchmark)->RangeMultiplier(2)->Range(64, 1024);
 
 // This is a hack to add custom context information to the benchmark output.
 // The alternative would be to do it in the main(). However, this would require
