@@ -1,17 +1,14 @@
 # Copyright {#about_copyright}
 
-| Summary                   |                                                                                            |
-|---------------------------|--------------------------------------------------------------------------------------------|
-| Copyright holders         | Knut Reinert, [FU-Berlin](https://fu-berlin.de), [MPI MolGen](https://www.molgen.mpg.de/)  |
-| Library source code       | ![](doc/about/copyright/bsdl_badge.svg)                                                    |
-| Documentation             | ![](doc/about/copyright/ccby_badge.svg)                                                    |
-| Snippets and examples     | ![](doc/about/copyright/cc0_badge.svg)                                                     |
-| Dependencies              | ![](doc/about/copyright/copyfree_badge.svg)                                                |
+In hibf, we have adopted the use of SPDX identifiers to specify the license under which each file is provided.
 
-# Source code license
+This approach simplifies the process of license declaration as it replaces the full license text with a single line
+identifier. The SPDX identifier is a globally recognized standard that allows for easy identification and understanding
+of the license. This means that each file in our project will have a license identifier at the top, making it clear
+under which license the file is provided. For more information about the specific licenses, you can refer to the
+[SPDX License List](https://spdx.org/licenses/).
 
-The contents of this repository/directory, in particular the library
-source code of HIBF, are licensed under the following terms:
+For the purpose of referring to a singular license, hibf is licensed under BSD-3-Clause:
 
 ```
 Copyright (c) 2006-2025, Knut Reinert & Freie Universität Berlin
@@ -42,26 +39,3 @@ LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
 OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
 DAMAGE.
 ```
-
-# Documentation
-
-The API documentation and manual are additionally provided under the
-terms of the [Creative Commons Attribution 4.0 International License](https://creativecommons.org/licenses/by/4.0/).
-This includes
-  * doxygen-style comments within the library source code;
-  * Markdown files and images in the `doc`-subfolder;
-  * HTML or other representation produced from the above.
-
-The source code examples and snippets within the documentation are
-additionally provided under the terms of the
-[Creative Commons Public Domain Dedication 1.0](https://creativecommons.org/publicdomain/zero/1.0/deed).
-This includes:
-  * source code files (`*.cpp`, `*.hpp`) in the `doc`-subfolder;
-  * the contents of `test/snippet`.
-
-# Submodules
-
-This repository/directory may contain other projects' content in the
-`submodules`-subfolder. We try to ensure that all dependencies are
-permissively licensed (BSD/MIT/X11/ISC/Boost…), but please verify the
-respective license files yourself.

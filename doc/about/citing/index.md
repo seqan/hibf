@@ -14,43 +14,22 @@ on SeqAn. This will help us continue to acquire funding and improve the library.
 
 # Publications
 
-HIBF has not yet been published academically, for now cite SeqAn2:
+## IBF
 
-| Publication   |                                                                                                   |
-|---------------|---------------------------------------------------------------------------------------------------|
-| Title         | The SeqAn C++ template library for efficient sequence analysis: A resource for programmers.       |
-| Year          | 2017                                                                                              |
-| Authors       | Reinert, K., Dadi, T. H., Ehrhardt, M., Hauswedell, H., Mehringer, S., Rahn, R., ... & Urgese, G. |
-| Journal       | Journal of biotechnology, 261, 157-168                                                            |
-| Links         | [original](https://doi.org/10.1016/j.jbiotec.2017.07.017)                                         |
+| Publication   |                                                                                                           |
+|---------------|-----------------------------------------------------------------------------------------------------------|
+| Title         | Raptor: A fast and space-efficient pre-filter for querying very large collections of nucleotide sequences |
+| Year          | 2021                                                                                                      |
+| Authors       | Enrico Seiler, Svenja Mehringer, Mitra Darvish, Etienne Turc, and Knut Reinert                            |
+| Journal       | iScience 2021 24 (7): 102782                                                                              |
+| Links         | https://doi.org/10.1016/j.isci.2021.102782                                                                |
 
-Certain compontents of SeqAn are published separately. If you make strong use of
-one of those compononts and/or specifically compare to that component, please
-cite the respective publication **additionally**.
+## HIBF
 
-## Alignment module
-
-| Publication   |                                                                                                   |
-|---------------|---------------------------------------------------------------------------------------------------|
-| Title         | Generic accelerated sequence alignment in SeqAn using vectorization and multi-threading.          |
-| Year          | 2018                                                                                              |
-| Authors       | Rahn, R., Budach, S., Costanza, P., Ehrhardt, M., Hancox, J., & Reinert, K                        |
-| Journal       | Bioinformatics, 34(20), 3437-3445                                                                 |
-| Links         | [original](https://doi.org/10.1093/bioinformatics/bty380)                                         |
-
-Cite the above publication when you make strong use of the alignment module, in
-particular if you rely on the high-performance computing capabilities.
-
-## Search module
-
-| Publication   |                                                                                                   |
-|---------------|---------------------------------------------------------------------------------------------------|
-| Title         | From theory to practice: Plug and play with succinct data structures.                             |
-| Year          | 2014                                                                                              |
-| Authors       | Gog, S., Beller, T., Moffat, A., & Petri, M.                                                      |
-| Journal       | International Symposium on Experimental Algorithms (pp. 326-337). Springer, Cham.                 |
-| Links         | [original](https://doi.org/10.1007/978-3-319-07959-2_28)                                          |
-
-
-Full text indexing in HIBF makes use of the Succint data structure library (SDSL).
-Version 3 has not yet been published, for now cite SDSL-v2 (above).
+| Publication   |                                                                                                          |
+|---------------|----------------------------------------------------------------------------------------------------------|
+| Title         | Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries                  |
+| Year          | 2023                                                                                                     |
+| Authors       | Svenja Mehringer, Enrico Seiler, Felix Droop, Mitra Darvish, René Rahn, Martin Vingron, and Knut Reinert |
+| Journal       | Genome Biol 24, 131 (2023)                                                                               |
+| Links         | https://doi.org/10.1186/s13059-023-02971-4                                                               |

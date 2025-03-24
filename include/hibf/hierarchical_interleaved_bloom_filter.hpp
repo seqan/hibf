@@ -438,9 +438,7 @@ public:
         return result_buffer;
     }
 
-    /*!\brief `membership_for` cannot be called on a temporary, since the object the returned reference points to
-     * is immediately destroyed.
-     */
+    //!\brief Deleted. Calling this function on a temporary would result in a dangling reference.
     template <std::ranges::range value_range_t>
     [[nodiscard]] std::vector<uint64_t> const & membership_for(value_range_t && values,
                                                                uint16_t const threshold) && noexcept = delete;
@@ -567,9 +565,7 @@ public:
         return result_buffer;
     }
 
-    /*!\brief `bulk_count` cannot be called on a temporary, since the object the returned reference points to
-     * is immediately destroyed.
-     */
+    //!\brief Deleted. Calling this function on a temporary would result in a dangling reference.
     template <std::ranges::range value_range_t>
     [[nodiscard]] counting_vector<value_t> const & bulk_count(value_range_t && values,
                                                               size_t const threshold) && noexcept = delete;
