@@ -11,13 +11,12 @@
 
 #include <algorithm>   // for fill
 #include <array>       // for array
-#include <cassert>     // for assert
-#include <concepts>    // for integral, same_as, unsigned_integral
-#include <cstdint>     // for uint32_t, uint16_t, uint64_t
+#include <concepts>    // for integral, unsigned_integral, same_as
+#include <cstdint>     // for uint16_t, uint64_t, uint32_t
 #include <cstring>     // for size_t
 #include <memory>      // for addressof
-#include <ranges>      // for range, range_reference_t, range_value_t, forward_range, input_...
-#include <type_traits> // for remove_cvref_t
+#include <ranges>      // for forward_range, range_value_t, range, range_reference_t, input...
+#include <type_traits> // for remove_cvref_t, false_type
 #include <vector>      // for vector, operator==
 
 #include <cereal/cereal.hpp>           // for make_nvp
@@ -27,11 +26,11 @@
 
 #include <hibf/cereal/concepts.hpp>            // for cereal_archive
 #include <hibf/contrib/aligned_allocator.hpp>  // for aligned_allocator
-#include <hibf/contrib/std/enumerate_view.hpp> // for enumerate_view
+#include <hibf/contrib/std/enumerate_view.hpp> // for enumerate
 #include <hibf/misc/bit_vector.hpp>            // for bit_vector
 #include <hibf/misc/counting_vector.hpp>       // for counting_vector
 #include <hibf/misc/next_multiple_of_64.hpp>   // for next_multiple_of_64
-#include <hibf/misc/unreachable.hpp>           // for unreachable
+#include <hibf/misc/unreachable.hpp>           // for unreachable, assert, forward
 #include <hibf/platform.hpp>                   // for HIBF_CONSTEXPR_VECTOR, HIBF_HAS_AVX512
 
 namespace seqan::hibf
