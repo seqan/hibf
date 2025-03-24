@@ -7,10 +7,11 @@
 #include <algorithm>  // for __fn, generate
 #include <cmath>      // for log, ceil, exp
 #include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
 #include <functional> // for equal_to
 #include <random>     // for uniform_int_distribution, mt19937_64
 #include <ranges>     // for transform_view, iota_view, __range_adaptor_closure_t, operator|
-#include <string>     // for to_string, basic_string
+#include <string>     // for basic_string, to_string
 #include <tuple>      // for tuple, make_tuple
 #include <utility>    // for move, pair
 #include <vector>     // for vector
@@ -19,6 +20,7 @@
 #include <hibf/contrib/std/chunk_view.hpp>   // for chunk, chunk_fn, chunk_view
 #include <hibf/contrib/std/to.hpp>           // for to
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
+#include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/platform.hpp>                 // for HIBF_HAS_AVX512
 #include <hibf/test/bytes.hpp>               // for operator""_MiB

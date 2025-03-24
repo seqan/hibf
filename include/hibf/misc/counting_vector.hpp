@@ -11,7 +11,6 @@
 
 #include <algorithm>   // for transform
 #include <bit>         // for countr_zero
-#include <cassert>     // for assert
 #include <climits>     // for CHAR_BIT
 #include <concepts>    // for integral
 #include <cstdint>     // for uint64_t, uint8_t
@@ -24,7 +23,7 @@
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
-#include <hibf/misc/unreachable.hpp>          // for unreachable
+#include <hibf/misc/unreachable.hpp>          // for assert, unreachable
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 
 #if HIBF_HAS_AVX512
