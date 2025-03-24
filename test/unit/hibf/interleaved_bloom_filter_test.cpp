@@ -407,6 +407,29 @@ TEST(ibf_test, counting_agent_no_ub)
     EXPECT_RANGE_EQ(agent2.bulk_count(std::views::iota(0u, 128u)), expected);
 }
 
+TEST(ibf_test, membership_for)
+{
+    std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};
+
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const num, seqan::hibf::insert_iterator it)
+                               {
+                                   for (auto const hash : hashes[num])
+                                       it = hash;
+                               },
+                               .number_of_user_bins = 2};
+
+    seqan::hibf::interleaved_bloom_filter ibf{config};
+
+    std::vector<size_t> query{1u, 2u, 3u, 4u, 5u};
+
+    auto agent = ibf.membership_agent();
+    auto & result = agent.membership_for(query, 2u);
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+    agent.sort_results();
+    EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
+}
+
 TEST(ibf_test, try_increase_bin_number_to)
 {
     seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};
