@@ -32,7 +32,7 @@ CPMDeclarePackage (benchmark
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
-set (HIBF_GOOGLETEST_VERSION 1.16.0 CACHE STRING "" FORCE)
+set (HIBF_GOOGLETEST_VERSION 1.17.0 CACHE STRING "" FORCE)
 CPMDeclarePackage (googletest
                    NAME GTest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
