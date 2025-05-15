@@ -29,7 +29,7 @@ macro (hibf_test unit_test_cpp)
     collect_used_test (${target})
 
     if (HIBF_TEST_SDE)
-        set (TARGET_WITH_SDE "${HIBF_TEST_SDE}" "-cnl" "--" "./${target}")
+        set (TARGET_WITH_SDE "${HIBF_TEST_SDE}" "-cnl" "-check_app_mt" "--" "./${target}")
         add_test (NAME "${test_name}_sde" COMMAND ${TARGET_WITH_SDE})
     else ()
         add_test (NAME "${test_name}" COMMAND ${target})
