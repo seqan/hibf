@@ -29,10 +29,10 @@ defaults:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: gcc-14
+    name: gcc-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     container:
-      image: ghcr.io/seqan/gcc-14
+      image: ghcr.io/seqan/gcc-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
