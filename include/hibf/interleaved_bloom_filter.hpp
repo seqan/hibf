@@ -599,11 +599,20 @@ public:
     {
         result_buffer.resize(ibf.bin_count()); // Resize to actual requested size.
                                                // Silences llvm's ASAN container-overflow warning.
-#    if defined(_LIBCPP_VERSION) && !defined(_LIBCPP_HAS_NO_ASAN)
+#    if defined(_LIBCPP_VERSION)
+#        if __has_feature(address_sanitizer)
+#            if (_LIBCPP_VERSION < 200000)
         __sanitizer_annotate_contiguous_container(result_buffer.data(),
                                                   result_buffer.data() + result_buffer.capacity(),
                                                   result_buffer.data() + result_buffer.size(),
                                                   result_buffer.data() + result_buffer.capacity());
+#            else
+        std::__annotate_contiguous_container<allocator_t>(result_buffer.data(),
+                                                          result_buffer.data() + result_buffer.capacity(),
+                                                          result_buffer.data() + result_buffer.size(),
+                                                          result_buffer.data() + result_buffer.capacity());
+#            endif
+#        endif
 #    endif
     }
 #endif

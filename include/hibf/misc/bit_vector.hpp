@@ -45,7 +45,7 @@
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive, cereal_text_archive
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR, _LIBCPP_HAS_NO_ASAN, _LIBCPP_VERSION
+#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR, _LIBCPP_VERSION
 
 namespace seqan::hibf
 {
@@ -945,7 +945,11 @@ private:
 
             pointer begin;
             pointer end;
+#        if (_LIBCPP_VERSION < 200000)
             std::__compressed_pair<pointer, allocator_t> end_cap;
+#        else
+            _LIBCPP_COMPRESSED_PAIR(pointer, end_cap = nullptr, allocator_type, allocator);
+#        endif
         };
 
         static_assert(sizeof(fake_vector) == sizeof(base_t));
@@ -953,13 +957,19 @@ private:
 
         if (size > base_t::capacity())
             base_t::reserve(size);
-
 // Annotate the new memory as contiguous container for llvm's address sanitizer.
-#        ifndef _LIBCPP_HAS_NO_ASAN
+#        if __has_feature(address_sanitizer)
+#            if (_LIBCPP_VERSION < 200000)
         __sanitizer_annotate_contiguous_container(base_t::data(),
                                                   base_t::data() + base_t::capacity(),
                                                   base_t::data() + base_t::size(),
                                                   base_t::data() + size);
+#            else
+        std::__annotate_contiguous_container<allocator_t>(base_t::data(),
+                                                          base_t::data() + base_t::capacity(),
+                                                          base_t::data() + base_t::size(),
+                                                          base_t::data() + size);
+#            endif
 #        endif
 
         fake_vector & vec = reinterpret_cast<fake_vector &>(*this);
