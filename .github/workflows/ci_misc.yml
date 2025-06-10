@@ -26,66 +26,20 @@ defaults:
 
 jobs:
   build:
-    name: ${{ matrix.name }}
+    name: ${{ matrix.name || matrix.build }} ${{ matrix.compiler }}
     runs-on: ubuntu-latest
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
+        build: [snippet, performance, header, tutorial]
+        compiler: ["clang-latest", "clang-third-latest", "gcc-latest", "gcc-third-latest"]
+        use_include_dependencies: ["OFF"]
         include:
-          - name: "Snippet clang17"
-            compiler: "clang-17"
-            build: snippet
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Snippet gcc12"
-            compiler: "gcc-12"
-            build: snippet
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Performance clang17"
-            compiler: "clang-17"
-            build: performance
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Performance gcc12"
-            compiler: "gcc-12"
-            build: performance
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Header clang17"
-            compiler: "clang-17"
-            build: header
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Header gcc13"
-            compiler: "gcc-13"
-            build: header
-            build_type: Release
-            use_include_dependencies: "OFF"
-
-          - name: "Header gcc12"
-            compiler: "gcc-12"
-            build: header
-            build_type: Release
-            use_include_dependencies: "OFF"
-
           - name: "Non-cyclic tests"
-            compiler: "gcc-12"
+            compiler: "gcc-third-latest"
             build: unit
-            build_type: Debug
             use_include_dependencies: "ON"
-
-          - name: "Tutorial"
-            compiler: "gcc-12"
-            build: tutorial
-            build_type: Debug
-            use_include_dependencies: "OFF"
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
@@ -98,8 +52,7 @@ jobs:
       - name: Configure tests
         run: |
           mkdir build && cd build
-          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
-                                            -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}" \
+          cmake ../test/${{ matrix.build }} -DCMAKE_BUILD_TYPE=Release \
                                             -DHIBF_USE_INCLUDE_DEPENDENCIES="${{ matrix.use_include_dependencies }}" \
                                             -DCMAKE_DEPENDS_USE_COMPILER=OFF
           case "${{ matrix.build }}" in

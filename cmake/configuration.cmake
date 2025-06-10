@@ -140,7 +140,11 @@ set (HIBF_UNINITIALISED_RESIZE_TEST_SOURCE
 
                   pointer begin;
                   pointer end;
+      #if (_LIBCPP_VERSION < 200000)
                   std::__compressed_pair<pointer, allocator_t> end_cap;
+      #else
+                  _LIBCPP_COMPRESSED_PAIR(pointer, end_cap = nullptr, allocator_type, allocator);
+      #endif
               };
 
               static_assert(sizeof(fake_vector) == sizeof(base_t));

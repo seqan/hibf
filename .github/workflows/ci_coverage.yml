@@ -32,7 +32,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        compiler: ["gcc-14"]
+        compiler: ["gcc-latest"]
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
