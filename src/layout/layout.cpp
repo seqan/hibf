@@ -6,13 +6,14 @@
 #include <cassert>     // for assert
 #include <charconv>    // for from_chars, from_chars_result
 #include <cstddef>     // for size_t
-#include <iostream>    // for operator<<, char_traits, basic_ostream, basic_istream, istream, ostream
-#include <string>      // for basic_string, getline, string
-#include <string_view> // for operator<<, string_view, operator==, basic_string_view
-#include <vector>      // for vector
+#include <iostream>    // for basic_ostream, operator<<, basic_istream, getline, basic_ios, istream
+#include <string>      // for char_traits, basic_string, string
+#include <string_view> // for basic_string_view, string_view, operator==
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/layout.hpp>   // for layout, operator<<
-#include <hibf/layout/prefixes.hpp> // for layout_lower_level, layout_column_names, layout_fullest_technical_bin_idx
+#include <hibf/layout/prefixes.hpp> // for layout_lower_level, layout_fullest_technical_bin_idx, layout_column_names
 
 namespace seqan::hibf::layout
 {

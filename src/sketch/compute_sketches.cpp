@@ -2,21 +2,22 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>  // for __fn, sort_heap, all_of, fill, make_heap
+#include <algorithm>  // for __sort_heap, sort_heap, __all_of, __fill, __make_heap, all_of, fill
 #include <atomic>     // for atomic_flag
 #include <cassert>    // for assert
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint64_t, uint8_t
-#include <functional> // for equal_to, function
+#include <functional> // for function
 #include <limits>     // for numeric_limits
 #include <span>       // for span
 #include <stdexcept>  // for runtime_error
 #include <string>     // for operator+, allocator, char_traits, to_string, basic_string
 #include <utility>    // for move
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                  // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>      // for hash, unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>      // for unordered_flat_set
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
 #include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 #include <hibf/sketch/minhashes.hpp>        // for minhashes

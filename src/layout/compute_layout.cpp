@@ -2,12 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for __fn, max, sort
+#include <algorithm> // for __max, __sort, max, sort
 #include <cassert>   // for assert
 #include <cstddef>   // for size_t
 #include <memory>    // for addressof
 #include <utility>   // for move
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                                // for config
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction

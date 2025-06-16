@@ -5,7 +5,8 @@
 #pragma once
 
 #include <cstddef> // for size_t
-#include <vector>  // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 

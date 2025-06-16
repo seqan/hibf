@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: CC0-1.0
 
 #include <cstdint> // for uint64_t
-#include <vector>  // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size
 #include <hibf/misc/print.hpp>               // for print, print_t

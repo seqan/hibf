@@ -7,7 +7,8 @@
 #include <cstddef>   // for size_t
 #include <stdexcept> // for invalid_argument
 #include <string>    // for basic_string
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                                // for config
 #include <hibf/layout/compute_fpr_correction.hpp>         // for compute_fpr_correction

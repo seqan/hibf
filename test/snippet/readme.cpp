@@ -7,7 +7,8 @@
 #include <functional> // for function
 #include <iostream>   // for basic_ostream, operator<<, cout
 #include <ranges>     // for __fn, iota, views
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter

@@ -7,17 +7,18 @@
 #include <bit>        // for bit_ceil, countl_zero
 #include <cstdint>    // for uint64_t
 #include <cstring>    // for size_t, memcpy
-#include <functional> // for equal_to, function
+#include <functional> // for function
 #include <stdexcept>  // for logic_error, invalid_argument
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/build/bin_size_in_bits.hpp>   // for bin_size_in_bits
 #include <hibf/config.hpp>                   // for config, insert_iterator
-#include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
-#include <hibf/misc/unreachable.hpp>         // for assert, unreachable
+#include <hibf/misc/unreachable.hpp>         // for unreachable, assert
 #include <hibf/platform.hpp>                 // for HIBF_COMPILER_IS_GCC
 #include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 

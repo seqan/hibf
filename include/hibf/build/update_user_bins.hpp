@@ -6,7 +6,8 @@
 
 #include <algorithm> // for fill_n
 #include <cstdint>   // for uint64_t
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/layout.hpp> // for layout
 

@@ -7,7 +7,9 @@
 #include <concepts> // for derived_from
 #include <cstddef>  // for size_t
 #include <iosfwd>   // for ostream, istream
-#include <vector>   // for operator==, vector
+
+#include <__vector/comparison.h> // for operator==
+#include <__vector/vector.h>     // for vector
 
 #include <hibf/layout/prefixes.hpp> // for layout_fullest_technical_bin_idx, layout_header, layout_lower_level
 #include <hibf/platform.hpp>

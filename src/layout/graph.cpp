@@ -6,9 +6,10 @@
 #include <cassert>          // for assert
 #include <cstddef>          // for size_t
 #include <initializer_list> // for initializer_list
-#include <iterator>         // for __fn, prev
-#include <optional>         // for optional, nullopt
-#include <vector>           // for vector
+#include <iterator>         // for __prev, prev
+#include <optional>         // for optional, nullopt, nullopt_t
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/graph.hpp>  // for graph
 #include <hibf/layout/layout.hpp> // for layout

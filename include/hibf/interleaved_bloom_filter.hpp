@@ -17,8 +17,9 @@
 #include <memory>      // for addressof
 #include <ranges>      // for forward_range, range_value_t, range, range_reference_t, input...
 #include <type_traits> // for remove_cvref_t, false_type
-#include <vector>      // for vector, operator==
 
+#include <__vector/comparison.h>       // for operator==
+#include <__vector/vector.h>           // for vector
 #include <cereal/cereal.hpp>           // for make_nvp
 #include <cereal/macros.hpp>           // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/base_class.hpp> // for base_class

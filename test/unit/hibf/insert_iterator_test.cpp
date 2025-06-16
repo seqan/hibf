@@ -4,16 +4,17 @@
 
 #include <gtest/gtest.h> // for Test, Message, TestInfo, TEST, TestPartResult, CmpHelperEQ, Cmp...
 
-#include <algorithm>  // for __fn, copy
+#include <algorithm>  // for __copy, copy
 #include <array>      // for array
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint64_t, uint8_t
-#include <functional> // for equal_to, function
+#include <functional> // for function
 #include <string>     // for basic_string
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                   // for insert_iterator
-#include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_size, hash_function_count
 #include <hibf/sketch/hyperloglog.hpp>       // for hyperloglog
 #include <hibf/test/expect_range_eq.hpp>     // for expect_range_eq, EXPECT_RANGE_EQ

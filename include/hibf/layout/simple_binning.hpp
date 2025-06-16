@@ -8,7 +8,8 @@
 #include <cstddef>   // for size_t
 #include <memory>    // for addressof
 #include <stdexcept> // for runtime_error
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/data_store.hpp>        // for data_store
 #include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64

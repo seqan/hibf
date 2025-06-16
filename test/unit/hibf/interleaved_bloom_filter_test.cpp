@@ -6,11 +6,11 @@
 #    define HIBF_HAS_AVX512 0
 #endif
 
-#include <gtest/gtest.h> // for Message, Test, AssertionResult, TestPartResult, CmpHelperEQ
+#include <gtest/gtest.h> // for Message, Test, AssertionResult, TestPartResult, TestInfo, CmpHe...
 
-#include <algorithm>   // for __fn, fill, all_of, for_each
+#include <algorithm>   // for fill, __all_of, __for_each, all_of, for_each
 #include <array>       // for array
-#include <compare>     // for operator<, strong_ordering
+#include <compare>     // for operator<, _CmpUnspecifiedParam, strong_ordering
 #include <cstddef>     // for size_t
 #include <cstdint>     // for uint64_t
 #include <functional>  // for function
@@ -19,7 +19,10 @@
 #include <string>      // for basic_string
 #include <type_traits> // for is_copy_assignable_v, is_copy_constructible_v, is_default_const...
 #include <utility>     // for move
-#include <vector>      // for vector, __bit_iterator, operator-
+#include <vector>      // for __bit_iterator, operator-
+
+#include <__vector/vector.h>      // for vector
+#include <__vector/vector_bool.h> // for vector
 
 #include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...

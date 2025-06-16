@@ -4,14 +4,15 @@
 
 #include <gtest/gtest.h> // for AssertionResult, Message, Test, TestPartResult, EXPECT_FALSE, TestInfo
 
-#include <algorithm> // for __fn, equal, make_heap
+#include <algorithm> // for __equal, __make_heap, equal, make_heap
 #include <cstddef>   // for size_t
 #include <cstdint>   // for uint64_t
 #include <ranges>    // for __fn, iota, views
 #include <span>      // for span
 #include <string>    // for basic_string
 #include <utility>   // for move
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/misc/iota_vector.hpp>     // for iota_vector
 #include <hibf/sketch/minhashes.hpp>     // for minhashes

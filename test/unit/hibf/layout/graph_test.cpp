@@ -7,7 +7,8 @@
 #include <cstddef>  // for size_t
 #include <optional> // for optional
 #include <string>   // for basic_string
-#include <vector>   // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/graph.hpp>  // for graph
 #include <hibf/layout/layout.hpp> // for layout

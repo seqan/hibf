@@ -8,7 +8,8 @@
 #include <cstdint> // for uint64_t
 #include <random>  // for uniform_int_distribution, mt19937_64
 #include <string>  // for basic_string
-#include <vector>  // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 #include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog

@@ -2,8 +2,9 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: CC0-1.0
 
-#include <ranges> // for iota_view, operator==, _Iota, iota, views
-#include <vector> // for vector
+#include <ranges> // for iota_view, __fn, iota, views
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
 #include <hibf/misc/print.hpp>               // for print, print_t

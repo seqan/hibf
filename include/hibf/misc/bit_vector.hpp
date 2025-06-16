@@ -21,7 +21,7 @@
 
 #pragma once
 
-#include <algorithm>        // for __fn, for_each, all_of, any_of, copy, fill
+#include <algorithm>        // for __for_each, for_each, __all_of, __any_of, __fill, all_of, any_of
 #include <bit>              // for countr_zero
 #include <cassert>          // for assert
 #include <climits>          // for CHAR_BIT
@@ -30,15 +30,15 @@
 #include <cstddef>          // for size_t, ptrdiff_t
 #include <cstdint>          // for uint64_t
 #include <initializer_list> // for initializer_list
-#include <iterator>         // for iter_reference_t, __fn, back_inserter, distance, iter_differen...
-#include <memory>           // for allocator, allocator_traits, assume_aligned, __compressed_pair
+#include <iterator>         // for iter_reference_t, __next, back_inserter, distance, iter_differ...
+#include <memory>           // for allocator, allocator_traits, assume_aligned, _LIBCPP_COMPRESSE...
 #include <ranges>           // for __fn, begin, end
 #include <stdexcept>        // for out_of_range
 #include <string>           // for char_traits, operator+, to_string, operator""s, basic_string
 #include <type_traits>      // for conditional_t
 #include <utility>          // for swap
-#include <vector>           // for vector
 
+#include <__vector/vector.h>     // for vector
 #include <cereal/cereal.hpp>     // for binary_data
 #include <cereal/macros.hpp>     // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
 #include <cereal/specialize.hpp> // for specialization, specialize

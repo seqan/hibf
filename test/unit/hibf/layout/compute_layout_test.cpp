@@ -7,7 +7,8 @@
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <string>     // for basic_string
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                      // for insert_iterator, config
 #include <hibf/layout/compute_layout.hpp>       // for compute_layout

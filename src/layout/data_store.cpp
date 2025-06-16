@@ -3,7 +3,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <stdexcept> // for invalid_argument
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/layout/data_store.hpp>  // for data_store
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
