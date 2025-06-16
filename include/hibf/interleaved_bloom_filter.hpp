@@ -607,10 +607,10 @@ public:
                                                   result_buffer.data() + result_buffer.size(),
                                                   result_buffer.data() + result_buffer.capacity());
 #            else
-        std::__annotate_contiguous_container<allocator_t>(result_buffer.data(),
-                                                          result_buffer.data() + result_buffer.capacity(),
-                                                          result_buffer.data() + result_buffer.size(),
-                                                          result_buffer.data() + result_buffer.capacity());
+        std::__annotate_contiguous_container<allocator_type>(result_buffer.data(),
+                                                             result_buffer.data() + result_buffer.capacity(),
+                                                             result_buffer.data() + result_buffer.size(),
+                                                             result_buffer.data() + result_buffer.capacity());
 #            endif
 #        endif
 #    endif
