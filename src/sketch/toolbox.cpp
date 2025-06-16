@@ -2,19 +2,18 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>  // for sort
-#include <cassert>    // for assert
-#include <cmath>      // for floor, sqrt
-#include <cstddef>    // for size_t
-#include <cstdint>    // for uint64_t, int64_t
-#include <functional> // for equal_to
-#include <limits>     // for numeric_limits
-#include <omp.h>      // for omp_get_thread_num
-#include <random>     // for uniform_int_distribution, mt19937_64
-#include <utility>    // for swap, move
-#include <vector>     // for vector
+#include <algorithm> // for sort
+#include <cassert>   // for assert
+#include <cmath>     // for floor, sqrt
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t, int64_t
+#include <limits>    // for numeric_limits
+#include <omp.h>     // for omp_get_thread_num
+#include <random>    // for uniform_int_distribution, mt19937_64
+#include <utility>   // for swap, move
+#include <vector>    // for vector
 
-#include <hibf/contrib/robin_hood.hpp> // for hash, unordered_flat_map
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_map
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog
 #include <hibf/sketch/toolbox.hpp>     // for clustering_node, entry, neighbor, prio_queue, distance_matrix, cluste...
 

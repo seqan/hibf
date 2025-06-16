@@ -4,19 +4,18 @@
 
 #include <gtest/gtest.h> // for Test, Message, TestInfo, TestPartResult, TEST, CmpHelperEQ
 
-#include <algorithm>  // for __fn, generate
+#include <algorithm>  // for __generate, generate
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint64_t, uint8_t
 #include <filesystem> // for path
 #include <fstream>    // for basic_ofstream, basic_ifstream, basic_ios, ofstream, ifs...
-#include <functional> // for equal_to
 #include <random>     // for uniform_int_distribution, mt19937_64
 #include <ranges>     // for __fn, iota, iota_view, views
 #include <stdexcept>  // for runtime_error, invalid_argument
 #include <string>     // for basic_string
 #include <vector>     // for vector
 
-#include <hibf/contrib/robin_hood.hpp>              // for hash, unordered_flat_set
+#include <hibf/contrib/robin_hood.hpp>              // for unordered_flat_set
 #include <hibf/contrib/std/chunk_view.hpp>          // for chunk, chunk_fn, chunk_view
 #include <hibf/contrib/std/detail/adaptor_base.hpp> // for operator|
 #include <hibf/misc/divide_and_ceil.hpp>            // for divide_and_ceil

@@ -8,10 +8,9 @@
  */
 #pragma once
 
-#include <cstdint>    // for uint64_t
-#include <functional> // for equal_to
+#include <cstdint> // for uint64_t
 
-#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set, hash
+#include <hibf/contrib/robin_hood.hpp> // for unordered_flat_set
 #include <hibf/misc/timer.hpp>         // for serial_timer, concurrent_timer
 #include <hibf/platform.hpp>
 

@@ -4,17 +4,16 @@
 
 #include <benchmark/benchmark.h> // for State, Counter, Benchmark, DoNotOptimize, BENCHMARK, BENCHMARK_MAIN
 
-#include <algorithm>  // for __fn, generate
+#include <algorithm>  // for __generate, generate
 #include <cstddef>    // for size_t
 #include <cstdint>    // for int32_t, uint8_t, int64_t
 #include <filesystem> // for exists, file_size
 #include <fstream>    // for basic_ifstream, basic_ofstream, basic_ios, ios, ifstream, ofstream
 #include <random>     // for uniform_int_distribution, mt19937_64
 #include <stdexcept>  // for logic_error
-#include <string>     // for basic_string, to_string
+#include <string>     // for basic_string, to_string, operator<=>
 
 #include <cereal/archives/binary.hpp> // for BinaryInputArchive, BinaryOutputArchive
-#include <cereal/cereal.hpp>          // for InputArchive, OutputArchive
 
 #include <hibf/misc/bit_vector.hpp>     // for bit_vector
 #include <hibf/test/sandboxed_path.hpp> // for sandboxed_path, operator/
