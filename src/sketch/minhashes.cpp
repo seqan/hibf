@@ -2,11 +2,12 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm> // for __fn, is_sorted, all_of, find, pop_heap, push_heap
+#include <algorithm> // for __is_sorted, is_sorted, __all_of, __find, __pop_heap, __push_heap, all_of
 #include <cassert>   // for assert
 #include <cstdint>   // for uint64_t
 #include <span>      // for span
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/sketch/minhashes.hpp> // for minhashes
 

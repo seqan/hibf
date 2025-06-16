@@ -8,7 +8,8 @@
 #include <cstdint>    // for uint64_t, int64_t
 #include <functional> // for greater
 #include <queue>      // for priority_queue
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/contrib/robin_hood.hpp> // for unordered_flat_map
 #include <hibf/sketch/hyperloglog.hpp> // for hyperloglog

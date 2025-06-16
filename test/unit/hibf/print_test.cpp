@@ -9,7 +9,8 @@
 #include <iostream> // for cerr
 #include <ranges>   // for range_value_t
 #include <string>   // for basic_string
-#include <vector>   // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/misc/bit_vector.hpp>      // for bit_vector
 #include <hibf/misc/counting_vector.hpp> // for counting_vector

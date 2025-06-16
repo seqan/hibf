@@ -5,7 +5,8 @@
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint64_t
 #include <functional> // for function
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp> // for insert_iterator, config
 

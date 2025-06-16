@@ -14,10 +14,11 @@
 #include <algorithm> // for copy, equal
 #include <concepts>  // for same_as
 #include <iterator>  // for back_inserter
-#include <ostream>   // for operator<<, ostream
+#include <ostream>   // for basic_ostream, operator<<, ostream
 #include <ranges>    // for range, range_value_t
 #include <utility>   // for forward
-#include <vector>    // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/platform.hpp>
 

@@ -4,13 +4,14 @@
 
 #pragma once
 
-#include <atomic>  // for atomic_fetch_add, atomic
+#include <atomic>  // for atomic, atomic_fetch_add
 #include <cstddef> // for size_t
-#include <vector>  // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>       // for config
-#include <hibf/layout/graph.hpp> // for node_data
-#include <hibf/misc/timer.hpp>   // for concurrent, timer
+#include <hibf/layout/graph.hpp> // for graph
+#include <hibf/misc/timer.hpp>   // for concurrent_timer
 
 namespace seqan::hibf::build
 {

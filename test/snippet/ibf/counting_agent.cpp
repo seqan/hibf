@@ -5,7 +5,8 @@
 #include <cstddef> // for size_t
 #include <cstdint> // for uint8_t
 #include <ranges>  // for iota_view, __fn, iota, views
-#include <vector>  // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size, hash_...
 #include <hibf/misc/print.hpp>               // for print, print_t

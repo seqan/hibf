@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <algorithm> // for __fn, fill, sort
+#include <algorithm> // for __sort, fill, sort
 #include <cassert>   // for assert
 #include <concepts>  // for integral, unsigned_integral
 #include <cstddef>   // for size_t
@@ -12,8 +12,9 @@
 #include <limits>    // for numeric_limits
 #include <memory>    // for addressof
 #include <ranges>    // for forward_range, range_value_t, range
-#include <vector>    // for vector, operator==
 
+#include <__vector/comparison.h>   // for operator==
+#include <__vector/vector.h>       // for vector
 #include <cereal/cereal.hpp>       // for make_nvp
 #include <cereal/macros.hpp>       // for CEREAL_SERIALIZE_FUNCTION_NAME
 #include <cereal/types/vector.hpp> // IWYU pragma: keep

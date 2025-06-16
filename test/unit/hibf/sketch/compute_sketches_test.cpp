@@ -9,7 +9,8 @@
 #include <ranges>     // for __fn, iota, views
 #include <stdexcept>  // for runtime_error
 #include <string>     // for basic_string
-#include <vector>     // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                  // for config, insert_iterator
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches

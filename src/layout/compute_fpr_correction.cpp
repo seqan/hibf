@@ -5,9 +5,10 @@
 #include <cassert> // for assert
 #include <cmath>   // for log1p, exp, log
 #include <cstddef> // for size_t
-#include <vector>  // for vector
 
-#include <hibf/layout/compute_fpr_correction.hpp> // for compute_fpr_correction
+#include <__vector/vector.h> // for vector
+
+#include <hibf/layout/compute_fpr_correction.hpp> // for fpr_correction_parameters, compute_fpr_correction
 #include <hibf/misc/next_multiple_of_64.hpp>      // for next_multiple_of_64
 
 namespace seqan::hibf::layout

@@ -2,12 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for Counter, State, BENCHMARK_TEMPLATE, Benchmark, ClobberMemory
+#include <benchmark/benchmark.h> // for Counter, Benchmark, State, BENCHMARK_TEMPLATE, ClobberMemory
 
 #include <cstddef> // for size_t
 #include <cstdint> // for uint64_t, uint8_t
-#include <string>  // for basic_string
-#include <vector>  // for vector
+#include <string>  // for basic_string, operator<=>
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                  // for config, insert_iterator
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches

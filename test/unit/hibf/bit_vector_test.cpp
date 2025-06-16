@@ -15,7 +15,8 @@
 #include <stdexcept>        // for out_of_range
 #include <string>           // for basic_string
 #include <utility>          // for as_const, move
-#include <vector>           // for vector
+
+#include <__vector/vector_bool.h> // for vector
 
 #include <hibf/misc/bit_vector.hpp>             // for bit_vector, operator&, operator^, operator|
 #include <hibf/test/cereal.hpp>                 // for test_serialisation

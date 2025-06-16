@@ -9,7 +9,8 @@
 #include <functional>  // for function
 #include <string>      // for basic_string, string
 #include <string_view> // for basic_string_view
-#include <vector>      // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/test/temporary_snippet_file.hpp> // for temporary_snippet_file
 

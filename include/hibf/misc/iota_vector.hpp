@@ -14,7 +14,8 @@
 #include <cstddef>  // for size_t
 #include <limits>   // for numeric_limits
 #include <numeric>  // for iota
-#include <vector>   // for vector
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/platform.hpp> // for HIBF_CONSTEXPR_VECTOR
 

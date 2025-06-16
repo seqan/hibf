@@ -2,18 +2,19 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Benchmark, Counter, ClobberMemory, BENCHMARK
+#include <benchmark/benchmark.h> // for Benchmark, State, Counter, ClobberMemory, BENCHMARK
 
-#include <algorithm>  // for copy, fill_n, __generate_fn, generate
+#include <algorithm>  // for __generate, generate
 #include <cstddef>    // for size_t
 #include <functional> // for function
 #include <random>     // for uniform_int_distribution, mt19937_64
-#include <ranges>     // for _Size, size
+#include <ranges>     // for __fn, size
 #include <span>       // for span
 #include <stdexcept>  // for invalid_argument
-#include <string>     // for basic_string
-#include <tuple>      // for make_tuple
-#include <vector>     // for allocator, vector
+#include <string>     // for basic_string, operator<=>
+#include <tuple>      // for get, make_tuple
+
+#include <__vector/vector.h> // for vector
 
 #include <hibf/config.hpp>                                // for insert_iterator, config
 #include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
