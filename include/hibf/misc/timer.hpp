@@ -10,12 +10,13 @@
 #pragma once
 
 #include <algorithm> // for max
-#include <atomic>    // for atomic, __atomic_base, memory_order_relaxed
+#include <atomic>    // for atomic, memory_order_relaxed
 #include <cassert>   // for assert
 #include <chrono>    // for duration, time_point, operator-, operator<=>, steady_clock
-#include <compare>   // for operator>=, strong_ordering
+#include <compare>   // for operator>=, _CmpUnspecifiedParam, strong_ordering
 #include <concepts>  // for same_as
 #include <cstdint>   // for uint64_t
+#include <ratio>     // for ratio
 
 #include <hibf/platform.hpp>
 

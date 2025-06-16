@@ -2,21 +2,20 @@
 // SPDX-FileCopyrightText: 2016-2025, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Benchmark, AddCustomContext, Counter, BENCHMARK, Clobber...
+#include <benchmark/benchmark.h> // for Benchmark, State, AddCustomContext, Counter, BENCHMARK, Clobber...
 
-#include <algorithm>  // for __fn, generate
-#include <cmath>      // for log, ceil, exp
-#include <cstddef>    // for size_t
-#include <cstdint>    // for uint64_t
-#include <functional> // for equal_to
-#include <random>     // for uniform_int_distribution, mt19937_64
-#include <ranges>     // for transform_view, iota_view, __range_adaptor_closure_t, operator|
-#include <string>     // for basic_string, to_string
-#include <tuple>      // for tuple, make_tuple
-#include <utility>    // for move, pair
-#include <vector>     // for vector
+#include <algorithm> // for __generate, generate
+#include <cmath>     // for log, ceil, exp
+#include <cstddef>   // for size_t
+#include <cstdint>   // for uint64_t
+#include <random>    // for uniform_int_distribution, mt19937_64
+#include <ranges>    // for transform_view, __pipeable, iota_view, operator|, __fn, to, views
+#include <string>    // for basic_string, to_string, operator<=>
+#include <tuple>     // for tuple, get, make_tuple
+#include <utility>   // for move, pair
+#include <vector>    // for vector
 
-#include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_map
+#include <hibf/contrib/robin_hood.hpp>       // for unordered_map
 #include <hibf/contrib/std/chunk_view.hpp>   // for chunk, chunk_fn, chunk_view
 #include <hibf/contrib/std/to.hpp>           // for to
 #include <hibf/interleaved_bloom_filter.hpp> // for bin_index, interleaved_bloom_filter, bin_count, bin_size, hash_...
