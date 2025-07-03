@@ -209,19 +209,18 @@ TEST(ibf_test, emplace)
 TEST(ibf_test, emplace_with_occupancy)
 {
     // 1. Construct and emplace
-    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{128u},
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
                                               seqan::hibf::bin_size{512},
                                               seqan::hibf::hash_function_count{2u},
-                                              true};
+                                              0.5}; // 64 empty bins
 
     for (size_t bin_idx : std::views::iota(0, 64))
         for (size_t hash : std::views::iota(0, 64))
             ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
 
     // 2. Test for correctness
-
     auto agent = ibf.containment_agent();
-    std::vector<bool> expected(128);
+    std::vector<bool> expected(64);
     std::fill(expected.begin(), expected.begin() + 64u, true);
     for (size_t hash : std::views::iota(0, 64))
     {
@@ -452,9 +451,34 @@ TEST(ibf_test, try_increase_bin_number_to)
     EXPECT_EQ(ibf.bit_size(), original_bitsize);
 }
 
+TEST(ibf_test, try_increase_bin_number_to_empty_bins)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{60u},
+                                              seqan::hibf::bin_size{1024u},
+                                              seqan::hibf::hash_function_count{2u},
+                                              0.5}; // 60 empty bins
+    size_t const original_bitsize{ibf.bit_size()};
+
+    EXPECT_TRUE(ibf.try_increase_bin_number_to({64u}));
+    EXPECT_EQ(ibf.bin_count(), 64u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_TRUE(ibf.try_increase_bin_number_to({120u}));
+    EXPECT_EQ(ibf.bin_count(), 120u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_FALSE(ibf.try_increase_bin_number_to({129u}));
+    EXPECT_EQ(ibf.bin_count(), 120u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    EXPECT_TRUE(ibf.try_increase_bin_number_to({128u}));
+    EXPECT_EQ(ibf.bin_count(), 128u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+}
+
 TEST(ibf_test, increase_bin_number_to)
 {
-    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{1024u}};
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{73u}, seqan::hibf::bin_size{8u}};
     size_t const original_bitsize{ibf.bit_size()};
 
     // 1. Throw if trying to reduce number of bins.
@@ -485,6 +509,63 @@ TEST(ibf_test, increase_bin_number_to)
         EXPECT_EQ(ibf.bit_size(), 1024u);
 
         std::vector<bool> expected(73, 0);
+        expected[current_bin] = 1; // none of the bins except current_bin stores the hash values.
+        auto agent = ibf.containment_agent();
+        for (size_t const h : hashes)
+        {
+            auto & res = agent.bulk_contains(h);
+            EXPECT_RANGE_EQ(res, expected);
+        }
+    }
+}
+
+TEST(ibf_test, increase_bin_number_to_empty_bins)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{60u},
+                                              seqan::hibf::bin_size{8u},
+                                              seqan::hibf::hash_function_count{2u},
+                                              0.5}; // 60 empty bins
+    size_t const original_bitsize{ibf.bit_size()};
+
+    // 1. Throw if trying to reduce number of bins.
+    EXPECT_THROW(ibf.increase_bin_number_to(seqan::hibf::bin_count{50u}), std::invalid_argument);
+    EXPECT_EQ(ibf.bin_count(), 60u);
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+
+    // 2. No change in bin_words implies no change in size.
+    ibf.increase_bin_number_to({seqan::hibf::bin_count{60u}});
+    EXPECT_EQ(ibf.bit_size(), original_bitsize);
+    EXPECT_EQ(ibf.bin_count(), 60u);
+
+    // 3. If resizing takes place, the inserted values must still be valid.
+    auto hashes = std::views::iota(0, 64);
+    for (size_t current_bin : std::views::iota(0, 64)) // test correct resize for each bin individually
+    {
+        seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
+                                                  seqan::hibf::bin_size{8u},
+                                                  seqan::hibf::hash_function_count{2u},
+                                                  0.5};
+
+        EXPECT_EQ(ibf.bit_size(), 1024u);
+        std::ranges::for_each(hashes,
+                              [&ibf, &current_bin](auto const h)
+                              {
+                                  ibf.emplace(h, seqan::hibf::bin_index{current_bin});
+                              });
+
+        ibf.increase_bin_number_to(seqan::hibf::bin_count{73u});
+        EXPECT_EQ(ibf.bin_count(), 73u);
+        EXPECT_EQ(ibf.bit_size(), 1024);
+
+        ibf.increase_bin_number_to(seqan::hibf::bin_count{135});
+        EXPECT_EQ(ibf.bin_count(), 135u);
+        EXPECT_EQ(ibf.bit_size(), 1536);
+
+        ibf.increase_bin_number_to(seqan::hibf::bin_count{205});
+        EXPECT_EQ(ibf.bin_count(), 205);
+        EXPECT_EQ(ibf.bit_size(), 2048);
+
+        std::vector<bool> expected(205, 0);
         expected[current_bin] = 1; // none of the bins except current_bin stores the hash values.
         auto agent = ibf.containment_agent();
         for (size_t const h : hashes)

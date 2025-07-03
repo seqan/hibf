@@ -17,6 +17,7 @@
 #include <hibf/layout/hierarchical_binning.hpp> // for hierarchical_binning
 #include <hibf/layout/layout.hpp>               // for layout
 #include <hibf/layout/simple_binning.hpp>       // for simple_binning
+#include <hibf/misc/add_empty_bins.hpp>         // for add_empty_bins
 #include <hibf/misc/divide_and_ceil.hpp>        // for divide_and_ceil
 #include <hibf/misc/next_multiple_of_64.hpp>    // for next_multiple_of_64
 #include <hibf/misc/subtract_empty_bins.hpp>    // for subtract_empty_bins
@@ -420,8 +421,9 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     {
         // use simple binning to distribute remaining UBs
         // Simple binning is not bound by config.tmax
-        size_t const num_user_bins_next_64 = next_multiple_of_64(number_of_user_bins);
-        size_t const number_of_technical_bins = subtract_empty_bins(num_user_bins_next_64, config.empty_bin_fraction);
+        size_t const user_and_empty_bins = add_empty_bins(number_of_user_bins, config.empty_bin_fraction);
+        size_t const number_of_technical_bins =
+            subtract_empty_bins(next_multiple_of_64(user_and_empty_bins), config.empty_bin_fraction);
         return simple_binning{libf_data, number_of_technical_bins}.execute(); // return id of maximum technical bin
     }
 }
