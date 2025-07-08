@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include <cmath>     // for ceil
-#include <cstddef>   // for size_t
+#include <cmath>   // for ceil
+#include <cstddef> // for size_t
 
 #include <hibf/platform.hpp>
 
