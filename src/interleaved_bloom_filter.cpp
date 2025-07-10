@@ -142,6 +142,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
 void interleaved_bloom_filter::clear(bin_index const bin) noexcept
 {
     assert(bin.value < bins);
+    occupancy[bin.value] = 0u;
     for (size_t idx = bin.value, i = 0; i < bin_size_; idx += technical_bins, ++i)
         (*this)[idx] = 0;
 }
