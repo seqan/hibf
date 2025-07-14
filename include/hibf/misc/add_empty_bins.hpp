@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <cmath>   // for ceil
+#include <cmath>   // for floor
 #include <cstddef> // for size_t
 
 #include <hibf/platform.hpp>
@@ -19,7 +19,7 @@ namespace seqan::hibf
  */
 [[nodiscard]] constexpr size_t add_empty_bins(size_t const tmax, double const fraction) noexcept
 {
-    return std::ceil(tmax / (1.0 - fraction));
+    return std::floor(tmax / (1.0 - fraction));
 }
 
 } // namespace seqan::hibf
