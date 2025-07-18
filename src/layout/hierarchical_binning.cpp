@@ -412,7 +412,7 @@ size_t hierarchical_binning::add_lower_level(data_store & libf_data) const
     size_t const number_of_user_bins = libf_data.positions.size();
 
     // now do the binning for the low-level IBF:
-    if (number_of_user_bins > config.tmax)
+    if (number_of_user_bins > subtract_empty_bins(config.tmax, config.empty_bin_fraction))
     {
         // recursively call hierarchical binning if there are still too many UBs
         return hierarchical_binning{libf_data, config}.execute(); // return id of maximum technical bin
