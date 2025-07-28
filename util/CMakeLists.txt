@@ -11,13 +11,12 @@ include (${HIBF_ROOT_DIR}/cmake/cxx_config.cmake)
 add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
 
 # Dependency: Sharg
-include (FetchContent)
-option (SHARG_NO_TDL "" ON)
-FetchContent_Declare (
-    sharg
-    GIT_REPOSITORY https://github.com/seqan/sharg-parser
-    GIT_TAG main)
-FetchContent_MakeAvailable (sharg)
+CPMAddPackage (URI "gh:seqan/sharg-parser#main"
+               OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF"
+                       "SHARG_NO_TDL ON")
 
 add_executable (fpr_correction_check fpr_correction_check.cpp)
 target_link_libraries (fpr_correction_check seqan::hibf sharg::sharg)
+
+add_executable (hash_collisions hash_collisions.cpp)
+target_link_libraries (hash_collisions seqan::hibf sharg::sharg)
