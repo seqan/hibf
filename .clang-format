@@ -127,27 +127,31 @@ IncludeCategories:
     Priority:        2
     SortPriority:    0
     CaseSensitive:   false
-  - Regex:           '<sharg/'
+  - Regex:           '<fmt/'
     Priority:        3
     SortPriority:    0
     CaseSensitive:   false
-  - Regex:           '<seqan3/'
+  - Regex:           '<sharg/'
     Priority:        4
     SortPriority:    0
     CaseSensitive:   false
-  - Regex:           '<hibf/'
-    Priority:        6
-    SortPriority:    0
-    CaseSensitive:   false
-  - Regex:           '<.*>'
+  - Regex:           '<seqan3/'
     Priority:        5
     SortPriority:    0
     CaseSensitive:   false
-  - Regex:           '.*'
+  - Regex:           '<hibf/'
     Priority:        7
     SortPriority:    0
     CaseSensitive:   false
-IncludeIsMainRegex: '(Test)?$'
+  - Regex:           '<.*>'
+    Priority:        6
+    SortPriority:    0
+    CaseSensitive:   false
+  - Regex:           '.*'
+    Priority:        8
+    SortPriority:    0
+    CaseSensitive:   false
+IncludeIsMainRegex: 'x$'
 IncludeIsMainSourceRegex: ''
 IndentAccessModifiers: false
 IndentCaseBlocks: false

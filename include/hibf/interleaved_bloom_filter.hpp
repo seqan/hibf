@@ -39,6 +39,11 @@ namespace seqan::hibf
 // config.hpp -> misc/insert_iterator.hpp (Needs interleaved_bloom_filter to be a complete class)
 struct config;
 
+/*!\brief For testing: An accessor used to inspect private members of seqan::hibf::interleaved_bloom_filter.
+ * \ingroup ibf
+ */
+struct inspector;
+
 /*!\brief A strong type that represents the number of bins for the seqan::hibf::interleaved_bloom_filter.
  * \ingroup ibf
  * \qualifier strong
@@ -147,6 +152,9 @@ private:
     //!\brief Allow cereal to cast the IBF into its base class.
     template <typename t>
     friend struct cereal::base_class;
+
+    //!\brief Allow access to private members. Used for util/inspect.
+    friend struct seqan::hibf::inspector;
 
     //!\brief The number of bins specified by the user.
     size_t bins{};
