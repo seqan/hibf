@@ -61,6 +61,43 @@ target_link_libraries (<your_app> PUBLIC seqan::hibf)
 
 A quick overview on how to use the HIBF lib:
 
+```cpp
+#include <hibf/config.hpp>                                // for config, insert_iterator
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for hierarchical_interleaved_bloom_filter
+
+int main()
+{
+    auto insert_data_fn = [&](size_t const user_bin_id, seqan::hibf::insert_iterator it)
+    {
+        // for (auto seq : files[user_bin_id])      // read file with id == `user_bin_id`, e.g. with seqan3 I/O
+        //     for (auto hash : seq | kmer_hashing) // hash sequences e.g. with seqan3::kmer_hash
+        //         it = hash;                       // insert hash into HIBF index
+    };
+    seqan::hibf::config config{.input_fn = insert_data_fn, .number_of_user_bins = 3u}; // adapt config to your needs!
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config}; // constructs HIBF from config
+
+    std::vector<uint64_t> query_hashes{3u, 9u, 12u, 14u};
+    auto agent = hibf.membership_agent(); // needed for querying/searching
+
+    for (int64_t hit_user_bin : agent.membership_for(query_hashes, 2u/*threshold*/))
+        std::cout << hit_user_bin << ' '; // print out the ids of user bin with at least 2 hits from query hashes
+    std::cout << '\n';
+}
+```
+
+## Where to look for more information
+
+* The [online API documentation](https://hibf.vercel.app/topics.html) for details on the data structures
+
+## Please cite
+
+If you are working with the HIBF, please cite:
+
+> Hierarchical Interleaved Bloom Filter: enabling ultrafast, approximate sequence queries; Svenja Mehringer, Enrico Seiler, Felix Droop, Mitra Darvish, René Rahn, Martin Vingron, and Knut Reinert; Genome Biol 24, 131 (2023). doi: https://doi.org/10.1186/s13059-023-02971-4
+
+## A more detailed example
+
 <!-- MARKDOWN-AUTO-DOCS:START (CODE:src=./test/snippet/readme.cpp) -->
 <!-- The below code snippet is automatically added from ./test/snippet/readme.cpp -->
 ```cpp
