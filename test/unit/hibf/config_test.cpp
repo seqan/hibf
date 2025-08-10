@@ -349,6 +349,20 @@ TEST(config_test, validate_and_set_defaults)
                          "[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0).");
     }
 
+    // empty_bin_fraction != 0.0 also enables tracking occupancy
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .track_occupancy = false,
+                                          .empty_bin_fraction = 0.0};
+        configuration.validate_and_set_defaults();
+        EXPECT_EQ(configuration.track_occupancy, false);
+
+        configuration.empty_bin_fraction = 0.3;
+        configuration.validate_and_set_defaults();
+        EXPECT_EQ(configuration.track_occupancy, true);
+    }
+
     // alpha must be positive
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .alpha = -0.1};
