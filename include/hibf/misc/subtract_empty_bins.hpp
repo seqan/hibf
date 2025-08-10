@@ -5,6 +5,7 @@
 #pragma once
 
 #include <algorithm> // for clamp
+#include <cmath>     // for ceil
 #include <cstddef>   // for size_t
 
 #include <hibf/platform.hpp>
@@ -25,7 +26,7 @@ namespace seqan::hibf
     if (fraction == 0.0 || tmax <= 2u)
         return tmax;
 
-    size_t const number_of_empty_bins = std::clamp<size_t>(tmax * fraction, 1, tmax - 2);
+    size_t const number_of_empty_bins = std::clamp<size_t>(std::ceil(tmax * fraction), 1, tmax - 2);
     return tmax - number_of_empty_bins;
 }
 

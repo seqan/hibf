@@ -15,6 +15,7 @@
 #include <hibf/config.hpp>                   // for config, insert_iterator
 #include <hibf/contrib/robin_hood.hpp>       // for hash, unordered_flat_set
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_count, bin_index, bin_size, hash_...
+#include <hibf/misc/add_empty_bins.hpp>      // for add_empty_bins
 #include <hibf/misc/bit_vector.hpp>          // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>     // for divide_and_ceil
 #include <hibf/misc/unreachable.hpp>         // for assert, unreachable
@@ -32,11 +33,11 @@ namespace seqan::hibf
 interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count const bins_,
                                                    seqan::hibf::bin_size const size,
                                                    seqan::hibf::hash_function_count const funs,
-                                                   bool const track_occupancy_) :
+                                                   double const empty_bin_fraction) :
     bins{bins_.value},
     bin_size_{size.value},
     hash_funs{funs.value},
-    track_occupancy{track_occupancy_}
+    track_occupancy{empty_bin_fraction > 0.0}
 {
     if (bins == 0)
         throw std::logic_error{"The number of bins must be > 0."};
@@ -47,7 +48,14 @@ interleaved_bloom_filter::interleaved_bloom_filter(seqan::hibf::bin_count const 
 
     hash_shift = std::countl_zero(bin_size_);
     bin_words = divide_and_ceil(bins, 64u);
-    technical_bins = bin_words * 64u;
+    // Note: If the IBF is constructed as part of an HIBF, the layout only contains information about the
+    //       non-empty bins. Hence, we need to add the empty bins to the total number of bins.
+    // Example: tmax = 320, empty_bin_fraction = 0.2
+    //          user bins = 320 * (1 - 0.2) = 256
+    //          The layout only contains information about the 256 bins.
+    //          The HIBF construction will then request an IBF with 256 bins.
+    size_t const user_and_empty_bins = add_empty_bins(bins, empty_bin_fraction);
+    technical_bins = next_multiple_of_64(user_and_empty_bins);
     resize(technical_bins * bin_size_);
     occupancy.resize(technical_bins, 0u);
 }
@@ -105,7 +113,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
                              seqan::hibf::bin_size{max_bin_size(configuration, max_bin_elements)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions},
-                             configuration.empty_bin_fraction > 0.0}
+                             configuration.empty_bin_fraction}
 {
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
 
@@ -150,12 +158,13 @@ void interleaved_bloom_filter::clear(bin_index const bin) noexcept
 bool interleaved_bloom_filter::try_increase_bin_number_to(seqan::hibf::bin_count const new_bin_count) noexcept
 {
     size_t const new_bins = new_bin_count.value;
-    size_t const new_bin_words = divide_and_ceil(new_bins, 64u);
+    size_t const new_technical_bins = next_multiple_of_64(new_bins);
 
-    if (new_bins < bins || new_bin_words > bin_words)
+    if (new_bins < bins || new_technical_bins > technical_bins)
         return false;
 
     bins = new_bins;
+    bin_words = divide_and_ceil(new_bins, 64u);
     return true;
 }
 

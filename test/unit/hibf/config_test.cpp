@@ -11,9 +11,11 @@
 #include <string>     // for allocator, char_traits, string
 #include <utility>    // for move
 
-#include <hibf/config.hpp>                // for config, insert_iterator
-#include <hibf/test/cereal.hpp>           // for test_serialisation
-#include <hibf/test/expect_throw_msg.hpp> // for EXPECT_THROW_MSG
+#include <hibf/config.hpp>                   // for config, insert_iterator
+#include <hibf/misc/add_empty_bins.hpp>      // for add_empty_bins
+#include <hibf/misc/subtract_empty_bins.hpp> // for subtract_empty_bins
+#include <hibf/test/cereal.hpp>              // for test_serialisation
+#include <hibf/test/expect_throw_msg.hpp>    // for EXPECT_THROW_MSG
 
 TEST(config_test, write_to)
 {
@@ -402,6 +404,45 @@ TEST(config_test, validate_and_set_defaults)
         EXPECT_FALSE(configuration.disable_estimate_union);
         EXPECT_TRUE(configuration.disable_rearrangement);
         EXPECT_EQ((testing::internal::GetCapturedStderr()), "");
+    }
+}
+
+TEST(config_test, empty_bin_fraction)
+{
+    seqan::hibf::config config{.input_fn = [](size_t const, seqan::hibf::insert_iterator) {},
+                               .number_of_user_bins = 1u};
+
+    for (size_t top_level_tmax = 64; top_level_tmax <= 1024; top_level_tmax += 64)
+    {
+        config.tmax = top_level_tmax;
+
+        // Some deviation for high fractions
+        for (double fraction = 0.00; fraction <= 0.97; fraction += 0.01)
+        {
+            size_t const top_level_subtracted = seqan::hibf::subtract_empty_bins(top_level_tmax, fraction);
+            double const adjusted_fraction = 1.0 - static_cast<double>(top_level_subtracted) / top_level_tmax;
+
+            config.empty_bin_fraction = fraction;
+            config.validate_and_set_defaults();
+            EXPECT_EQ(config.empty_bin_fraction, adjusted_fraction);
+
+            // Roundtrip test
+            for (size_t lower_level_tmax = 64; lower_level_tmax <= top_level_tmax; lower_level_tmax += 64)
+            {
+                size_t const lower_level_subtracted =
+                    seqan::hibf::subtract_empty_bins(lower_level_tmax, adjusted_fraction);
+                size_t const lower_level_added = seqan::hibf::add_empty_bins(lower_level_subtracted, adjusted_fraction);
+
+                ASSERT_EQ(seqan::hibf::next_multiple_of_64(lower_level_added), lower_level_tmax)
+                    << "top_level_tmax: " << top_level_tmax << '\n'
+                    << "lower_level_tmax: " << lower_level_tmax << '\n'
+                    << "fraction: " << fraction << '\n'
+                    << "top_level_subtracted: " << top_level_subtracted << '\n'
+                    << "adjusted_fraction: " << adjusted_fraction << '\n'
+                    << "lower_level_subtracted: " << lower_level_subtracted << '\n'
+                    << "lower_level_added: " << lower_level_added << '\n';
+            }
+        }
     }
 }
 
