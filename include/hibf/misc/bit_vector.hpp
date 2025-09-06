@@ -948,7 +948,10 @@ private:
 #        if (_LIBCPP_VERSION < 200000)
             std::__compressed_pair<pointer, allocator_t> end_cap;
 #        else
+#            pragma GCC diagnostic push
+#            pragma GCC diagnostic ignored "-Wgnu-anonymous-struct" // Warning since clang-21
             _LIBCPP_COMPRESSED_PAIR(pointer, end_cap = nullptr, allocator_type, allocator);
+#            pragma GCC diagnostic pop
 #        endif
         };
 
