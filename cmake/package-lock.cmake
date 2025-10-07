@@ -40,7 +40,7 @@ CPMDeclarePackage (googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
-set (HIBF_DOXYGEN_AWESOME_VERSION 2.3.4 CACHE STRING "" FORCE)
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.4.0 CACHE STRING "" FORCE)
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
