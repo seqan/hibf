@@ -17,8 +17,15 @@ int main()
     ibf.emplace(712, seqan::hibf::bin_index{3u});
     ibf.emplace(237, seqan::hibf::bin_index{9u});
 
+#if !HIBF_HAS_AVX512
     // The counting_vector must be at least as big as the number of bins.
     seqan::hibf::counting_vector<uint16_t> counts(12, 0);
+#else
+    // With AVX512:
+    // 512 (AVX) / 16 (value type of counting_vector) = 32 per iteration
+    // Next multiple of 32 for 12: 32
+    seqan::hibf::counting_vector<uint16_t> counts(32, 0);
+#endif
 
     auto agent = ibf.containment_agent();
 
