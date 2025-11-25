@@ -228,6 +228,21 @@ private:
         sub
     };
 
+    template <size_t multiple>
+    inline constexpr size_t next_multiple_of(size_t const value) noexcept
+    {
+        if constexpr (multiple == 8u)
+            return ((value + 7u) >> 3) << 3;
+        else if constexpr (multiple == 16u)
+            return ((value + 15u) >> 4) << 4;
+        else if constexpr (multiple == 32u)
+            return ((value + 31u) >> 5) << 5;
+        else if constexpr (multiple == 64u)
+            return ((value + 63u) >> 6) << 6;
+        else
+            static_assert("multiple must be one of 8, 16, 32, 64.");
+    }
+
     //!\brief Bin-wise adds or subtracts the bits of a seqan::hibf::bit_vector.
     template <operation op>
     inline void impl(bit_vector const & bit_vector)
@@ -244,7 +259,7 @@ private:
         bits_type const * bit_vector_ptr = reinterpret_cast<bits_type const *>(bit_vector.data());
         value_t * counting_vector_ptr = base_t::data();
 
-        size_t const bits = next_multiple_of_64(bit_vector.size());
+        size_t const bits = next_multiple_of<simd::bits_per_iterations>(bit_vector.size());
         assert(bits <= this->capacity()); // Not enough memory reserved for AVX512 chunk access.
         size_t const iterations = bits / simd::bits_per_iterations;
 
