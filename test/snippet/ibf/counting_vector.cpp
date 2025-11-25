@@ -24,7 +24,8 @@ int main()
     // With AVX512:
     // 512 (AVX) / 16 (value type of counting_vector) = 32 per iteration
     // Next multiple of 32 for 12: 32
-    seqan::hibf::counting_vector<uint16_t> counts(32, 0);
+    seqan::hibf::counting_vector<uint16_t> counts(12, 0);
+    counts.reserve(32);
 #endif
 
     auto agent = ibf.containment_agent();
