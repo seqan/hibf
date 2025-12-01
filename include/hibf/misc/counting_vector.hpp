@@ -22,7 +22,6 @@
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/misc/bit_vector.hpp>           // for bit_vector
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
-#include <hibf/misc/next_multiple_of_64.hpp>  // for next_multiple_of_64
 #include <hibf/misc/unreachable.hpp>          // for assert, unreachable
 #include <hibf/platform.hpp>                  // for HIBF_HAS_AVX512
 

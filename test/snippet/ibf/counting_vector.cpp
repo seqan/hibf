@@ -7,6 +7,7 @@
 #include <hibf/interleaved_bloom_filter.hpp> // for interleaved_bloom_filter, bin_index, bin_count, bin_size
 #include <hibf/misc/counting_vector.hpp>     // for counting_vector
 #include <hibf/misc/print.hpp>               // for print, print_t
+#include <hibf/platform.hpp>                 // for HIBF_HAS_AVX512
 
 int main()
 {
