@@ -40,6 +40,7 @@ namespace seqan::hibf
  * | General | seqan::hibf::config::threads                  | 1       | [RECOMMENDED_TO_ADAPT] |
  * | Layout  | seqan::hibf::config::sketch_bits              | 12      |                        |
  * | Layout  | seqan::hibf::config::tmax                     | 0       | 0 indicates unset      |
+ * | General | seqan::hibf::config::track_occupancy          | false   |                        |
  * | Layout  | seqan::hibf::config::empty_bin_fraction       | 0.0     | Dynamic Layout         |
  * | Layout  | seqan::hibf::config::max_rearrangement_ratio  | 0.5     |                        |
  * | Layout  | seqan::hibf::config::alpha                    | 1.2     |                        |
@@ -231,6 +232,25 @@ struct config
      */
     size_t tmax{};
 
+    /*!\brief Track the amount of emplaced elements for each technical bin.
+     *
+     * An IBF can track how many elements were emplaced into each technical bin.
+     * This option can be useful for a dynamic index, or to compute the exact FPR for a technical bin.
+     *
+     * The occupancy of a technical bin `i` of IBF `ibf` can be accessed via `ibf.occupancy[i]`.
+     *
+     * For occupancy, emplacing an element means that a bit of the conceptual Bloom Filter representing the respective
+     * technical bin changes.
+     * For example, adding the same value multiple times to the same technical bin will not increase the occupancy.
+     * Likewise, if the respective bits for a value have already been set by previous emplacing operations, the
+     * occupancy will not increase.
+     *
+     * This option comes with a minor performance penalty for seqan::hibf::interleaved_bloom_filter::emplace.
+     *
+     * Recommendation: default value (false).
+     */
+    bool track_occupancy{false};
+
     /*!\brief The percentage of empty bins in the layout.
      *
      * \note Do not set this option unless you are developing an application that requires empty technical bins.
@@ -242,6 +262,8 @@ struct config
      * For example, if `tmax` is `64` and `empty_bin_fraction` is `0.10`, then 6 bins will be empty, i.e., not
      * designated to contain any data. The resulting layout will be very similar to a layout with `tmax` set to `58`
      * and no empty bins.
+     *
+     * Choosing a value larger than `0.0` will also enable the `track_occupancy` option.
      *
      * Value must be in range [0.0,1.0).
      * Recommendation: default value (0.0). This option is not recommended for general use.
@@ -330,6 +352,8 @@ struct config
      *   * Not setting seqan::hibf::config::tmax, or setting it to `0`, results in a default tmax
      *     `std::ceil(std::sqrt(number_of_user_bins))` being used.
      *   * seqan::hibf::config::tmax is increased to the next multiple of 64.
+     *   * Setting seqan::hibf::config::empty_bin_fraction to a value larger than `0.0` will also enable
+     *     seqan::hibf::config::track_occupancy.
      */
     void validate_and_set_defaults();
 

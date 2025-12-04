@@ -116,6 +116,9 @@ void config::validate_and_set_defaults()
     if (empty_bin_fraction < 0.0 || empty_bin_fraction >= 1.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0)."};
 
+    if (empty_bin_fraction != 0.0)
+        track_occupancy = true;
+
     if (alpha < 0.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};
 
