@@ -63,13 +63,15 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
         if (current_node.max_bin_is_merged())
         {
             // recursively initialize favourite child first
-            technical_bin_to_ibf_id[current_node.max_bin_index] =
+            size_t const favourite_child_ibf_idx =
                 hierarchical_build(hibf,
                                    kmers,
                                    current_node.children[current_node.favourite_child_idx.value()],
                                    data,
                                    false,
                                    ibf_pos);
+            technical_bin_to_ibf_id[current_node.max_bin_index] = favourite_child_ibf_idx;
+            hibf.prev_ibf_id[favourite_child_ibf_idx] = {.ibf_idx = ibf_pos, .bin_idx = current_node.max_bin_index};
             return 1;
         }
         else // max bin is not a merged bin
@@ -127,7 +129,7 @@ size_t hierarchical_build(hierarchical_interleaved_bloom_filter & hibf,
             robin_hood::unordered_flat_set<uint64_t> local_kmers{};
             size_t const local_ibf_pos = hierarchical_build(hibf, local_kmers, child, data, false, ibf_pos);
             auto parent_bin_index = child.parent_bin_index;
-            hibf.prev_ibf_id[local_ibf_pos] = {.ibf_idx = parent_ibf_idx, .bin_idx = parent_bin_index};
+            hibf.prev_ibf_id[local_ibf_pos] = {.ibf_idx = ibf_pos, .bin_idx = parent_bin_index};
             {
                 size_t const mutex_id{parent_bin_index / 64};
                 std::lock_guard<std::mutex> guard{local_ibf_mutex[mutex_id]};
