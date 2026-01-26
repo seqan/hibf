@@ -17,6 +17,7 @@
 #include <hibf/config.hpp>                   // for config
 #include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start
 #include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
+#include <hibf/misc/subtract_empty_bins.hpp> // for subtract_empty_bins
 
 namespace seqan::hibf
 {
@@ -115,6 +116,12 @@ void config::validate_and_set_defaults()
 
     if (empty_bin_fraction < 0.0 || empty_bin_fraction >= 1.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0)."};
+
+    if (empty_bin_fraction != 0.0)
+    {
+        size_t const substracted = seqan::hibf::subtract_empty_bins(tmax, empty_bin_fraction);
+        empty_bin_fraction = 1.0 - static_cast<double>(substracted) / tmax;
+    }
 
     if (alpha < 0.0)
         throw std::invalid_argument{"[HIBF CONFIG ERROR] config::alpha must be positive."};

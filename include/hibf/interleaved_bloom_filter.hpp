@@ -214,9 +214,14 @@ public:
      * \param bins_ The number of bins.
      * \param size The bitvector size.
      * \param funs The number of hash functions. Default 2. At least 1, at most 5.
-     * \param track_occupancy_ Whether to track the occupancy of the bins.
+     * \param empty_bin_fraction The fraction of total technical bins that should be empty.
      *
      * \details
+     *
+     * Upon construction, `_bins` many bins are immediately accessible.
+     * Additionally, enough space is reserve to accomodate a total of at least `_bins / empty_bin_fraction` many bins.
+     * For example, with `bins_ = 64` and `empty_bin_fraction = 0.5`, the Interleaved Bloom Filter will reserve space
+     * for 128 bins, 64 of which are immediately accessible and 64 of which are reserved for future use.
      *
      * ### Example
      *
@@ -225,7 +230,7 @@ public:
     interleaved_bloom_filter(seqan::hibf::bin_count const bins_,
                              seqan::hibf::bin_size const size,
                              seqan::hibf::hash_function_count const funs = seqan::hibf::hash_function_count{2u},
-                             bool const track_occupancy_ = false);
+                             double const empty_bin_fraction = 0.0);
 
     /*!\brief Construct an Interleaved Bloom Filter.
      * \param configuration The seqan::hibf::config.
