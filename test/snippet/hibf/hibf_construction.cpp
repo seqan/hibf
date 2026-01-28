@@ -28,6 +28,8 @@ int main()
                                .threads = 1,        // recommended to adapt
                                .sketch_bits = 12,
                                .tmax = 0, // triggers default copmutation
+                               .empty_bin_fraction = 0.0,
+                               .track_occupancy = false,
                                .alpha = 1.2,
                                .max_rearrangement_ratio = 0.5,
                                .disable_estimate_union = false,

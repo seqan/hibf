@@ -51,7 +51,7 @@ seqan::hibf::interleaved_bloom_filter construct_ibf(robin_hood::unordered_flat_s
     seqan::hibf::interleaved_bloom_filter ibf{bin_count,
                                               bin_size,
                                               seqan::hibf::hash_function_count{data.config.number_of_hash_functions},
-                                              data.config.empty_bin_fraction > 0.0};
+                                              data.config.track_occupancy};
 
     local_index_allocation_timer.stop();
     data.index_allocation_timer += local_index_allocation_timer;
