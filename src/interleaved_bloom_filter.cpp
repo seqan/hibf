@@ -105,7 +105,7 @@ interleaved_bloom_filter::interleaved_bloom_filter(config & configuration, size_
     interleaved_bloom_filter{seqan::hibf::bin_count{configuration.number_of_user_bins},
                              seqan::hibf::bin_size{max_bin_size(configuration, max_bin_elements)},
                              seqan::hibf::hash_function_count{configuration.number_of_hash_functions},
-                             configuration.empty_bin_fraction > 0.0}
+                             configuration.track_occupancy}
 {
     size_t const chunk_size = std::clamp<size_t>(std::bit_ceil(bin_count() / configuration.threads), 8u, 64u);
 

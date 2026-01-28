@@ -37,7 +37,7 @@ TEST(config_test, write_to)
     std::string const expected_file{"@HIBF_CONFIG\n"
                                     "@{\n"
                                     "@    \"hibf_config\": {\n"
-                                    "@        \"version\": 2,\n"
+                                    "@        \"version\": 3,\n"
                                     "@        \"number_of_user_bins\": 123456789,\n"
                                     "@        \"number_of_hash_functions\": 4,\n"
                                     "@        \"maximum_fpr\": 0.0001,\n"
@@ -46,6 +46,7 @@ TEST(config_test, write_to)
                                     "@        \"sketch_bits\": 8,\n"
                                     "@        \"tmax\": 128,\n"
                                     "@        \"empty_bin_fraction\": 0.0,\n"
+                                    "@        \"track_occupancy\": false,\n"
                                     "@        \"alpha\": 1.0,\n"
                                     "@        \"max_rearrangement_ratio\": 0.333,\n"
                                     "@        \"disable_estimate_union\": true,\n"
@@ -62,7 +63,7 @@ TEST(config_test, read_from)
     std::stringstream ss{"@HIBF_CONFIG\n"
                          "@{\n"
                          "@    \"hibf_config\": {\n"
-                         "@        \"version\": 2,\n"
+                         "@        \"version\": 3,\n"
                          "@        \"number_of_user_bins\": 123456789,\n"
                          "@        \"number_of_hash_functions\": 4,\n"
                          "@        \"maximum_fpr\": 0.0001,\n"
@@ -71,6 +72,7 @@ TEST(config_test, read_from)
                          "@        \"sketch_bits\": 8,\n"
                          "@        \"tmax\": 128,\n"
                          "@        \"empty_bin_fraction\": 0.5,\n"
+                         "@        \"track_occupancy\": true,\n"
                          "@        \"alpha\": 1.0,\n"
                          "@        \"max_rearrangement_ratio\": 0.333,\n"
                          "@        \"disable_estimate_union\": true,\n"
@@ -90,6 +92,7 @@ TEST(config_test, read_from)
     EXPECT_EQ(configuration.sketch_bits, 8);
     EXPECT_EQ(configuration.tmax, 128);
     EXPECT_EQ(configuration.empty_bin_fraction, 0.5);
+    EXPECT_EQ(configuration.track_occupancy, true);
     EXPECT_EQ(configuration.alpha, 1.0);
     EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
     EXPECT_EQ(configuration.disable_estimate_union, true);
@@ -134,17 +137,12 @@ TEST(config_test, read_from_v1)
     EXPECT_EQ(configuration.disable_rearrangement, false);
 }
 
-TEST(config_test, read_from_with_more_meta)
+TEST(config_test, read_from_v2)
 {
-    std::stringstream ss{"@blah some chopper stuff\n"
-                         "@blah some chopper stuff\n"
-                         "@blah some chopper stuff\n"
-                         "@blah some chopper stuff\n"
-                         "@blah some chopper stuff\n"
-                         "@HIBF_CONFIG\n"
+    std::stringstream ss{"@HIBF_CONFIG\n"
                          "@{\n"
                          "@    \"hibf_config\": {\n"
-                         "@        \"version\": 1,\n"
+                         "@        \"version\": 2,\n"
                          "@        \"number_of_user_bins\": 123456789,\n"
                          "@        \"number_of_hash_functions\": 4,\n"
                          "@        \"maximum_fpr\": 0.0001,\n"
@@ -152,6 +150,7 @@ TEST(config_test, read_from_with_more_meta)
                          "@        \"threads\": 31,\n"
                          "@        \"sketch_bits\": 8,\n"
                          "@        \"tmax\": 128,\n"
+                         "@        \"empty_bin_fraction\": 0.5,\n"
                          "@        \"alpha\": 1.0,\n"
                          "@        \"max_rearrangement_ratio\": 0.333,\n"
                          "@        \"disable_estimate_union\": true,\n"
@@ -170,6 +169,54 @@ TEST(config_test, read_from_with_more_meta)
     EXPECT_EQ(configuration.threads, 31);
     EXPECT_EQ(configuration.sketch_bits, 8);
     EXPECT_EQ(configuration.tmax, 128);
+    EXPECT_EQ(configuration.empty_bin_fraction, 0.5);
+    EXPECT_EQ(configuration.track_occupancy, true);
+    EXPECT_EQ(configuration.alpha, 1.0);
+    EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
+    EXPECT_EQ(configuration.disable_estimate_union, true);
+    EXPECT_EQ(configuration.disable_rearrangement, false);
+}
+
+TEST(config_test, read_from_with_more_meta)
+{
+    std::stringstream ss{"@blah some chopper stuff\n"
+                         "@blah some chopper stuff\n"
+                         "@blah some chopper stuff\n"
+                         "@blah some chopper stuff\n"
+                         "@blah some chopper stuff\n"
+                         "@HIBF_CONFIG\n"
+                         "@{\n"
+                         "@    \"hibf_config\": {\n"
+                         "@        \"version\": 3,\n"
+                         "@        \"number_of_user_bins\": 123456789,\n"
+                         "@        \"number_of_hash_functions\": 4,\n"
+                         "@        \"maximum_fpr\": 0.0001,\n"
+                         "@        \"relaxed_fpr\": 0.3,\n"
+                         "@        \"threads\": 31,\n"
+                         "@        \"sketch_bits\": 8,\n"
+                         "@        \"tmax\": 128,\n"
+                         "@        \"empty_bin_fraction\": 0.0,\n"
+                         "@        \"track_occupancy\": true,\n"
+                         "@        \"alpha\": 1.0,\n"
+                         "@        \"max_rearrangement_ratio\": 0.333,\n"
+                         "@        \"disable_estimate_union\": true,\n"
+                         "@        \"disable_rearrangement\": false\n"
+                         "@    }\n"
+                         "@}\n"
+                         "@HIBF_CONFIG_END\n"};
+
+    seqan::hibf::config configuration;
+    configuration.read_from(ss);
+
+    EXPECT_EQ(configuration.number_of_user_bins, 123456789);
+    EXPECT_EQ(configuration.number_of_hash_functions, 4);
+    EXPECT_EQ(configuration.maximum_fpr, 0.0001);
+    EXPECT_EQ(configuration.relaxed_fpr, 0.3);
+    EXPECT_EQ(configuration.threads, 31);
+    EXPECT_EQ(configuration.sketch_bits, 8);
+    EXPECT_EQ(configuration.tmax, 128);
+    EXPECT_EQ(configuration.empty_bin_fraction, 0.0);
+    EXPECT_EQ(configuration.track_occupancy, true);
     EXPECT_EQ(configuration.alpha, 1.0);
     EXPECT_EQ(configuration.max_rearrangement_ratio, 0.333);
     EXPECT_EQ(configuration.disable_estimate_union, true);
@@ -349,6 +396,20 @@ TEST(config_test, validate_and_set_defaults)
                          "[HIBF CONFIG ERROR] config::empty_bin_fraction must be in [0.0,1.0).");
     }
 
+    // empty_bin_fraction != 0.0 also enables tracking occupancy
+    {
+        seqan::hibf::config configuration{.input_fn = dummy_input_fn,
+                                          .number_of_user_bins = 1u,
+                                          .empty_bin_fraction = 0.0,
+                                          .track_occupancy = false};
+        configuration.validate_and_set_defaults();
+        EXPECT_EQ(configuration.track_occupancy, false);
+
+        configuration.empty_bin_fraction = 0.3;
+        configuration.validate_and_set_defaults();
+        EXPECT_EQ(configuration.track_occupancy, true);
+    }
+
     // alpha must be positive
     {
         seqan::hibf::config configuration{.input_fn = dummy_input_fn, .number_of_user_bins = 1u, .alpha = -0.1};
@@ -413,6 +474,8 @@ TEST(config_test, serialisation)
                                .threads = 31,
                                .sketch_bits = 8,
                                .tmax = 128,
+                               .empty_bin_fraction = 0.13,
+                               .track_occupancy = true,
                                .alpha = 1.0,
                                .max_rearrangement_ratio = 0.333,
                                .disable_estimate_union = true,
