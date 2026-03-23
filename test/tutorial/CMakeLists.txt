@@ -12,21 +12,8 @@ include (../hibf-test.cmake)
 
 set (CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin")
 
-CPMAddPackage (NAME seqan3
-               VERSION 3.4.0
-               GIT_TAG 3.4.0
-               GITHUB_REPOSITORY seqan/seqan3
-               SYSTEM TRUE
-               EXCLUDE_FROM_ALL TRUE
-               OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
-
-CPMAddPackage (NAME sharg
-               VERSION 1.2.1
-               GIT_TAG 1.2.1
-               GITHUB_REPOSITORY seqan/sharg-parser
-               SYSTEM TRUE
-               EXCLUDE_FROM_ALL TRUE
-               OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "SHARG_NO_TDL ON")
+CPMGetPackage (seqan3)
+CPMGetPackage (sharg)
 
 add_executable ("hibf_tutorial" build.cpp count.cpp main.cpp search.cpp)
 target_link_libraries ("hibf_tutorial" PRIVATE seqan::hibf seqan3::seqan3 sharg::sharg)

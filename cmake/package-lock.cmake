@@ -8,7 +8,7 @@
 # cmake-format: off
 
 # cereal
-set (HIBF_CEREAL_VERSION 1.3.2 CACHE STRING "" FORCE)
+set (HIBF_CEREAL_VERSION 1.3.2 CACHE STRING "")
 CPMDeclarePackage (cereal
                    NAME cereal
                    VERSION ${HIBF_CEREAL_VERSION}
@@ -16,14 +16,14 @@ CPMDeclarePackage (cereal
                    SYSTEM TRUE
                    OPTIONS "JUST_INSTALL_CEREAL ON" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # simde
-set (HIBF_SIMDE_VERSION 0.8.2 CACHE STRING "" FORCE)
+set (HIBF_SIMDE_VERSION 0.8.2 CACHE STRING "")
 CPMDeclarePackage (simde
                    NAME simde
                    VERSION ${HIBF_SIMDE_VERSION}
                    GITHUB_REPOSITORY simd-everywhere/simde
                    DOWNLOAD_ONLY YES QUIET YES)
 # benchmark
-set (HIBF_BENCHMARK_VERSION 1.9.5 CACHE STRING "" FORCE)
+set (HIBF_BENCHMARK_VERSION 1.9.5 CACHE STRING "")
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
@@ -32,7 +32,7 @@ CPMDeclarePackage (benchmark
                    OPTIONS "BENCHMARK_ENABLE_TESTING OFF" "BENCHMARK_ENABLE_WERROR OFF"
                            "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # googletest
-set (HIBF_GOOGLETEST_VERSION 1.17.0 CACHE STRING "" FORCE)
+set (HIBF_GOOGLETEST_VERSION 1.17.0 CACHE STRING "")
 CPMDeclarePackage (googletest
                    NAME GTest
                    VERSION ${HIBF_GOOGLETEST_VERSION}
@@ -40,11 +40,33 @@ CPMDeclarePackage (googletest
                    SYSTEM TRUE
                    OPTIONS "BUILD_GMOCK OFF" "INSTALL_GTEST OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
 # doxygen-awesome
-set (HIBF_DOXYGEN_AWESOME_VERSION 2.4.1 CACHE STRING "" FORCE)
+set (HIBF_DOXYGEN_AWESOME_VERSION 2.4.2 CACHE STRING "")
 CPMDeclarePackage (doxygen_awesome
                    NAME doxygen_awesome
                    VERSION ${HIBF_DOXYGEN_AWESOME_VERSION}
                    GITHUB_REPOSITORY jothepro/doxygen-awesome-css
                    DOWNLOAD_ONLY TRUE)
+
+# seqan3 - test/tutorial only
+set (HIBF_SEQAN3_VERSION 3.4.2 CACHE STRING "")
+CPMDeclarePackage (seqan3
+                   NAME seqan3
+                   VERSION ${HIBF_SEQAN3_VERSION}
+                   GIT_TAG ${HIBF_SEQAN3_VERSION}
+                   GITHUB_REPOSITORY seqan/seqan3
+                   SYSTEM TRUE
+                   EXCLUDE_FROM_ALL TRUE
+                   OPTIONS "INSTALL_SEQAN3 OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING")
+
+# sharg - test/tutorial only
+set (HIBF_SHARG_VERSION 1.2.2 CACHE STRING "")
+CPMDeclarePackage (sharg
+                   NAME sharg
+                   VERSION ${HIBF_SHARG_VERSION}
+                   GIT_TAG ${HIBF_SHARG_VERSION}
+                   GITHUB_REPOSITORY seqan/sharg-parser
+                   SYSTEM TRUE
+                   EXCLUDE_FROM_ALL TRUE
+                   OPTIONS "INSTALL_SHARG OFF" "INSTALL_TDL OFF" "CMAKE_MESSAGE_LOG_LEVEL WARNING" "BUILD_TESTING OFF")
 
 # cmake-format: on
