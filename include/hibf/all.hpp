@@ -54,6 +54,15 @@
  * \brief Includes all API relevant to build an HIBF from a given layout.
  * \ingroup hibf
  */
+
 #pragma once
 
+#include <hibf/build/all.hpp>
+#include <hibf/config.hpp>
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp>
 #include <hibf/interleaved_bloom_filter.hpp>
+#include <hibf/layout/all.hpp>
+#include <hibf/misc/all.hpp>
+#include <hibf/platform.hpp>
+#include <hibf/sketch/all.hpp>
+#include <hibf/version.hpp>
