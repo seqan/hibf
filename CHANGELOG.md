@@ -25,6 +25,8 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## New features
 
+* Added Python bindings via nanobind. Install with `pip install .`; see `python/README.md`.
+
 ## Notable Bug-fixes
 
 ## API changes
