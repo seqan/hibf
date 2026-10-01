@@ -201,6 +201,8 @@ public:
      * This constructor makes it possible to avoid computing the layout on construction of an hibf by using a given
      * layout. A layout file can be constructed manually or via chopper (https://github.com/seqan/chopper)
      * or raptor-layout (https://github.com/seqan/raptor).
+     * The layout is checked with seqan::hibf::layout::layout::validate, which throws std::invalid_argument if the
+     * layout does not describe a consistent HIBF for the configuration.
      */
     hierarchical_interleaved_bloom_filter(config & configuration, layout::layout const & layout);
     //!\}

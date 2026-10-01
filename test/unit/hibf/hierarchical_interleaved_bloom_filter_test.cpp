@@ -9,6 +9,7 @@
 #include <functional> // for function
 #include <ranges>     // for __fn, iota, views
 #include <sstream>    // for char_traits, basic_stringstream, stringstream
+#include <stdexcept>  // for invalid_argument
 #include <string>     // for basic_string
 #include <utility>    // for move
 #include <vector>     // for vector, allocator
@@ -19,6 +20,7 @@
 #include <hibf/misc/counting_vector.hpp>                  // for counting_vector
 #include <hibf/test/cereal.hpp>                           // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/test/expect_throw_msg.hpp>                 // for EXPECT_THROW_MSG
 
 TEST(hibf_test, small_example_with_direct_hashes)
 {
@@ -107,6 +109,29 @@ TEST(hibf_test, build_from_layout)
     agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
     EXPECT_EQ(configuration.number_of_user_bins, hibf.number_of_user_bins);
+}
+
+TEST(hibf_test, build_from_invalid_layout)
+{
+    seqan::hibf::config configuration{.input_fn =
+                                          [](size_t const, seqan::hibf::insert_iterator it)
+                                      {
+                                          it = 1u;
+                                      },
+                                      .number_of_user_bins = 2u};
+
+    // The top-level max bin 1 is the second technical bin of user bin 1.
+    std::stringstream stream{"#TOP_LEVEL_IBF fullest_technical_bin_idx:1\n"
+                             "#USER_BIN_IDX\tTECHNICAL_BIN_INDICES\tNUMBER_OF_TECHNICAL_BINS\n"
+                             "1\t0\t34\n"
+                             "0\t34\t30\n"};
+    seqan::hibf::layout::layout layout{};
+    layout.read_from(stream);
+
+    EXPECT_THROW_MSG((seqan::hibf::hierarchical_interleaved_bloom_filter{configuration, layout}),
+                     std::invalid_argument,
+                     "[HIBF LAYOUT ERROR] The max bin (\"fullest_technical_bin_idx:\") of the Root-IBF is neither a "
+                     "merged bin nor the first technical bin of a user bin.");
 }
 
 // The max bins do not need to be sorted by level.
