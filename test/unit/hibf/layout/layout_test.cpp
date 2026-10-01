@@ -162,3 +162,41 @@ TEST(layout_test, read_from_partitioned_layout)
                   (seqan::hibf::layout::layout::user_bin{std::vector<size_t>{1, 2, 3, 4}, 22, 21, 5}));
     }
 }
+
+namespace
+{
+
+using layout_t = seqan::hibf::layout::layout;
+
+// Root-IBF: UB 0 is split into TBs 0-1, TB 2 is merged, UB 5 is split into TBs 3-63.
+// IBF 2: UB 1 is split into TBs 0-1, TB 2 is merged, UB 2 is split into TBs 3-63.
+// IBF 2;2: UB 3 in TB 0, UB 4 is split into TBs 1-63.
+// Each IBF uses all of its 64 technical bins. The user bins are deliberately not sorted by index.
+layout_t valid_layout()
+{
+    layout_t layout{};
+    layout.top_level_max_bin_id = 2;
+    layout.max_bins.emplace_back(std::vector<size_t>{2}, 0);
+    layout.max_bins.emplace_back(std::vector<size_t>{2, 2}, 1);
+    layout.user_bins.emplace_back(std::vector<size_t>{}, 3, 61, 5);
+    layout.user_bins.emplace_back(std::vector<size_t>{}, 0, 2, 0);
+    layout.user_bins.emplace_back(std::vector<size_t>{2}, 0, 2, 1);
+    layout.user_bins.emplace_back(std::vector<size_t>{2}, 3, 61, 2);
+    layout.user_bins.emplace_back(std::vector<size_t>{2, 2}, 0, 1, 3);
+    layout.user_bins.emplace_back(std::vector<size_t>{2, 2}, 1, 63, 4);
+    return layout;
+}
+
+} // namespace
+
+TEST(layout_test, number_of_levels)
+{
+    layout_t layout = valid_layout();
+    EXPECT_EQ(layout.number_of_levels(), 3u);
+
+    layout.user_bins.resize(2u); // only the top-level user bins
+    EXPECT_EQ(layout.number_of_levels(), 1u);
+
+    layout.clear();
+    EXPECT_EQ(layout.number_of_levels(), 0u);
+}

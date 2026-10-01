@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>   // for find
+#include <algorithm>   // for find, max
 #include <cassert>     // for assert
 #include <charconv>    // for from_chars, from_chars_result
 #include <cstddef>     // for size_t
@@ -149,6 +149,14 @@ void seqan::hibf::layout::layout::clear()
     top_level_max_bin_id = 0;
     max_bins.clear();
     user_bins.clear();
+}
+
+size_t seqan::hibf::layout::layout::number_of_levels() const
+{
+    size_t levels{};
+    for (auto const & ub : user_bins)
+        levels = std::max(levels, ub.previous_TB_indices.size() + 1u);
+    return levels;
 }
 
 } // namespace seqan::hibf::layout

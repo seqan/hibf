@@ -79,6 +79,13 @@ struct layout
 
     void clear();
 
+    /*!\brief Returns the number of levels of the described HIBF.
+     * \returns `0` if there are no user bins, `1` if there is only the top-level IBF, and so on.
+     * \details
+     * Only the user bins are considered.
+     */
+    [[nodiscard]] size_t number_of_levels() const;
+
     size_t top_level_max_bin_id{};
     std::vector<max_bin> max_bins{};
     std::vector<user_bin> user_bins{};
