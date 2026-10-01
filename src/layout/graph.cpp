@@ -2,7 +2,7 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>        // for max
+#include <algorithm>        // for max, is_sorted, sort
 #include <cassert>          // for assert
 #include <cstddef>          // for size_t
 #include <initializer_list> // for initializer_list
@@ -19,22 +19,22 @@ namespace seqan::hibf::layout
 void update_header_node_data(std::vector<layout::layout::max_bin> const & header_max_bins,
                              seqan::hibf::layout::graph & ibf_graph)
 {
-#ifndef NDEBUG
-    // head_max_bins must be sorted ascending by the number of bin indices (corresponds to the IBF levels)
-    if (!header_max_bins.empty())
+    // A parent IBF must be added before its children: The max bins must be sorted ascending by the number of bin
+    // indices (the IBF level). compute_layout sorts them, so only unsorted layouts (e.g., hand-written) need a copy.
+    auto const level = [](layout::layout::max_bin const & max_bin)
     {
-        layout::layout::max_bin current = header_max_bins.front();
-        for (auto it = header_max_bins.begin() + 1; it < header_max_bins.end(); ++it)
-        {
-            assert(current.previous_TB_indices.size() <= it->previous_TB_indices.size());
-            current = *it;
-        }
+        return max_bin.previous_TB_indices.size();
+    };
+    std::vector<layout::layout::max_bin> sorted_copy{};
+    if (!std::ranges::is_sorted(header_max_bins, {}, level))
+    {
+        sorted_copy = header_max_bins;
+        std::ranges::sort(sorted_copy, {}, level);
     }
-#endif
+    auto const & max_bins = sorted_copy.empty() ? header_max_bins : sorted_copy; // an empty range is sorted
 
-    for (auto const & [bin_indices, max_id] : header_max_bins)
+    for (auto const & [bin_indices, max_id] : max_bins)
     {
-        // we assume that the header lines are in the correct order
         // go down the tree until you find the matching parent
         seqan::hibf::layout::graph::node * parent = &ibf_graph.root; // start at root
 
