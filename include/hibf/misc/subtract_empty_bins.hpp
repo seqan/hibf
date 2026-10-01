@@ -26,7 +26,11 @@ namespace seqan::hibf
     if (fraction == 0.0 || tmax <= 2u)
         return tmax;
 
-    size_t const number_of_empty_bins = std::clamp<size_t>(std::ceil(tmax * fraction), 1, tmax - 2);
+    // `tmax * fraction` may exceed an integer by a rounding error, e.g., for the fraction `1 - subtracted / tmax` that
+    // config::validate_and_set_defaults() sets. It then counts as that integer. Otherwise, a repeated
+    // config::validate_and_set_defaults() could change the fraction again.
+    double const rounding_error = tmax * 1e-12;
+    size_t const number_of_empty_bins = std::clamp<size_t>(std::ceil(tmax * fraction - rounding_error), 1, tmax - 2);
     return tmax - number_of_empty_bins;
 }
 
