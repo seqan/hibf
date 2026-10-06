@@ -13,7 +13,7 @@
 #include <cstdint>     // for uint64_t, uint16_t, uint32_t
 #include <exception>   // for exception_ptr, current_exception, rethrow_exception
 #include <filesystem>  // for path
-#include <fstream>     // for ifstream, ofstream
+#include <fstream>     // for filebuf, ifstream, ofstream
 #include <istream>     // for istream
 #include <limits>      // for numeric_limits
 #include <memory>      // for addressof, make_unique, unique_ptr
@@ -25,10 +25,8 @@
 #include <stdexcept>   // for invalid_argument, runtime_error
 #include <streambuf>   // for streambuf
 #include <string>      // for string, to_string
-#include <string_view> // for string_view
-#include <tuple>       // for tuple
 #include <type_traits> // for invoke_result_t, remove_reference_t
-#include <utility>     // for move
+#include <utility>     // for move, make_pair, pair
 #include <variant>     // for variant, get_if
 #include <vector>      // for vector
 
