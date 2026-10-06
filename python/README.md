@@ -87,6 +87,17 @@ results = index.batch_membership_for(queries, [int(0.8 * len(q)) for q in querie
 `batch_membership_for` releases the GIL and runs in parallel on its own threads. This is the fastest way to answer many
 queries.
 
+## Thread safety
+
+Querying from several threads is safe. Give each thread its own agent; `batch_membership_for` manages its threads
+itself.
+
+Methods that modify an object are not synchronised with other methods on the same object:
+`InterleavedBloomFilter.emplace`, `clear`, `increase_bin_number_to` and `try_increase_bin_number_to`, and
+`HyperLogLog.add`, `merge` and `reset`. Do not call them while another thread uses that object. Some operations, such
+as `batch_membership_for` and `save`, release the GIL, so another thread can run while they work. If such a thread
+increases the number of bins of the IBF they are reading, the interpreter can crash.
+
 ## Serialisation
 
 ```python

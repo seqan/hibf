@@ -1040,7 +1040,9 @@ void bind_ibf(nb::module_ & m)
     auto cls = nb::class_<ibf_t>(m,
                                  "InterleavedBloomFilter",
                                  "The Interleaved Bloom Filter (IBF): a set of equally sized Bloom filters (bins) "
-                                 "that can be queried simultaneously.");
+                                 "that can be queried simultaneously.\n\n"
+                                 "Methods that modify the IBF are not synchronised. Do not call them while another "
+                                 "thread uses the IBF.");
 
     cls.def(
            "__init__",
@@ -1115,7 +1117,7 @@ void bind_ibf(nb::module_ & m)
             },
             "new_bin_count"_a,
             "Increases the number of bins without reallocation, if possible. Returns whether the bins were "
-            "increased.")
+            "increased. Must not be called while another thread uses this IBF.")
         .def(
             "increase_bin_number_to",
             [](ibf_t & self, size_t new_bin_count)
@@ -1124,7 +1126,9 @@ void bind_ibf(nb::module_ & m)
             },
             "new_bin_count"_a,
             "Increases the number of bins. Requires reallocation if the number of technical bins grows. "
-            "Existing agents adapt to the new number of bins.")
+            "Existing agents adapt to the new number of bins.\n\n"
+            "Must not be called while another thread uses this IBF: the reallocation frees the memory that thread "
+            "may be reading.")
         .def_prop_ro("hash_function_count", &ibf_t::hash_function_count, "The number of hash functions.")
         .def_prop_ro("bin_count", &ibf_t::bin_count, "The number of bins.")
         .def_prop_ro("bin_size", &ibf_t::bin_size, "The size of each bin in bits.")
@@ -1354,7 +1358,9 @@ void bind_hyperloglog(nb::module_ & m)
 {
     auto cls = nb::class_<hyperloglog_t>(m,
                                          "HyperLogLog",
-                                         "A HyperLogLog sketch for estimating the number of distinct values.");
+                                         "A HyperLogLog sketch for estimating the number of distinct values.\n\n"
+                                         "Methods that modify the sketch are not synchronised. Do not call them "
+                                         "while another thread uses the sketch.");
 
     cls.def(
            "__init__",
