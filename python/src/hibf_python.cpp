@@ -342,13 +342,14 @@ void validate_input(nb::handle input)
  * `allow_empty` is set, an empty user bin is recorded as an error and a placeholder value is inserted instead. This
  * also applies to the calls after an error. The resulting index is discarded.
  *
- * The Python object is borrowed; the owning py_config must outlive the adapter.
+ * The adapter holds a reference to the Python object: the input may be reassigned (e.g., by the input itself) while
+ * the library is running. The adapter must be destroyed while holding the GIL.
  */
 class input_adapter
 {
 public:
     input_adapter(nb::handle source, bool const allow_empty) :
-        source{source},
+        source{nb::borrow(source)},
         is_callable{PyCallable_Check(source.ptr()) == 1},
         allow_empty{allow_empty}
     {}
@@ -413,7 +414,7 @@ private:
         failed.store(true, std::memory_order_relaxed);
     }
 
-    nb::handle source;
+    nb::object source;
     bool is_callable{};
     bool allow_empty{};
     std::atomic<bool> failed{false};

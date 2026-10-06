@@ -197,6 +197,24 @@ def test_callback_exception_during_build_is_propagated():
         hibf.HIBF(hibf.Config(input_fn, number_of_user_bins=len(data)))
 
 
+@pytest.mark.parametrize("build", [hibf.HIBF, hibf.IBF, hibf.compute_layout])
+def test_input_reassigned_during_construction(build):
+    """The input drops the last reference to itself while the library still requests values."""
+    data = random_user_bins(30)
+    config = hibf.Config(number_of_user_bins=len(data))
+
+    class Source:
+        def __call__(self, user_bin_id):
+            config.input = data
+            return data[user_bin_id]
+
+    config.input = Source()
+    result = build(config)
+    if not isinstance(result, hibf.Layout):
+        for user_bin_id, values in enumerate(data):
+            assert user_bin_id in result.membership_for(values, len(values))
+
+
 def test_user_bin_empty_during_build():
     """The input returns different values when requested again."""
     data = random_user_bins(20)
