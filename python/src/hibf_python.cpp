@@ -846,6 +846,17 @@ void check_bin(ibf_t const & ibf, size_t const bin)
 // Bindings
 // ---------------------------------------------------------------------------------------------------------------------
 
+/*!\brief Makes instances of a class unhashable.
+ * \details
+ * The bound classes compare by value, but the default hash is based on identity. Python requires that equal objects
+ * have equal hashes. A hash over the values would be expensive and most objects are mutable. Hence, like lists, the
+ * objects are unhashable.
+ */
+void make_unhashable(nb::handle cls)
+{
+    cls.attr("__hash__") = nb::none();
+}
+
 void bind_config(nb::module_ & m)
 {
     nb::class_<py_config>(m,
@@ -1037,6 +1048,8 @@ void bind_config(nb::module_ & m)
                         << ", disable_rearrangement=" << (self.disable_rearrangement ? "True" : "False") << ")";
                  return stream.str();
              });
+
+    make_unhashable(m.attr("Config"));
 }
 
 void bind_layout(nb::module_ & m)
@@ -1089,6 +1102,8 @@ void bind_layout(nb::module_ & m)
                  return "<Layout number_of_user_bins=" + std::to_string(self.user_bins.size())
                       + " number_of_max_bins=" + std::to_string(self.max_bins.size()) + ">";
              });
+
+    make_unhashable(m.attr("Layout"));
 
     m.def("compute_layout",
           &compute_layout_for,
@@ -1288,6 +1303,7 @@ void bind_ibf(nb::module_ & m)
              });
 
     add_serialisation(cls);
+    make_unhashable(cls);
 
     nb::class_<ibf_containment_agent>(cls, "ContainmentAgent", "Answers single-value containment queries.")
         .def(
@@ -1421,6 +1437,7 @@ void bind_hibf(nb::module_ & m)
              });
 
     add_serialisation(cls);
+    make_unhashable(cls);
 
     nb::class_<hibf_membership_agent>(cls, "MembershipAgent", "Answers membership queries.")
         .def(

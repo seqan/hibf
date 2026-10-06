@@ -386,6 +386,13 @@ def test_batch_membership(index, user_bins):
         index.batch_membership_for(queries, 1, threads=0)
 
 
+def test_unhashable(index):
+    """The classes compare by value, so the identity-based default hash would break sets and dicts."""
+    for obj in (hibf.Config(), hibf.Layout(), hibf.IBF(bin_count=4, bin_size=64), index):
+        with pytest.raises(TypeError, match="unhashable"):
+            hash(obj)
+
+
 def test_agent_keeps_index_alive(user_bins):
     index = hibf.HIBF(hibf.Config(user_bins[:10]))
     agent = index.membership_agent()
