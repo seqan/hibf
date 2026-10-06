@@ -57,7 +57,9 @@ print(next(d.locate_file(f) for f in d.files if f.name == 'LICENSE'))"
         list (GET license 0 name)
         list (GET license 1 file)
         if (EXISTS "${file}" AND NOT IS_DIRECTORY "${file}")
-            install (FILES "${file}" DESTINATION "${HIBF_THIRD_PARTY_LICENSES}" RENAME "${name}.txt")
+            install (FILES "${file}"
+                     DESTINATION "${HIBF_THIRD_PARTY_LICENSES}"
+                     RENAME "${name}.txt")
         else ()
             message (WARNING "Licence of ${name} not found. It will be missing from the wheel.")
         endif ()
