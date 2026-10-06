@@ -33,7 +33,8 @@ test = ["pytest"]
 [tool.scikit-build]
 minimum-version = "build-system.requires"
 cmake.version = ">=3.20"
-build-dir = "build/python/{wheel_tag}"
+# CMake keeps the compiler of an existing build directory; delete the directory after changing CXX.
+build-dir = "build/python/{wheel_tag}-{build_type}"
 # The stable ABI requires Python >= 3.12. Older Pythons get version-specific wheels.
 wheel.py-api = "cp312"
 wheel.packages = ["python/hibf"]

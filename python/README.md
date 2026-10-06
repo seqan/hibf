@@ -187,5 +187,8 @@ pip install --no-build-isolation -e ".[test]"  # or: pip install ".[test]"
 pytest
 ```
 
+Builds reuse the directory `build/python/<wheel tag>-<build type>`, e.g., after `-C cmake.build-type=Debug`. CMake
+keeps the compiler of an existing build directory, so delete the directory after changing `CXX`.
+
 Type stubs (`_hibf.pyi`) are generated during the build. The C++ sources are in [`src/`](src), and the tests are in
 [`tests/`](tests).
