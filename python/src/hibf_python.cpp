@@ -14,7 +14,7 @@
 #include <exception>   // for exception_ptr, current_exception, rethrow_exception
 #include <filesystem>  // for path
 #include <fstream>     // for ifstream, ofstream
-#include <memory>      // for addressof
+#include <memory>      // for addressof, make_unique, unique_ptr
 #include <mutex>       // for mutex, lock_guard
 #include <span>        // for span
 #include <sstream>     // for ostringstream, istringstream
@@ -92,12 +92,45 @@ nb::module_ numpy()
     return nb::module_::import_("numpy");
 }
 
+//!\brief Wraps the values in an array that owns them.
+u64_array to_u64_array(std::vector<uint64_t> values)
+{
+    auto owned = std::make_unique<std::vector<uint64_t>>(std::move(values));
+    uint64_t const * const data = owned->data();
+    size_t const size = owned->size();
+
+    nb::capsule owner(owned.get(),
+                      [](void * ptr) noexcept
+                      {
+                          delete static_cast<std::vector<uint64_t> *>(ptr);
+                      });
+    owned.release();
+
+    return u64_array(data, {size}, owner);
+}
+
+//!\brief Converts a Python integer (or any object implementing `__index__`) to uint64_t. Raises for other values.
+uint64_t index_to_u64(nb::handle obj)
+{
+    nb::object const index = nb::steal(PyNumber_Index(obj.ptr()));
+    if (!index.is_valid())
+        throw nb::python_error{};
+
+    unsigned long long const value = PyLong_AsUnsignedLongLong(index.ptr());
+    if (value == static_cast<unsigned long long>(-1) && PyErr_Occurred())
+        throw nb::python_error{};
+
+    return value;
+}
+
 /*!\brief Converts an arbitrary Python object into a one-dimensional uint64 array.
  * \details
  * A C-contiguous uint64 array (anything supporting the buffer protocol or DLPack) is used without copying.
- * Everything else is handed to NumPy: sequences and buffers via `numpy.asarray`, other iterables (e.g. generators,
- * sets) via `numpy.fromiter`. Scalars are treated as arrays of length one.
- * Requires the GIL.
+ * Other arrays, buffers and NumPy scalars must have an integer dtype and are converted by NumPy. Signed values are
+ * reinterpreted as two's complement, e.g., -1 becomes 2^64 - 1.
+ * Python integers and iterables of them (e.g., lists, generators, sets) are converted value by value. Each value must
+ * be an integer in [0, 2^64).
+ * Floats are rejected in both cases instead of being truncated. Requires the GIL.
  */
 u64_array as_u64_array(nb::handle obj)
 {
@@ -105,20 +138,40 @@ u64_array as_u64_array(nb::handle obj)
     if (nb::try_cast(obj, result, /*convert=*/false))
         return result;
 
-    nb::module_ np = numpy();
-    nb::object array;
+    if (PyObject_CheckBuffer(obj.ptr()) || nb::hasattr(obj, "__array__") || nb::hasattr(obj, "__array_interface__")
+        || nb::hasattr(obj, "__dlpack__"))
+    {
+        nb::module_ np = numpy();
+        nb::object const array = np.attr("asarray")(obj);
+        nb::object const dtype = array.attr("dtype");
+        std::string const kind = nb::cast<std::string>(dtype.attr("kind"));
 
-    if (PyObject_CheckBuffer(obj.ptr()) || PySequence_Check(obj.ptr()) || PyNumber_Check(obj.ptr()))
-        array = np.attr("asarray")(obj, "dtype"_a = "uint64");
-    else
-        array = np.attr("fromiter")(obj, "dtype"_a = "uint64");
+        if (kind != "i" && kind != "u")
+            throw nb::type_error(
+                ("Expected an array of integers, got an array of dtype " + nb::cast<std::string>(nb::str(dtype)) + ".")
+                    .c_str());
 
-    array = np.attr("ascontiguousarray")(np.attr("atleast_1d")(array));
+        if (nb::cast<size_t>(array.attr("ndim")) > 1u)
+            throw std::invalid_argument{"Expected a one-dimensional array of integers."};
 
-    if (nb::cast<size_t>(array.attr("ndim")) != 1u)
-        throw std::invalid_argument{"Expected a one-dimensional array of unsigned 64-bit integers."};
+        return nb::cast<u64_array>(np.attr("ascontiguousarray")(array, "dtype"_a = "uint64"));
+    }
 
-    return nb::cast<u64_array>(array);
+    if (PyIndex_Check(obj.ptr()))
+        return to_u64_array({index_to_u64(obj)});
+
+    if (!nb::hasattr(obj, "__iter__") && !nb::hasattr(obj, "__getitem__"))
+        throw nb::type_error(("Expected an integer, an array of integers, or an iterable of integers, got "
+                              + nb::cast<std::string>(obj.type().attr("__name__")) + ".")
+                                 .c_str());
+
+    std::vector<uint64_t> values;
+    if (nb::hasattr(obj, "__len__"))
+        values.reserve(nb::len(obj));
+    for (nb::handle item : obj)
+        values.push_back(index_to_u64(item));
+
+    return to_u64_array(std::move(values));
 }
 
 std::span<uint64_t const> as_span(u64_array const & array)

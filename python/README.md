@@ -56,8 +56,13 @@ index.membership_for([3, 9, 12, 14], threshold=2)  # array([2, 0], dtype=uint64)
 * **A callable**, where `input(i)` returns the values of user bin `i`. Use this when the data does not fit into memory,
   e.g., to read a file per user bin. `number_of_user_bins` is required.
 
-The values of a user bin can be any iterable of non-negative integers. A contiguous NumPy `uint64` array is used without
-copying. Other inputs, such as lists, generators, sets, or arrays with a different dtype, are converted first.
+The values of a user bin are integers. A contiguous NumPy `uint64` array is used without copying. Other inputs are
+converted first:
+
+* Arrays with another integer dtype. Signed values are reinterpreted as two's complement, so `-1` becomes `2**64 - 1`.
+* Python integers in `[0, 2**64)`, and iterables of them, such as lists, generators, or sets.
+
+Floats are rejected rather than truncated.
 
 The library requests the values of each user bin **more than once** (once for the layout, once for building the
 index). With `threads > 1`, requests come from several threads at once. The input must therefore return the same values

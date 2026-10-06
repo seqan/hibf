@@ -256,8 +256,34 @@ def test_ibf_allows_empty_user_bins():
 def test_invalid_values():
     with pytest.raises(OverflowError):
         hibf.HIBF(hibf.Config([[1, 2], [-1]]))
-    with pytest.raises(ValueError, match="one-dimensional"):
+    with pytest.raises(TypeError):
         hibf.HIBF(hibf.Config([[1, 2], [[1, 2], [3, 4]]]))
+    with pytest.raises(ValueError, match="one-dimensional"):
+        hibf.HIBF(hibf.Config([[1, 2], np.ones((2, 2), dtype=np.uint64)]))
+    with pytest.raises(TypeError, match="dtype float64"):
+        hibf.HIBF(hibf.Config([[1, 2], np.array([1.5, 2.5])]))
+
+
+def test_value_conversion():
+    ibf = hibf.IBF(bin_count=1, bin_size=1 << 16)
+
+    for values in (np.array([1.5]), [1.0], 2.5, np.float64(2.0), np.array([True]), b"\x01", "1", [[1, 2]]):
+        with pytest.raises(TypeError):
+            ibf.emplace(values, 0)
+        with pytest.raises(TypeError):
+            ibf.membership_for(values, 1)
+    for values in ([-1], -1, [2**64]):
+        with pytest.raises(OverflowError):
+            ibf.emplace(values, 0)
+    with pytest.raises(ValueError, match="one-dimensional"):
+        ibf.emplace(np.ones((2, 2), dtype=np.uint64), 0)
+
+    ibf.emplace(np.array([-1], dtype=np.int64), 0)  # reinterpreted as 2**64 - 1
+    ibf.emplace([2**64 - 2], 0)
+    ibf.emplace(np.arange(10, 15, dtype=">u8"), 0)  # non-native byte order
+    ibf.emplace(np.uint8(7), 0)
+    ibf.emplace((v for v in [20, 21]), 0)
+    assert list(ibf.membership_for([2**64 - 1, 2**64 - 2, 10, 14, 7, 21], 6)) == [0]
 
 
 def test_timings(index):
