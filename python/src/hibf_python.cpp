@@ -79,12 +79,22 @@ bool accept_any(PyObject *) noexcept
 class array_like : public nb::object
 {
     NB_OBJECT_DEFAULT(array_like, object, "numpy.typing.ArrayLike", accept_any)
+    array_like(array_like const &) = default;
+    array_like & operator=(array_like const &) = default;
+    array_like(array_like &&) = default;
+    array_like & operator=(array_like &&) = default;
+    ~array_like() = default;
 };
 
 //!\brief Accepts any object. Arguments of this type are converted via numpy.dtype; the name is used in the stubs.
 class dtype_like : public nb::object
 {
     NB_OBJECT_DEFAULT(dtype_like, object, "numpy.typing.DTypeLike", accept_any)
+    dtype_like(dtype_like const &) = default;
+    dtype_like & operator=(dtype_like const &) = default;
+    dtype_like(dtype_like &&) = default;
+    dtype_like & operator=(dtype_like &&) = default;
+    ~dtype_like() = default;
 };
 
 //!\brief Accepts any object. Arguments of this type are checked by validate_input; the name is used in the stubs.
@@ -95,6 +105,11 @@ class input_like : public nb::object
                       "collections.abc.Sequence[numpy.typing.ArrayLike] | "
                       "collections.abc.Callable[[int], numpy.typing.ArrayLike]",
                       accept_any)
+    input_like(input_like const &) = default;
+    input_like & operator=(input_like const &) = default;
+    input_like(input_like &&) = default;
+    input_like & operator=(input_like &&) = default;
+    ~input_like() = default;
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -255,6 +270,13 @@ std::vector<uint16_t> resolve_thresholds(std::variant<uint16_t, std::vector<uint
 //!\brief A read-only stream buffer over existing memory. Avoids copying the pickled bytes.
 struct memory_buffer : public std::streambuf
 {
+    memory_buffer() = default;
+    memory_buffer(memory_buffer const &) = default;
+    memory_buffer & operator=(memory_buffer const &) = default;
+    memory_buffer(memory_buffer &&) = default;
+    memory_buffer & operator=(memory_buffer &&) = default;
+    ~memory_buffer() override = default;
+
     memory_buffer(char const * data, size_t const size)
     {
         char * begin = const_cast<char *>(data);
@@ -527,6 +549,13 @@ void add_serialisation(nb::class_<object_t, extra_t...> & cls)
  */
 struct py_config : public seqan::hibf::config
 {
+    py_config() = default;
+    py_config(py_config const &) = default;
+    py_config & operator=(py_config const &) = default;
+    py_config(py_config &&) = default;
+    py_config & operator=(py_config &&) = default;
+    ~py_config() = default;
+
     nb::object input{nb::none()};
 
     //!\brief Returns number_of_user_bins or, if unset and the input is a sized sequence, the length of the input.
@@ -585,8 +614,13 @@ public:
         allow_empty{allow_empty}
     {}
 
+    // Holds a mutex and an atomic.
+    input_adapter() = delete;
     input_adapter(input_adapter const &) = delete;
     input_adapter & operator=(input_adapter const &) = delete;
+    input_adapter(input_adapter &&) = delete;
+    input_adapter & operator=(input_adapter &&) = delete;
+    ~input_adapter() = default;
 
     void operator()(size_t const user_bin_id, seqan::hibf::insert_iterator it) noexcept
     {
@@ -694,6 +728,13 @@ py_config config_from_string(std::string const & text)
 
 struct layout_timers
 {
+    layout_timers() = default;
+    layout_timers(layout_timers const &) = default;
+    layout_timers & operator=(layout_timers const &) = default;
+    layout_timers(layout_timers &&) = default;
+    layout_timers & operator=(layout_timers &&) = default;
+    ~layout_timers() = default;
+
     seqan::hibf::concurrent_timer compute_sketches{};
     seqan::hibf::concurrent_timer union_estimation{};
     seqan::hibf::concurrent_timer rearrangement{};
