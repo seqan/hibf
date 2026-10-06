@@ -105,6 +105,12 @@ def test_config_validate():
         hibf.Config(number_of_user_bins=3).validate_and_set_defaults()
 
 
+def test_config_equality():
+    assert hibf.Config(README_DATA) == hibf.Config(lambda i: README_DATA[i], number_of_user_bins=3)
+    assert hibf.Config(number_of_hash_functions=2) != hibf.Config(number_of_hash_functions=5)
+    assert hibf.Config(track_occupancy=False) != hibf.Config(track_occupancy=True)
+
+
 def test_config_string_roundtrip():
     config = hibf.Config(README_DATA, maximum_fpr=0.01, tmax=128)
     parsed = hibf.Config.from_string(config.to_string())
