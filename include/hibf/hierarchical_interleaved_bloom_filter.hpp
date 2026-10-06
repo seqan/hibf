@@ -4,7 +4,7 @@
 
 #pragma once
 
-#include <algorithm> // for __fn, fill, sort
+#include <algorithm> // for __fn, fill, min, sort
 #include <cassert>   // for assert
 #include <concepts>  // for integral, unsigned_integral
 #include <cstddef>   // for size_t
@@ -324,7 +324,9 @@ private:
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<uint16_t>();
         auto & result = agent.bulk_count(values);
 
-        uint16_t sum{};
+        // A value is counted in its own technical bin and may be a false positive in the other technical bins of a split
+        // bin. Hence, the sum over a split bin may exceed the number of values and must not be limited to uint16_t.
+        size_t sum{};
 
         for (size_t bin{}; bin < result.size(); ++bin)
         {
@@ -465,7 +467,9 @@ private:
         auto agent = hibf_ptr->ibf_vector[ibf_idx].template counting_agent<value_t>();
         auto & result = agent.bulk_count(values);
 
-        value_t sum{};
+        // A value is counted in its own technical bin and may be a false positive in the other technical bins of a split
+        // bin. Hence, the sum over a split bin may exceed the number of values and must not be limited to value_t.
+        size_t sum{};
 
         for (size_t bin{}; bin < result.size(); ++bin)
         {
@@ -488,7 +492,8 @@ private:
                 if (bin + 1u == result.size() || user_bin_id != hibf_ptr->ibf_bin_to_user_bin_id[ibf_idx][bin + 1])
                 { //  last bin || end of split bin
                     if (sum >= threshold)
-                        result_buffer[user_bin_id] = sum;
+                        result_buffer[user_bin_id] =
+                            static_cast<value_t>(std::min<size_t>(sum, std::numeric_limits<value_t>::max()));
                     sum = 0u;
                 }
             }
@@ -540,6 +545,7 @@ public:
      * may avoid to recurse into every part of the HIBF.
      *
      * Counts that do not exceed the threshold will be reported as `0`.
+     * Counts that exceed the maximum value of `value_t` are reported as that maximum.
      *
      * ### Thread safety
      *
