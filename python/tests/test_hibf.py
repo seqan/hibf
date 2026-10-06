@@ -2,6 +2,7 @@
 # SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: BSD-3-Clause
 
+import concurrent.futures
 import copy
 import gc
 import pathlib
@@ -455,6 +456,39 @@ def test_unhashable(index):
     for obj in (hibf.Config(), hibf.Layout(), hibf.IBF(bin_count=4, bin_size=64), index):
         with pytest.raises(TypeError, match="unhashable"):
             hash(obj)
+
+
+def test_agents_in_threads(index, user_bins):
+    """Queries release the GIL. Threads with their own agents get the same results as sequential queries."""
+    queries = [values[:500] for values in user_bins[:40]]
+    expected = [sorted(index.membership_for(q, len(q))) for q in queries]
+
+    def run(chunk):
+        agent = index.membership_agent()
+        return [(i, sorted(agent.membership_for(queries[i], len(queries[i])))) for i in chunk]
+
+    with concurrent.futures.ThreadPoolExecutor(4) as pool:
+        for results in pool.map(run, [range(i, len(queries), 4) for i in range(4)]):
+            for i, result in results:
+                assert result == expected[i]
+
+
+def test_shared_agent_raises_instead_of_racing(index, user_bins):
+    """An agent's buffers must not be used by two threads at once. The second thread gets an exception."""
+    agent = index.counting_agent("uint32")
+    query = np.concatenate(user_bins[:30])
+    expected = agent.bulk_count(query)
+
+    def run():
+        for _ in range(20):
+            try:
+                assert np.array_equal(agent.bulk_count(query), expected)
+            except RuntimeError as error:
+                assert "in use by another thread" in str(error)
+
+    with concurrent.futures.ThreadPoolExecutor(4) as pool:
+        for future in [pool.submit(run) for _ in range(4)]:
+            future.result()
 
 
 def test_agent_keeps_index_alive(user_bins):

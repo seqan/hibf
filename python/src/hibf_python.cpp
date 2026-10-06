@@ -27,6 +27,7 @@
 #include <string>      // for string, to_string
 #include <string_view> // for string_view
 #include <tuple>       // for tuple
+#include <type_traits> // for invoke_result_t, remove_reference_t
 #include <utility>     // for move
 #include <variant>     // for variant, get_if
 #include <vector>      // for vector
@@ -846,6 +847,42 @@ public:
         agent{filter}
     {}
 
+    /*!\brief Marks the agent as in use for the lifetime of the lease.
+     * \details
+     * Queries release the GIL and agents keep their results in buffers. Two threads using the same agent at the same
+     * time would hence race on these buffers. Instead, the second thread gets an exception.
+     * The flag is only accessed while holding the GIL; the lease must be created and destroyed while holding it.
+     */
+    class lease
+    {
+    public:
+        lease() = delete;
+        lease(lease const &) = delete;
+        lease & operator=(lease const &) = delete;
+        lease(lease &&) = delete;
+        lease & operator=(lease &&) = delete;
+
+        explicit lease(py_agent & owner) : owner{owner}
+        {
+            if (owner.busy)
+                throw std::runtime_error{"This agent is in use by another thread. Create one agent per thread."};
+            owner.busy = true;
+        }
+
+        ~lease()
+        {
+            owner.busy = false;
+        }
+
+        agent_t & agent()
+        {
+            return owner.get();
+        }
+
+    private:
+        py_agent & owner;
+    };
+
     //!\brief Returns the agent. Rebuilds it if the number of bins of the filter changed.
     agent_t & get()
     {
@@ -868,6 +905,7 @@ private:
 
     filter_t const * filter{nullptr};
     size_t bin_count{};
+    bool busy{false};
     agent_t agent;
 };
 
@@ -893,12 +931,33 @@ void check_query_size(size_t const size)
                                     + "dtype."};
 }
 
+/*!\brief Runs a query without the GIL and copies its result into a NumPy array.
+ * \details
+ * `query` returns a reference to a buffer of an agent. The agent must not be used by another thread until the result
+ * is copied.
+ */
+template <typename value_t, typename query_t>
+numpy_array<value_t> query_without_gil(query_t && query)
+{
+    std::remove_reference_t<std::invoke_result_t<query_t &>> * result{nullptr};
+    {
+        nb::gil_scoped_release nogil{};
+        result = std::addressof(query());
+    }
+    return to_numpy<value_t>(*result);
+}
+
+//!\brief Answers a membership query. `agent` must not be used by another thread meanwhile.
 template <typename agent_t>
 numpy_array<uint64_t> membership_for(agent_t & agent, array_like const & values, uint16_t const threshold)
 {
     u64_array const array = as_u64_array(values);
     check_query_size<uint16_t>(array.size());
-    return to_numpy<uint64_t>(agent.membership_for(as_span(array), threshold));
+    return query_without_gil<uint64_t>(
+        [&]() -> auto const &
+        {
+            return agent.membership_for(as_span(array), threshold);
+        });
 }
 
 //!\brief Queries many value sets in parallel. Each thread uses its own membership agent.
@@ -956,9 +1015,15 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
             "bulk_count",
             [](agent_t & agent, array_like const & values)
             {
+                typename agent_t::lease lease{agent};
                 u64_array const array = as_u64_array(values);
                 check_query_size<value_t>(array.size());
-                return to_numpy<value_t>(agent.get().bulk_count(as_span(array)));
+                auto & raw_agent = lease.agent(); // May rebuild the agent; needs the GIL.
+                return query_without_gil<value_t>(
+                    [&]() -> auto const &
+                    {
+                        return raw_agent.bulk_count(as_span(array));
+                    });
             },
             "values"_a,
             "Returns, for each bin, how many of the given values are contained in it.");
@@ -972,9 +1037,15 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
                 if (threshold == 0u)
                     throw std::invalid_argument{"threshold must be > 0."};
 
+                typename agent_t::lease lease{agent};
                 u64_array const array = as_u64_array(values);
                 check_query_size<value_t>(array.size());
-                return to_numpy<value_t>(agent.get().bulk_count(as_span(array), threshold));
+                auto & raw_agent = lease.agent(); // May rebuild the agent; needs the GIL.
+                return query_without_gil<value_t>(
+                    [&]() -> auto const &
+                    {
+                        return raw_agent.bulk_count(as_span(array), threshold);
+                    });
             },
             "values"_a,
             "threshold"_a = 1u,
@@ -1559,7 +1630,8 @@ void bind_ibf(nb::module_ & m)
             "membership_for",
             [](ibf_membership_agent & agent, array_like const & values, uint16_t threshold)
             {
-                return membership_for(agent.get(), values, threshold);
+                ibf_membership_agent::lease lease{agent};
+                return membership_for(lease.agent(), values, threshold);
             },
             "values"_a,
             "threshold"_a,
@@ -1679,7 +1751,8 @@ void bind_hibf(nb::module_ & m)
             "membership_for",
             [](hibf_membership_agent & agent, array_like const & values, uint16_t threshold)
             {
-                return membership_for(agent.get(), values, threshold);
+                hibf_membership_agent::lease lease{agent};
+                return membership_for(lease.agent(), values, threshold);
             },
             "values"_a,
             "threshold"_a,
