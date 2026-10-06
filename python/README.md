@@ -13,12 +13,21 @@ Python bindings for the [Hierarchical Interleaved Bloom Filter (HIBF)](https://g
 
 Requirements: GCC >= 14 or Clang >= 20, CMake >= 3.20, Python >= 3.10.
 
+The library requires OpenMP, which Apple's clang does not provide. On macOS, use LLVM from Homebrew:
+
+```bash
+brew install llvm
+CXX="$(brew --prefix llvm)/bin/clang++" pip install .
+```
+
 ```bash
 pip install .                  # from the repository root
 pip install ".[test]"          # additionally installs pytest
 ```
 
 The build fetches the C++ dependencies (cereal, simde) via CPM. Set `CPM_SOURCE_CACHE` to reuse downloads across builds.
+Building, also from an sdist, therefore needs network access, unless the cache already contains the dependencies or
+system packages are used (`-C cmake.define.CPM_USE_LOCAL_PACKAGES=ON`).
 
 By default, the library is compiled with `-march=native`. The result is fast, but it may not run on other machines. For
 portable wheels, disable this:
@@ -31,6 +40,11 @@ pip caches the wheels it builds from an sdist or from a git URL pinned to a comm
 If several machines share that cache, e.g., through the home directory on a cluster, a wheel built on a newer CPU fails
 with an illegal-instruction error on an older one. In that case, install with `--no-cache-dir`, or disable the native
 build as above. Wheels built from a local directory, as with `pip install .`, are not cached.
+
+A wheel built this way is meant for the machine that built it. Besides `-march=native`, it links the compiler's OpenMP
+runtime by absolute path, e.g., Homebrew's `libomp.dylib`. To distribute wheels, build with `HIBF_NATIVE_BUILD=OFF` and
+bundle the runtime with `delocate` (macOS) or `auditwheel` (Linux). Two different OpenMP runtimes in one process, e.g.,
+hibf's and the one bundled with PyTorch, can conflict; LLVM's runtime then aborts with `OMP: Error #15`.
 
 ## Quick start
 
