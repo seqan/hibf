@@ -4,6 +4,7 @@
 
 import copy
 import gc
+import pathlib
 import pickle
 import weakref
 
@@ -67,6 +68,8 @@ def test_config_infers_number_of_user_bins():
     config = hibf.Config()
     config.input = README_DATA
     assert config.number_of_user_bins == 3
+    config.input = None
+    assert config.input is None
 
 
 def test_config_number_of_user_bins_follows_input():
@@ -355,6 +358,24 @@ def test_counting_agent(index, user_bins, dtype):
     assert counts.dtype == np.dtype(dtype)
     assert counts.shape == (index.number_of_user_bins,)
     assert counts[3] >= len(user_bins[3])
+
+
+def test_counting_agent_types(index):
+    ibf = hibf.IBF(bin_count=4, bin_size=64)
+    for filter in (index, ibf):
+        for dtype, agent_type in (
+            ("uint16", type(filter).CountingAgentUInt16),
+            ("uint32", type(filter).CountingAgentUInt32),
+            ("uint64", type(filter).CountingAgentUInt64),
+        ):
+            assert type(filter.counting_agent(dtype)) is agent_type
+
+
+def test_stub_types():
+    stub = pathlib.Path(hibf.__file__).with_name("_hibf.pyi").read_text()
+    assert "-> HierarchicalInterleavedBloomFilter.CountingAgentUInt16 | " in stub
+    assert "def timings(self) -> dict[str, float]:" in stub
+    assert "def input(self) -> Sequence[numpy.typing.ArrayLike] | Callable[[int], numpy.typing.ArrayLike] | None:" in stub
 
 
 def test_counting_agent_invalid(index):

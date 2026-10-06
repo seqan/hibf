@@ -17,6 +17,7 @@
 #include <limits>      // for numeric_limits
 #include <memory>      // for addressof, make_unique, unique_ptr
 #include <mutex>       // for mutex, lock_guard
+#include <optional>    // for optional, nullopt
 #include <span>        // for span
 #include <sstream>     // for ostringstream, istringstream
 #include <stdexcept>   // for invalid_argument
@@ -33,6 +34,7 @@
 #include <nanobind/ndarray.h>
 #include <nanobind/operators.h>
 #include <nanobind/stl/filesystem.h>
+#include <nanobind/stl/optional.h>
 #include <nanobind/stl/pair.h>
 #include <nanobind/stl/string.h>
 #include <nanobind/stl/variant.h>
@@ -82,6 +84,16 @@ class array_like : public nb::object
 class dtype_like : public nb::object
 {
     NB_OBJECT_DEFAULT(dtype_like, object, "numpy.typing.DTypeLike", accept_any)
+};
+
+//!\brief Accepts any object. Arguments of this type are checked by validate_input; the name is used in the stubs.
+class input_like : public nb::object
+{
+    NB_OBJECT_DEFAULT(input_like,
+                      object,
+                      "collections.abc.Sequence[numpy.typing.ArrayLike] | "
+                      "collections.abc.Callable[[int], numpy.typing.ArrayLike]",
+                      accept_any)
 };
 
 // ---------------------------------------------------------------------------------------------------------------------
@@ -819,18 +831,19 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
     }
 }
 
-//!\brief Creates a counting agent with the requested counter type. The agent keeps the filter alive.
+//!\brief Creates a counting agent with the requested counter type. The variant makes the stubs list all agent types.
 template <typename filter_t>
-nb::object make_counting_agent(filter_t const & filter, nb::handle dtype)
+std::variant<counting_agent<filter_t, uint16_t>, counting_agent<filter_t, uint32_t>, counting_agent<filter_t, uint64_t>>
+make_counting_agent(filter_t const & filter, nb::handle dtype)
 {
     switch (parse_count_dtype(dtype))
     {
     case count_type::uint16:
-        return nb::cast(counting_agent<filter_t, uint16_t>{filter});
+        return counting_agent<filter_t, uint16_t>{filter};
     case count_type::uint32:
-        return nb::cast(counting_agent<filter_t, uint32_t>{filter});
+        return counting_agent<filter_t, uint32_t>{filter};
     default:
-        return nb::cast(counting_agent<filter_t, uint64_t>{filter});
+        return counting_agent<filter_t, uint64_t>{filter};
     }
 }
 
@@ -902,7 +915,7 @@ void bind_config(nb::module_ & m)
         .def(
             "__init__",
             [](py_config * self,
-               nb::object input,
+               input_like input,
                size_t number_of_user_bins,
                size_t number_of_hash_functions,
                double maximum_fpr,
@@ -951,14 +964,19 @@ void bind_config(nb::module_ & m)
             "disable_rearrangement"_a = false)
         .def_prop_rw(
             "input",
-            [](py_config const & self)
+            [](py_config const & self) -> std::optional<input_like>
             {
-                return self.input;
+                if (self.input.is_none())
+                    return std::nullopt;
+                return nb::borrow<input_like>(self.input);
             },
-            [](py_config & self, nb::object input)
+            [](py_config & self, std::optional<input_like> input)
             {
-                validate_input(input);
-                self.input = std::move(input);
+                nb::object value = nb::none();
+                if (input)
+                    value = std::move(*input);
+                validate_input(value);
+                self.input = std::move(value);
             },
             "A sequence or callable providing the values of each user bin.")
         .def_prop_rw(
@@ -1089,7 +1107,9 @@ void bind_layout(nb::module_ & m)
                          "Layouts can be computed with ``compute_layout()`` or read from layout files, e.g., those "
                          "written by chopper.")
         .def(nb::init<>())
-        .def_ro("top_level_max_bin_id", &layout_t::top_level_max_bin_id)
+        .def_ro("top_level_max_bin_id",
+                &layout_t::top_level_max_bin_id,
+                "The technical bin of the top-level IBF that holds the most values.")
         .def_prop_ro(
             "number_of_user_bins",
             [](layout_t const & self)
@@ -1406,7 +1426,7 @@ void bind_hibf(nb::module_ & m)
             "timings",
             [](hibf_t const & self)
             {
-                nb::dict timings;
+                nb::typed<nb::dict, nb::str, double> timings;
                 timings["layout_compute_sketches"] = self.layout_compute_sketches_timer.in_seconds();
                 timings["layout_union_estimation"] = self.layout_union_estimation_timer.in_seconds();
                 timings["layout_rearrangement"] = self.layout_rearrangement_timer.in_seconds();
