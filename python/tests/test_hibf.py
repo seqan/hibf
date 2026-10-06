@@ -557,8 +557,16 @@ for obj in (hibf.HyperLogLog(5), hibf.IBF(bin_count=64, bin_size=1 << 16)):
 
 
 def test_setstate_invalid_bytes():
-    with pytest.raises(Exception):
-        pickle.loads(pickle.dumps(hibf.HIBF(hibf.Config(README_DATA)))[:-20])
+    """Truncating the pickle would only test pickle itself. Truncate the state that __setstate__ deserialises."""
+    state = hibf.HIBF(hibf.Config(README_DATA)).__getstate__()
+    restored = hibf.HIBF.__new__(hibf.HIBF)
+    with pytest.raises(RuntimeError, match="Failed to read"):
+        restored.__setstate__(state[:-20])
+
+    # The object stays uninitialised instead of being partially initialised.
+    with pytest.warns(RuntimeWarning, match="uninitialized instance"):
+        with pytest.raises(TypeError):
+            restored.membership_for([1], 1)
 
 
 # --------------------------------------------------------------------------------------------------------------------
