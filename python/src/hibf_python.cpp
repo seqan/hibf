@@ -303,6 +303,9 @@ void add_serialisation(nb::class_<object_t, extra_t...> & cls)
  * seqan::hibf::config::input_fn cannot be exposed directly, because a std::function owning a Python object may be
  * copied or destroyed by library threads that do not hold the GIL. Instead, the Python object is stored here and
  * wrapped by an input_adapter for the duration of a construction.
+ *
+ * A number_of_user_bins of 0 means that the number of user bins is inferred from the input whenever it is needed.
+ * The inferred value is only stored by validate_and_set_defaults(), like other defaults.
  */
 struct py_config : public seqan::hibf::config
 {
@@ -320,6 +323,14 @@ struct py_config : public seqan::hibf::config
     void infer_number_of_user_bins()
     {
         number_of_user_bins = inferred_number_of_user_bins();
+    }
+
+    //!\brief Returns a copy of the library config with the inferred number of user bins.
+    seqan::hibf::config resolved() const
+    {
+        seqan::hibf::config config{static_cast<seqan::hibf::config const &>(*this)};
+        config.number_of_user_bins = inferred_number_of_user_bins();
+        return config;
     }
 };
 
@@ -427,8 +438,7 @@ private:
 //!\brief Returns a copy of the config whose input_fn forwards to the adapter.
 seqan::hibf::config make_cpp_config(py_config const & py_cfg, input_adapter & adapter)
 {
-    seqan::hibf::config config{static_cast<seqan::hibf::config const &>(py_cfg)};
-    config.number_of_user_bins = py_cfg.inferred_number_of_user_bins();
+    seqan::hibf::config config = py_cfg.resolved();
 
     config.input_fn = [&adapter](size_t const user_bin_id, seqan::hibf::insert_iterator && it)
     {
@@ -445,7 +455,7 @@ nb::handle require_input(py_config const & config)
     return config.input;
 }
 
-std::string config_to_string(py_config const & config)
+std::string config_to_string(seqan::hibf::config const & config)
 {
     std::ostringstream stream;
     config.write_to(stream);
@@ -808,7 +818,6 @@ void bind_config(nb::module_ & m)
                 config->max_rearrangement_ratio = max_rearrangement_ratio;
                 config->disable_estimate_union = disable_estimate_union;
                 config->disable_rearrangement = disable_rearrangement;
-                config->infer_number_of_user_bins();
             },
             "input"_a = nb::none(),
             nb::kw_only(),
@@ -835,10 +844,20 @@ void bind_config(nb::module_ & m)
             {
                 validate_input(input);
                 self.input = std::move(input);
-                self.infer_number_of_user_bins();
             },
             "A sequence or callable providing the values of each user bin.")
-        .def_rw("number_of_user_bins", &py_config::number_of_user_bins, "The number of user bins. [REQUIRED]")
+        .def_prop_rw(
+            "number_of_user_bins",
+            [](py_config const & self)
+            {
+                return self.inferred_number_of_user_bins();
+            },
+            [](py_config & self, size_t const number_of_user_bins)
+            {
+                self.number_of_user_bins = number_of_user_bins;
+            },
+            "The number of user bins. If set to 0 (the default) and ``input`` is a sequence, ``len(input)`` is "
+            "used.")
         .def_rw("number_of_hash_functions",
                 &py_config::number_of_hash_functions,
                 "The number of hash functions for the underlying Bloom filters. Must be in [1, 5].")
@@ -883,22 +902,26 @@ void bind_config(nb::module_ & m)
                 self.input_fn = {};
             },
             "Checks the config for errors and sets defaults, e.g., for ``tmax``.")
-        .def("to_string",
-             &config_to_string,
-             "Returns the config in the textual format used by layout files. ``input`` is not included.")
+        .def(
+            "to_string",
+            [](py_config const & self)
+            {
+                return config_to_string(self.resolved());
+            },
+            "Returns the config in the textual format used by layout files. ``input`` is not included.")
         .def_static("from_string", &config_from_string, "text"_a, "Parses a config written by ``to_string()``.")
         .def(
             "__eq__",
             [](py_config const & self, py_config const & other)
             {
-                return static_cast<seqan::hibf::config const &>(self)
-                    == static_cast<seqan::hibf::config const &>(other);
+                return self.resolved() == other.resolved();
             },
             nb::is_operator(),
             "Two configs are equal if all options, except ``input``, are equal.")
         .def("__getstate__",
              [](py_config const & self)
              {
+                 // Without inferring number_of_user_bins: the restored config infers it from its input.
                  return std::make_pair(config_to_string(self), self.input);
              })
         .def("__setstate__",
@@ -928,7 +951,7 @@ void bind_config(nb::module_ & m)
                  std::string const input_repr = nb::cast<std::string>(nb::repr(self.input));
                  std::ostringstream stream;
                  stream << "Config(input=" << (input_repr.size() > 60 ? input_repr.substr(0, 57) + "..." : input_repr)
-                        << ", number_of_user_bins=" << self.number_of_user_bins
+                        << ", number_of_user_bins=" << self.inferred_number_of_user_bins()
                         << ", number_of_hash_functions=" << self.number_of_hash_functions
                         << ", maximum_fpr=" << self.maximum_fpr << ", relaxed_fpr=" << self.relaxed_fpr
                         << ", threads=" << self.threads << ", sketch_bits=" << static_cast<int>(self.sketch_bits)
@@ -1026,7 +1049,7 @@ void bind_layout(nb::module_ & m)
             if (!stream.good())
                 raise_os_error(path);
 
-            config.write_to(stream);
+            config.resolved().write_to(stream);
             layout.write_to(stream);
         },
         "path"_a,

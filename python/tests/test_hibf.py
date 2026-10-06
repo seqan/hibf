@@ -68,6 +68,26 @@ def test_config_infers_number_of_user_bins():
     assert config.number_of_user_bins == 3
 
 
+def test_config_number_of_user_bins_follows_input():
+    data = random_user_bins(5)
+    config = hibf.Config(data[:3])
+    config.input = data
+    assert config.number_of_user_bins == 5
+    assert hibf.HIBF(config).number_of_user_bins == 5
+    assert hibf.Config.from_string(config.to_string()).number_of_user_bins == 5
+
+    restored = pickle.loads(pickle.dumps(config))
+    restored.input = data[:4]
+    assert restored.number_of_user_bins == 4
+
+    config.number_of_user_bins = 2  # An explicit value takes precedence.
+    config.input = data[:4]
+    assert config.number_of_user_bins == 2
+
+    config.number_of_user_bins = 0  # Back to inference.
+    assert config.number_of_user_bins == 4
+
+
 def test_config_rejects_invalid_input():
     with pytest.raises(TypeError):
         hibf.Config(42)
