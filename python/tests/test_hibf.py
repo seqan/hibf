@@ -626,8 +626,17 @@ def test_ibf_basic():
 
 
 def test_ibf_invalid():
-    with pytest.raises(Exception, match="bins must be > 0"):
-        hibf.IBF(bin_count=0, bin_size=10)
+    for kwargs, message in (
+        ({"bin_count": 0}, "bin_count must be > 0"),
+        ({"bin_size": 0}, "bin_size must be > 0"),
+        ({"hash_function_count": 0}, "hash_function_count must be in"),
+        ({"hash_function_count": 6}, "hash_function_count must be in"),
+        ({"empty_bin_fraction": -0.5}, "empty_bin_fraction must be in"),
+        ({"empty_bin_fraction": 1.0}, "empty_bin_fraction must be in"),
+        ({"empty_bin_fraction": float("nan")}, "empty_bin_fraction must be in"),
+    ):
+        with pytest.raises(ValueError, match=message):
+            hibf.IBF(**({"bin_count": 4, "bin_size": 64} | kwargs))
     ibf = hibf.IBF(bin_count=4, bin_size=64)
     with pytest.raises(IndexError):
         ibf.emplace(1, 4)

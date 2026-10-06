@@ -1472,6 +1472,17 @@ void bind_ibf(nb::module_ & m)
               double empty_bin_fraction,
               bool track_occupancy)
            {
+               // The library throws std::logic_error (RuntimeError) for some values and does not check
+               // empty_bin_fraction, which determines the number of technical bins.
+               if (bin_count == 0u)
+                   throw std::invalid_argument{"bin_count must be > 0."};
+               if (bin_size == 0u)
+                   throw std::invalid_argument{"bin_size must be > 0."};
+               if (hash_function_count == 0u || hash_function_count > 5u)
+                   throw std::invalid_argument{"hash_function_count must be in [1, 5]."};
+               if (!(empty_bin_fraction >= 0.0 && empty_bin_fraction < 1.0))
+                   throw std::invalid_argument{"empty_bin_fraction must be in [0.0, 1.0)."};
+
                new (self) ibf_t{seqan::hibf::bin_count{bin_count},
                                 seqan::hibf::bin_size{bin_size},
                                 seqan::hibf::hash_function_count{hash_function_count},
