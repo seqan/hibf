@@ -518,8 +518,9 @@ def test_hyperloglog():
     sketch.reset()
     assert sketch.estimate() == 0
 
-    with pytest.raises(ValueError):
-        hibf.HyperLogLog(4)
+    for num_bits in (4, 33, 40):  # 40 would allocate 1 TiB before the library checks the value
+        with pytest.raises(ValueError, match="num_bits must be in"):
+            hibf.HyperLogLog(num_bits)
 
 
 def test_hyperloglog_merge_requires_same_size():

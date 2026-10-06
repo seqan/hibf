@@ -1356,9 +1356,17 @@ void bind_hyperloglog(nb::module_ & m)
                                          "HyperLogLog",
                                          "A HyperLogLog sketch for estimating the number of distinct values.");
 
-    cls.def(nb::init<uint8_t>(),
-            "num_bits"_a = 5u,
-            "Creates an empty sketch with 2^num_bits registers. ``num_bits`` must be in [5, 32].")
+    cls.def(
+           "__init__",
+           [](hyperloglog_t * self, uint8_t const num_bits)
+           {
+               // The library allocates 2^num_bits bytes before checking num_bits.
+               if (num_bits < 5u || num_bits > 32u)
+                   throw std::invalid_argument{"num_bits must be in [5, 32], got " + std::to_string(num_bits) + "."};
+               new (self) hyperloglog_t{num_bits};
+           },
+           "num_bits"_a = 5u,
+           "Creates an empty sketch with 2^num_bits registers. ``num_bits`` must be in [5, 32].")
         .def(
             "add",
             [](hyperloglog_t & self, array_like const & values)
