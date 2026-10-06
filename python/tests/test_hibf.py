@@ -520,3 +520,13 @@ def test_hyperloglog():
 
     with pytest.raises(ValueError):
         hibf.HyperLogLog(4)
+
+
+def test_hyperloglog_merge_requires_same_size():
+    small, big = hibf.HyperLogLog(5), hibf.HyperLogLog(16)
+    big.add(hashed(np.arange(1000)))
+    for sketch, other in ((big, small), (small, big)):
+        for merge in (sketch.merge, sketch.merge_and_estimate):
+            with pytest.raises(ValueError, match="same num_bits"):
+                merge(other)
+    assert big.estimate() == pytest.approx(1000, rel=0.05)

@@ -1341,6 +1341,15 @@ void bind_hibf(nb::module_ & m)
                                                                             "Counting agent.");
 }
 
+//!\brief The library only asserts that merged sketches have the same size; otherwise, it reads out of bounds.
+void check_same_size(hyperloglog_t const & self, hyperloglog_t const & other)
+{
+    if (self.data_size() != other.data_size())
+        throw std::invalid_argument{"Cannot merge a sketch with " + std::to_string(other.data_size())
+                                    + " registers into a sketch with " + std::to_string(self.data_size())
+                                    + " registers. Both sketches must have the same num_bits."};
+}
+
 void bind_hyperloglog(nb::module_ & m)
 {
     auto cls = nb::class_<hyperloglog_t>(m,
@@ -1362,11 +1371,24 @@ void bind_hyperloglog(nb::module_ & m)
             "values"_a,
             "Adds a value or an array of values. Values should be hashed.")
         .def("estimate", &hyperloglog_t::estimate, "Estimates the number of distinct values.")
-        .def("merge", &hyperloglog_t::merge, "other"_a, "Merges another sketch with the same ``num_bits`` into this.")
-        .def("merge_and_estimate",
-             &hyperloglog_t::merge_and_estimate,
-             "other"_a,
-             "Merges another sketch into this one and returns the new estimate.")
+        .def(
+            "merge",
+            [](hyperloglog_t & self, hyperloglog_t const & other)
+            {
+                check_same_size(self, other);
+                self.merge(other);
+            },
+            "other"_a,
+            "Merges another sketch with the same ``num_bits`` into this.")
+        .def(
+            "merge_and_estimate",
+            [](hyperloglog_t & self, hyperloglog_t const & other)
+            {
+                check_same_size(self, other);
+                return self.merge_and_estimate(other);
+            },
+            "other"_a,
+            "Merges another sketch with the same ``num_bits`` into this and returns the new estimate.")
         .def("reset", &hyperloglog_t::reset, "Removes all values.")
         .def_prop_ro("data_size", &hyperloglog_t::data_size, "The number of registers.");
 
