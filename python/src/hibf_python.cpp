@@ -511,11 +511,36 @@ layout_t compute_layout_for(py_config const & py_cfg)
     return compute_layout_impl(config, adapter, timers);
 }
 
+/*!\brief Checks that the layout's user bins are exactly the config's user bins.
+ * \details
+ * The library trusts the layout. An empty layout crashes the construction, and user bin ids that are out of range are
+ * reported by queries and written out of bounds by counting agents.
+ */
+void check_layout_matches(layout_t const & layout, size_t const number_of_user_bins)
+{
+    if (layout.user_bins.size() != number_of_user_bins)
+        throw std::invalid_argument{"The layout contains " + std::to_string(layout.user_bins.size())
+                                    + " user bins, but the config has " + std::to_string(number_of_user_bins) + "."};
+
+    std::vector<bool> seen(number_of_user_bins);
+    for (auto const & user_bin : layout.user_bins)
+    {
+        if (user_bin.idx >= number_of_user_bins || seen[user_bin.idx])
+            throw std::invalid_argument{"The layout's user bin ids must be 0, ..., "
+                                        + std::to_string(number_of_user_bins - 1) + ", each exactly once. Found "
+                                        + std::to_string(user_bin.idx) + "."};
+        seen[user_bin.idx] = true;
+    }
+}
+
 hibf_t build_hibf(py_config const & py_cfg, layout_t const * layout)
 {
     input_adapter adapter{require_input(py_cfg), /*allow_empty=*/false};
     seqan::hibf::config config = make_cpp_config(py_cfg, adapter);
     config.validate_and_set_defaults();
+
+    if (layout != nullptr)
+        check_layout_matches(*layout, config.number_of_user_bins);
 
     nb::gil_scoped_release nogil{};
     try

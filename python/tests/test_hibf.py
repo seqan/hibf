@@ -372,6 +372,23 @@ def test_layout(user_bins, index, tmp_path):
     assert_same_results(index, hibf.HIBF(read_config, read_layout), user_bins)
 
 
+def test_layout_must_match_config(user_bins):
+    config = hibf.Config(user_bins[:3])
+    with pytest.raises(ValueError, match="contains 0 user bins, but the config has 3"):
+        hibf.HIBF(config, hibf.Layout())
+    with pytest.raises(ValueError, match="contains 100 user bins, but the config has 3"):
+        hibf.HIBF(config, hibf.compute_layout(hibf.Config(user_bins)))
+
+    # Each line after the header is `user_bin_id<TAB>technical_bin_indices<TAB>number_of_technical_bins`.
+    header, lines = hibf.compute_layout(config).to_string().split("#USER_BIN_IDX")
+    column_names, *records = lines.rstrip("\n").split("\n")
+    for replacement in ("7", "0"):  # out of range, duplicate
+        changed = [replacement + record[1:] if record.startswith("2\t") else record for record in records]
+        layout = hibf.Layout.from_string(header + "#USER_BIN_IDX" + "\n".join([column_names, *changed]) + "\n")
+        with pytest.raises(ValueError, match=f"Found {replacement}"):
+            hibf.HIBF(config, layout)
+
+
 # --------------------------------------------------------------------------------------------------------------------
 # IBF
 # --------------------------------------------------------------------------------------------------------------------
