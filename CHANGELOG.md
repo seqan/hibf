@@ -31,5 +31,7 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
   can hold, e.g., more than 65535 for membership queries. Counting agents report such counts as the counter type's
   maximum instead of wrapping around.
 * `config::operator==` now also compares `number_of_hash_functions` and `track_occupancy`.
+* `interleaved_bloom_filter::clear` now resets the occupancy of the cleared bins when given a range of bins, as it
+  already did for a single bin.
 
 ## API changes
