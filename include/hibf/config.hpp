@@ -362,12 +362,14 @@ struct config
     {
         // clang-format off
         return number_of_user_bins == other.number_of_user_bins &&
+               number_of_hash_functions == other.number_of_hash_functions &&
                maximum_fpr == other.maximum_fpr &&
                relaxed_fpr == other.relaxed_fpr &&
                threads == other.threads &&
                sketch_bits == other.sketch_bits &&
                tmax == other.tmax &&
                empty_bin_fraction == other.empty_bin_fraction &&
+               track_occupancy == other.track_occupancy &&
                alpha == other.alpha &&
                max_rearrangement_ratio == other.max_rearrangement_ratio &&
                disable_estimate_union == other.disable_estimate_union &&

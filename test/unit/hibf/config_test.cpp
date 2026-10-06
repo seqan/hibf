@@ -525,3 +525,103 @@ TEST(config_test, serialisation)
                                .disable_rearrangement = false};
     seqan::hibf::test::test_serialisation(std::move(config));
 }
+
+TEST(config_test, equality)
+{
+    using seqan::hibf::config;
+    config const reference{};
+
+    auto modified = [](auto && modify)
+    {
+        config result{};
+        modify(result);
+        return result;
+    };
+
+    // input_fn is not compared.
+    EXPECT_EQ(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.input_fn = [](size_t const, seqan::hibf::insert_iterator &&) {};
+                  }));
+
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.number_of_user_bins = 2u;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.number_of_hash_functions = 3u;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.maximum_fpr = 0.01;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.relaxed_fpr = 0.2;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.threads = 2u;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.sketch_bits = 13u;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.tmax = 128u;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.empty_bin_fraction = 0.1;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.track_occupancy = true;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.alpha = 1.0;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.max_rearrangement_ratio = 0.25;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.disable_estimate_union = true;
+                  }));
+    EXPECT_NE(reference,
+              modified(
+                  [](config & c)
+                  {
+                      c.disable_rearrangement = true;
+                  }));
+}
