@@ -14,13 +14,15 @@
 #include <exception>   // for exception_ptr, current_exception, rethrow_exception
 #include <filesystem>  // for path
 #include <fstream>     // for ifstream, ofstream
+#include <istream>     // for istream
 #include <limits>      // for numeric_limits
 #include <memory>      // for addressof, make_unique, unique_ptr
 #include <mutex>       // for mutex, lock_guard
 #include <optional>    // for optional, nullopt
+#include <ostream>     // for ostream
 #include <span>        // for span
 #include <sstream>     // for ostringstream, istringstream
-#include <stdexcept>   // for invalid_argument
+#include <stdexcept>   // for invalid_argument, runtime_error
 #include <streambuf>   // for streambuf
 #include <string>      // for string, to_string
 #include <string_view> // for string_view
@@ -267,20 +269,94 @@ struct memory_buffer : public std::streambuf
     throw nb::python_error{};
 }
 
+//!\brief A stream buffer that only counts the bytes written to it. Determines the size of a serialisation.
+class counting_buffer : public std::streambuf
+{
+public:
+    counting_buffer() = default;
+    counting_buffer(counting_buffer const &) = default;
+    counting_buffer & operator=(counting_buffer const &) = default;
+    counting_buffer(counting_buffer &&) = default;
+    counting_buffer & operator=(counting_buffer &&) = default;
+    ~counting_buffer() override = default;
+
+    size_t size{};
+
+protected:
+    std::streamsize xsputn(char const *, std::streamsize const count) override
+    {
+        size += static_cast<size_t>(count);
+        return count;
+    }
+
+    int_type overflow(int_type const character) override
+    {
+        if (!traits_type::eq_int_type(character, traits_type::eof()))
+            ++size;
+        return traits_type::not_eof(character);
+    }
+};
+
+//!\brief A stream buffer that writes into existing memory of a fixed size. Writing beyond the end fails.
+class output_memory_buffer : public std::streambuf
+{
+public:
+    output_memory_buffer() = default;
+    output_memory_buffer(output_memory_buffer const &) = default;
+    output_memory_buffer & operator=(output_memory_buffer const &) = default;
+    output_memory_buffer(output_memory_buffer &&) = default;
+    output_memory_buffer & operator=(output_memory_buffer &&) = default;
+    ~output_memory_buffer() override = default;
+
+    output_memory_buffer(char * const data, size_t const size)
+    {
+        setp(data, data + size);
+    }
+
+    size_t written() const
+    {
+        return static_cast<size_t>(pptr() - pbase());
+    }
+};
+
+template <typename object_t>
+void serialise(object_t const & object, std::streambuf & buffer)
+{
+    std::ostream stream{&buffer};
+    cereal::BinaryOutputArchive archive{stream};
+    archive(object);
+}
+
+/*!\brief Serialises the object into a bytes object.
+ * \details
+ * The object is serialised twice: first to determine the size, then directly into the bytes object. Serialising into
+ * a growing buffer and copying it into a bytes object needs several times the size of the object in memory.
+ */
 template <typename object_t>
 nb::bytes to_bytes(object_t const & object)
 {
-    std::string buffer;
+    counting_buffer counter{};
     {
         nb::gil_scoped_release nogil{};
-        std::ostringstream stream{std::ios::binary};
-        {
-            cereal::BinaryOutputArchive archive{stream};
-            archive(object);
-        }
-        buffer = std::move(stream).str();
+        serialise(object, counter);
     }
-    return nb::bytes(buffer.data(), buffer.size());
+
+    nb::bytes result = nb::steal<nb::bytes>(PyBytes_FromStringAndSize(nullptr, static_cast<Py_ssize_t>(counter.size)));
+    if (!result.is_valid())
+        throw nb::python_error{};
+
+    // A newly created bytes object may be written to as long as no one else has a reference to it.
+    output_memory_buffer buffer{PyBytes_AsString(result.ptr()), counter.size};
+    {
+        nb::gil_scoped_release nogil{};
+        serialise(object, buffer);
+    }
+
+    if (buffer.written() != counter.size)
+        throw std::runtime_error{"Serialisation wrote " + std::to_string(buffer.written()) + " bytes, but "
+                                 + std::to_string(counter.size) + " were expected."};
+
+    return result;
 }
 
 template <typename object_t>

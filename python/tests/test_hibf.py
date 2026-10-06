@@ -482,6 +482,14 @@ def test_hibf_save_load(index, tmp_path):
     assert hibf.HIBF.load(str(path)) == index
 
 
+def test_getstate_matches_save(index, tmp_path):
+    """__getstate__ serialises into a pre-sized buffer. Its size and content must match a regular serialisation."""
+    for obj in (index, hibf.IBF(bin_count=70, bin_size=1000), hibf.HyperLogLog(8)):
+        path = tmp_path / "object"
+        obj.save(path)
+        assert obj.__getstate__() == path.read_bytes()
+
+
 def test_load_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
         hibf.HIBF.load(tmp_path / "does_not_exist")
