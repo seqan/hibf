@@ -30,5 +30,6 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 * HIBF queries no longer miss a split user bin if the counts of its technical bins sum to more than the counter type
   can hold, e.g., more than 65535 for membership queries. Counting agents report such counts as the counter type's
   maximum instead of wrapping around.
+* `config::operator==` now also compares `number_of_hash_functions` and `track_occupancy`.
 
 ## API changes
