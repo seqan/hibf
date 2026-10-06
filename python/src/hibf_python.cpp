@@ -857,10 +857,39 @@ void make_unhashable(nb::handle cls)
     cls.attr("__hash__") = nb::none();
 }
 
+/*!\brief Lets the garbage collector see Config.input.
+ * \details
+ * Config owns a Python object. Without these slots, a reference cycle through Config.input, e.g., a bound method of
+ * an object that stores the config, is never collected.
+ */
+int config_tp_traverse(PyObject * self, visitproc visit, void * arg)
+{
+    Py_VISIT(Py_TYPE(self));
+
+    // May be called before the C++ object is constructed.
+    if (!nb::inst_ready(self))
+        return 0;
+
+    Py_VISIT(nb::inst_ptr<py_config>(self)->input.ptr());
+    return 0;
+}
+
+int config_tp_clear(PyObject * self)
+{
+    if (nb::inst_ready(self))
+        nb::inst_ptr<py_config>(self)->input = nb::none();
+    return 0;
+}
+
+PyType_Slot config_slots[] = {{Py_tp_traverse, reinterpret_cast<void *>(config_tp_traverse)},
+                              {Py_tp_clear, reinterpret_cast<void *>(config_tp_clear)},
+                              {0, nullptr}};
+
 void bind_config(nb::module_ & m)
 {
     nb::class_<py_config>(m,
                           "Config",
+                          nb::type_slots(config_slots),
                           "The configuration used to build an HIBF or IBF.\n\n"
                           "``input`` provides the values of each user bin. It is either\n\n"
                           "* a sequence with ``input[user_bin_id]`` returning the values of a user bin, or\n"

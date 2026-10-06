@@ -5,6 +5,7 @@
 import copy
 import gc
 import pickle
+import weakref
 
 import numpy as np
 import pytest
@@ -125,6 +126,25 @@ def test_config_pickle_and_copy():
         assert other.input == README_DATA
     assert copy.copy(config).input is config.input
     assert copy.deepcopy(config).input is not config.input
+
+
+def test_config_reference_cycle_is_collected():
+    """A bound method as input creates a cycle: object -> config -> input -> object."""
+
+    class Indexer:
+        def __init__(self):
+            self.data = [np.arange(1, 6, dtype=np.uint64)]
+            self.config = hibf.Config(self.read_bin, number_of_user_bins=1)
+
+        def read_bin(self, user_bin_id):
+            return self.data[user_bin_id]
+
+    indexer = Indexer()
+    hibf.HIBF(indexer.config)
+    ref = weakref.ref(indexer)
+    del indexer
+    gc.collect()
+    assert ref() is None
 
 
 def test_config_repr():
