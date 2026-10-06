@@ -28,12 +28,14 @@ defaults:
 jobs:
   test:
     runs-on: ubuntu-latest
-    name: ${{ matrix.compiler }}
+    name: ${{ matrix.compiler }} ${{ matrix.build_type }}
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch' || github.event.label.name == 'lint'
     strategy:
       fail-fast: false
       matrix:
         compiler: ["clang-latest", "gcc-latest"]
+        # Debug enables the library's assertions.
+        build_type: ["Release", "Debug"]
     container:
       image: ghcr.io/seqan/${{ matrix.compiler }}
     steps:
@@ -55,7 +57,7 @@ jobs:
       - name: Build bindings
         run: |
           ccache -z
-          "${VENV}/bin/pip" install --verbose ".[test]"
+          "${VENV}/bin/pip" install --verbose ".[test]" -C cmake.build-type=${{ matrix.build_type }}
           ccache -sv
 
       - name: Run tests
