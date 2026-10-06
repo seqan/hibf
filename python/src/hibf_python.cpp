@@ -14,6 +14,7 @@
 #include <exception>   // for exception_ptr, current_exception, rethrow_exception
 #include <filesystem>  // for path
 #include <fstream>     // for ifstream, ofstream
+#include <limits>      // for numeric_limits
 #include <memory>      // for addressof, make_unique, unique_ptr
 #include <mutex>       // for mutex, lock_guard
 #include <span>        // for span
@@ -712,10 +713,26 @@ using hibf_membership_agent = py_agent<hibf_t, hibf_t::membership_agent_type>;
 template <typename filter_t, typename value_t>
 using counting_agent = py_agent<filter_t, typename filter_t::template counting_agent_type<value_t>>;
 
+/*!\brief Checks that the counts of a query fit into the counter type.
+ * \details
+ * Agents count the values per technical bin in `counter_t`. A query with more values than `counter_t` can represent
+ * may overflow these counts, which causes false negatives. Membership queries count in uint16_t.
+ */
+template <typename counter_t>
+void check_query_size(size_t const size)
+{
+    constexpr size_t max = std::numeric_limits<counter_t>::max();
+    if (size > max)
+        throw std::invalid_argument{"A query may contain at most " + std::to_string(max) + " values, got "
+                                    + std::to_string(size) + ". Split the query or, for counting agents, use a larger "
+                                    + "dtype."};
+}
+
 template <typename agent_t>
 numpy_array<uint64_t> membership_for(agent_t & agent, array_like const & values, uint16_t const threshold)
 {
     u64_array const array = as_u64_array(values);
+    check_query_size<uint16_t>(array.size());
     return to_numpy<uint64_t>(agent.membership_for(as_span(array), threshold));
 }
 
@@ -736,7 +753,10 @@ batch_membership_for(filter_t const & filter,
     std::vector<u64_array> arrays;
     arrays.reserve(number_of_queries);
     for (nb::handle query : queries)
+    {
         arrays.push_back(as_u64_array(query));
+        check_query_size<uint16_t>(arrays.back().size());
+    }
 
     std::vector<std::vector<uint64_t>> results(number_of_queries);
     {
@@ -772,6 +792,7 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
             [](agent_t & agent, array_like const & values)
             {
                 u64_array const array = as_u64_array(values);
+                check_query_size<value_t>(array.size());
                 return to_numpy<value_t>(agent.get().bulk_count(as_span(array)));
             },
             "values"_a,
@@ -787,6 +808,7 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
                     throw std::invalid_argument{"threshold must be > 0."};
 
                 u64_array const array = as_u64_array(values);
+                check_query_size<value_t>(array.size());
                 return to_numpy<value_t>(agent.get().bulk_count(as_span(array), threshold));
             },
             "values"_a,
@@ -1228,7 +1250,7 @@ void bind_ibf(nb::module_ & m)
             "dtype"_a = "uint16",
             nb::keep_alive<0, 1>(),
             "Returns an agent that counts the occurrences of values per bin. ``dtype`` is the counter type: "
-            "uint16, uint32, or uint64.")
+            "uint16, uint32, or uint64. A query may contain at most as many values as ``dtype`` can count.")
         .def(
             "membership_agent",
             [](ibf_t const & self)
@@ -1246,7 +1268,7 @@ void bind_ibf(nb::module_ & m)
             },
             "values"_a,
             "threshold"_a,
-            "Returns the bins containing at least ``threshold`` of the given values.\n\n"
+            "Returns the bins containing at least ``threshold`` of the given values. At most 65535 values.\n\n"
             "Convenience for ``membership_agent().membership_for(values, threshold)``.")
         .def("batch_membership_for",
              &batch_membership_for<ibf_t>,
@@ -1290,7 +1312,7 @@ void bind_ibf(nb::module_ & m)
             },
             "values"_a,
             "threshold"_a,
-            "Returns the bins containing at least ``threshold`` of the given values.");
+            "Returns the bins containing at least ``threshold`` of the given values. At most 65535 values.");
 }
 
 void bind_hibf(nb::module_ & m)
@@ -1368,7 +1390,7 @@ void bind_hibf(nb::module_ & m)
             "dtype"_a = "uint16",
             nb::keep_alive<0, 1>(),
             "Returns an agent that counts the occurrences of values per user bin. ``dtype`` is the counter type: "
-            "uint16, uint32, or uint64.")
+            "uint16, uint32, or uint64. A query may contain at most as many values as ``dtype`` can count.")
         .def(
             "membership_for",
             [](hibf_t const & self, array_like const & values, uint16_t threshold)
@@ -1378,7 +1400,8 @@ void bind_hibf(nb::module_ & m)
             },
             "values"_a,
             "threshold"_a,
-            "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted.\n\n"
+            "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted. "
+            "At most 65535 values.\n\n"
             "Convenience for ``membership_agent().membership_for(values, threshold)``.")
         .def("batch_membership_for",
              &batch_membership_for<hibf_t>,
@@ -1408,7 +1431,8 @@ void bind_hibf(nb::module_ & m)
             },
             "values"_a,
             "threshold"_a,
-            "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted.");
+            "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted. "
+            "At most 65535 values.");
 
     bind_counting_agent<counting_agent<hibf_t, uint16_t>, uint16_t, size_t>(cls,
                                                                             "CountingAgentUInt16",

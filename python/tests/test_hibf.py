@@ -338,6 +338,36 @@ def test_counting_agent_invalid(index):
         index.counting_agent().bulk_count([1, 2, 3], 0)
 
 
+def test_query_size_limits(index):
+    values = np.arange(1, 65_537, dtype=np.uint64)  # 65536 values
+    ibf = hibf.IBF(bin_count=1, bin_size=1 << 20)
+    ibf.emplace(values, 0)
+
+    for filter in (index, ibf):
+        for query in (filter.membership_for, filter.membership_agent().membership_for):
+            with pytest.raises(ValueError, match="at most 65535 values, got 65536"):
+                query(values, 1)
+            query(values[:-1], 1)
+        with pytest.raises(ValueError, match="at most 65535 values"):
+            filter.batch_membership_for([values[:10], values], 1)
+        with pytest.raises(ValueError, match="at most 65535 values"):
+            filter.counting_agent().bulk_count(values)
+        filter.counting_agent("uint32").bulk_count(values)
+
+    assert list(ibf.membership_for(values[:-1], len(values) - 1)) == [0]
+    assert ibf.counting_agent("uint32").bulk_count(values)[0] == len(values)
+
+
+def test_split_bin_sum_exceeds_uint16():
+    """A query value may be a false positive in the other technical bins of a split bin; the sum exceeds 65535."""
+    values = np.arange(1, 70_001, dtype=np.uint64)
+    index = hibf.HIBF(hibf.Config([values], maximum_fpr=0.3, relaxed_fpr=0.3))
+    query = values[:60_000]
+    assert index.counting_agent("uint32").bulk_count(query)[0] > 65_535
+    assert list(index.membership_for(query, 60_000)) == [0]
+    assert index.counting_agent().bulk_count(query)[0] == 65_535
+
+
 def test_batch_membership(index, user_bins):
     queries = user_bins[:10]
     thresholds = [len(q) for q in queries]

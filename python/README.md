@@ -89,6 +89,9 @@ counts = index.counting_agent(dtype=np.uint32).bulk_count(query, threshold=1)
 results = index.batch_membership_for(queries, [int(0.8 * len(q)) for q in queries], threads=8)
 ```
 
+Membership queries count in 16 bits, so a query may contain at most 65 535 values. Counting agents accept as many
+values as their `dtype` can count. Longer queries raise a `ValueError` instead of returning wrong counts.
+
 `batch_membership_for` releases the GIL and runs in parallel on its own threads. This is the fastest way to answer many
 queries.
 

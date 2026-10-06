@@ -29,4 +29,8 @@ If possible, provide tooling that performs the changes, e.g. a shell-script.
 
 ## Notable Bug-fixes
 
+* HIBF queries no longer miss a split user bin if the counts of its technical bins sum to more than the counter type
+  can hold, e.g., more than 65535 for membership queries. Counting agents report such counts as the counter type's
+  maximum instead of wrapping around.
+
 ## API changes
