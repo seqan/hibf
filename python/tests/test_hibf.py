@@ -554,7 +554,12 @@ def test_ibf_occupancy():
     ibf = hibf.IBF(bin_count=4, bin_size=1024, track_occupancy=True)
     assert ibf.track_occupancy
     ibf.emplace([1, 2, 3], 1)
-    assert ibf.occupancy[:4] == [0, 3, 0, 0]
+    ibf.emplace([1, 2, 3], 2)
+    assert ibf.occupancy[:4] == [0, 3, 3, 0]
+
+    ibf.clear(1)
+    ibf.clear([2])
+    assert ibf.occupancy[:4] == [0, 0, 0, 0]
 
 
 def test_ibf_from_config(user_bins):
