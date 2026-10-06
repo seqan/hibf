@@ -8,11 +8,13 @@
 
 #include <atomic>      // for atomic
 #include <cerrno>      // for errno
+#include <concepts>    // for same_as
 #include <cstddef>     // for size_t
 #include <cstdint>     // for uint64_t, uint16_t, uint32_t
 #include <exception>   // for exception_ptr, current_exception, rethrow_exception
 #include <filesystem>  // for path
 #include <fstream>     // for ifstream, ofstream
+#include <memory>      // for addressof
 #include <mutex>       // for mutex, lock_guard
 #include <span>        // for span
 #include <sstream>     // for ostringstream, istringstream
@@ -567,6 +569,61 @@ ibf_t build_ibf(py_config const & py_cfg, size_t const max_bin_elements)
 // Queries
 // ---------------------------------------------------------------------------------------------------------------------
 
+/*!\brief An agent as exposed to Python.
+ * \details
+ * IBF agents size their buffers by the number of bins. Using such an agent after the number of bins changed, e.g., via
+ * interleaved_bloom_filter::increase_bin_number_to(), accesses memory out of bounds. Hence, the agent is rebuilt if the
+ * number of bins changed since it was created. An HIBF cannot change; its agents are wrapped for uniformity.
+ */
+template <typename filter_t, typename agent_t>
+class py_agent
+{
+public:
+    py_agent() = delete;
+    py_agent(py_agent const &) = default;
+    py_agent & operator=(py_agent const &) = default;
+    py_agent(py_agent &&) = default;
+    py_agent & operator=(py_agent &&) = default;
+    ~py_agent() = default;
+
+    explicit py_agent(filter_t const & filter) :
+        filter{std::addressof(filter)},
+        bin_count{number_of_bins(filter)},
+        agent{filter}
+    {}
+
+    //!\brief Returns the agent. Rebuilds it if the number of bins of the filter changed.
+    agent_t & get()
+    {
+        if (size_t const current = number_of_bins(*filter); current != bin_count)
+        {
+            agent = agent_t{*filter};
+            bin_count = current;
+        }
+        return agent;
+    }
+
+private:
+    static size_t number_of_bins(filter_t const & filter)
+    {
+        if constexpr (std::same_as<filter_t, ibf_t>)
+            return filter.bin_count();
+        else
+            return 0u;
+    }
+
+    filter_t const * filter{nullptr};
+    size_t bin_count{};
+    agent_t agent;
+};
+
+using ibf_containment_agent = py_agent<ibf_t, ibf_t::containment_agent_type>;
+using ibf_membership_agent = py_agent<ibf_t, ibf_t::membership_agent_type>;
+using hibf_membership_agent = py_agent<hibf_t, hibf_t::membership_agent_type>;
+
+template <typename filter_t, typename value_t>
+using counting_agent = py_agent<filter_t, typename filter_t::template counting_agent_type<value_t>>;
+
 template <typename agent_t>
 numpy_array<uint64_t> membership_for(agent_t & agent, array_like const & values, uint16_t const threshold)
 {
@@ -627,7 +684,7 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
             [](agent_t & agent, array_like const & values)
             {
                 u64_array const array = as_u64_array(values);
-                return to_numpy<value_t>(agent.bulk_count(as_span(array)));
+                return to_numpy<value_t>(agent.get().bulk_count(as_span(array)));
             },
             "values"_a,
             "Returns, for each bin, how many of the given values are contained in it.");
@@ -642,7 +699,7 @@ void bind_counting_agent(nb::handle scope, char const * name, char const * doc)
                     throw std::invalid_argument{"threshold must be > 0."};
 
                 u64_array const array = as_u64_array(values);
-                return to_numpy<value_t>(agent.bulk_count(as_span(array), threshold));
+                return to_numpy<value_t>(agent.get().bulk_count(as_span(array), threshold));
             },
             "values"_a,
             "threshold"_a = 1u,
@@ -659,11 +716,11 @@ nb::object make_counting_agent(filter_t const & filter, nb::handle dtype)
     switch (parse_count_dtype(dtype))
     {
     case count_type::uint16:
-        return nb::cast(filter.template counting_agent<uint16_t>());
+        return nb::cast(counting_agent<filter_t, uint16_t>{filter});
     case count_type::uint32:
-        return nb::cast(filter.template counting_agent<uint32_t>());
+        return nb::cast(counting_agent<filter_t, uint32_t>{filter});
     default:
-        return nb::cast(filter.template counting_agent<uint64_t>());
+        return nb::cast(counting_agent<filter_t, uint64_t>{filter});
     }
 }
 
@@ -1042,17 +1099,21 @@ void bind_ibf(nb::module_ & m)
             },
             "new_bin_count"_a,
             "Increases the number of bins. Requires reallocation if the number of technical bins grows. "
-            "Invalidates all agents.")
+            "Existing agents adapt to the new number of bins.")
         .def_prop_ro("hash_function_count", &ibf_t::hash_function_count, "The number of hash functions.")
         .def_prop_ro("bin_count", &ibf_t::bin_count, "The number of bins.")
         .def_prop_ro("bin_size", &ibf_t::bin_size, "The size of each bin in bits.")
         .def_prop_ro("bit_size", &ibf_t::bit_size, "The total size of the IBF in bits.")
         .def_ro("occupancy", &ibf_t::occupancy, "The number of values inserted into each technical bin.")
         .def_ro("track_occupancy", &ibf_t::track_occupancy, "Whether occupancy is tracked.")
-        .def("containment_agent",
-             &ibf_t::containment_agent,
-             nb::keep_alive<0, 1>(),
-             "Returns an agent for single-value containment queries.")
+        .def(
+            "containment_agent",
+            [](ibf_t const & self)
+            {
+                return ibf_containment_agent{self};
+            },
+            nb::keep_alive<0, 1>(),
+            "Returns an agent for single-value containment queries.")
         .def(
             "counting_agent",
             [](ibf_t const & self, dtype_like const & dtype)
@@ -1063,10 +1124,14 @@ void bind_ibf(nb::module_ & m)
             nb::keep_alive<0, 1>(),
             "Returns an agent that counts the occurrences of values per bin. ``dtype`` is the counter type: "
             "uint16, uint32, or uint64.")
-        .def("membership_agent",
-             &ibf_t::membership_agent,
-             nb::keep_alive<0, 1>(),
-             "Returns an agent that determines the bins containing at least ``threshold`` of the given values.")
+        .def(
+            "membership_agent",
+            [](ibf_t const & self)
+            {
+                return ibf_membership_agent{self};
+            },
+            nb::keep_alive<0, 1>(),
+            "Returns an agent that determines the bins containing at least ``threshold`` of the given values.")
         .def(
             "membership_for",
             [](ibf_t const & self, array_like const & values, uint16_t threshold)
@@ -1097,26 +1162,30 @@ void bind_ibf(nb::module_ & m)
 
     add_serialisation(cls);
 
-    nb::class_<ibf_t::containment_agent_type>(cls, "ContainmentAgent", "Answers single-value containment queries.")
+    nb::class_<ibf_containment_agent>(cls, "ContainmentAgent", "Answers single-value containment queries.")
         .def(
             "bulk_contains",
-            [](ibf_t::containment_agent_type & agent, uint64_t value)
+            [](ibf_containment_agent & agent, uint64_t value)
             {
-                return to_numpy<bool>(agent.bulk_contains(value));
+                return to_numpy<bool>(agent.get().bulk_contains(value));
             },
             "value"_a,
             "Returns a boolean array indicating which bins (may) contain the value.");
 
-    bind_counting_agent<ibf_t::counting_agent_type<uint16_t>, uint16_t>(cls, "CountingAgentUInt16", "Counting agent.");
-    bind_counting_agent<ibf_t::counting_agent_type<uint32_t>, uint32_t>(cls, "CountingAgentUInt32", "Counting agent.");
-    bind_counting_agent<ibf_t::counting_agent_type<uint64_t>, uint64_t>(cls, "CountingAgentUInt64", "Counting agent.");
+    bind_counting_agent<counting_agent<ibf_t, uint16_t>, uint16_t>(cls, "CountingAgentUInt16", "Counting agent.");
+    bind_counting_agent<counting_agent<ibf_t, uint32_t>, uint32_t>(cls, "CountingAgentUInt32", "Counting agent.");
+    bind_counting_agent<counting_agent<ibf_t, uint64_t>, uint64_t>(cls, "CountingAgentUInt64", "Counting agent.");
 
-    nb::class_<ibf_t::membership_agent_type>(cls, "MembershipAgent", "Answers membership queries.")
-        .def("membership_for",
-             &membership_for<ibf_t::membership_agent_type>,
-             "values"_a,
-             "threshold"_a,
-             "Returns the bins containing at least ``threshold`` of the given values.");
+    nb::class_<ibf_membership_agent>(cls, "MembershipAgent", "Answers membership queries.")
+        .def(
+            "membership_for",
+            [](ibf_membership_agent & agent, array_like const & values, uint16_t threshold)
+            {
+                return membership_for(agent.get(), values, threshold);
+            },
+            "values"_a,
+            "threshold"_a,
+            "Returns the bins containing at least ``threshold`` of the given values.");
 }
 
 void bind_hibf(nb::module_ & m)
@@ -1177,10 +1246,14 @@ void bind_hibf(nb::module_ & m)
                 return timings;
             },
             "Time spent in each construction step in seconds. Not preserved by serialisation.")
-        .def("membership_agent",
-             &hibf_t::membership_agent,
-             nb::keep_alive<0, 1>(),
-             "Returns an agent that determines the user bins containing at least ``threshold`` of the given values.")
+        .def(
+            "membership_agent",
+            [](hibf_t const & self)
+            {
+                return hibf_membership_agent{self};
+            },
+            nb::keep_alive<0, 1>(),
+            "Returns an agent that determines the user bins containing at least ``threshold`` of the given values.")
         .def(
             "counting_agent",
             [](hibf_t const & self, dtype_like const & dtype)
@@ -1221,22 +1294,26 @@ void bind_hibf(nb::module_ & m)
 
     add_serialisation(cls);
 
-    nb::class_<hibf_t::membership_agent_type>(cls, "MembershipAgent", "Answers membership queries.")
-        .def("membership_for",
-             &membership_for<hibf_t::membership_agent_type>,
-             "values"_a,
-             "threshold"_a,
-             "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted.");
+    nb::class_<hibf_membership_agent>(cls, "MembershipAgent", "Answers membership queries.")
+        .def(
+            "membership_for",
+            [](hibf_membership_agent & agent, array_like const & values, uint16_t threshold)
+            {
+                return membership_for(agent.get(), values, threshold);
+            },
+            "values"_a,
+            "threshold"_a,
+            "Returns the user bins containing at least ``threshold`` of the given values. The result is unsorted.");
 
-    bind_counting_agent<hibf_t::counting_agent_type<uint16_t>, uint16_t, size_t>(cls,
-                                                                                 "CountingAgentUInt16",
-                                                                                 "Counting agent.");
-    bind_counting_agent<hibf_t::counting_agent_type<uint32_t>, uint32_t, size_t>(cls,
-                                                                                 "CountingAgentUInt32",
-                                                                                 "Counting agent.");
-    bind_counting_agent<hibf_t::counting_agent_type<uint64_t>, uint64_t, size_t>(cls,
-                                                                                 "CountingAgentUInt64",
-                                                                                 "Counting agent.");
+    bind_counting_agent<counting_agent<hibf_t, uint16_t>, uint16_t, size_t>(cls,
+                                                                            "CountingAgentUInt16",
+                                                                            "Counting agent.");
+    bind_counting_agent<counting_agent<hibf_t, uint32_t>, uint32_t, size_t>(cls,
+                                                                            "CountingAgentUInt32",
+                                                                            "Counting agent.");
+    bind_counting_agent<counting_agent<hibf_t, uint64_t>, uint64_t, size_t>(cls,
+                                                                            "CountingAgentUInt64",
+                                                                            "Counting agent.");
 }
 
 void bind_hyperloglog(nb::module_ & m)

@@ -420,6 +420,30 @@ def test_ibf_increase_bins():
     assert ibf.bin_count == 65
 
 
+def test_ibf_agents_after_increasing_bins():
+    ibf = hibf.IBF(bin_count=4, bin_size=1024)
+    ibf.emplace([1, 2, 3], 0)
+    containment, counting, membership = ibf.containment_agent(), ibf.counting_agent(), ibf.membership_agent()
+    filled_bins = [0]
+
+    # 64 bins fit into the allocated technical bins; 100 000 bins require a reallocation.
+    for increase, new_bin_count in ((ibf.try_increase_bin_number_to, 64), (ibf.increase_bin_number_to, 100_000)):
+        increase(new_bin_count)
+        last_bin = new_bin_count - 1
+        ibf.emplace([1, 2, 3], last_bin)
+        filled_bins.append(last_bin)
+
+        contained = containment.bulk_contains(2)
+        assert contained.shape == (new_bin_count,)
+        assert contained[0] and contained[last_bin]
+
+        counts = counting.bulk_count([1, 2, 3])
+        assert counts.shape == (new_bin_count,)
+        assert counts[0] == 3 and counts[last_bin] == 3
+
+        assert list(membership.membership_for([1, 2, 3], 3)) == filled_bins
+
+
 def test_ibf_occupancy():
     ibf = hibf.IBF(bin_count=4, bin_size=1024, track_occupancy=True)
     assert ibf.track_occupancy
