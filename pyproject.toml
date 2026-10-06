@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 [build-system]
-requires = ["scikit-build-core>=0.10", "nanobind>=2.0"]
+requires = ["scikit-build-core>=0.11", "nanobind>=2.0"]
 build-backend = "scikit_build_core.build"
 
 [project]
