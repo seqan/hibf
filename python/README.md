@@ -27,6 +27,11 @@ portable wheels, disable this:
 pip wheel . -C cmake.define.HIBF_NATIVE_BUILD=OFF
 ```
 
+pip caches the wheels it builds from an sdist or from a git URL pinned to a commit, and reuses them for later installs.
+If several machines share that cache, e.g., through the home directory on a cluster, a wheel built on a newer CPU fails
+with an illegal-instruction error on an older one. In that case, install with `--no-cache-dir`, or disable the native
+build as above. Wheels built from a local directory, as with `pip install .`, are not cached.
+
 ## Quick start
 
 ```python
