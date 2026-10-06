@@ -870,6 +870,38 @@ void make_unhashable(nb::handle cls)
     cls.attr("__hash__") = nb::none();
 }
 
+/*!\brief Describes the input by its type, and its name or length, e.g., `<list of length 3>`.
+ * \details
+ * The input's own repr may be very long, e.g., for a list of many arrays, and expensive to compute.
+ */
+std::string describe_input(nb::handle input)
+{
+    if (input.is_none())
+        return "None";
+
+    std::string description = "<" + nb::cast<std::string>(input.type().attr("__name__"));
+
+    if (nb::hasattr(input, "__qualname__"))
+    {
+        description += " " + nb::cast<std::string>(input.attr("__qualname__"));
+    }
+    else if (!PyCallable_Check(input.ptr()))
+    {
+        if (Py_ssize_t const length = PyObject_Length(input.ptr()); length >= 0)
+            description += " of length " + std::to_string(length);
+        else
+            PyErr_Clear();
+    }
+
+    return description + ">";
+}
+
+//!\brief Formats a float like Python's repr, e.g., `1.0` instead of `1`, and `0.30000000000000004` instead of `0.3`.
+std::string float_repr(double const value)
+{
+    return nb::cast<std::string>(nb::repr(nb::float_(value)));
+}
+
 /*!\brief Lets the garbage collector see Config.input.
  * \details
  * Config owns a Python object. Without these slots, a reference cycle through Config.input, e.g., a bound method of
@@ -1081,16 +1113,17 @@ void bind_config(nb::module_ & m)
         .def("__repr__",
              [](py_config const & self)
              {
-                 std::string const input_repr = nb::cast<std::string>(nb::repr(self.input));
                  std::ostringstream stream;
-                 stream << "Config(input=" << (input_repr.size() > 60 ? input_repr.substr(0, 57) + "..." : input_repr)
+                 stream << "Config(input=" << describe_input(self.input)
                         << ", number_of_user_bins=" << self.inferred_number_of_user_bins()
                         << ", number_of_hash_functions=" << self.number_of_hash_functions
-                        << ", maximum_fpr=" << self.maximum_fpr << ", relaxed_fpr=" << self.relaxed_fpr
-                        << ", threads=" << self.threads << ", sketch_bits=" << static_cast<int>(self.sketch_bits)
-                        << ", tmax=" << self.tmax << ", empty_bin_fraction=" << self.empty_bin_fraction
-                        << ", track_occupancy=" << (self.track_occupancy ? "True" : "False") << ", alpha=" << self.alpha
-                        << ", max_rearrangement_ratio=" << self.max_rearrangement_ratio
+                        << ", maximum_fpr=" << float_repr(self.maximum_fpr)
+                        << ", relaxed_fpr=" << float_repr(self.relaxed_fpr) << ", threads=" << self.threads
+                        << ", sketch_bits=" << static_cast<int>(self.sketch_bits) << ", tmax=" << self.tmax
+                        << ", empty_bin_fraction=" << float_repr(self.empty_bin_fraction)
+                        << ", track_occupancy=" << (self.track_occupancy ? "True" : "False")
+                        << ", alpha=" << float_repr(self.alpha)
+                        << ", max_rearrangement_ratio=" << float_repr(self.max_rearrangement_ratio)
                         << ", disable_estimate_union=" << (self.disable_estimate_union ? "True" : "False")
                         << ", disable_rearrangement=" << (self.disable_rearrangement ? "True" : "False") << ")";
                  return stream.str();

@@ -153,6 +153,21 @@ def test_config_reference_cycle_is_collected():
 def test_config_repr():
     assert repr(hibf.Config(maximum_fpr=0.01)).startswith("Config(input=None, number_of_user_bins=0")
 
+    class Input(list):
+        def __repr__(self):
+            raise AssertionError("repr(input) may be expensive and must not be called")
+
+    text = repr(hibf.Config(Input([[1]] * 20_000), maximum_fpr=0.1 + 0.2, alpha=1.0))
+    assert "input=<Input of length 20000>, number_of_user_bins=20000" in text
+    assert "maximum_fpr=0.30000000000000004" in text
+    assert "alpha=1.0" in text
+
+    def read_bin(user_bin_id):
+        return [user_bin_id]
+
+    text = repr(hibf.Config(read_bin))
+    assert "input=<function test_config_repr.<locals>.read_bin>" in text
+
 
 # --------------------------------------------------------------------------------------------------------------------
 # HIBF construction
