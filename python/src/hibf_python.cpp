@@ -263,9 +263,13 @@ struct memory_buffer : public std::streambuf
     }
 };
 
+//!\brief Raises an OSError for the path, based on errno.
 [[noreturn]] void raise_os_error(std::filesystem::path const & path)
 {
-    PyErr_SetFromErrnoWithFilename(PyExc_OSError, path.string().c_str());
+    if (errno != 0)
+        PyErr_SetFromErrnoWithFilename(PyExc_OSError, path.string().c_str());
+    else
+        PyErr_SetString(PyExc_OSError, ("Could not access " + path.string() + ".").c_str());
     throw nb::python_error{};
 }
 
@@ -375,16 +379,89 @@ object_t from_bytes(nb::bytes const & data)
     return object;
 }
 
+//!\brief A file buffer that records errno of the first failed write. Other code may overwrite errno before it is read.
+class checked_filebuf : public std::filebuf
+{
+public:
+    checked_filebuf() = default;
+    checked_filebuf(checked_filebuf const &) = delete;
+    checked_filebuf & operator=(checked_filebuf const &) = delete;
+    checked_filebuf(checked_filebuf &&) = default;
+    checked_filebuf & operator=(checked_filebuf &&) = default;
+    ~checked_filebuf() override = default;
+
+    int error{};
+
+protected:
+    std::streamsize xsputn(char const * const data, std::streamsize const count) override
+    {
+        std::streamsize const written = std::filebuf::xsputn(data, count);
+        if (written != count)
+            record();
+        return written;
+    }
+
+    int_type overflow(int_type const character) override
+    {
+        int_type const result = std::filebuf::overflow(character);
+        if (traits_type::eq_int_type(result, traits_type::eof()))
+            record();
+        return result;
+    }
+
+    int sync() override
+    {
+        int const result = std::filebuf::sync();
+        if (result != 0)
+            record();
+        return result;
+    }
+
+private:
+    void record()
+    {
+        if (error == 0)
+            error = errno;
+    }
+};
+
+/*!\brief Serialises the object into a file. Raises OSError if any write fails.
+ * \details
+ * cereal throws if the file buffer does not accept all bytes, e.g., because the disk is full. The last bytes are only
+ * written when the file is closed, so closing is checked, too.
+ */
 template <typename object_t>
 void save_to_file(object_t const & object, std::filesystem::path const & path)
 {
-    std::ofstream stream{path, std::ios::binary};
-    if (!stream.good())
+    checked_filebuf buffer{};
+    if (buffer.open(path, std::ios::out | std::ios::binary | std::ios::trunc) == nullptr)
         raise_os_error(path);
 
-    nb::gil_scoped_release nogil{};
-    cereal::BinaryOutputArchive archive{stream};
-    archive(object);
+    bool failed{false};
+    {
+        nb::gil_scoped_release nogil{};
+        try
+        {
+            serialise(object, buffer);
+        }
+        catch (cereal::Exception const &)
+        {
+            failed = true;
+        }
+
+        if (buffer.close() == nullptr)
+        {
+            failed = true;
+            if (buffer.error == 0)
+                buffer.error = errno;
+        }
+    }
+
+    if (failed)
+    {
+        errno = buffer.error;
+        raise_os_error(path);
+    }
 }
 
 template <typename object_t>

@@ -6,6 +6,8 @@ import copy
 import gc
 import pathlib
 import pickle
+import subprocess
+import sys
 import weakref
 
 import numpy as np
@@ -493,6 +495,24 @@ def test_getstate_matches_save(index, tmp_path):
 def test_load_missing_file(tmp_path):
     with pytest.raises(FileNotFoundError):
         hibf.HIBF.load(tmp_path / "does_not_exist")
+
+
+@pytest.mark.skipif(sys.platform == "win32", reason="needs RLIMIT_FSIZE")
+def test_save_reports_write_errors(tmp_path):
+    """A file size limit makes writes fail. A small object is only written when the file is closed."""
+    script = f"""
+import errno, resource, signal, hibf
+signal.signal(signal.SIGXFSZ, signal.SIG_IGN)
+resource.setrlimit(resource.RLIMIT_FSIZE, (16, resource.getrlimit(resource.RLIMIT_FSIZE)[1]))
+for obj in (hibf.HyperLogLog(5), hibf.IBF(bin_count=64, bin_size=1 << 16)):
+    try:
+        obj.save({str(tmp_path / "object")!r})
+        print("no error")
+    except OSError as error:
+        print(errno.errorcode[error.errno])
+"""
+    result = subprocess.run([sys.executable, "-c", script], capture_output=True, text=True, check=True)
+    assert result.stdout.split() == ["EFBIG", "EFBIG"]
 
 
 def test_setstate_invalid_bytes():
