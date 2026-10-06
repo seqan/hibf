@@ -38,3 +38,43 @@ nanobind_add_stub (_hibf_stub
 
 install (TARGETS _hibf LIBRARY DESTINATION hibf)
 install (FILES "${CMAKE_CURRENT_BINARY_DIR}/_hibf.pyi" "${CMAKE_CURRENT_BINARY_DIR}/py.typed" DESTINATION hibf)
+
+# Licences of the third-party code compiled into the module. Files installed into SKBUILD_METADATA_DIR end up in the
+# .dist-info directory of the wheel. Dependencies found on the system instead of via CPM are not covered.
+if (DEFINED SKBUILD_METADATA_DIR)
+    set (HIBF_THIRD_PARTY_LICENSES "${SKBUILD_METADATA_DIR}/licenses/third_party")
+    set (HIBF_GENERATED_LICENSES "${CMAKE_CURRENT_BINARY_DIR}/licenses")
+
+    execute_process (COMMAND "${Python_EXECUTABLE}" -c
+                             "import importlib.metadata as m; d = m.distribution('nanobind'); \
+print(next(d.locate_file(f) for f in d.files if f.name == 'LICENSE'))"
+                     OUTPUT_VARIABLE HIBF_NANOBIND_LICENSE
+                     OUTPUT_STRIP_TRAILING_WHITESPACE ERROR_QUIET)
+
+    foreach (license IN ITEMS "nanobind|${HIBF_NANOBIND_LICENSE}" "cereal|${cereal_SOURCE_DIR}/LICENSE"
+                              "simde|${simde_SOURCE_DIR}/COPYING")
+        string (REPLACE "|" ";" license "${license}")
+        list (GET license 0 name)
+        list (GET license 1 file)
+        if (EXISTS "${file}" AND NOT IS_DIRECTORY "${file}")
+            install (FILES "${file}" DESTINATION "${HIBF_THIRD_PARTY_LICENSES}" RENAME "${name}.txt")
+        else ()
+            message (WARNING "Licence of ${name} not found. It will be missing from the wheel.")
+        endif ()
+    endforeach ()
+
+    # robin_hood.hpp contains its licence in a comment.
+    file (READ "${HIBF_SOURCE_DIR}/include/hibf/contrib/robin_hood.hpp" robin_hood_header LIMIT 4096)
+    string (REGEX MATCH "// Copyright[^\n]*\n(//[^\n]*\n)*" robin_hood_license "${robin_hood_header}")
+    string (REGEX REPLACE "(^|\n)// ?" "\\1" robin_hood_license "${robin_hood_license}")
+    file (WRITE "${HIBF_GENERATED_LICENSES}/robin_hood.txt" "${robin_hood_license}")
+
+    # The HyperLogLog implementation states its copyright and licence via SPDX.
+    file (READ "${HIBF_SOURCE_DIR}/LICENSES/MIT.txt" hyperloglog_license)
+    string (REPLACE "<year> <copyright holders>" "2013 Hideaki Ohno <hide.o.j55{at}gmail.com>" hyperloglog_license
+                    "${hyperloglog_license}")
+    file (WRITE "${HIBF_GENERATED_LICENSES}/hyperloglog.txt" "${hyperloglog_license}")
+
+    install (FILES "${HIBF_GENERATED_LICENSES}/robin_hood.txt" "${HIBF_GENERATED_LICENSES}/hyperloglog.txt"
+             DESTINATION "${HIBF_THIRD_PARTY_LICENSES}")
+endif ()

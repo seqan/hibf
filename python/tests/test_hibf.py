@@ -5,6 +5,7 @@
 import concurrent.futures
 import copy
 import gc
+import importlib.metadata
 import pathlib
 import pickle
 import subprocess
@@ -387,6 +388,12 @@ def test_counting_agent_types(index):
             ("uint64", type(filter).CountingAgentUInt64),
         ):
             assert type(filter.counting_agent(dtype)) is agent_type
+
+
+def test_third_party_licenses_are_installed():
+    """cereal and simde are only covered if CPM downloaded them, so they are not checked."""
+    files = {file.name for file in importlib.metadata.files("hibf") if "third_party" in file.parts}
+    assert {"nanobind.txt", "robin_hood.txt", "hyperloglog.txt"} <= files
 
 
 def test_stub_types():

@@ -12,7 +12,8 @@ dynamic = ["version"]
 description = "Python bindings for the Hierarchical Interleaved Bloom Filter (HIBF)"
 readme = "python/README.md"
 requires-python = ">=3.10"
-license = "BSD-3-Clause"
+# The module contains MIT-licensed code (robin_hood, HyperLogLog, simde); see .dist-info/licenses/third_party.
+license = "BSD-3-Clause AND MIT"
 license-files = ["LICENSE.md"]
 authors = [{ name = "SeqAn Team" }]
 dependencies = ["numpy>=1.21"]
