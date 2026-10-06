@@ -77,7 +77,7 @@ are raised by the constructor.
 # Single queries. The result is an unsorted array of user bin ids.
 hits = index.membership_for(query, threshold)
 
-# Agents avoid reallocating buffers. Use one agent per thread.
+# Agents are reusable query objects. Use one agent per thread.
 agent = index.membership_agent()
 for query in queries:
     hits = agent.membership_for(query, threshold)
@@ -92,19 +92,22 @@ results = index.batch_membership_for(queries, [int(0.8 * len(q)) for q in querie
 Membership queries count in 16 bits, so a query may contain at most 65 535 values. Counting agents accept as many
 values as their `dtype` can count. Longer queries raise a `ValueError` instead of returning wrong counts.
 
-`batch_membership_for` releases the GIL and runs in parallel on its own threads. This is the fastest way to answer many
-queries.
+Queries release the GIL while they run, so Python threads can query in parallel, each with its own agent.
+`batch_membership_for` runs in parallel on its own threads. This is the fastest way to answer many queries.
 
 ## Thread safety
 
-Querying from several threads is safe. Give each thread its own agent; `batch_membership_for` manages its threads
-itself.
+Querying from several threads is safe. Give each thread its own agent: an agent that is used by two threads at once
+raises a `RuntimeError` in the second thread. `batch_membership_for` manages its threads itself.
 
 Methods that modify an object are not synchronised with other methods on the same object:
 `InterleavedBloomFilter.emplace`, `clear`, `increase_bin_number_to` and `try_increase_bin_number_to`, and
 `HyperLogLog.add`, `merge` and `reset`. Do not call them while another thread uses that object. Some operations, such
 as `batch_membership_for` and `save`, release the GIL, so another thread can run while they work. If such a thread
 increases the number of bins of the IBF they are reading, the interpreter can crash.
+
+On free-threaded Python builds (e.g., 3.14t), importing `hibf` enables the GIL again. The module relies on the GIL for
+the checks above.
 
 ## Serialisation
 
