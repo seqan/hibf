@@ -1,0 +1,17 @@
+# collect
+valid: 1, findings: 2
+# print
+[HIBF LAYOUT NOTE] The Root-IBF uses technical bins 0-63, but technical bin 1 is empty.
+[HIBF LAYOUT WARNING] IBF 63 only contains user bin 2. Storing it in the parent IBF would save a level.
+valid
+# ignore
+[HIBF LAYOUT WARNING] IBF 63 only contains user bin 2. Storing it in the parent IBF would save a level.
+valid
+# strict
+rejected: IBF 63 only contains user bin 2. Storing it in the parent IBF would save a level.
+# locate
+IBF: Root-IBF, technical bin: 1
+IBF: 63, user bin: 2, technical bin: 0
+valid
+# validate
+[HIBF LAYOUT ERROR] User bin 3 is missing from the layout.

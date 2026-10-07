@@ -9,6 +9,7 @@
 #include <functional> // for function
 #include <ranges>     // for __fn, iota, views
 #include <sstream>    // for char_traits, basic_stringstream, stringstream
+#include <stdexcept>  // for invalid_argument
 #include <string>     // for basic_string
 #include <utility>    // for move
 #include <vector>     // for vector, allocator
@@ -19,6 +20,7 @@
 #include <hibf/misc/counting_vector.hpp>                  // for counting_vector
 #include <hibf/test/cereal.hpp>                           // for test_serialisation
 #include <hibf/test/expect_range_eq.hpp>                  // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/test/expect_throw_msg.hpp>                 // for EXPECT_THROW_MSG
 
 TEST(hibf_test, small_example_with_direct_hashes)
 {
@@ -107,6 +109,69 @@ TEST(hibf_test, build_from_layout)
     agent.sort_results();
     EXPECT_RANGE_EQ(result, (std::vector<size_t>{0u, 1u}));
     EXPECT_EQ(configuration.number_of_user_bins, hibf.number_of_user_bins);
+}
+
+TEST(hibf_test, build_from_invalid_layout)
+{
+    seqan::hibf::config configuration{.input_fn =
+                                          [](size_t const, seqan::hibf::insert_iterator it)
+                                      {
+                                          it = 1u;
+                                      },
+                                      .number_of_user_bins = 2u};
+
+    // The top-level max bin 1 is the second technical bin of user bin 1.
+    std::stringstream stream{"#TOP_LEVEL_IBF fullest_technical_bin_idx:1\n"
+                             "#USER_BIN_IDX\tTECHNICAL_BIN_INDICES\tNUMBER_OF_TECHNICAL_BINS\n"
+                             "1\t0\t34\n"
+                             "0\t34\t30\n"};
+    seqan::hibf::layout::layout layout{};
+    layout.read_from(stream);
+
+    EXPECT_THROW_MSG((seqan::hibf::hierarchical_interleaved_bloom_filter{configuration, layout}),
+                     std::invalid_argument,
+                     "[HIBF LAYOUT ERROR] The max bin (\"fullest_technical_bin_idx:\") of the Root-IBF is neither a "
+                     "merged bin nor the first technical bin of a user bin.");
+}
+
+// The max bins do not need to be sorted by level.
+TEST(hibf_test, build_from_layout_with_unsorted_max_bins)
+{
+    // 20 hashes per user bin.
+    seqan::hibf::config configuration{.input_fn =
+                                          [](size_t const user_bin, seqan::hibf::insert_iterator it)
+                                      {
+                                          for (size_t i = 0u; i < 20u; ++i)
+                                              it = user_bin * 100u + i;
+                                      },
+                                      .number_of_user_bins = 6u};
+
+    // Root-IBF: UB 0 in TBs 0-1, merged bin in TB 2, UB 5 in TB 3.
+    // IBF 2: UB 1 in TB 0, UB 2 in TB 1, merged bin in TB 2.
+    // IBF 2;2: UB 3 in TB 0, UB 4 in TB 1.
+    // The entry for IBF 2;2 precedes the entry for IBF 2.
+    std::stringstream stream{"#TOP_LEVEL_IBF fullest_technical_bin_idx:2\n"
+                             "#LOWER_LEVEL_IBF_2;2 fullest_technical_bin_idx:1\n"
+                             "#LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:0\n"
+                             "#USER_BIN_IDX\tTECHNICAL_BIN_INDICES\tNUMBER_OF_TECHNICAL_BINS\n"
+                             "5\t3\t1\n"
+                             "0\t0\t2\n"
+                             "1\t2;0\t1;1\n"
+                             "2\t2;1\t1;1\n"
+                             "3\t2;2;0\t1;1;1\n"
+                             "4\t2;2;1\t1;1;1\n"};
+    seqan::hibf::layout::layout layout{};
+    layout.read_from(stream);
+    ASSERT_EQ(layout.max_bins.size(), 2u);
+    EXPECT_EQ(layout.max_bins[0].previous_TB_indices, (std::vector<size_t>{2u, 2u}));
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{configuration, layout};
+    auto agent = hibf.membership_agent();
+    for (size_t user_bin = 0u; user_bin < 6u; ++user_bin)
+    {
+        auto & result = agent.membership_for(std::views::iota(user_bin * 100u, user_bin * 100u + 20u), 20u);
+        EXPECT_RANGE_EQ(result, (std::vector<size_t>{user_bin}));
+    }
 }
 
 TEST(hibf_test, three_level_hibf)

@@ -489,6 +489,12 @@ TEST(config_test, empty_bin_fraction)
             config.validate_and_set_defaults();
             EXPECT_NEAR(config.empty_bin_fraction, adjusted_fraction, 0.000000000000001);
 
+            // Validating again does not change the fraction, and the Root-IBF has top_level_subtracted technical bins.
+            double const validated_fraction = config.empty_bin_fraction;
+            config.validate_and_set_defaults();
+            EXPECT_EQ(config.empty_bin_fraction, validated_fraction);
+            EXPECT_EQ(seqan::hibf::subtract_empty_bins(top_level_tmax, validated_fraction), top_level_subtracted);
+
             // Roundtrip test
             for (size_t lower_level_tmax = 64; lower_level_tmax <= top_level_tmax; lower_level_tmax += 64)
             {

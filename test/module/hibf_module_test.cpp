@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <format>
 #include <sstream>
 #include <string>
 #include <vector>
@@ -157,6 +158,20 @@ TEST(module_test, layout)
     seqan::hibf::layout::layout layout{};
     layout.user_bins.push_back(user_bin);
     EXPECT_EQ(layout.user_bins.size(), 1u);
+
+    seqan::hibf::config const config{.number_of_user_bins = 1u};
+    EXPECT_TRUE(layout.validate(config));
+    layout.top_level_max_bin_id = 1u;
+    std::ostringstream diagnostic_stream{};
+    std::string formatted{};
+    EXPECT_FALSE(layout.validate(config,
+                                 [&](seqan::hibf::layout::layout::diagnostic const & diagnostic)
+                                 {
+                                     diagnostic_stream << diagnostic;
+                                     formatted = std::format("{}", diagnostic);
+                                 }));
+    EXPECT_TRUE(diagnostic_stream.str().starts_with("[HIBF LAYOUT ERROR] "));
+    EXPECT_EQ(formatted, diagnostic_stream.str());
 
     std::vector<double> const correction =
         seqan::hibf::layout::compute_fpr_correction({.fpr = 0.05, .hash_count = 2u, .t_max = 4u});

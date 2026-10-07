@@ -250,6 +250,7 @@ hierarchical_interleaved_bloom_filter::hierarchical_interleaved_bloom_filter(con
                                                                              layout::layout const & layout)
 {
     configuration.validate_and_set_defaults();
+    layout.validate(configuration);
     number_of_user_bins = configuration.number_of_user_bins;
     build_index(*this, configuration, layout);
 }
