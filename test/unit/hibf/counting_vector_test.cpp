@@ -179,6 +179,26 @@ TYPED_TEST(counting_vector_test, size_not_divisible_by_64)
     this->check_sub();
 }
 
+TYPED_TEST(counting_vector_test, saturation)
+{
+    constexpr TypeParam max_value = std::numeric_limits<TypeParam>::max();
+
+    // Counts are max_value, max_value - 1, and 0, repeating.
+    for (size_t i = 0u; i < this->counting_vector.size(); ++i)
+        this->counting_vector[i] = (i % 3u == 0u) ? max_value : ((i % 3u == 1u) ? max_value - 1 : 0);
+    std::ranges::fill(this->bit_vector, true);
+
+    // Counts at max_value do not wrap around.
+    for (size_t i = 0u; i < this->expected.size(); ++i)
+        this->expected[i] = (i % 3u == 2u) ? 1 : max_value;
+    this->check_add();
+
+    // Counts that reach max_value stay there.
+    for (size_t i = 0u; i < this->expected.size(); ++i)
+        this->expected[i] = (i % 3u == 2u) ? 2 : max_value;
+    this->check_add();
+}
+
 // Do not run for GCC with ASAN enabled or GCC in debug mode (assert).
 #if !(HIBF_COMPILER_IS_GCC && (defined(__SANITIZE_ADDRESS__) || !defined(NDEBUG)))
 TYPED_TEST(counting_vector_test, overflow)
