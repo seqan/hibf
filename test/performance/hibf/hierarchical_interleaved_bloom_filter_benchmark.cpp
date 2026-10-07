@@ -43,10 +43,10 @@ auto set_up(::benchmark::State const & state)
 
     // Generate random values for insertion and query.
     std::vector<size_t> values(sequence_length);
-    auto generator = []()
+    std::uniform_int_distribution<size_t> distr{0u};
+    std::mt19937_64 engine{0ULL};
+    auto generator = [&]()
     {
-        std::uniform_int_distribution<size_t> distr{0u};
-        std::mt19937_64 engine{0ULL};
         return distr(engine);
     };
     std::ranges::generate(values, generator);
