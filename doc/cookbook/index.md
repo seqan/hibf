@@ -29,6 +29,7 @@ Search for keywords with `Strg + F`.
 \include test/snippet/hibf/config_number_of_user_bins.cpp
 \include test/snippet/hibf/hibf_construction.cpp
 \include test/snippet/hibf/hierarchical_interleaved_bloom_filter.cpp
+\include test/snippet/hibf/layout/layout_validate.cpp
 \include test/snippet/ibf/containment_agent_bulk_contains.cpp
 \include test/snippet/ibf/containment_agent_construction.cpp
 \include test/snippet/ibf/counting_agent.cpp
