@@ -323,6 +323,32 @@ TEST(hibf_test, split_bin_sum_exceeds_counter_type)
     EXPECT_EQ(small_counting_agent.bulk_count(query, 1u)[0], 65'535u);
 }
 
+TEST(hibf_test, query_exceeds_counter_type)
+{
+    // The query consists of 65'536 copies of one value. Each technical bin containing the value counts 65'536 hits,
+    // which does not fit into an uint16_t.
+    seqan::hibf::config config{.input_fn =
+                                   [&](size_t const, seqan::hibf::insert_iterator it)
+                               {
+                                   for (size_t i = 1u; i <= 1'000u; ++i)
+                                       it = i;
+                               },
+                               .number_of_user_bins = 1};
+
+    seqan::hibf::hierarchical_interleaved_bloom_filter hibf{config};
+    std::vector<size_t> const query(65'536u, 1u);
+
+    auto membership_agent = hibf.membership_agent();
+    EXPECT_RANGE_EQ(membership_agent.membership_for(query, 65'535u), (std::vector<size_t>{0u}));
+
+    // The count saturates.
+    auto counting_agent = hibf.counting_agent();
+    EXPECT_EQ(counting_agent.bulk_count(query, 1u)[0], 65'535u);
+
+    auto large_counting_agent = hibf.template counting_agent<uint32_t>();
+    EXPECT_GE(large_counting_agent.bulk_count(query, 1u)[0], 65'536u);
+}
+
 TEST(hibf_test, copy_agents)
 {
     std::vector<std::vector<size_t>> hashes{{1u, 2u, 3u, 4u, 5u, 6u, 7u, 8u, 9u, 10u}, {1u, 2u, 3u, 4u, 5u}};

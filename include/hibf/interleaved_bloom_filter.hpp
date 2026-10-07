@@ -662,6 +662,8 @@ public:
      *
      * \details
      *
+     * Counts that exceed the maximum value of `value_t` are reported as that maximum.
+     *
      * ### Example
      *
      * \include test/snippet/ibf/counting_agent.cpp
