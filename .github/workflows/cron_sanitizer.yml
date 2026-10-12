@@ -49,6 +49,10 @@ jobs:
           - name: "UBSan"
             os: macos-latest
             cxx_flags: "-fno-omit-frame-pointer -fsanitize=undefined,float-divide-by-zero,implicit-conversion,local-bounds,nullability -Wno-pass-failed"
+            # Apple's ld from Command Line Tools 26.6 writes an __unwind_info that does not cover the last function of
+            # layout_validate_snippet; its exception terminates with "libunwind: malformed __unwind_info".
+            # Remove once macos-latest ships a fixed ld (Command Line Tools 27.0 works).
+            ldflags: "-fuse-ld=lld"
 
           - name: "UBSan"
             os: macos-latest
@@ -90,6 +94,9 @@ jobs:
       - name: Configure tests
         run: |
           mkdir build && cd build
+          if [[ -n "${{ matrix.ldflags }}" ]]; then
+            export LDFLAGS="${LDFLAGS:-} ${{ matrix.ldflags }}"
+          fi
           cmake ../test/all -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} \
                             -DCMAKE_CXX_FLAGS="${{ matrix.cxx_flags }}"
           make gtest_main benchmark_main
@@ -101,4 +108,3 @@ jobs:
       - name: Run tests
         working-directory: build
         run: ctest . -j --output-on-failure --no-tests=error ${{ matrix.ctest_excludes }}
-
