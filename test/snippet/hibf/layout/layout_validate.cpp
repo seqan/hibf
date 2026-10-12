@@ -3,12 +3,13 @@
 // SPDX-License-Identifier: CC0-1.0
 
 #include <cstddef>   // for size_t
-#include <iostream>  // for basic_ostream, operator<<, cout
+#include <iostream>  // for basic_ostream, operator<<, char_traits, cout, basic_ios
+#include <optional>  // for optional
 #include <stdexcept> // for invalid_argument
 #include <vector>    // for vector
 
 #include <hibf/config.hpp>        // for config
-#include <hibf/layout/layout.hpp> // for layout
+#include <hibf/layout/layout.hpp> // for layout, operator<<
 
 using diagnostic = seqan::hibf::layout::layout::diagnostic;
 
