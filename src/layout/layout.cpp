@@ -2,34 +2,35 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>   // for find_if, sort, adjacent_find, equal_range, mismatch, max
+#include <algorithm>   // for __sort, find, max, sort, __adjacent_find, __equal_...
 #include <cassert>     // for assert
 #include <charconv>    // for from_chars, from_chars_result
 #include <cmath>       // for floor
-#include <compare>     // for operator<=>
+#include <compare>     // for strong_ordering, operator==, _CmpUnspecifiedParam
 #include <cstddef>     // for size_t
 #include <format>      // for format, format_to
-#include <iostream>    // for operator<<, char_traits, basic_ostream, basic_istream, istream, ostream, cerr
-#include <iterator>    // for back_inserter
+#include <functional>  // for less
+#include <iostream>    // for basic_ostream, operator<<, basic_istream, getline
+#include <iterator>    // for back_insert_iterator, back_inserter
 #include <limits>      // for numeric_limits
-#include <map>         // for map
+#include <map>         // for map, __map_iterator, operator==
 #include <memory>      // for addressof
-#include <optional>    // for optional, nullopt
-#include <ranges>      // for iota, to, transform
+#include <optional>    // for optional, nullopt, nullopt_t
+#include <ranges>      // for transform_view, iota_view, __pipeable, operator|
 #include <set>         // for set
 #include <stdexcept>   // for invalid_argument
-#include <string>      // for basic_string, getline, string
-#include <string_view> // for operator<<, string_view, operator==, basic_string_view
-#include <utility>     // for move
+#include <string>      // for basic_string, char_traits, string
+#include <string_view> // for basic_string_view, string_view, operator==
+#include <utility>     // for get, move, pair
 #include <vector>      // for vector
 
 #include <hibf/config.hpp>                                // for config
-#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for bin_kind
+#include <hibf/hierarchical_interleaved_bloom_filter.hpp> // for merged
 #include <hibf/layout/layout.hpp>                         // for layout, operator<<
-#include <hibf/layout/prefixes.hpp>          // for layout_lower_level, layout_column_names, layout_fullest_techni...
-#include <hibf/misc/add_empty_bins.hpp>      // for add_empty_bins
-#include <hibf/misc/next_multiple_of_64.hpp> // for next_multiple_of_64
-#include <hibf/misc/subtract_empty_bins.hpp> // for subtract_empty_bins
+#include <hibf/layout/prefixes.hpp>                       // for layout_lower_level, layout_header, layout_fullest_...
+#include <hibf/misc/add_empty_bins.hpp>                   // for add_empty_bins
+#include <hibf/misc/next_multiple_of_64.hpp>              // for next_multiple_of_64
+#include <hibf/misc/subtract_empty_bins.hpp>              // for subtract_empty_bins
 
 namespace seqan::hibf::layout
 {

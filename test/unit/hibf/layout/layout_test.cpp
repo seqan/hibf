@@ -2,21 +2,22 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <gtest/gtest.h> // for Test, Message, AssertionResult, TestPartResult, CmpHelperEQ, CmpHelperEQFa...
+#include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, Test, CmpHelperEQ
 
-#include <cstddef>     // for size_t
-#include <cstdint>     // for uint64_t
-#include <format>      // for format
-#include <functional>  // for function
-#include <limits>      // for numeric_limits
-#include <optional>    // for optional
-#include <ranges>      // for transform
-#include <sstream>     // for basic_stringstream, operator<<, stringstream, basic_ios, basic_iostream
-#include <stdexcept>   // for invalid_argument
-#include <string>      // for char_traits, allocator, basic_string, string
-#include <string_view> // for basic_string_view
-#include <utility>     // for pair, swap
-#include <vector>      // for vector
+#include <cstddef>          // for size_t
+#include <cstdint>          // for uint64_t
+#include <format>           // for format, format_error, make_format_args, vformat
+#include <functional>       // for function
+#include <initializer_list> // for initializer_list
+#include <limits>           // for numeric_limits
+#include <optional>         // for optional
+#include <ranges>           // for __pipeable, operator|, __fn, transform, views
+#include <sstream>          // for basic_stringstream, operator<<, basic_ostringstream, strings...
+#include <stdexcept>        // for invalid_argument
+#include <string>           // for basic_string, char_traits, allocator, operator+, string
+#include <string_view>      // for basic_string_view, string_view
+#include <utility>          // for get, pair, swap
+#include <vector>           // for vector
 
 #include <hibf/config.hpp>                      // for config, insert_iterator
 #include <hibf/layout/compute_layout.hpp>       // for compute_layout
@@ -24,7 +25,7 @@
 #include <hibf/sketch/compute_sketches.hpp>     // for compute_sketches
 #include <hibf/sketch/estimate_kmer_counts.hpp> // for estimate_kmer_counts
 #include <hibf/sketch/hyperloglog.hpp>          // for hyperloglog
-#include <hibf/test/expect_range_eq.hpp>        // for EXPECT_RANGE_EQ
+#include <hibf/test/expect_range_eq.hpp>        // for expect_range_eq, EXPECT_RANGE_EQ
 #include <hibf/test/expect_throw_msg.hpp>       // for EXPECT_THROW_MSG
 
 TEST(layout_test, printing_max_bins)

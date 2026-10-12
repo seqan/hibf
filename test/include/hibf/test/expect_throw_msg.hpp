@@ -12,9 +12,10 @@
 #include <gtest/gtest.h> // for GTEST_NONFATAL_FAILURE_, AssertionResult, GetTypeName, EqHelper
 
 #include <exception>   // for exception
+#include <format>      // for format_error
 #include <stdexcept>   // for invalid_argument
-#include <string>      // for string
-#include <string_view> // for string_view
+#include <string>      // for basic_string, string
+#include <string_view> // for basic_string_view, string_view
 
 #include <hibf/platform.hpp>
 
