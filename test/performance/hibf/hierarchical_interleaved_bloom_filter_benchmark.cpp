@@ -43,10 +43,10 @@ auto set_up(::benchmark::State const & state)
 
     // Generate random values for insertion and query.
     std::vector<size_t> values(sequence_length);
-    auto generator = []()
+    std::uniform_int_distribution<size_t> distr{0u};
+    std::mt19937_64 engine{0ULL};
+    auto generator = [&]()
     {
-        std::uniform_int_distribution<size_t> distr{0u};
-        std::mt19937_64 engine{0ULL};
         return distr(engine);
     };
     std::ranges::generate(values, generator);
@@ -104,7 +104,44 @@ void membership_for_benchmark_multiple_queries(::benchmark::State & state)
     state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(values));
 }
 
+void bulk_count_benchmark_single_query(::benchmark::State & state)
+{
+    auto && [values, hibf] = set_up(state);
+    auto agent = hibf.counting_agent();
+
+    for (auto _ : state)
+    {
+        [[maybe_unused]] auto & res = agent.bulk_count(values, 1u);
+        benchmark::ClobberMemory();
+    }
+
+    state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(values));
+}
+
+void bulk_count_benchmark_multiple_queries(::benchmark::State & state)
+{
+    auto && [values, hibf] = set_up(state);
+    auto agent = hibf.counting_agent();
+
+    size_t const num_queries = 64u;
+    size_t const values_per_query = sequence_length / num_queries;
+
+    for (auto _ : state)
+    {
+        for (size_t i = 0u; i < num_queries; ++i)
+        {
+            auto query = std::span(values.begin() + i * values_per_query, values_per_query);
+            [[maybe_unused]] auto & res = agent.bulk_count(query, 1u);
+            benchmark::ClobberMemory();
+        }
+    }
+
+    state.counters["hashes/sec"] = hashes_per_second(std::ranges::size(values));
+}
+
 BENCHMARK(membership_for_benchmark_single_query)->RangeMultiplier(2)->Range(64, 256)->Iterations(1);
 BENCHMARK(membership_for_benchmark_multiple_queries)->RangeMultiplier(2)->Range(64, 256)->Iterations(1);
+BENCHMARK(bulk_count_benchmark_single_query)->RangeMultiplier(2)->Range(64, 256)->Iterations(1);
+BENCHMARK(bulk_count_benchmark_multiple_queries)->RangeMultiplier(2)->Range(64, 256)->Iterations(1);
 
 BENCHMARK_MAIN();
