@@ -23,7 +23,7 @@ CPMDeclarePackage (simde
                    GITHUB_REPOSITORY simd-everywhere/simde
                    DOWNLOAD_ONLY YES QUIET YES)
 # benchmark
-set (HIBF_BENCHMARK_VERSION 1.9.5 CACHE STRING "")
+set (HIBF_BENCHMARK_VERSION 1.10.0 CACHE STRING "")
 CPMDeclarePackage (benchmark
                    NAME benchmark
                    VERSION ${HIBF_BENCHMARK_VERSION}
