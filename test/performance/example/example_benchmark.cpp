@@ -2,12 +2,15 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Benchmark, Counter, BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/benchmark_api.h> // for Benchmark
+#include <benchmark/counter.h>       // for Counter
+#include <benchmark/registration.h>  // for BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/state.h>         // for State
 
-#include <algorithm> // for copy, fill_n, copy_n
+#include <algorithm> // for copy, copy_n
 #include <cstring>   // for memset, size_t
-#include <string>    // for basic_string
-#include <vector>    // for allocator, vector
+#include <string>    // for basic_string, operator<=>
+#include <vector>    // for vector
 
 inline benchmark::Counter bytes_per_second(size_t bytes)
 {

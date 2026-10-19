@@ -2,7 +2,11 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for State, Counter, Benchmark, DoNotOptimize, BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/benchmark_api.h> // for Benchmark
+#include <benchmark/counter.h>       // for Counter
+#include <benchmark/registration.h>  // for BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/state.h>         // for State
+#include <benchmark/utils.h>         // for DoNotOptimize
 
 #include <algorithm>  // for __generate, generate
 #include <cstddef>    // for size_t

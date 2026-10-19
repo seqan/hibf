@@ -2,13 +2,17 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <benchmark/benchmark.h> // for AddCustomContext, State, Benchmark, Counter, DoNotOptimize, BEN...
+#include <benchmark/benchmark_api.h> // for AddCustomContext, Benchmark
+#include <benchmark/counter.h>       // for Counter
+#include <benchmark/registration.h>  // for BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/state.h>         // for State
+#include <benchmark/utils.h>         // for DoNotOptimize
 
 #include <cmath>      // for log, ceil, exp
 #include <cstddef>    // for size_t
 #include <functional> // for function
-#include <ranges>     // for iota_view, all_t, view_interface, __fn, iota, views
-#include <string>     // for to_string, basic_string
+#include <ranges>     // for iota_view, all_t, __fn, iota, views
+#include <string>     // for basic_string, to_string, operator<=>
 
 #include <hibf/config.hpp>                   // for insert_iterator, config
 #include <hibf/contrib/std/chunk_view.hpp>   // for chunk_view, chunk, chunk_fn
