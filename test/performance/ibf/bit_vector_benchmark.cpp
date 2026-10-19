@@ -4,14 +4,17 @@
 
 // Authored by: Rene Rahn <rene.rahn AT fu-berlin.de>
 
-#include <benchmark/benchmark.h> // for State, Benchmark, BENCHMARK_CAPTURE, DoNotOptimize, BENCHMARK_MAIN
+#include <benchmark/benchmark_api.h> // for Benchmark
+#include <benchmark/registration.h>  // for BENCHMARK_CAPTURE, BENCHMARK, BENCHMARK_MAIN
+#include <benchmark/state.h>         // for State
+#include <benchmark/utils.h>         // for DoNotOptimize
 
-#include <algorithm>   // for __fn, generate
+#include <algorithm>   // for __count, __generate, count, generate
 #include <cstddef>     // for size_t
 #include <cstdint>     // for int32_t, uint8_t
 #include <random>      // for uniform_int_distribution, mt19937_64
 #include <type_traits> // for invoke_result_t
-#include <utility>     // for move, pair
+#include <utility>     // for get, move, pair
 
 #include <hibf/misc/bit_vector.hpp> // for bit_vector
 
