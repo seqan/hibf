@@ -145,6 +145,7 @@ TEST(layout_test, read_from_partitioned_layout)
 7	0	1
 4	1;0	1;22
 5	1;2;3;4;22	1;1;1;1;21
+@dummy config -- layout reads until @ is found
 #TOP_LEVEL_IBF fullest_technical_bin_idx:111
 #LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:1
 #LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
@@ -153,6 +154,7 @@ TEST(layout_test, read_from_partitioned_layout)
 7	0	1
 4	1;0	1;22
 5	1;2;3;4;22	1;1;1;1;21
+@dummy config -- layout reads until @ is found
 #TOP_LEVEL_IBF fullest_technical_bin_idx:111
 #LOWER_LEVEL_IBF_0 fullest_technical_bin_idx:2
 #LOWER_LEVEL_IBF_2 fullest_technical_bin_idx:2
@@ -165,8 +167,10 @@ TEST(layout_test, read_from_partitioned_layout)
 
     for (size_t i = 0; i < 3; ++i)
     {
+        ASSERT_TRUE(ss.good());
         seqan::hibf::layout::layout layout;
         layout.read_from(ss);
+        ss.ignore(50, '\n'); // skip dummy config line
 
         EXPECT_EQ(layout.top_level_max_bin_id, 111);
         EXPECT_EQ(layout.max_bins[0], (seqan::hibf::layout::layout::max_bin{{0}, i}));
