@@ -320,6 +320,9 @@ public:
         for (size_t offset = 0, i = 0; i < bin_size_; offset += technical_bins, ++i)
             for (auto && bin : bin_range)
                 (*this)[bin.value + offset] = 0;
+
+        for (auto && bin : bin_range)
+            occupancy[bin.value] = 0u;
     }
 
     /*!\brief Tries increasing the number of bins stored in the Interleaved Bloom Filter without reallocating memory.

@@ -28,6 +28,11 @@ set (HIBF_HEADER_PATH "${HIBF_SOURCE_DIR}/include")
 include (cmake/configuration.cmake)
 add_subdirectory (src)
 
+option (HIBF_PYTHON_BINDINGS "Build the Python bindings. (Usually enabled via `pip install .`)" OFF)
+if (HIBF_PYTHON_BINDINGS)
+    add_subdirectory (python)
+endif ()
+
 option (INSTALL_HIBF "Enable installation of HIBF. (Projects embedding HIBF may want to turn this OFF.)" ON)
 if (INSTALL_HIBF)
     include (GNUInstallDirs)
