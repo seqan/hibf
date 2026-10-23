@@ -4,9 +4,10 @@
 
 #include <gtest/gtest.h> // for Message, TestPartResult, CmpHelperEQ, CmpHelperEQFailure, Assert...
 
+#include <algorithm>   // for sort
 #include <cstddef>     // for size_t
+#include <cstdint>     // for uint64_t
 #include <functional>  // for function
-#include <ranges>      // for __fn, iota, views
 #include <stdexcept>   // for runtime_error
 #include <string>      // for basic_string
 #include <string_view> // for basic_string_view
@@ -16,6 +17,7 @@
 #include <hibf/sketch/compute_sketches.hpp> // for compute_sketches
 #include <hibf/sketch/hyperloglog.hpp>      // for hyperloglog
 #include <hibf/sketch/minhashes.hpp>        // for minhashes
+#include <hibf/sketch/wyhash.hpp>           // for wyhash
 #include <hibf/test/expect_range_eq.hpp>    // for expect_range_eq, EXPECT_RANGE_EQ
 
 class compute_sketches_test : public ::testing::Test
@@ -60,21 +62,26 @@ public:
     void check_minhash_sketches()
     {
         ASSERT_EQ(minhash_sketches.size(), 3);
-        size_t start{};
         size_t ub_id{};
         for (auto & minhash : minhash_sketches)
         {
             ASSERT_TRUE(minhash.is_valid()) << "ub_id: " << ub_id;
+            std::vector<uint64_t> hashes{};
+            seqan::hibf::insert_iterator::function_t push_hash = [&hashes](uint64_t const value)
+            {
+                hashes.push_back(seqan::hibf::sketch::wyhash(value));
+            };
+            config.input_fn(ub_id, seqan::hibf::insert_iterator{push_hash});
+            std::ranges::sort(hashes);
+            seqan::hibf::sketch::minhashes const expected{hashes};
             size_t sid{};
             for (auto & sketch : minhash.table)
             {
                 ASSERT_EQ(sketch.size(), seqan::hibf::sketch::minhashes::sketch_size)
                     << "ub_id: " << ub_id << "sid: " << sid;
-                EXPECT_RANGE_EQ(sketch, std::views::iota(start, start + seqan::hibf::sketch::minhashes::sketch_size))
-                    << "ub_id: " << ub_id << "sid: " << sid;
+                EXPECT_RANGE_EQ(sketch, expected.table[sid]) << "ub_id: " << ub_id << "sid: " << sid;
                 ++sid;
             }
-            start += 625;
             ++ub_id;
         }
     }
