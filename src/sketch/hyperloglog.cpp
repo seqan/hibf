@@ -21,6 +21,7 @@
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
 #include <hibf/sketch/hyperloglog.hpp>        // for hyperloglog
+#include <hibf/sketch/wyhash.hpp>             // for wyhash
 
 namespace seqan::hibf::sketch
 {
@@ -48,15 +49,6 @@ hyperloglog::hyperloglog(uint8_t const num_bits) : bits{num_bits}, size{1ULL << 
     normalization_factor = correction_factor * size * size;
     // Last `bits` bits are 1.
     rank_mask = (1ULL << bits) - 1u;
-}
-
-// See https://github.com/wangyi-fudan/wyhash
-// Simpler than murmur3: https://godbolt.org/z/bz7fd4aYz
-[[nodiscard]] inline uint64_t wyhash(uint64_t const value) noexcept
-{
-    __uint128_t result = value;
-    result *= 0x9E3779B97F4A7C15ULL;
-    return static_cast<uint64_t>(result) ^ static_cast<uint64_t>(result >> 64);
 }
 
 void hyperloglog::add(uint64_t const value)
