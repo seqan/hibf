@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include <cstdint>   // for uint64_t
+#include <cstdint> // for uint64_t
 
 namespace seqan::hibf::sketch
 {
