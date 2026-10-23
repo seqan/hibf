@@ -13,6 +13,8 @@
 
 #include <cstdint> // for uint64_t
 
+#include <hibf/platform.hpp>
+
 namespace seqan::hibf::sketch
 {
 
