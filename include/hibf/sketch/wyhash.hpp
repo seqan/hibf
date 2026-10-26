@@ -18,6 +18,14 @@
 namespace seqan::hibf::sketch
 {
 
-[[nodiscard]] uint64_t wyhash(uint64_t const value) noexcept;
+/*!\brief Mixes the bits of `value`: the 128-bit product with a 64-bit constant, folded to 64 bits via XOR.
+ * \ingroup hibf_sketch
+ */
+[[nodiscard]] constexpr uint64_t wyhash(uint64_t const value) noexcept
+{
+    __uint128_t result = value;
+    result *= 0x9E3779B97F4A7C15ULL;
+    return static_cast<uint64_t>(result) ^ static_cast<uint64_t>(result >> 64);
+}
 
 } // namespace seqan::hibf::sketch
