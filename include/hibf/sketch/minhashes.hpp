@@ -79,7 +79,7 @@ struct minhashes
     //!\brief Adds more minhash values to an existing but incomplete table.
     void fill_incomplete_sketches(std::span<uint64_t> const & more_smallest_values);
 
-    //!\brief Pushes `value` to the heap if it is smaller than the current largest element.
+    //!\brief Pushes `wyhash(value)` to the heap if it is smaller than the current largest element.
     static void push_to_heap_if_smaller(uint64_t const value, std::vector<uint64_t> & heap);
 
 private:

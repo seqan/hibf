@@ -70,6 +70,7 @@ module;
 #include <hibf/sketch/hyperloglog.hpp>
 #include <hibf/sketch/minhashes.hpp>
 #include <hibf/sketch/toolbox.hpp>
+#include <hibf/sketch/wyhash.hpp>
 #include <hibf/version.hpp>
 
 // ============================================================================
@@ -194,6 +195,7 @@ using ::seqan::hibf::sketch::compute_sketches;
 using ::seqan::hibf::sketch::estimate_kmer_counts;
 using ::seqan::hibf::sketch::hyperloglog;
 using ::seqan::hibf::sketch::minhashes;
+using ::seqan::hibf::sketch::wyhash;
 
 } // namespace seqan::hibf::sketch
 

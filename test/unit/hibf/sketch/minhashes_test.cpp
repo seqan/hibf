@@ -16,6 +16,7 @@
 
 #include <hibf/misc/iota_vector.hpp>     // for iota_vector
 #include <hibf/sketch/minhashes.hpp>     // for minhashes
+#include <hibf/sketch/wyhash.hpp>        // for wyhash
 #include <hibf/test/expect_range_eq.hpp> // for expect_range_eq, EXPECT_RANGE_EQ
 
 TEST(minhashes_test, ctor)
@@ -48,12 +49,13 @@ TEST(minhashes_test, push_to_heap_if_smaller)
     std::vector<uint64_t> heap{3, 4, 5, 6, 7, 8};
     std::ranges::make_heap(heap);
 
-    // No change because 10 is larger than all values in the heap
+    // No change because wyhash(1) is larger than all values in the heap (1 itself is not)
+    ASSERT_GT(seqan::hibf::sketch::wyhash(1), 8u);
     std::vector<uint64_t> const original_heap{heap};
-    seqan::hibf::sketch::minhashes::push_to_heap_if_smaller(10, heap);
+    seqan::hibf::sketch::minhashes::push_to_heap_if_smaller(1, heap);
     EXPECT_RANGE_EQ(original_heap, heap);
 
-    // Heap changes
+    // Heap changes because wyhash(0) == 0
     seqan::hibf::sketch::minhashes::push_to_heap_if_smaller(0, heap);
     EXPECT_FALSE(std::ranges::equal(original_heap, heap));
     EXPECT_EQ(heap[0], 7u); // largest element is now 7 (not 8 anymore)
