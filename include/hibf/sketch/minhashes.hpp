@@ -69,7 +69,7 @@ private:
     template <typename archive_t>
     void serialize(archive_t & archive)
     {
-        uint32_t version{2}; // 2: values are mixed with wyhash before sketching
+        uint32_t version{1};
         archive(CEREAL_NVP(version));
 
         // other members are const static currently
