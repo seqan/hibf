@@ -42,41 +42,6 @@ void compute_sketches(config const & config, std::vector<sketch::hyperloglog> & 
     }
 }
 
-/*!\brief Encapsulates handling of too few kmers to compute minHash sketches.
- * \details
- * OMP does not allow just throwing in a thread; it requires that the throw is handled in the same thread.
- * In order to properly throw the exeception in the main thread, we need to set a flag.
- * This flag then tells the other threads to stop working.
- * Afterwards, the main thread can throw the exception.
- */
-struct too_few_kmers_handler
-{
-    std::atomic_flag flag{};
-    size_t available{};
-
-    inline bool test() noexcept
-    {
-        return flag.test();
-    }
-
-    inline void set(size_t const new_available) noexcept
-    {
-        // Sets the flag to true and returns previous value.
-        // If the flag was already set, another thread encountered this block at the same time.
-        // This basically acts as a mutex for setting available.
-        if (!flag.test_and_set())
-            this->available = new_available;
-    }
-
-    inline void check_and_throw()
-    {
-        if (test())
-            throw std::runtime_error{"Not enough kmers (" + std::to_string(available) + ") to get "
-                                     + std::to_string(minhashes::num_sketches * minhashes::sketch_size)
-                                     + " hashes for all minHash sketches."};
-    }
-};
-
 // minhash_sketches data structure:
 // Vector L1 : number of user bins
 // Vector L2 : number_of_max_minhash_sketches (LSH ADD+OR parameter b)
@@ -92,17 +57,11 @@ void compute_sketches(config const & config,
     // compute hll_sketches
     robin_hood::unordered_flat_set<uint64_t> kmers{};
 
-    too_few_kmers_handler too_few_kmers{};
-
     std::vector<uint64_t> heap{};
 
 #pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers) private(heap)
     for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
-        // Skip work if we already know that we have too few kmers.
-        if (too_few_kmers.test())
-            continue;
-
         seqan::hibf::sketch::hyperloglog hll_sketch{config.sketch_bits};
 
         kmers.clear();
@@ -120,20 +79,20 @@ void compute_sketches(config const & config,
 
         std::ranges::sort_heap(heap); // sort ascending to get the smallest numbers first
 
+        if (heap.size() > kmers.size()) // If heap size is larger then number of available kmers to begin with
+            heap.resize(kmers.size()); // such that unitializes values are cut off
+
         seqan::hibf::sketch::minhashes minhash_sketch{heap};
 
         // In case the former heap_size wasn't sufficient to fill the minhash table
         // we need to increase the heap size and fill the heap further. We can take advantage of values
         // that already had been in the heap because they are still the smallest ones.
-        while (!minhash_sketch.is_valid() && !too_few_kmers.test())
+        while (!minhash_sketch.is_valid())
         {
             heap_size *= 2;
 
             if (heap_size > kmers.size())
-            {
-                too_few_kmers.set(kmers.size());
                 break;
-            }
 
             heap.resize(heap_size, std::numeric_limits<uint64_t>::max());
             std::ranges::make_heap(heap);
@@ -151,8 +110,6 @@ void compute_sketches(config const & config,
         hll_sketches[i] = std::move(hll_sketch);
         minhash_sketches[i] = std::move(minhash_sketch);
     }
-
-    too_few_kmers.check_and_throw();
 }
 
 } // namespace seqan::hibf::sketch

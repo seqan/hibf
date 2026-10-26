@@ -102,11 +102,16 @@ TEST_F(compute_sketches_test, too_few_hashes)
     this->config.sketch_bits = 12;
     this->config.input_fn = [&](size_t const, seqan::hibf::insert_iterator it)
     {
-        for (size_t i = 0; i < 100; ++i)
+        for (size_t i = 0; i < 10; ++i)
             it = i;
     };
 
-    EXPECT_THROW(
-        seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches),
-        std::runtime_error);
+    seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches);
+
+    ASSERT_EQ(this->minhash_sketches.size(), 1); // only one user bin
+
+    for (auto const & sketch : this->minhash_sketches[0].table)
+    {
+        ASSERT_FALSE(sketch.is_valid()) << "It by chance is valid";
+    }
 }
