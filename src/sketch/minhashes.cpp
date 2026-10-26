@@ -20,11 +20,11 @@ minhashes::minhashes(std::vector<uint64_t> const & smallest_values)
     table.resize(num_sketches);
 
     for (auto & elem : table)
-        elem.reserve(sketch_size);
+        elem.hashes.reserve(sketch_size);
 
     for (uint64_t const hash : smallest_values)
     {
-        auto & hash_table = table[hash & register_id_mask];
+        auto & hash_table = table[hash & register_id_mask].hashes;
         if (hash_table.size() < sketch_size)
             hash_table.push_back(hash >> 4);
     }
@@ -32,12 +32,7 @@ minhashes::minhashes(std::vector<uint64_t> const & smallest_values)
 
 bool minhashes::is_valid() const
 {
-    return table.size() == num_sketches
-        && std::ranges::all_of(table,
-                               [](auto const & minHash_sketch)
-                               {
-                                   return minHash_sketch.size() == sketch_size;
-                               });
+    return table.size() == num_sketches && std::ranges::all_of(table, &minhash_sketch::is_valid);
 }
 
 void minhashes::fill_incomplete_sketches(std::span<uint64_t> const & more_smallest_values)
@@ -46,7 +41,7 @@ void minhashes::fill_incomplete_sketches(std::span<uint64_t> const & more_smalle
 
     for (uint64_t const hash : more_smallest_values)
     {
-        auto & hash_table = table[hash & register_id_mask];
+        auto & hash_table = table[hash & register_id_mask].hashes;
         assert(std::ranges::find(hash_table, hash) == hash_table.end()); // hashes should be unique
         if (hash_table.size() < sketch_size)
             hash_table.push_back(hash >> 4);

@@ -68,9 +68,10 @@ public:
             size_t sid{};
             for (auto & sketch : minhash.table)
             {
-                ASSERT_EQ(sketch.size(), seqan::hibf::sketch::minhashes::sketch_size)
+                ASSERT_EQ(sketch.hashes.size(), seqan::hibf::sketch::minhashes::sketch_size)
                     << "ub_id: " << ub_id << "sid: " << sid;
-                EXPECT_RANGE_EQ(sketch, std::views::iota(start, start + seqan::hibf::sketch::minhashes::sketch_size))
+                EXPECT_RANGE_EQ(sketch.hashes,
+                                std::views::iota(start, start + seqan::hibf::sketch::minhashes::sketch_size))
                     << "ub_id: " << ub_id << "sid: " << sid;
                 ++sid;
             }

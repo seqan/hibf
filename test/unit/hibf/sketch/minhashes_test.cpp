@@ -74,8 +74,9 @@ TEST(minhashes_test, ctor_sorted_list)
     size_t sid{};
     for (auto & sketch : sketches.table)
     {
-        ASSERT_EQ(sketch.size(), seqan::hibf::sketch::minhashes::sketch_size) << "sid: " << sid;
-        EXPECT_RANGE_EQ(sketch, std::views::iota(0u, seqan::hibf::sketch::minhashes::sketch_size)) << "sid: " << sid;
+        ASSERT_EQ(sketch.hashes.size(), seqan::hibf::sketch::minhashes::sketch_size) << "sid: " << sid;
+        EXPECT_RANGE_EQ(sketch.hashes, std::views::iota(0u, seqan::hibf::sketch::minhashes::sketch_size))
+            << "sid: " << sid;
         ++sid;
     }
 }
@@ -101,8 +102,9 @@ TEST(minhashes_test, fill_incomplete_sketches)
     size_t sid{};
     for (auto & sketch : sketches.table)
     {
-        ASSERT_EQ(sketch.size(), seqan::hibf::sketch::minhashes::sketch_size) << "sid: " << sid;
-        EXPECT_RANGE_EQ(sketch, std::views::iota(0u, seqan::hibf::sketch::minhashes::sketch_size)) << "sid: " << sid;
+        ASSERT_EQ(sketch.hashes.size(), seqan::hibf::sketch::minhashes::sketch_size) << "sid: " << sid;
+        EXPECT_RANGE_EQ(sketch.hashes, std::views::iota(0u, seqan::hibf::sketch::minhashes::sketch_size))
+            << "sid: " << sid;
         ++sid;
     }
 }
