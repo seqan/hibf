@@ -80,7 +80,7 @@ void compute_sketches(config const & config,
         std::ranges::sort_heap(heap); // sort ascending to get the smallest numbers first
 
         if (heap.size() > kmers.size()) // If heap size is larger then number of available kmers to begin with
-            heap.resize(kmers.size()); // such that unitializes values are cut off
+            heap.resize(kmers.size());  // such that unitializes values are cut off
 
         seqan::hibf::sketch::minhashes minhash_sketch{heap};
 
