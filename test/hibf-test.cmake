@@ -23,6 +23,8 @@ if (HIBF_POST_INSTALL_TEST)
 else ()
     add_subdirectory ("${HIBF_ROOT_DIR}" "${CMAKE_CURRENT_BINARY_DIR}/hibf_lib")
     target_compile_options (hibf PUBLIC "-pedantic" "-Wall" "-Wextra" "-Werror")
+    # Warn about undefined macros in `#if`, which silently evaluate to 0. Only for the library's own sources.
+    target_compile_options (hibf PRIVATE "-Wundef")
 
     if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
         # Warn about failed return value optimization.
