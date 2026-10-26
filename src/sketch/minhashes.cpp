@@ -48,7 +48,7 @@ void minhashes::fill_incomplete_sketches(std::span<uint64_t> const & more_smalle
     for (uint64_t const hash : more_smallest_values)
     {
         auto & hash_table = table[hash & register_id_mask];
-        assert(std::ranges::find(hash_table, hash) == hash_table.end()); // hashes should be unique
+        assert(std::ranges::find(hash_table, hash >> 4) == hash_table.end()); // hashes should be unique
         if (hash_table.size() < sketch_size)
             hash_table.push_back(hash >> 4);
     }

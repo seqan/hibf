@@ -5,12 +5,15 @@
 #include <gtest/gtest.h> // for Message, TestPartResult, CmpHelperEQ, CmpHelperEQFailure, Assert...
 
 #include <algorithm>   // for sort
+#include <array>       // for array
 #include <cstddef>     // for size_t
 #include <cstdint>     // for uint64_t
 #include <functional>  // for function
+#include <limits>      // for numeric_limits
 #include <stdexcept>   // for runtime_error
 #include <string>      // for basic_string
 #include <string_view> // for basic_string_view
+#include <utility>     // for pair
 #include <vector>      // for vector
 
 #include <hibf/config.hpp>                  // for config, insert_iterator
@@ -19,6 +22,19 @@
 #include <hibf/sketch/minhashes.hpp>        // for minhashes
 #include <hibf/sketch/wyhash.hpp>           // for wyhash
 #include <hibf/test/expect_range_eq.hpp>    // for expect_range_eq, EXPECT_RANGE_EQ
+#include <hibf/test/expect_throw_msg.hpp>   // for EXPECT_THROW_MSG
+
+static constexpr uint64_t max_hash = std::numeric_limits<uint64_t>::max();
+
+// The register of a hash is `hash & 15`, and minhash sketch `r` holds the 40 smallest hashes of register `r`.
+// Inserts the values in [0, size), except those whose hash is in register 15 and smaller than `threshold`.
+// Register 15 is then rare among the smallest hashes, and the smallest 1000 hashes do not fill sketch 15.
+static void sparse_register_15(size_t const size, uint64_t const threshold, seqan::hibf::insert_iterator & it)
+{
+    for (uint64_t value = 0; value < size; ++value)
+        if (uint64_t const hash = seqan::hibf::sketch::wyhash(value); (hash & 15u) != 15u || hash >= threshold)
+            it = value;
+}
 
 class compute_sketches_test : public ::testing::Test
 {
@@ -61,7 +77,7 @@ public:
 
     void check_minhash_sketches()
     {
-        ASSERT_EQ(minhash_sketches.size(), 3);
+        ASSERT_EQ(minhash_sketches.size(), config.number_of_user_bins);
         size_t ub_id{};
         for (auto & minhash : minhash_sketches)
         {
@@ -115,4 +131,45 @@ TEST_F(compute_sketches_test, too_few_hashes)
     EXPECT_THROW(
         seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches),
         std::runtime_error);
+}
+
+TEST_F(compute_sketches_test, minHash_refill)
+{
+    // compute_sketches first keeps the smallest 1000 hashes of a user bin. If they do not fill all 16 sketches, it
+    // refills with a larger heap (2000, 4000, ..., at most the number of kmers). Here, both user bins need a refill:
+    // * User bin 0: 3968 kmers. Register 15 has 33 of the smallest 1000 and 95 of the smallest 2000 hashes.
+    //   The old refill pushed all kmers into the previous heap. The heap of 2000 then held each of the smallest 1000
+    //   hashes twice, and sketch 15 got duplicates.
+    // * User bin 1: 1463 kmers. Register 15 has 26 of the smallest 1000 hashes and 56 in total. The heap has to grow
+    //   to 1463. The old code threw instead, because 2000 > 1463.
+    // check_minhash_sketches compares the result to the sketches built from all hashes at once.
+    // Each user bin: {number of values, threshold}.
+    static constexpr std::array<std::pair<size_t, uint64_t>, 2> bins{
+        {{4000u, max_hash / 8u}, {1500u, max_hash / 5u * 2u}}};
+    this->config.number_of_user_bins = bins.size();
+    this->config.input_fn = [](size_t const ub_id, seqan::hibf::insert_iterator it)
+    {
+        sparse_register_15(bins[ub_id].first, bins[ub_id].second, it);
+    };
+
+    seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches);
+
+    this->check_minhash_sketches();
+}
+
+TEST_F(compute_sketches_test, too_few_hashes_in_one_register)
+{
+    // 960 kmers, but only 31 hashes in register 15, so sketch 15 cannot be filled.
+    // With fewer than 1000 kmers, the old code kept max() placeholders in the heap. These filled sketch 15 with
+    // max() >> 4, and it did not throw. If the throw is removed, check that sketch 15 holds only the 31 hashes instead.
+    this->config.number_of_user_bins = 1;
+    this->config.input_fn = [](size_t const, seqan::hibf::insert_iterator it)
+    {
+        sparse_register_15(990u, max_hash / 2u, it);
+    };
+
+    EXPECT_THROW_MSG(
+        seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches),
+        std::runtime_error,
+        "Not enough kmers (960) to get 640 hashes for all minHash sketches.");
 }
