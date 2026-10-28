@@ -293,6 +293,30 @@ TEST(ibf_test, clear_range)
     }
 }
 
+TEST(ibf_test, clear_with_occupancy)
+{
+    seqan::hibf::interleaved_bloom_filter ibf{seqan::hibf::bin_count{64u},
+                                              seqan::hibf::bin_size{1024u},
+                                              seqan::hibf::hash_function_count{2u},
+                                              seqan::hibf::empty_bin_fraction{0.0},
+                                              seqan::hibf::track_occupancy{true}};
+
+    for (size_t bin_idx : std::views::iota(0, 64))
+        for (size_t hash : std::views::iota(0, 64))
+            ibf.emplace(hash, seqan::hibf::bin_index{bin_idx});
+
+    ibf.clear(seqan::hibf::bin_index{3u});
+    ibf.clear(std::vector<seqan::hibf::bin_index>{seqan::hibf::bin_index{8u}, seqan::hibf::bin_index{17u}});
+
+    for (size_t bin_idx : std::views::iota(0, 64))
+    {
+        if (bin_idx == 3u || bin_idx == 8u || bin_idx == 17u)
+            EXPECT_EQ(ibf.occupancy[bin_idx], 0u) << "bin_idx: " << bin_idx;
+        else
+            EXPECT_NE(ibf.occupancy[bin_idx], 0u) << "bin_idx: " << bin_idx;
+    }
+}
+
 TEST(ibf_test, counting)
 {
     // 1. Construct and emplace

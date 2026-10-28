@@ -16,7 +16,8 @@
 #include <cstdint>     // for uint64_t, uint8_t
 #include <cstring>     // for size_t
 #include <functional>  // for minus, plus
-#include <type_traits> // for conditional, conditional_t
+#include <limits>      // for numeric_limits
+#include <type_traits> // for conditional, conditional_t, make_signed_t
 #include <vector>      // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
@@ -27,6 +28,8 @@
 
 #if HIBF_HAS_AVX512
 #    include <simde/x86/avx512/add.h>   // for simde_mm512_add_epi16, simde_mm512_add_epi32, simde_mm512_add_...
+#    include <simde/x86/avx512/adds.h>  // for simde_mm512_adds_epi16, simde_mm512_adds_epi8, simde_mm512_add...
+#    include <simde/x86/avx512/cmpeq.h> // for simde_mm512_mask_cmpeq_epi32_mask, simde_mm512_mask_cmpeq_epi6...
 #    include <simde/x86/avx512/load.h>  // for simde_mm512_load_si512
 #    include <simde/x86/avx512/mov.h>   // for simde_mm512_maskz_mov_epi16, simde_mm512_maskz_mov_epi32, simd...
 #    include <simde/x86/avx512/set1.h>  // for simde_mm512_set1_epi16, simde_mm512_set1_epi32, simde_mm512_se...
@@ -69,6 +72,29 @@ struct simd_mapping_crtp
     {
         return derived_t::mm512_maskz_mov_epi(*bits, derived_t::mm512_set1_epi(1));
     }
+
+    // Adds B bits from the bit_vector to the counts. Counts saturate at the maximum of integral_t.
+    static inline auto saturating_add(simde__m512i const counts, bits_type const * const bits)
+    {
+        if constexpr (sizeof(integral_t) <= 2u)
+        {
+            // AVX512BW provides saturating additions for 8-bit and 16-bit integers.
+            return derived_t::mm512_adds_epi(counts, expand_bits(bits));
+        }
+        else
+        {
+            // There are no saturating additions for 32-bit and 64-bit integers.
+            // Only increment the counts whose bit is set and that are below the maximum.
+            using signed_t = std::make_signed_t<integral_t>;
+            auto const maximum =
+                derived_t::mm512_set1_epi(static_cast<signed_t>(std::numeric_limits<integral_t>::max()));
+            bits_type const saturated = derived_t::mm512_mask_cmpeq_epi_mask(*bits, counts, maximum);
+            return derived_t::mm512_mask_add_epi(counts,
+                                                 static_cast<bits_type>(*bits ^ saturated),
+                                                 counts,
+                                                 derived_t::mm512_set1_epi(1));
+        }
+    }
 };
 
 // SIMD instructions for int8_t and uint8_t.
@@ -79,6 +105,8 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
     static inline constexpr auto mm512_maskz_mov_epi = simde_mm512_maskz_mov_epi8;
     static inline constexpr auto mm512_set1_epi = simde_mm512_set1_epi8;
     static inline constexpr auto mm512_add_epi = simde_mm512_add_epi8;
+    static inline constexpr auto mm512_adds_epi =
+        std::signed_integral<integral_t> ? simde_mm512_adds_epi8 : simde_mm512_adds_epu8;
     static inline constexpr auto mm512_sub_epi = simde_mm512_sub_epi8;
 };
 
@@ -90,6 +118,8 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
     static inline constexpr auto mm512_maskz_mov_epi = simde_mm512_maskz_mov_epi16;
     static inline constexpr auto mm512_set1_epi = simde_mm512_set1_epi16;
     static inline constexpr auto mm512_add_epi = simde_mm512_add_epi16;
+    static inline constexpr auto mm512_adds_epi =
+        std::signed_integral<integral_t> ? simde_mm512_adds_epi16 : simde_mm512_adds_epu16;
     static inline constexpr auto mm512_sub_epi = simde_mm512_sub_epi16;
 };
 
@@ -101,6 +131,8 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
     static inline constexpr auto mm512_maskz_mov_epi = simde_mm512_maskz_mov_epi32;
     static inline constexpr auto mm512_set1_epi = simde_mm512_set1_epi32;
     static inline constexpr auto mm512_add_epi = simde_mm512_add_epi32;
+    static inline constexpr auto mm512_mask_add_epi = simde_mm512_mask_add_epi32;
+    static inline constexpr auto mm512_mask_cmpeq_epi_mask = simde_mm512_mask_cmpeq_epi32_mask;
     static inline constexpr auto mm512_sub_epi = simde_mm512_sub_epi32;
 };
 
@@ -112,6 +144,8 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
     static inline constexpr auto mm512_maskz_mov_epi = simde_mm512_maskz_mov_epi64;
     static inline constexpr auto mm512_set1_epi = simde_mm512_set1_epi64;
     static inline constexpr auto mm512_add_epi = simde_mm512_add_epi64;
+    static inline constexpr auto mm512_mask_add_epi = simde_mm512_mask_add_epi64;
+    static inline constexpr auto mm512_mask_cmpeq_epi_mask = simde_mm512_mask_cmpeq_epi64_mask;
     static inline constexpr auto mm512_sub_epi = simde_mm512_sub_epi64;
 };
 //!\endcond
@@ -132,9 +166,10 @@ struct simd_mapping<integral_t> : simd_mapping_crtp<simd_mapping<integral_t>, in
  * The seqan::hibf::counting_vector offers an easy way to add up the individual
  * seqan::hibf::bit_vector by offering an `+=` operator.
  *
- * The `value_t` template parameter should be chosen in a way that no overflow occurs if all calls to `bulk_contains`
- * return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina reads, whereas
- * long reads will require at least `uint32_t`.
+ * Adding a seqan::hibf::bit_vector saturates the counts at the maximum of `value_t` instead of wrapping around.
+ * The `value_t` template parameter should be chosen in a way that this maximum is not reached if all calls to
+ * `bulk_contains` return a hit for a specific bin. For example, `uint8_t` will suffice when processing short Illumina
+ * reads, whereas long reads will require at least `uint32_t`.
  *
  * ### Example
  *
@@ -164,6 +199,8 @@ public:
     /*!\brief Bin-wise adds the bits of a seqan::hibf::bit_vector.
      * \copydetails operator-=(bit_vector const &)
      * \details
+     * Counts saturate at the maximum of `value_t` instead of wrapping around.
+     *
      * ### Example
      *
      * \include test/snippet/ibf/counting_vector.cpp
@@ -268,7 +305,7 @@ private:
             simde__m512i load = simde_mm512_load_si512(counting_vector_ptr);
             if constexpr (op == operation::add)
             {
-                load = simd::mm512_add_epi(load, simd::expand_bits(bit_vector_ptr));
+                load = simd::saturating_add(load, bit_vector_ptr);
             }
             else
             {
@@ -301,7 +338,9 @@ private:
 
                 if constexpr (op == operation::add)
                 {
-                    ++(*this)[bin];
+                    // Saturate at the maximum instead of wrapping around.
+                    if (value_t & count = (*this)[bin]; count != std::numeric_limits<value_t>::max())
+                        ++count;
                 }
                 else
                 {
