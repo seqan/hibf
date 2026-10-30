@@ -6,14 +6,15 @@
 #include <cmath>       // for ceil, sqrt
 #include <cstddef>     // for size_t
 #include <functional>  // for function
-#include <iostream>    // for operator<<, basic_ostream, basic_istream, getline, stringstream
+#include <iostream>    // for basic_ostream, basic_istream, operator<<, stringstream, cerr
 #include <sstream>     // for basic_stringstream
 #include <stdexcept>   // for invalid_argument
-#include <string>      // for char_traits, basic_string, string
-#include <string_view> // for basic_string_view, operator==, string_view
+#include <string>      // for char_traits, basic_string, getline, operator<<, string
+#include <string_view> // for basic_string_view, operator==, operator<<, string_view
 
-#include <cereal/archives/json.hpp> // for epilogue, prologue, JSONInputArchive, JSONOutputArchive
-#include <cereal/cereal.hpp>        // for make_nvp
+#include <cereal/archives/json.hpp>   // for epilogue, prologue, load, JSONInputArchive, JSONOutputArchive
+#include <cereal/cereal.hpp>          // for make_nvp
+#include <cereal/details/helpers.hpp> // for NameValuePair
 
 #include <hibf/config.hpp>                   // for config
 #include <hibf/layout/prefixes.hpp>          // for meta_header, meta_hibf_config_end, meta_hibf_config_start

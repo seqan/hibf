@@ -2,20 +2,21 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <cassert> // for assert
-#include <cmath>   // for ceil
-#include <cstddef> // for size_t
-#include <cstdint> // for uint64_t
-#include <vector>  // for vector
+#include <cassert>    // for assert
+#include <cmath>      // for ceil
+#include <cstddef>    // for size_t
+#include <cstdint>    // for uint64_t
+#include <functional> // for equal_to
+#include <vector>     // for vector
 
-#include <hibf/build/bin_size_in_bits.hpp>    // for bin_size_in_bits
+#include <hibf/build/bin_size_in_bits.hpp>    // for bin_size_parameters, bin_size_in_bits
 #include <hibf/build/build_data.hpp>          // for build_data
 #include <hibf/build/construct_ibf.hpp>       // for construct_ibf
 #include <hibf/build/insert_into_ibf.hpp>     // for insert_into_ibf
 #include <hibf/build/update_parent_kmers.hpp> // for update_parent_kmers
 #include <hibf/config.hpp>                    // for config
-#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set
-#include <hibf/interleaved_bloom_filter.hpp>  // for interleaved_bloom_filter, bin_count, bin_size, hash_function_c...
+#include <hibf/contrib/robin_hood.hpp>        // for unordered_flat_set, hash
+#include <hibf/interleaved_bloom_filter.hpp>  // for bin_count, bin_size, interleaved_bloom_filter, empty_bin_fraction
 #include <hibf/layout/graph.hpp>              // for graph
 #include <hibf/misc/divide_and_ceil.hpp>      // for divide_and_ceil
 #include <hibf/misc/timer.hpp>                // for serial_timer, concurrent_timer

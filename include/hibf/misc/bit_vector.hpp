@@ -21,23 +21,21 @@
 
 #pragma once
 
-#include <algorithm>        // for __fn, for_each, copy, fill
-#include <bit>              // for countr_zero
-#include <cassert>          // for assert
-#include <climits>          // for CHAR_BIT
-#include <compare>          // for strong_ordering, operator==
-#include <concepts>         // for assignable_from
-#include <cstddef>          // for size_t, ptrdiff_t
-#include <cstdint>          // for uint64_t
-#include <initializer_list> // for initializer_list
-#include <iterator>         // for iter_reference_t, __fn, back_inserter, distance, iter_differen...
-#include <memory>           // for allocator, allocator_traits, assume_aligned, __compressed_pair
-#include <ranges>           // for __fn, begin, end
-#include <stdexcept>        // for out_of_range
-#include <string>           // for char_traits, operator+, to_string, operator""s, basic_string
-#include <type_traits>      // for conditional_t
-#include <utility>          // for swap
-#include <vector>           // for vector
+#include <algorithm>   // for initializer_list, __for_each, for_each, __fill, copy, fill
+#include <bit>         // for popcount, countr_zero
+#include <cassert>     // for assert
+#include <climits>     // for CHAR_BIT
+#include <compare>     // for strong_ordering, operator==
+#include <cstddef>     // for size_t, ptrdiff_t
+#include <cstdint>     // for uint64_t
+#include <iterator>    // for iter_reference_t, __next, distance, iter_difference_t, iter_va...
+#include <memory>      // for allocator, allocator_traits, assume_aligned, _LIBCPP_COMPRESSE...
+#include <ranges>      // for __fn, begin, end
+#include <stdexcept>   // for out_of_range
+#include <string>      // for char_traits, operator+, operator""s, basic_string, to_string
+#include <type_traits> // for conditional_t
+#include <utility>     // for swap
+#include <vector>      // for vector
 
 #include <cereal/cereal.hpp>     // for binary_data
 #include <cereal/macros.hpp>     // for CEREAL_LOAD_FUNCTION_NAME, CEREAL_SAVE_FUNCTION_NAME
@@ -45,7 +43,7 @@
 
 #include <hibf/cereal/concepts.hpp>           // for cereal_archive, cereal_text_archive
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
-#include <hibf/platform.hpp>                  // for HIBF_CONSTEXPR_VECTOR, _LIBCPP_VERSION
+#include <hibf/platform.hpp>                  // for _LIBCPP_VERSION
 
 namespace seqan::hibf
 {

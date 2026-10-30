@@ -13,10 +13,10 @@
 #include <bit>         // for countr_zero
 #include <climits>     // for CHAR_BIT
 #include <concepts>    // for integral
+#include <cstddef>     // for size_t
 #include <cstdint>     // for uint64_t, uint8_t
-#include <cstring>     // for size_t
 #include <functional>  // for minus, plus
-#include <type_traits> // for conditional, conditional_t
+#include <type_traits> // for conditional_t
 #include <vector>      // for vector
 
 #include <hibf/contrib/aligned_allocator.hpp> // for aligned_allocator
