@@ -22,7 +22,6 @@
 #include <hibf/sketch/minhashes.hpp>        // for minhashes
 #include <hibf/sketch/wyhash.hpp>           // for wyhash
 #include <hibf/test/expect_range_eq.hpp>    // for expect_range_eq, EXPECT_RANGE_EQ
-#include <hibf/test/expect_throw_msg.hpp>   // for EXPECT_THROW_MSG
 
 static constexpr uint64_t max_hash = std::numeric_limits<uint64_t>::max();
 
@@ -93,9 +92,9 @@ public:
             size_t sid{};
             for (auto & sketch : minhash.table)
             {
-                ASSERT_EQ(sketch.size(), seqan::hibf::sketch::minhashes::sketch_size)
+                ASSERT_EQ(sketch.hashes.size(), seqan::hibf::sketch::minhashes::sketch_size)
                     << "ub_id: " << ub_id << "sid: " << sid;
-                EXPECT_RANGE_EQ(sketch, expected.table[sid]) << "ub_id: " << ub_id << "sid: " << sid;
+                EXPECT_RANGE_EQ(sketch.hashes, expected.table[sid].hashes) << "ub_id: " << ub_id << "sid: " << sid;
                 ++sid;
             }
             ++ub_id;
@@ -124,13 +123,18 @@ TEST_F(compute_sketches_test, too_few_hashes)
     this->config.sketch_bits = 12;
     this->config.input_fn = [&](size_t const, seqan::hibf::insert_iterator it)
     {
-        for (size_t i = 0; i < 100; ++i)
+        for (size_t i = 0; i < 10; ++i)
             it = i;
     };
 
-    EXPECT_THROW(
-        seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches),
-        std::runtime_error);
+    seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches);
+
+    ASSERT_EQ(this->minhash_sketches.size(), 1); // only one user bin
+
+    for (auto const & sketch : this->minhash_sketches[0].table)
+    {
+        ASSERT_FALSE(sketch.is_valid()) << "It by chance is valid";
+    }
 }
 
 TEST_F(compute_sketches_test, minHash_refill)
@@ -159,17 +163,20 @@ TEST_F(compute_sketches_test, minHash_refill)
 
 TEST_F(compute_sketches_test, too_few_hashes_in_one_register)
 {
-    // 960 kmers, but only 31 hashes in register 15, so sketch 15 cannot be filled.
+    // 960 kmers, but only 31 hashes in register 15, so sketch 15 cannot be filled and stays incomplete.
     // With fewer than 1000 kmers, the old code kept max() placeholders in the heap. These filled sketch 15 with
-    // max() >> 4, and it did not throw. If the throw is removed, check that sketch 15 holds only the 31 hashes instead.
+    // max() >> 4.
     this->config.number_of_user_bins = 1;
     this->config.input_fn = [](size_t const, seqan::hibf::insert_iterator it)
     {
         sparse_register_15(990u, max_hash / 2u, it);
     };
 
-    EXPECT_THROW_MSG(
-        seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches),
-        std::runtime_error,
-        "Not enough kmers (960) to get 640 hashes for all minHash sketches.");
+    seqan::hibf::sketch::compute_sketches(this->config, this->hyperloglog_sketches, this->minhash_sketches);
+
+    ASSERT_EQ(this->minhash_sketches.size(), 1u);
+    auto const & table = this->minhash_sketches[0].table;
+    ASSERT_EQ(table.size(), seqan::hibf::sketch::minhashes::num_sketches);
+    EXPECT_FALSE(this->minhash_sketches[0].is_valid());
+    EXPECT_EQ(table[15].hashes.size(), 31u); // no max() >> 4 placeholders
 }
