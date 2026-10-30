@@ -4,20 +4,19 @@
 
 #include <gtest/gtest.h> // for Message, TestPartResult, AssertionResult, Test, CmpHelperEQ
 
-#include <cstddef>          // for size_t
-#include <cstdint>          // for uint64_t
-#include <format>           // for format, format_error, make_format_args, vformat
-#include <functional>       // for function
-#include <initializer_list> // for initializer_list
-#include <limits>           // for numeric_limits
-#include <optional>         // for optional
-#include <ranges>           // for __pipeable, operator|, __fn, transform, views
-#include <sstream>          // for basic_stringstream, operator<<, basic_ostringstream, strings...
-#include <stdexcept>        // for invalid_argument
-#include <string>           // for basic_string, char_traits, allocator, operator+, string
-#include <string_view>      // for basic_string_view, string_view
-#include <utility>          // for get, pair, swap
-#include <vector>           // for vector
+#include <cstddef>     // for size_t
+#include <cstdint>     // for uint64_t
+#include <format>      // for format, format_error, make_format_args, vformat
+#include <functional>  // for function
+#include <limits>      // for numeric_limits
+#include <optional>    // for optional
+#include <ranges>      // for __pipeable, __fn, initializer_list, operator|, transform, views
+#include <sstream>     // for basic_stringstream, operator<<, basic_ostringstream, strings...
+#include <stdexcept>   // for invalid_argument
+#include <string>      // for basic_string, allocator, char_traits, operator+, string, ope...
+#include <string_view> // for basic_string_view, operator<<, string_view
+#include <utility>     // for get, pair, swap
+#include <vector>      // for vector
 
 #include <hibf/config.hpp>                      // for config, insert_iterator
 #include <hibf/layout/compute_layout.hpp>       // for compute_layout

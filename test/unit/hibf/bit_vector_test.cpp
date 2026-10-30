@@ -6,21 +6,18 @@
 
 #include <gtest/gtest.h> // for AssertionResult, Message, TestPartResult, Test, CmpHelperEQ
 
-#include <algorithm>        // for __count, count, for_each
-#include <concepts>         // for convertible_to, same_as, integral
-#include <cstddef>          // for size_t
-#include <initializer_list> // for initializer_list
-#include <iterator>         // for output_iterator, random_access_iterator_tag
-#include <ranges>           // for __fn, cend, cbegin
-#include <stdexcept>        // for out_of_range
-#include <string>           // for basic_string
-#include <string_view>      // for basic_string_view
-#include <utility>          // for as_const, move
-#include <vector>           // for vector
+#include <algorithm>   // for __count, count, initializer_list, for_each
+#include <cstddef>     // for size_t
+#include <ranges>      // for convertible_to, output_iterator, same_as, __fn, cend, integral
+#include <stdexcept>   // for out_of_range
+#include <string>      // for basic_string
+#include <string_view> // for basic_string_view
+#include <utility>     // for as_const, move
+#include <vector>      // for vector
 
 #include <hibf/misc/bit_vector.hpp>             // for bit_vector, operator&, operator^, operator|
 #include <hibf/test/cereal.hpp>                 // for test_serialisation
-#include <hibf/test/iterator_test_template.hpp> // for iterator_fixture, gtest_registered_test_names_iterator_fixture_
+#include <hibf/test/iterator_test_template.hpp> // for iterator_fixture, gtest_AllTests_, gtest_registered_test_nam...
 
 // ----------------------------------------------------------------------------
 // associated types

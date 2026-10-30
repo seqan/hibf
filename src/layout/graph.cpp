@@ -2,14 +2,13 @@
 // SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 // SPDX-License-Identifier: BSD-3-Clause
 
-#include <algorithm>        // for max, __is_sorted, __sort, is_sorted, sort
-#include <cassert>          // for assert
-#include <cstddef>          // for size_t
-#include <functional>       // for less
-#include <initializer_list> // for initializer_list
-#include <iterator>         // for __prev, prev
-#include <optional>         // for optional, nullopt, nullopt_t
-#include <vector>           // for vector
+#include <algorithm>  // for initializer_list, max, __is_sorted, __sort, is_sorted, sort
+#include <cassert>    // for assert
+#include <cstddef>    // for size_t
+#include <functional> // for less
+#include <iterator>   // for __prev, prev
+#include <optional>   // for optional, nullopt, nullopt_t
+#include <vector>     // for vector
 
 #include <hibf/layout/graph.hpp>  // for graph
 #include <hibf/layout/layout.hpp> // for layout

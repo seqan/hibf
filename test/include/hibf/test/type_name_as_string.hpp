@@ -16,9 +16,8 @@
 #include <cstdlib>     // for free
 #include <functional>  // for function
 #include <memory>      // for allocator, unique_ptr, addressof
-#include <string>      // for char_traits, basic_string, operator+, string, to_string
-#include <tuple>       // for tuple
-#include <type_traits> // for remove_reference_t, is_const_v, is_lvalue_reference_v, is_rvalue_reference_v
+#include <string>      // for basic_string, char_traits, operator+, string, to_string
+#include <type_traits> // for is_const_v, is_lvalue_reference_v, is_rvalue_reference_v, remove_reference_t
 #include <typeinfo>    // for type_info
 
 #include <hibf/platform.hpp>

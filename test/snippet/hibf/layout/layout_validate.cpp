@@ -3,9 +3,10 @@
 // SPDX-License-Identifier: CC0-1.0
 
 #include <cstddef>   // for size_t
-#include <iostream>  // for basic_ostream, operator<<, char_traits, cout, basic_ios
+#include <iostream>  // for basic_ostream, char_traits, operator<<, cout
 #include <optional>  // for optional
 #include <stdexcept> // for invalid_argument
+#include <string>    // for operator<<
 #include <vector>    // for vector
 
 #include <hibf/config.hpp>        // for config

@@ -9,13 +9,11 @@
 
 #pragma once
 
-#include <gtest/gtest.h> // for EXPECT_PRED_FORMAT2, AssertionSuccess, AssertionResult, CmpHelperEQFailure
+#include <gtest/gtest.h> // for EXPECT_PRED_FORMAT2, AssertionResult, AssertionSuccess, CmpHelperEQFailure
 
 #include <algorithm> // for copy, equal
-#include <concepts>  // for same_as
-#include <iterator>  // for back_inserter
-#include <ostream>   // for operator<<, ostream
-#include <ranges>    // for range, range_value_t
+#include <ostream>   // for basic_ostream, operator<<, ostream
+#include <ranges>    // for range, range_value_t, back_inserter, same_as
 #include <utility>   // for forward
 #include <vector>    // for vector
 
