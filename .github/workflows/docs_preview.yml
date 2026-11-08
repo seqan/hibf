@@ -1,0 +1,118 @@
+# SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+# Publishes documentation previews to https://seqan.github.io/docs-preview/<owner>/<repo>/<pr>/ and deletes them
+# when the PR is closed. No server access: the App token only reaches seqan/docs-preview (contents) and this
+# repository (PR comments). The preview HTML is untrusted data; it is hashed into git, never executed.
+
+name: Documentation Preview
+
+on:
+  workflow_run: # zizmor: ignore[dangerous-triggers] -- privileged half; treats PR data as data only
+    workflows: [Documentation]
+    types: [completed]
+  # Safe use of pull_request_target: no checkout, only the repository name and PR number are used.
+  pull_request_target: # zizmor: ignore[dangerous-triggers] -- no checkout; uses repository name and PR number only
+    types: [closed]
+
+permissions: {}
+
+defaults:
+  run:
+    shell: bash -Eeuo pipefail {0}
+
+jobs:
+  publish:
+    name: Publish Preview
+    if: >-
+      github.repository_owner == 'seqan' &&
+      github.event_name == 'workflow_run' &&
+      github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: docs-preview # deployment branch: main; holds the App key
+    permissions:
+      actions: read        # artifact of the triggering run
+      pull-requests: read
+    steps:
+      - name: Resolve PR from trusted event data
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
+          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: |
+          # Also drops stale runs: the PR head must still be the commit that was built.
+          gh api -X GET "repos/${GITHUB_REPOSITORY}/pulls" -f state=open -f head="${HEAD_OWNER}:${HEAD_BRANCH}" \
+            | jq -e --arg sha "${HEAD_SHA}" 'map(select(.head.sha == $sha)) | first' > "${RUNNER_TEMP}/pr.json"
+          echo "number=$(jq -r .number "${RUNNER_TEMP}/pr.json")" >> "${GITHUB_OUTPUT}"
+
+      - name: Download documentation
+        uses: actions/download-artifact@v8 # locked via actions.lock
+        with:
+          name: documentation
+          path: ${{ runner.temp }}/untrusted/html
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ github.token }}
+
+      - name: Token for seqan/docs-preview
+        id: preview_token
+        uses: actions/create-github-app-token@v3 # locked via actions.lock
+        with:
+          client-id: ${{ vars.SEQAN_PR_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SEQAN_PR_BOT_KEY }}
+          repositories: docs-preview
+          permission-contents: write
+
+      - name: Publish
+        uses: seqan/actions/docs_preview@main
+        with:
+          source: ${{ runner.temp }}/untrusted/html
+          destination: ${{ github.repository }}/${{ steps.pr.outputs.number }}
+          token: ${{ steps.preview_token.outputs.token }}
+
+      - name: Token for PR comments
+        id: comment_token
+        uses: actions/create-github-app-token@v3 # locked via actions.lock
+        with:
+          client-id: ${{ vars.SEQAN_PR_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SEQAN_PR_BOT_KEY }}
+          repositories: ${{ github.event.repository.name }}
+          permission-pull-requests: write
+
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ steps.comment_token.outputs.token }}
+          PR: ${{ steps.pr.outputs.number }}
+          URL: https://seqan.github.io/docs-preview/${{ github.repository }}/${{ steps.pr.outputs.number }}/
+        run: |
+          if ! gh api --paginate "repos/${GITHUB_REPOSITORY}/issues/${PR}/comments" \
+                 --jq '.[] | select(.user.type == "Bot") | .body' | grep -qF 'Documentation preview available'; then
+            gh pr comment "${PR}" -R "${GITHUB_REPOSITORY}" --body "Documentation preview available at ${URL}"
+          fi
+
+  delete:
+    name: Delete Preview
+    if: github.repository_owner == 'seqan' && github.event_name == 'pull_request_target'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: docs-preview
+    steps:
+      - name: Token for seqan/docs-preview
+        id: preview_token
+        uses: actions/create-github-app-token@v3 # locked via actions.lock
+        with:
+          client-id: ${{ vars.SEQAN_PR_BOT_CLIENT_ID }}
+          private-key: ${{ secrets.SEQAN_PR_BOT_KEY }}
+          repositories: docs-preview
+          permission-contents: write
+
+      - name: Delete
+        uses: seqan/actions/docs_preview@main
+        with:
+          source: ''
+          destination: ${{ github.repository }}/${{ github.event.pull_request.number }}
+          token: ${{ steps.preview_token.outputs.token }}
