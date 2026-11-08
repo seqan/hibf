@@ -1,0 +1,88 @@
+# SPDX-FileCopyrightText: 2006-2026, Knut Reinert & Freie Universität Berlin
+# SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
+# SPDX-License-Identifier: CC0-1.0
+
+# Staged CI: cheap checks -> Linux unit tests -> everything else.
+# Runs PR code, therefore only `pull_request`: read-only GITHUB_TOKEN, no secrets for fork PRs.
+# The only required status check is "CI result" (plus "Documentation", which stays a separate workflow).
+
+name: CI
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+  workflow_dispatch:
+
+# Replaces the cancel_running_workflows job of the old lint workflow: a new push to a PR cancels all stages.
+concurrency:
+  group: ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: ${{ github.event_name != 'push' }}
+
+permissions:
+  contents: read
+
+jobs:
+  # Stage 1
+  lint:
+    name: Lint
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/ci_lint.yml
+  license:
+    name: License
+    if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
+    uses: ./.github/workflows/ci_license.yml
+
+  # Stage 2
+  linux:
+    name: Unit
+    needs: [lint, license]
+    uses: ./.github/workflows/ci_linux.yml
+
+  # Stage 3
+  misc:
+    name: Misc
+    needs: linux
+    uses: ./.github/workflows/ci_misc.yml
+  coverage:
+    name: Coverage
+    needs: linux
+    uses: ./.github/workflows/ci_coverage.yml
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+  install:
+    name: Install
+    needs: linux
+    uses: ./.github/workflows/ci_install.yml
+  macos:
+    name: macOS
+    needs: linux
+    uses: ./.github/workflows/ci_macos.yml
+  module:
+    name: Module
+    needs: linux
+    uses: ./.github/workflows/ci_module.yml
+  util:
+    name: Util
+    needs: linux
+    uses: ./.github/workflows/ci_util.yml
+
+  # Skipped jobs report "Success" to required checks, and skipped matrix jobs report under their unexpanded names.
+  # One gate that fails unless every stage succeeded is robust against both.
+  result:
+    name: CI result
+    if: always() && (github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch')
+    needs: [lint, license, linux, misc, coverage, install, macos, module, util]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check stage results
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for result in ${RESULTS}; do
+            if [[ ${result} != success ]]; then
+              echo "::error::Not every CI stage succeeded: ${RESULTS}"
+              exit 1
+            fi
+          done
