@@ -170,6 +170,7 @@ jobs:
           gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
           passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
           git_user_signingkey: true
+          git_config_global: true # no checkout here; commit.sh uses its own GIT_DIR and reads the global config
 
       - name: Commit and push
         if: steps.pr.outputs.pushable == 'true'
