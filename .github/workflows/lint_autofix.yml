@@ -2,193 +2,28 @@
 # SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-# Privileged half of linting. Runs from the default branch after a CI run whose Lint job failed.
-#
-#   prepare  No secrets. Formats the PR head (fetched as data) and hands over a git bundle.
-#   push     Environment `pr-bot` (deployment branch: main). Never touches PR files on disk. Verifies the
-#            bundle, re-creates the commit as seqan-actions[bot] with the GPG key, pushes it with a GitHub App token.
-#
-# Nothing from the PR reaches a `run:` script through ${{ }}: branch names, file names and the bundle are env/data.
+# Pushes a formatting commit to a PR whose CI failed in Lint. Runs from the default branch; the called workflow only
+# reads the PR as data. Details: seqan/actions/.github/workflows/lint_autofix.yml.
 
 name: Lint Autofix
 
 on:
-  workflow_run: # zizmor: ignore[dangerous-triggers] -- privileged half; treats PR data as data only
+  workflow_run: # zizmor: ignore[dangerous-triggers] -- privileged half; the called workflow treats PR data as data only
     workflows: [CI]
     types: [completed]
 
 permissions: {}
 
-defaults:
-  run:
-    shell: bash -Eeuo pipefail {0}
-
 jobs:
-  prepare:
-    name: Prepare
-    if: >-
-      github.repository_owner == 'seqan' &&
-      github.event.workflow_run.event == 'pull_request' &&
-      github.event.workflow_run.conclusion == 'failure'
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
+  autofix:
+    name: Lint Autofix
+    uses: seqan/actions/.github/workflows/lint_autofix.yml@main
     permissions:
-      actions: read        # jobs of the triggering run
       contents: read
       pull-requests: read
-    outputs:
-      pr: ${{ steps.pr.outputs.number }}
-      head_sha: ${{ steps.pr.outputs.head_sha }}
-      changed: ${{ steps.bundle.outputs.changed }}
-    steps:
-      - name: Check whether the Lint job failed
-        id: lint
-        env:
-          GH_TOKEN: ${{ github.token }}
-          RUN_ID: ${{ github.event.workflow_run.id }}
-        run: |
-          conclusions=$(gh api --paginate "repos/${GITHUB_REPOSITORY}/actions/runs/${RUN_ID}/jobs" \
-                          --jq '.jobs[] | select(.name | test("(^|/ )Lint$")) | .conclusion')
-          echo "failed=$([[ ${conclusions} == *failure* ]] && echo true || echo false)" >> "${GITHUB_OUTPUT}"
-
-      - name: Resolve PR from trusted event data
-        id: pr
-        if: steps.lint.outputs.failed == 'true'
-        env:
-          GH_TOKEN: ${{ github.token }}
-          HEAD_OWNER: ${{ github.event.workflow_run.head_repository.owner.login }}
-          HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
-          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
-        run: |
-          gh api -X GET "repos/${GITHUB_REPOSITORY}/pulls" -f state=open -f head="${HEAD_OWNER}:${HEAD_BRANCH}" \
-            | jq -e --arg sha "${HEAD_SHA}" 'map(select(.head.sha == $sha)) | first' > "${RUNNER_TEMP}/pr.json"
-          {
-            echo "number=$(jq -r .number "${RUNNER_TEMP}/pr.json")"
-            echo "base_sha=$(jq -r .base.sha "${RUNNER_TEMP}/pr.json")"
-            echo "head_sha=${HEAD_SHA}"
-          } >> "${GITHUB_OUTPUT}"
-
-      - name: Checkout default branch
-        if: steps.pr.outputs.number
-        uses: actions/checkout@v7 # locked via actions.lock
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      # Deliberately not actions/checkout: its fork guard exists because code checked out here usually gets
-      # executed. Here the PR tree is only read and rewritten by pinned formatters, in a job without secrets.
-      - name: Fetch PR head as data
-        if: steps.pr.outputs.number
-        env:
-          PR: ${{ steps.pr.outputs.number }}
-          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
-        run: |
-          git fetch -q --no-tags origin "+refs/pull/${PR}/head:refs/autofix/head"
-          test "$(git rev-parse refs/autofix/head)" = "${HEAD_SHA}"
-          git -c core.hooksPath=/dev/null worktree add -q --detach "${RUNNER_TEMP}/pr" "${HEAD_SHA}"
-
-      - name: Format
-        if: steps.pr.outputs.number
-        uses: seqan/actions/lint@main
-        with:
-          path: ${{ runner.temp }}/pr
-          base: ${{ steps.pr.outputs.base_sha }}
-
-      - name: Bundle result
-        id: bundle
-        if: steps.pr.outputs.number
-        working-directory: ${{ runner.temp }}/pr
-        env:
-          HEAD_SHA: ${{ steps.pr.outputs.head_sha }}
-        run: |
-          if git diff --quiet; then
-            echo "changed=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          git add -u
-          git -c user.name=autofix -c user.email=autofix@invalid -c commit.gpgsign=false -c core.hooksPath=/dev/null \
-            commit -q --no-verify -m autofix
-          mkdir -p "${RUNNER_TEMP}/autofix"
-          git bundle create -q "${RUNNER_TEMP}/autofix/autofix.bundle" HEAD "^${HEAD_SHA}"
-          echo "changed=true" >> "${GITHUB_OUTPUT}"
-
-      - name: Upload bundle
-        if: steps.bundle.outputs.changed == 'true'
-        uses: actions/upload-artifact@v7 # locked via actions.lock
-        with:
-          name: autofix
-          path: ${{ runner.temp }}/autofix/autofix.bundle
-          retention-days: 1
-
-  push:
-    name: Push
-    needs: prepare
-    if: needs.prepare.outputs.changed == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    environment: pr-bot
-    permissions:
-      pull-requests: read
-    steps:
-      - name: Re-check PR
-        id: pr
-        env:
-          GH_TOKEN: ${{ github.token }}
-          PR: ${{ needs.prepare.outputs.pr }}
-          HEAD_SHA: ${{ needs.prepare.outputs.head_sha }}
-        run: |
-          gh api "repos/${GITHUB_REPOSITORY}/pulls/${PR}" > "${RUNNER_TEMP}/pr.json"
-          jq -e --arg sha "${HEAD_SHA}" '.state == "open" and .head.sha == $sha' "${RUNNER_TEMP}/pr.json" > /dev/null
-          head_repo=$(jq -r .head.repo.full_name "${RUNNER_TEMP}/pr.json")
-          if [[ ${head_repo} != "${GITHUB_REPOSITORY}" ]] && ! jq -e .maintainer_can_modify "${RUNNER_TEMP}/pr.json" > /dev/null; then
-            echo "pushable=false" >> "${GITHUB_OUTPUT}"
-            exit 0
-          fi
-          jq -j .head.ref "${RUNNER_TEMP}/pr.json" > "${RUNNER_TEMP}/head_ref" # attacker-chosen: keep it out of outputs
-          { echo "pushable=true"; echo "head_repo=${head_repo}"; } >> "${GITHUB_OUTPUT}"
-
-      - name: Download bundle
-        uses: actions/download-artifact@v8 # locked via actions.lock
-        with:
-          name: autofix
-          path: ${{ runner.temp }}/autofix
-
-      - name: Create App token
-        id: token
-        uses: actions/create-github-app-token@v3 # locked via actions.lock
-        with:
-          client-id: ${{ vars.SEQAN_PR_BOT_CLIENT_ID }}
-          private-key: ${{ secrets.SEQAN_PR_BOT_KEY }}
-          repositories: ${{ github.event.repository.name }}
-          permission-contents: write
-          permission-pull-requests: write
-
-      - name: Import GPG key
-        if: steps.pr.outputs.pushable == 'true'
-        uses: crazy-max/ghaction-import-gpg@v7 # locked via actions.lock
-        with:
-          gpg_private_key: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
-          passphrase: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
-          git_user_signingkey: true
-          git_config_global: true # no checkout here; commit.sh uses its own GIT_DIR and reads the global config
-
-      - name: Commit and push
-        if: steps.pr.outputs.pushable == 'true'
-        uses: seqan/actions/lint_autofix@main
-        with:
-          bundle: ${{ runner.temp }}/autofix/autofix.bundle
-          pr: ${{ needs.prepare.outputs.pr }}
-          head_sha: ${{ needs.prepare.outputs.head_sha }}
-          head_repo: ${{ steps.pr.outputs.head_repo }}
-          head_ref_file: ${{ runner.temp }}/head_ref
-          token: ${{ steps.token.outputs.token }}
-
-      - name: Explain why nothing was pushed
-        if: steps.pr.outputs.pushable == 'false'
-        env:
-          GH_TOKEN: ${{ steps.token.outputs.token }}
-          PR: ${{ needs.prepare.outputs.pr }}
-        run: |
-          gh pr comment "${PR}" -R "${GITHUB_REPOSITORY}" --body \
-            "Formatting is required, but this PR does not allow edits by maintainers, so the bot cannot push the fix. \
-          Enable \"Allow edits by maintainers\" or apply the diff from the Lint job summary."
+    # Only these secrets. This job has no environment, but GitHub resolves them with the environment of the called job
+    # that uses them (`pr-bot`).
+    secrets:
+      SEQAN_PR_BOT_KEY: ${{ secrets.SEQAN_PR_BOT_KEY }}
+      SEQAN_ACTIONS_GPG_KEY: ${{ secrets.SEQAN_ACTIONS_GPG_KEY }}
+      SEQAN_ACTIONS_GPG_PASSPHRASE: ${{ secrets.SEQAN_ACTIONS_GPG_PASSPHRASE }}
