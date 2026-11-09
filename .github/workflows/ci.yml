@@ -2,8 +2,15 @@
 # SPDX-FileCopyrightText: 2016-2026, Knut Reinert & MPI für molekulare Genetik
 # SPDX-License-Identifier: CC0-1.0
 
-# Staged CI: cheap checks -> Linux unit tests -> everything else.
-# Runs PR code, therefore only `pull_request`: read-only GITHUB_TOKEN, no secrets for fork PRs.
+# Staged CI: cheap checks -> Linux unit tests -> everything else. A later stage only starts if the earlier ones passed,
+# so a formatting error costs one short Lint job instead of a full CI run.
+#
+#   Stage 1  Lint (ci_lint.yml), License (ci_license.yml)
+#   Stage 2  Unit (ci_linux.yml)
+#   Stage 3  Misc, Coverage, Install, macOS, Module, Util
+#
+# Runs PR code, therefore only `pull_request`: read-only GITHUB_TOKEN, no secrets for fork PRs. If Lint fails,
+# lint_autofix.yml (from the default branch) pushes the formatting fix, which starts CI again.
 # The only required status check is "CI result" (plus "Documentation", which stays a separate workflow).
 
 name: CI
@@ -24,7 +31,7 @@ permissions:
   contents: read
 
 jobs:
-  # Stage 1
+  # Stage 1. As in all of hibf's workflows: on forks, only when started by hand.
   lint:
     name: Lint
     if: github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch'
@@ -40,7 +47,7 @@ jobs:
     needs: [lint, license]
     uses: ./.github/workflows/ci_linux.yml
 
-  # Stage 3
+  # Stage 3. Coverage gets the Codecov token; the other stages need no secrets.
   misc:
     name: Misc
     needs: linux
@@ -68,8 +75,9 @@ jobs:
     needs: linux
     uses: ./.github/workflows/ci_util.yml
 
-  # Skipped jobs report "Success" to required checks, and skipped matrix jobs report under their unexpanded names.
-  # One gate that fails unless every stage succeeded is robust against both.
+  # The single required check. Required checks cannot simply list the stages: a skipped job reports "Success", and a
+  # skipped matrix job reports under its unexpanded name. This gate runs always and fails unless every stage
+  # succeeded (skipped and cancelled count as failure).
   result:
     name: CI result
     if: always() && (github.repository_owner == 'seqan' || github.event_name == 'workflow_dispatch')
