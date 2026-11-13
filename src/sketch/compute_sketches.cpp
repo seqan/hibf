@@ -3,15 +3,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 
 #include <algorithm>  // for __fn, sort_heap, all_of, min
-#include <atomic>     // for atomic_flag
 #include <cassert>    // for assert
 #include <cstddef>    // for size_t
 #include <cstdint>    // for uint64_t, uint8_t
 #include <functional> // for equal_to, function
 #include <limits>     // for numeric_limits
 #include <span>       // for span
-#include <stdexcept>  // for runtime_error
-#include <string>     // for operator+, allocator, char_traits, to_string, basic_string
 #include <utility>    // for move
 #include <vector>     // for vector
 
@@ -42,41 +39,6 @@ void compute_sketches(config const & config, std::vector<sketch::hyperloglog> & 
     }
 }
 
-/*!\brief Encapsulates handling of too few kmers to compute minHash sketches.
- * \details
- * OMP does not allow just throwing in a thread; it requires that the throw is handled in the same thread.
- * In order to properly throw the exeception in the main thread, we need to set a flag.
- * This flag then tells the other threads to stop working.
- * Afterwards, the main thread can throw the exception.
- */
-struct too_few_kmers_handler
-{
-    std::atomic_flag flag{};
-    size_t available{};
-
-    inline bool test() noexcept
-    {
-        return flag.test();
-    }
-
-    inline void set(size_t const new_available) noexcept
-    {
-        // Sets the flag to true and returns previous value.
-        // If the flag was already set, another thread encountered this block at the same time.
-        // This basically acts as a mutex for setting available.
-        if (!flag.test_and_set())
-            this->available = new_available;
-    }
-
-    inline void check_and_throw()
-    {
-        if (test())
-            throw std::runtime_error{"Not enough kmers (" + std::to_string(available) + ") to get "
-                                     + std::to_string(minhashes::num_sketches * minhashes::sketch_size)
-                                     + " hashes for all minHash sketches."};
-    }
-};
-
 // minhash_sketches data structure:
 // Vector L1 : number of user bins
 // Vector L2 : number_of_max_minhash_sketches (LSH ADD+OR parameter b)
@@ -92,17 +54,11 @@ void compute_sketches(config const & config,
     // compute hll_sketches
     robin_hood::unordered_flat_set<uint64_t> kmers{};
 
-    too_few_kmers_handler too_few_kmers{};
-
     std::vector<uint64_t> heap{};
 
 #pragma omp parallel for schedule(dynamic) num_threads(config.threads) private(kmers) private(heap)
     for (size_t i = 0; i < config.number_of_user_bins; ++i)
     {
-        // Skip work if we already know that we have too few kmers.
-        if (too_few_kmers.test())
-            continue;
-
         seqan::hibf::sketch::hyperloglog hll_sketch{config.sketch_bits};
 
         kmers.clear();
@@ -124,13 +80,11 @@ void compute_sketches(config const & config,
 
         // In case the former heap_size wasn't sufficient to fill the minhash table, we need a larger heap.
         // Once sorted, it begins with the values of the previous heap, which are already in minhash_sketch.
-        while (!minhash_sketch.is_valid() && !too_few_kmers.test())
+        while (!minhash_sketch.is_valid())
         {
+            // All kmers are in the heap: too few to fill the minhash table, which stays invalid.
             if (heap_size == kmers.size())
-            {
-                too_few_kmers.set(kmers.size());
                 break;
-            }
 
             size_t const previous_heap_size = heap_size;
             heap_size = std::min(2u * heap_size, kmers.size());
@@ -153,8 +107,6 @@ void compute_sketches(config const & config,
         hll_sketches[i] = std::move(hll_sketch);
         minhash_sketches[i] = std::move(minhash_sketch);
     }
-
-    too_few_kmers.check_and_throw();
 }
 
 } // namespace seqan::hibf::sketch

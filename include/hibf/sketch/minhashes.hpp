@@ -35,11 +35,30 @@ namespace seqan::hibf::sketch
 struct minhashes
 {
     static constexpr uint64_t register_id_mask{15}; /// ...00001111
-    static constexpr size_t num_sketches{16};
-    static constexpr size_t sketch_size{40};
+    static constexpr size_t num_sketches{16};       // lsh parameter b
+    static constexpr size_t sketch_size{40};        // lsh parameter r
 
-    //!\brief A table of sketches. For LSH we need multiple sketches, stored in a table.
-    std::vector<std::vector<uint64_t>> table{}; // Each element (vector<uint64_t>) is a minhash.
+    struct minhash_sketch
+    {
+        std::vector<uint64_t> hashes{};
+
+        bool is_valid() const
+        {
+            return hashes.size() == sketch_size;
+        }
+
+    private:
+        friend class cereal::access;
+
+        template <typename archive_t>
+        void serialize(archive_t & archive)
+        {
+            archive(CEREAL_NVP(hashes));
+        }
+    };
+
+    //!\brief A table of minhash sketches. For LSH we need multiple sketches, stored in a table.
+    std::vector<minhash_sketch> table{};
 
     /*!\name Constructors, destructor and assignment
      * \{
