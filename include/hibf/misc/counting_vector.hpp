@@ -62,8 +62,8 @@ struct simd_mapping_crtp
     // clang-format on
     static_assert(!std::same_as<bits_type, void>, "Unsupported bits_type.");
 
-      static inline constexpr size_t next_multiple(size_t const value) noexcept 
-      {
+    static inline constexpr size_t next_multiple(size_t const value) noexcept
+    {
         return (value + bits_per_iterations - 1u) & ~(bits_per_iterations - 1u);
     }
 
